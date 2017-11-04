@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             fab2.startAnimation(fab_close);
             fab1.setClickable(false);
             fab2.setClickable(false);
-            isFabOpen = false;
+            isFabOpen = false; 
             Log.d("Raj", "close");
 
         } else {
