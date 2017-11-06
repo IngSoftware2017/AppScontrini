@@ -1,6 +1,7 @@
 package gruppo2.ocrcomponent;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -21,6 +22,24 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("gruppo2.ocrcomponent", appContext.getPackageName());
+        ImageProcessor imgProc = new ImageProcessor(appContext);
+        final DataAnalyzer dataAnalyzer = new DataAnalyzer();
+
+        Bitmap bitmap;
+        // todo: assegnare la bitmap con una foto di uno scontrino.
+
+        //imgProc.addFrame(bitmap);
+        imgProc.getOcrResult(new OnOcrResultReadyListener() {
+            @Override
+            public void onOcrResultReady(OcrResult result) {
+                dataAnalyzer.getTicket(result, new OnTicketReadyListener() {
+                    @Override
+                    public void onTicketReady(Ticket ticket) {
+                        //todo: controllare che i dati contenuti in ticket sono corretti.
+                    }
+                });
+            }
+        });
+
     }
 }
