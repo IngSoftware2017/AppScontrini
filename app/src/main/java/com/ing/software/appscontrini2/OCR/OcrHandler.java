@@ -50,44 +50,6 @@ public class OcrHandler extends Service {
         return null;
     }
 
-    void inspect(Bitmap bitmap) {
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(this).build();
-        try {
-            Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-            SparseArray<TextBlock> origTextBlocks = textRecognizer.detect(frame);
-            List<TextBlock> textBlocks = new ArrayList<>();
-            for (int i = 0; i < origTextBlocks.size(); i++) {
-                TextBlock textBlock = origTextBlocks.valueAt(i);
-                textBlocks.add(textBlock);
-            }
-            Collections.sort(textBlocks, new Comparator<TextBlock>() {
-                @Override
-                public int compare(TextBlock o1, TextBlock o2) {
-                    int diffOfTops = o1.getBoundingBox().top - o2.getBoundingBox().top;
-                    int diffOfLefts = o1.getBoundingBox().left - o2.getBoundingBox().left;
-                    if (diffOfTops != 0) {
-                        return diffOfTops;
-                    }
-                    return diffOfLefts;
-                }
-            });
-
-            StringBuilder detectedText = new StringBuilder();
-            for (TextBlock textBlock : textBlocks) {
-                if (textBlock != null && textBlock.getValue() != null) {
-                    //detectedText.append(textBlock.getValue());
-                    //detectedText.append("\n");
-                    //Log.e("MYAPP", "detected: "+ textBlock.getValue());
-                    Toast toast = Toast.makeText(this, textBlock.getValue(), Toast.LENGTH_LONG);
-                    toast.show();
-                }
-            }
-        }
-        finally {
-            textRecognizer.release();
-        }
-    }
-
     private Bitmap getBitmapFromAsset(String strName)
     {
         AssetManager assetManager = getAssets();
