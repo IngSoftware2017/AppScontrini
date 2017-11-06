@@ -1,6 +1,7 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.Context;
 import android.database.Cursor;
@@ -28,12 +29,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
     public Animation fab_open, fab_close, rotate_forward, rotate_backward;
     public List <Scontrino> list = new LinkedList<Scontrino>();
-
+    public Uri photoURI;
     public boolean isFabOpen = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             fab2.startAnimation(fab_close);
             fab1.setClickable(false);
             fab2.setClickable(false);
-            isFabOpen = false; 
+            isFabOpen = false;
             Log.d("Raj", "close");
 
         } else {
@@ -127,50 +133,17 @@ public class MainActivity extends AppCompatActivity {
     //------- Funzione che scatta foto -------//
     //----------------------------------------//
         static final int REQUEST_TAKE_PHOTO = 1;
-        //Lancio intent fotocamera
+
         private void dispatchTakePictureIntent() {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            // Ensure that there's a camera activity to handle the intent
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                // Create the File where the photo should go
-                File photoFile = null;
-                try {
-                    photoFile = createImageFile();
-                } catch (IOException ex) {
-                    // Error occurred while creating the File
-                }
-                // Continue only if the File was successfully created
-                if (photoFile != null) {
-                    Uri photoURI = FileProvider.getUriForFile(this,
-                            "com.example.android.fileprovider",
-                            photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-                }
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
-        //Creazione file per ospitare la foto scattata
-        String mCurrentPhotoPath;
-        private File createImageFile() throws IOException {
-            // Create an image file name
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            File image = File.createTempFile(
-                    imageFileName,  /* prefix */
-                    ".jpg",         /* suffix */
-                    storageDir      /* directory */
-            );
 
-            // Save a file: path for use with ACTION_VIEW intents
-            mCurrentPhotoPath = image.getAbsolutePath();
-            return image;
-        }
     //----------------------------------------//
     //----------------------------------------//
     //----------------------------------------//
-
-
 
 
     //----------------------------------------//
@@ -188,8 +161,6 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
 
 
-
-
     //----------------------------------------//
     //-----Cattura risultato degli intent-----//
     //----------------------------------------//
@@ -204,17 +175,28 @@ public class MainActivity extends AppCompatActivity {
                 switch (requestCode) {
 
                     //Foto scattata da noi
-                    case (1):
+                    case (REQUEST_TAKE_PHOTO):
+                        Bundle extras = data.getExtras();
+                        Bitmap imageBitmap = (Bitmap) extras.get("data");
+                        savePickedFile(imageBitmap);
                         printLastImage();
-                        //Inserimento nel db
-                        //....
                         break;
 
                     //Foto presa da galleria
-                    case (2):
-                        Uri uri = data.getData();
+                    case (PICK_PHOTO_FOR_AVATAR):
+                        photoURI = data.getData();
+                        //Invoco la libreria che si occupa del resize
+                        CropImage.activity(photoURI)
+                                .start(this);
+                        break;
+
+                    //Gestisco il risultato del Resize
+                    case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
+                        Log.d("Alla", "okoko");
+                        CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                        Uri resultUri = result.getUri();
                         try {
-                            Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                            Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
                             savePickedFile(btm);
                             printLastImage();
                         }catch (Exception e){
@@ -294,8 +276,6 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //----------------------------------------//
     //----------------------------------------//
-
-
 
 
 
