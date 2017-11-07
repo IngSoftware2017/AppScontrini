@@ -14,7 +14,9 @@ public class DataAnalyzer {
     public void getTicket(OcrResult resultInput, OnTicketReadyListener ticketCb) {
         Ticket newTicket = new Ticket();
 
+
         // todo: leggere resultInput e inserire le informazioni in newTicket
+
 
         //per ora chiamiamo il callback in modo sincrono.
         ticketCb.onTicketReady(newTicket);
