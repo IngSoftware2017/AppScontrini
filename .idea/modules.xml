@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://C:\Users\Task\AndroidStudioProjects\ingegneria-software\GestioneScontrini.iml" filepath="C:\Users\Task\AndroidStudioProjects\ingegneria-software\GestioneScontrini.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/ingegneria-software.iml" filepath="$PROJECT_DIR$/ingegneria-software.iml" />
     </modules>
