@@ -1,28 +1,33 @@
 package database;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.net.Uri;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * Represents the ticket and its associated informations
- * @author Marco Olivieri (Team 3)
+ * Created by Federico Taschin on 08/11/2017.
  */
 
-public class Ticket {
+//Entity class of Ticket. Should not be used outside of the database module.
 
-    int ID;     //Unique ID of the ticket
-    Uri fileUri;    //Path associated with the the ticket file stored in the memory
-    BigDecimal amount;
-    String shop;    //Name of the shop in which the ticket was issued
-    Date date;      //Returns the date of the issue of the ticket
-    String title;
+@Entity
+public class TicketEntity {
 
-    public Ticket() {
+    @PrimaryKey(autoGenerate = true)
+    private int ID;     //id univoco del ticket
+    private Uri fileUri;    //percorso di salvataggio associato
+    private BigDecimal amount;  //importo totale
+    private String shop;    //nome del negozio
+    private Date date;  //data del ticket
+    private String title;   //titolo dato al ticket
 
+    public TicketEntity() {
     }
 
-    public Ticket(int id, Uri fileUri, BigDecimal amount, String shop, Date date, String title) {
+    public TicketEntity(int id, Uri fileUri, BigDecimal amount, String shop, Date date, String title) {
         this.ID = id;
         this.amount = amount;
         this.date = date;
