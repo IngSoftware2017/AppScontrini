@@ -19,7 +19,6 @@ public class Ticket {
     String title;
 
     public Ticket() {
-
     }
 
     public Ticket(int id, Uri fileUri, BigDecimal amount, String shop, Date date, String title) {

@@ -10,7 +10,6 @@ import java.util.Date;
 /**
  * Created by Federico Taschin on 08/11/2017.
  */
-
 //Entity class of Ticket. Should not be used outside of the database module.
 
 @Entity
