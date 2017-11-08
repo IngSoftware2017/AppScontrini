@@ -1,4 +1,5 @@
 package com.sw.ing.gestionescontrini;
+import org.junit.Before;
 import org.junit.Test;
 
 import database.DatabaseManager;
@@ -11,21 +12,25 @@ import static org.junit.Assert.*;
 
 public class DatabaseManagerTest {
 
+    DatabaseManager dbm;
+    @Before
+    public void beforeTest(){
+        dbm = new DatabaseManager();
+        DatabaseManager dbm = new DatabaseManager();
+    }
+
     @Test
     public void TicketCreationShouldReturnAFailure(){
-        DatabaseManager dbm = new DatabaseManager();
         assertTrue(dbm.addTicket(new Ticket())==-1);
     }
 
     @Test
     public void TicketUpdateShouldReturnFalse(){
-        DatabaseManager dbm = new DatabaseManager();
         assertFalse(dbm.updateTicket(new Ticket()));
     }
 
     @Test
     public void getAllTicketsShouldReturnEmptyList(){
-        DatabaseManager dbm = new DatabaseManager();
         assertTrue(dbm.getAllTickets().size()==0);
     }
 }
