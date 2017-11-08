@@ -58,6 +58,4 @@ public class DatabaseManager {
         entity.setTitle(ticket.getTitle());
         return entity;
     }
-
-
 }

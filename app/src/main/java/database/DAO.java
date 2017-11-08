@@ -13,7 +13,6 @@ import android.arch.persistence.room.OnConflictStrategy;
 
 @Dao
 public interface DAO {
-
     /* executes the insert query. Inherits the same specifications from Ticket.addTicket(Ticket)     *
      */
     @Insert(onConflict = OnConflictStrategy.FAIL)
