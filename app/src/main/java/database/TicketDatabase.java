@@ -29,7 +29,6 @@ public abstract class TicketDatabase extends RoomDatabase {
                     Room.databaseBuilder(context.getApplicationContext(), TicketDatabase.class, DATABASE_NAME).allowMainThreadQueries().build();
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
-
         }
         return INSTANCE;
     }
