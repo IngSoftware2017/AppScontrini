@@ -5,34 +5,32 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- * Struttura contenente i dati relativi ad una singola foto/documento.
+ * Structure containing information about a single ticket.
  */
 public class Ticket {
 
     /**
-     * Identificatore.
-     * NB: non modificare al di fuori della classe che implementa IDatabase
+     * Database identifier.
      */
     public int ID;
 
     /**
-     * URI associato al file del documento (puo' essere un percorso locale o remoto).
-     * L'oggetto URI puo' essere convertito in stringa con il metodo toString.
+     * URI pointing to the ticket photo (local or remote).
      */
     public URI fileURI;
 
     /**
-     * Titolo del documento
+     * Ticket title
      */
     public String title;
 
     /**
-     * Data del documento.
+     * Purchase date.
      */
     public Date date;
 
     /**
-     * Importo del documento.
+     * Purchase amount.
      */
     public BigDecimal amount;
 }

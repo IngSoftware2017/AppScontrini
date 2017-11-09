@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Struttura contentente il testo non processato + metadati, estratti dall'algoritmo OCR.
+ * Structure containing the unprocessed text + metadata, extracted by OcrAnalyzer.
  */
 public class OcrResult {
 
     /**
-     * Lista di TextBlock
+     * List of TextBlock.
      */
     public List<TextBlock> blockList = new ArrayList<>();
 }

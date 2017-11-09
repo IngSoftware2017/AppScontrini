@@ -33,16 +33,16 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        ImageProcessor imgProc = new ImageProcessor();
-        while (imgProc.initialize(appContext) != 0)
+        OcrAnalyzer ocrAnalyzer = new OcrAnalyzer();
+        while (ocrAnalyzer.initialize(appContext) != 0)
             Thread.sleep(10);
         final DataAnalyzer dataAnalyzer = new DataAnalyzer();
 
 
-        // numero di foto di scontrini
-        int n_imgs = 1;
-        // oggetto usato per bloccare il thread principale finche' tutte le foto sono state processate
-        final CountDownLatch cdl = new CountDownLatch(n_imgs);
+        // number of Tickets
+        int imgsTot = 1;
+        // Object used to lock current thread until all photos are processed.
+        final CountDownLatch cdl = new CountDownLatch(imgsTot);
 
 
         // todo: assegnare la bitmap con una foto di uno scontrino.
@@ -50,7 +50,7 @@ public class ExampleInstrumentedTest {
         Bitmap bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
 
 
-        imgProc.getOcrResult(bitmap, new OnOcrResultReadyListener() {
+        ocrAnalyzer.getOcrResult(bitmap, new OnOcrResultReadyListener() {
             @Override
             public void onOcrResultReady(OcrResult result) {
                 dataAnalyzer.getTicket(result, new OnTicketReadyListener() {
@@ -61,14 +61,14 @@ public class ExampleInstrumentedTest {
                         //todo: controllare che i dati contenuti in ticket sono corretti.
 
 
-                        //decrementa il contatore
+                        //decreases the counter
                         cdl.countDown();
                     }
                 });
             }
         });
 
-        //Blocca il thread. Se il contatore arriva a zero, il thread si sblocca e il test si conclude
+        //Thread lock. If the counter reaches zero, the thread unlocks and the test ends.
         cdl.await();
     }
 }

@@ -1,15 +1,14 @@
 package gruppo2.ocrcomponent;
 
 /**
- * Classe responsabile dell'estrazione di informazioni dai dati.
+ * Class used to extract informations from raw data
  */
 public class DataAnalyzer {
 
     /**
-     * Ottieni un Ticket a partire dai dati contenuti in resultInput.
-     * alcuni campi del ticket possono essere null.
-     * @param resultInput input. Non puo' essere null.
-     * @param ticketCb callback per ottenere il ticket. Non nullo.
+     * Get a Ticket from an OcrResult. Some fields of the new ticket can be null.
+     * @param resultInput OcrResult. Not null.
+     * @param ticketCb callback to get the ticket. Not null.
      */
     public void getTicket(OcrResult resultInput, OnTicketReadyListener ticketCb) {
         Ticket newTicket = new Ticket();
@@ -18,7 +17,7 @@ public class DataAnalyzer {
         // todo: leggere resultInput e inserire le informazioni in newTicket
 
 
-        //per ora chiamiamo il callback in modo sincrono.
+        // for now, let's invoke the callback syncronously.
         ticketCb.onTicketReady(newTicket);
     }
 }

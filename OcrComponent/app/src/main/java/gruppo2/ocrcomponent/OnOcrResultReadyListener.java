@@ -1,13 +1,13 @@
 package gruppo2.ocrcomponent;
 
 /**
- * Interfaccia callback utilizzata per ottenere un OcrResult dalla classe ImageProcessor
+ * Callback interface used to get an OcrResult from OcrAnalyzer.
  */
 public interface OnOcrResultReadyListener {
 
     /**
-     * Ottieni un OcrResult
-     * @param result il nuovo OcrResult. Mai null.
+     * Get an OcrResult
+     * @param result new OcrResult. Never null.
      */
     void onOcrResultReady(OcrResult result);
 }
