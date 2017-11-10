@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini2.OCR;
+package com.ing.software.appscontrini.OCR;
 
 import android.graphics.Bitmap;
 

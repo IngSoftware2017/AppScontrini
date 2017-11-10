@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini2;
+package com.ing.software.appscontrini;
 
 import org.junit.Test;
 

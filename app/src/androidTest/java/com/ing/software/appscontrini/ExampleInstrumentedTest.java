@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini2;
+package com.ing.software.appscontrini;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

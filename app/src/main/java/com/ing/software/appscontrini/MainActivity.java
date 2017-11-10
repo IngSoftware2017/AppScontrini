@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini2;
+package com.ing.software.appscontrini;
 
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -12,7 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.ing.software.appscontrini2.OCR.OcrHandler;
+import com.ing.software.appscontrini.OCR.OcrHandler;
 
 public class MainActivity extends AppCompatActivity {
 
