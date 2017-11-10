@@ -9,7 +9,6 @@ import android.widget.Toast;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.ing.software.appscontrini2.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,8 +31,8 @@ public class OcrAnalyzer {
         analyze(photo, service);
     }
 
+    //Brute force, cerca e mostra tutto a caso
     static void inspect(Bitmap photo, Service service) {
-
         TextRecognizer textRecognizer = new TextRecognizer.Builder(service).build();
         try {
             Frame frame = new Frame.Builder().setBitmap(photo).build();
@@ -71,6 +70,7 @@ public class OcrAnalyzer {
         }
     }
 
+    //Cerca stringhe particolari, con regioni di probabilità custom (WIP)
     static void analyze(Bitmap photo, Service service) {
         TextRecognizer textRecognizer = new TextRecognizer.Builder(service).build();
         try {
@@ -80,25 +80,30 @@ public class OcrAnalyzer {
             for (int i = 0; i < origTextBlocks.size(); i++) {
                 orderedTextBlocks.add(origTextBlocks.valueAt(i));
             }
-            Collections.sort(orderedTextBlocks, new Comparator<TextBlock>() {
-                @Override
-                public int compare(TextBlock o1, TextBlock o2) {
-                    int diffOfTops = o1.getBoundingBox().top - o2.getBoundingBox().top;
-                    int diffOfLefts = o1.getBoundingBox().left - o2.getBoundingBox().left;
-                    if (diffOfTops != 0) {
-                        return diffOfTops;
-                    }
-                    return diffOfLefts;
-                }
-            });
+            orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
             List<RawBlock> rawBlocks = new ArrayList<>();
-            for (TextBlock textBlock : orderedTextBlocks) {
-                rawBlocks.add(new RawBlock(textBlock, photo));
+            int[] borders = OCRUtils.getRectBorders(orderedTextBlocks, photo);
+            int left = borders[0];
+            int right = borders[2];
+            int top = borders[1];
+            int bottom = borders[3];
+            Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
+            String grid = OCRUtils.getPreferredGrid(croppedPhoto);
+
+            frame = new Frame.Builder().setBitmap(croppedPhoto).build();
+            SparseArray<TextBlock> newTextBlocks = textRecognizer.detect(frame);
+            List<TextBlock> newOrderedTextBlocks = new ArrayList<>();
+            for (int i = 0; i < newTextBlocks.size(); i++) {
+                newOrderedTextBlocks.add(newTextBlocks.valueAt(i));
+            }
+            newOrderedTextBlocks = OCRUtils.orderBlocks(newOrderedTextBlocks);
+            for (TextBlock textBlock : newOrderedTextBlocks) {
+                rawBlocks.add(new RawBlock(textBlock, croppedPhoto, grid));
             }
             StringBuilder detectionList = new StringBuilder();
             for (RawBlock rawBlock : rawBlocks) {
-                List<RawText> rawTexts = rawBlock.getRawTexts();
-                for (RawText rawText : rawTexts) {
+                List<RawBlock.RawText> rawTexts = rawBlock.getRawTexts();
+                for (RawBlock.RawText rawText : rawTexts) {
                     detectionList.append(rawText.getDetection())
                             .append("\n");
                 }
