@@ -1,6 +1,8 @@
 package com.ing.software.appscontrini.OCR;
 
 import android.graphics.Bitmap;
+import android.graphics.RectF;
+import android.util.Log;
 
 import com.google.android.gms.vision.text.TextBlock;
 
@@ -25,13 +27,15 @@ public class OCRUtils {
      * @return cropped image
      */
     static Bitmap cropImage(Bitmap photo, int startX, int startY, int endX, int endY) {
-        if (endX < startX || endY < startY)
+        Log.d("UtilsMain.cropImage","Received crop: left " + startX + " top: " + startY + " right: " + endX + " bottom: " + endY);
+        if (endX < startX || endY > startY)
             return null;
-        int width = endX - startX;
-        int height = endY - startY;
-        return Bitmap.createBitmap(photo, startX, startY, width, height);
+        int width = Math.abs(endX - startX);
+        int height = Math.abs(endY - startY);
+        return Bitmap.createBitmap(photo, startX, endY, width, height);
     }
 
+    //Top e bottom sono misurati dall'alto, che due maroni
     /**
      * Get rectangular containing all blocks detected (Temporary method)
      * @param orderedTextBlocks blocks detected
@@ -42,22 +46,26 @@ public class OCRUtils {
         int[] borders = new int[4];
         int left = photo.getWidth();
         int right = 0;
-        int top = 0;
-        int bottom = photo.getHeight();
+        int top = photo.getHeight();
+        int bottom = 0;
         for (TextBlock textBlock : orderedTextBlocks) {
-            if (textBlock.getBoundingBox().left<left)
-                left = textBlock.getBoundingBox().left;
-            if (textBlock.getBoundingBox().right>right)
-                right = textBlock.getBoundingBox().right;
-            if (textBlock.getBoundingBox().bottom<bottom)
-                bottom = textBlock.getBoundingBox().bottom;
-            if (textBlock.getBoundingBox().top>top)
-                top = textBlock.getBoundingBox().top;
+            RectF rectF = new RectF(textBlock.getBoundingBox());
+            if (rectF.left<left)
+                left = Math.round(rectF.left);
+            if (rectF.right>right)
+                right = Math.round(rectF.right);
+            if (rectF.bottom>bottom)
+                bottom = Math.round(rectF.bottom);
+            if (rectF.top<top)
+                top = Math.round(rectF.top);
+            Log.d("UtilsMain.getRectBorder","Value " + textBlock.getValue());
+            Log.d("UtilsMain.getRectBorder","Temp rect: left " + rectF.left + " top: " + Math.round(rectF.top) + " right: " + rectF.right + " bottom: " + Math.round(rectF.bottom));
         }
         borders[0] = left;
-        borders[1] = top;
+        borders[1] = photo.getHeight() - top;
         borders[2] = right;
-        borders[3] = bottom;
+        borders[3] = photo.getHeight() - bottom;
+        Log.d("UtilsMain.getRectBorder","New rect: left " + left + " top: " + top + " right: " + right + " bottom: " + bottom);
         return borders;
     }
 
@@ -80,6 +88,7 @@ public class OCRUtils {
                 preferredRatio = ProbGrid.gridMap.get(testratio);
             }
         }
+        Log.d("UtilsMain.getPrefGrid","Ratio is: " + ratio + " Grid is: " + preferredRatio);
         return preferredRatio;
     }
 

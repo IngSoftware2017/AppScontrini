@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +26,11 @@ public class OcrHandler extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //TODO do something useful
-        Bitmap test = getBitmapFromAsset("test.png");
+        //TODO use cloud files
+        Bitmap test = getBitmapFromAsset("5.jpg");
+        if (test!=null) {
+            Log.e("ocrhandler", "image not null");
+        }
         OcrAnalyzer.execute(test, this);
         return Service.START_NOT_STICKY;
     }

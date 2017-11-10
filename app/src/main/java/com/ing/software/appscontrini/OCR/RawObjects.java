@@ -92,7 +92,7 @@ class RawBlock {
         }
 
         /**
-         * Check if in current textbox is in a probability region, if yes checks if amount is present
+         * Check if current textbox is in a probability region, if yes checks if amount is present
          * @return string with detected amount, null if nothing found
          */
         private String findAmount() {

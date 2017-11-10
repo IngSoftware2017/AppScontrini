@@ -28,6 +28,7 @@ public class OcrAnalyzer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        Log.d("OcrAnalyzer.execute:" , "Starting analyzing" );
         analyze(photo, service);
     }
 
@@ -42,6 +43,7 @@ public class OcrAnalyzer {
                 TextBlock textBlock = origTextBlocks.valueAt(i);
                 textBlocks.add(textBlock);
             }
+            Log.d("analyze:" , " E qui... " + origTextBlocks.size() + " ordered: " + textBlocks.size());
             Collections.sort(textBlocks, new Comparator<TextBlock>() {
                 @Override
                 public int compare(TextBlock o1, TextBlock o2) {
@@ -80,8 +82,9 @@ public class OcrAnalyzer {
             for (int i = 0; i < origTextBlocks.size(); i++) {
                 orderedTextBlocks.add(origTextBlocks.valueAt(i));
             }
+            Log.d("OcrAnalyzer.analyze:" , "Blocks detected");
             orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
-            List<RawBlock> rawBlocks = new ArrayList<>();
+            Log.d("OcrAnalyzer.analyze:" , "Blocks ordered");
             int[] borders = OCRUtils.getRectBorders(orderedTextBlocks, photo);
             int left = borders[0];
             int right = borders[2];
@@ -89,6 +92,7 @@ public class OcrAnalyzer {
             int bottom = borders[3];
             Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
             String grid = OCRUtils.getPreferredGrid(croppedPhoto);
+            Log.d("OcrAnalyzer.analyze:" , "Photo cropped");
 
             frame = new Frame.Builder().setBitmap(croppedPhoto).build();
             SparseArray<TextBlock> newTextBlocks = textRecognizer.detect(frame);
@@ -97,9 +101,12 @@ public class OcrAnalyzer {
                 newOrderedTextBlocks.add(newTextBlocks.valueAt(i));
             }
             newOrderedTextBlocks = OCRUtils.orderBlocks(newOrderedTextBlocks);
+            Log.d("OcrAnalyzer.analyze:" , "New Blocks ordered");
+            List<RawBlock> rawBlocks = new ArrayList<>();
             for (TextBlock textBlock : newOrderedTextBlocks) {
                 rawBlocks.add(new RawBlock(textBlock, croppedPhoto, grid));
             }
+            //NOT IMPLEMENTED CUSTOM SEARCH YET
             StringBuilder detectionList = new StringBuilder();
             for (RawBlock rawBlock : rawBlocks) {
                 List<RawBlock.RawText> rawTexts = rawBlock.getRawTexts();
