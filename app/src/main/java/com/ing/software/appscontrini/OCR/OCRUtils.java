@@ -114,4 +114,20 @@ public class OCRUtils {
         });
         return textBlocks;
     }
+
+    /**
+     * Returns a rect with maxed width
+     * @param rect source rect
+     * @param photo source photo for max width
+     * @return rect with max width
+     */
+    static RectF getExtendedRect(RectF rect, Bitmap photo) {
+        float top = rect.top;
+        float bottom = rect.bottom;
+        float left = 0;
+        float right = photo.getWidth();
+        RectF rectF = new RectF(left, top, right, bottom);
+        Log.d("UtilsMain.getExtendRect","Extended rect: left " + rectF.left + " top: " + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
+        return rectF;
+    }
 }

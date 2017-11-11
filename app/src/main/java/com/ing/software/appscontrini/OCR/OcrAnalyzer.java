@@ -133,11 +133,11 @@ public class OcrAnalyzer {
                 + "; " + targetText.getRect().top + "; " + targetText.getRect().right + "; "+ targetText.getRect().bottom + ".");
             }
 
-            //BRUTE SEARCH TEST CONTINUOS
+            //BRUTE SEARCH TEST CONTINUOUS
             List<RawBlock.RawText> targetTextList = new ArrayList<>();
             for (RawBlock rawBlock : rawBlocks) {
                 List<RawBlock.RawText> tempTextList = new ArrayList<>();
-                tempTextList = rawBlock.bruteSearchContinuos(testString);
+                tempTextList = rawBlock.bruteSearchContinuous(testString);
                 if (tempTextList != null) {
                     for (int i = 0; i < tempTextList.size(); i++) {
                         targetTextList.add(tempTextList.get(i));
@@ -149,6 +149,33 @@ public class OcrAnalyzer {
                     Log.d("OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getDetection());
                     Log.d("OcrAnalyzer", "Target text is at (left, top, right, bottom): " + text.getRect().left
                             + "; " + text.getRect().top + "; " + text.getRect().right + "; " + text.getRect().bottom + ".");
+                }
+            }
+
+            //BRUTE SEARCH TEST CONTINUOUS WITH AMOUNT
+            targetTextList = new ArrayList<>();
+            List<RawBlock.RawText> resultTexts = new ArrayList<>();
+            int testpercentage = 100;
+            for (RawBlock rawBlock : rawBlocks) {
+                List<RawBlock.RawText> tempTextList = new ArrayList<>();
+                tempTextList = rawBlock.bruteSearchContinuous(testString);
+                if (tempTextList != null) {
+                    for (int i = 0; i < tempTextList.size(); i++) {
+                        targetTextList.add(tempTextList.get(i));
+                        List<RawBlock.RawText> tempResultList = rawBlock.findByPosition(OCRUtils.getExtendedRect(tempTextList.get(i).getRect(), croppedPhoto), testpercentage);
+                        if (tempResultList!=null) {
+                            for (int j = 0; j < tempResultList.size(); j++)
+                            {
+                                resultTexts.add(tempResultList.get(j));
+                            }
+                        }
+                    }
+                }
+            }
+            if (resultTexts.size() >0) {
+                for (RawBlock.RawText text : resultTexts) {
+                    Log.d("OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getDetection());
+
                 }
             }
         }
