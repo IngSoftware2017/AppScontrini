@@ -28,8 +28,8 @@ public class OcrHandler extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO use cloud files
         Bitmap test = getBitmapFromAsset("5.jpg");
-        if (test!=null) {
-            Log.e("ocrhandler", "image not null");
+        if (test==null) {
+            Log.e("OcrHandler", "Received null image");
         }
         OcrAnalyzer.execute(test, this);
         return Service.START_NOT_STICKY;

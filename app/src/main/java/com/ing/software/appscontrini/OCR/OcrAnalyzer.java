@@ -22,7 +22,7 @@ import java.util.List;
 public class OcrAnalyzer {
 
     static void execute(Bitmap photo, Service service) {
-        inspect(photo, service);
+        //inspect(photo, service);
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -114,8 +114,8 @@ public class OcrAnalyzer {
                     detectionList.append(rawText.getDetection())
                             .append("\n");
                 }
-                detectionList.append("\n");
             }
+            Log.e("OcrAnalyzer", "detected: "+ detectionList);
             Toast toast = Toast.makeText(service, detectionList, Toast.LENGTH_LONG);
             toast.show();
         }
