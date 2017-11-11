@@ -71,6 +71,36 @@ class RawBlock {
         return null;
     }
 
+    /**
+     * Search string in block, only first occurrence is returned (top -> bottom, left -> right)
+     * @param string string to search
+     * @return RawText containing the string, null if nothing found
+     */
+    RawText bruteSearch(String string) {
+        for (RawText rawText : rawTexts) {
+            if (rawText.bruteSearch(string))
+                return rawText;
+        }
+        return null;
+    }
+
+    /**
+     * Search string in blockall occurrecnces are returned returned (top -> bottom, left -> right)
+     * @param string string to search
+     * @return list of RawText containing the string, null if nothing found
+     */
+    List<RawText> bruteSearchContinuos(String string) {
+        List<RawText> rawTextList = new ArrayList<>();
+        for (RawText rawText : rawTexts) {
+            if (rawText.bruteSearch(string))
+                rawTextList.add(rawText);
+        }
+        if (rawTextList.size()>0)
+            return rawTextList;
+        else
+            return null;
+    }
+
     class RawText {
 
         private RectF rectText;
@@ -89,6 +119,10 @@ class RawBlock {
 
         String getDetection() {
             return text.getValue();
+        }
+
+        RectF getRect() {
+            return rectText;
         }
 
         /**
@@ -131,6 +165,18 @@ class RawBlock {
         private boolean checkAmountPresent() {
             String amount = getDetection();
             if (amount.contains("TOTALE"))
+                return true;
+            else
+                return false;
+        }
+
+        /**
+         * Search string in text
+         * @param string string to search
+         * @return true if string is present
+         */
+        private boolean bruteSearch(String string) {
+            if (text.getValue().contains(string))
                 return true;
             else
                 return false;

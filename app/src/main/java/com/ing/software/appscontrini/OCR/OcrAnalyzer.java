@@ -24,7 +24,7 @@ public class OcrAnalyzer {
     static void execute(Bitmap photo, Service service) {
         //inspect(photo, service);
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -115,9 +115,42 @@ public class OcrAnalyzer {
                             .append("\n");
                 }
             }
-            Log.e("OcrAnalyzer", "detected: "+ detectionList);
+            Log.d("OcrAnalyzer", "detected: "+ detectionList);
             Toast toast = Toast.makeText(service, detectionList, Toast.LENGTH_LONG);
             toast.show();
+
+            //BRUTE SEARCH TEST
+            String testString = "TOTALE";
+            RawBlock.RawText targetText = null;
+            for (RawBlock rawBlock : rawBlocks) {
+                targetText = rawBlock.bruteSearch(testString);
+                if (targetText != null)
+                    break;
+            }
+            if (targetText != null) {
+                Log.d("OcrAnalyzer", "Found first target string: "+ testString + " \nat: " + targetText.getDetection());
+                Log.d("OcrAnalyzer", "Target text is at (left, top, right, bottom): "+ targetText.getRect().left
+                + "; " + targetText.getRect().top + "; " + targetText.getRect().right + "; "+ targetText.getRect().bottom + ".");
+            }
+
+            //BRUTE SEARCH TEST CONTINUOS
+            List<RawBlock.RawText> targetTextList = new ArrayList<>();
+            for (RawBlock rawBlock : rawBlocks) {
+                List<RawBlock.RawText> tempTextList = new ArrayList<>();
+                tempTextList = rawBlock.bruteSearchContinuos(testString);
+                if (tempTextList != null) {
+                    for (int i = 0; i < tempTextList.size(); i++) {
+                        targetTextList.add(tempTextList.get(i));
+                    }
+                }
+            }
+            if (targetTextList.size() >0) {
+                for (RawBlock.RawText text : targetTextList) {
+                    Log.d("OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getDetection());
+                    Log.d("OcrAnalyzer", "Target text is at (left, top, right, bottom): " + text.getRect().left
+                            + "; " + text.getRect().top + "; " + text.getRect().right + "; " + text.getRect().bottom + ".");
+                }
+            }
         }
         finally {
             textRecognizer.release();
