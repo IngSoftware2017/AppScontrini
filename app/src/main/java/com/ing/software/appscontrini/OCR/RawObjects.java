@@ -112,8 +112,10 @@ class RawBlock {
         List<RawText> rawTextList = new ArrayList<>();
         RectF newRect = extendRect(rect, percent);
         for (RawText rawText : rawTexts) {
-            if (rawText.isInside(newRect))
+            if (rawText.isInside(newRect)) {
                 rawTextList.add(rawText);
+                Log.d("OcrAnalyzer", "Found target rect: " + rawText.getDetection());
+            }
         }
         if (rawTextList.size()>0)
             return rawTextList;

@@ -121,6 +121,7 @@ public class OcrAnalyzer {
 
             //BRUTE SEARCH TEST
             String testString = "TOTALE";
+            //String testString = "24";
             RawBlock.RawText targetText = null;
             for (RawBlock rawBlock : rawBlocks) {
                 targetText = rawBlock.bruteSearch(testString);
@@ -153,30 +154,22 @@ public class OcrAnalyzer {
             }
 
             //BRUTE SEARCH TEST CONTINUOUS WITH AMOUNT
-            targetTextList = new ArrayList<>();
+            //usiamo il targetTextList di BRUTE SEARCH TEST CONTINUOUS
             List<RawBlock.RawText> resultTexts = new ArrayList<>();
             int testpercentage = 100;
             for (RawBlock rawBlock : rawBlocks) {
-                List<RawBlock.RawText> tempTextList = new ArrayList<>();
-                tempTextList = rawBlock.bruteSearchContinuous(testString);
-                if (tempTextList != null) {
-                    for (int i = 0; i < tempTextList.size(); i++) {
-                        targetTextList.add(tempTextList.get(i));
-                        List<RawBlock.RawText> tempResultList = rawBlock.findByPosition(OCRUtils.getExtendedRect(tempTextList.get(i).getRect(), croppedPhoto), testpercentage);
-                        if (tempResultList!=null) {
-                            for (int j = 0; j < tempResultList.size(); j++)
-                            {
-                                resultTexts.add(tempResultList.get(j));
-                            }
+                for (RawBlock.RawText rawText : targetTextList) {
+                    List<RawBlock.RawText> tempResultList = rawBlock.findByPosition(OCRUtils.getExtendedRect(rawText.getRect(), croppedPhoto), testpercentage);
+                    if (tempResultList != null) {
+                        for (int j = 0; j < tempResultList.size(); j++) {
+                            resultTexts.add(tempResultList.get(j));
+                            Log.d("OcrAnalyzer", "Found target string in: " + rawText.getDetection() + "\nwith value: " + tempResultList.get(j).getDetection());
                         }
                     }
                 }
             }
-            if (resultTexts.size() >0) {
-                for (RawBlock.RawText text : resultTexts) {
-                    Log.d("OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getDetection());
-
-                }
+            if (resultTexts.size() ==0) {
+                Log.d("OcrAnalyzer", "Nothing found ");
             }
         }
         finally {

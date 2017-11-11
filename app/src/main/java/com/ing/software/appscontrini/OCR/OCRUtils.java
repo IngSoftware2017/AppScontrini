@@ -59,8 +59,8 @@ public class OCRUtils {
                 bottom = Math.round(rectF.bottom);
             if (rectF.top<top)
                 top = Math.round(rectF.top);
-            Log.d("UtilsMain.getRectBorder","Value " + textBlock.getValue());
-            Log.d("UtilsMain.getRectBorder","Temp rect: left " + rectF.left + " top: " + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
+            //Log.d("UtilsMain.getRectBorder","Value " + textBlock.getValue());
+            //Log.d("UtilsMain.getRectBorder","Temp rect: left " + rectF.left + " top: " + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
         }
         borders[0] = left;
         borders[1] = top;
