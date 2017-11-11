@@ -1,55 +1,27 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaScannerConnection;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import static android.R.attr.bitmap;
-import static com.example.nicoladalmaso.gruppo1.R.id.container;
-import static com.example.nicoladalmaso.gruppo1.R.styleable.View;
 
 public class MainActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
@@ -61,6 +33,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initializeComponents();
+    }
+
+    //Gestione delle animazioni e visualizzazione delle foto salvate precedentemente
+    public void initializeComponents(){
         printAllImages();
         fab = (FloatingActionButton)findViewById(R.id.fab);
         fab1 = (FloatingActionButton)findViewById(R.id.fab1);
@@ -74,32 +51,18 @@ public class MainActivity extends AppCompatActivity {
                 animateFAB();
             }
         });
+        //Camera button
         fab1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dispatchTakePictureIntent();
             }
         });
+        //Gallery button
         fab2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                pickImage();
+                pickImageFromGallery();
             }
         });
-
-        //Esempio aggiunta record a db
-
-        /* DbManager db = new DbManager(this);
-        db.addRecord("ID della foto", getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString(), "Descrizione della foto", "Data della foto");
-        Cursor  cursor = db.query(); */
-
-    }
-
-    //Aggiunge una card alla lista
-    //Accetta come input 2 string contenenti il titolo e la descrizione dello scontrino
-    public void addToList(String title, String desc, Bitmap img){
-        list.add(new Scontrino(title, desc, img));
-        ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
-        listView.setAdapter(adapter);
     }
 
     //Animazioni per il Floating Action Button (FAB)
@@ -128,6 +91,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Aggiunge una card alla lista
+    //Accetta come input 2 string contenenti il titolo e la descrizione dello scontrino
+    public void addToList(String title, String desc, Bitmap img){
+        list.add(new Scontrino(title, desc, img));
+        ListView listView = (ListView)findViewById(R.id.list1);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        listView.setAdapter(adapter);
+    }
+
 
     //----------------------------------------//
     //------- Funzione che scatta foto -------//
@@ -151,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
         public static final int PICK_PHOTO_FOR_AVATAR = 2;
 
-        public void pickImage() {
+        public void pickImageFromGallery() {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
             startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
@@ -252,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Files", "Size: "+ files.length);
             return files;
         }
+
         //Stampa tutte le immagini
         private void printAllImages(){
             File[] files = readAllImages();
@@ -263,12 +236,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+
         //Stampa l'ultima foto
         private void printLastImage(){
             File[] files = readAllImages();
             Bitmap myBitmap = BitmapFactory.decodeFile(files[files.length-1].getAbsolutePath());
             addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
         }
+
         //Stampa il bitmap passato (Solo per testing)
         private void printThisBitmap(Bitmap myBitmap){
             addToList("Print this bitmap", "Descrizione della foto", myBitmap);
