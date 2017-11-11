@@ -16,16 +16,30 @@ import java.util.Date;
 public class TicketEntity {
 
     @PrimaryKey(autoGenerate = true)
-    private int ID;     //id univoco del ticket
-    private Uri fileUri;    //percorso di salvataggio associato
-    private BigDecimal amount;  //importo totale
-    private String shop;    //nome del negozio
-    private Date date;  //data del ticket
-    private String title;   //titolo dato al ticket
+    private int ID;
 
+    private Uri fileUri;
+    private BigDecimal amount;
+    private String shop;
+    private Date date;
+    private String title;
+
+    /**
+     * Non parametric constructor
+     */
     public TicketEntity() {
     }
 
+    /**
+     * Parametric constructor
+     *
+     * @param id Unique ID of the ticket
+     * @param fileUri Path associated with the the ticket file stored in the memory
+     * @param amount total amount
+     * @param shop Name of the shop in which the ticket was issued
+     * @param date the issue date of the ticket
+     * @param title name given
+     */
     public TicketEntity(int id, Uri fileUri, BigDecimal amount, String shop, Date date, String title) {
         this.ID = id;
         this.amount = amount;
