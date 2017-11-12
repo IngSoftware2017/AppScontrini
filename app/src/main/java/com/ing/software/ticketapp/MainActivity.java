@@ -1,5 +1,6 @@
 package com.ing.software.ticketapp;
 
+
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -15,8 +16,6 @@ import android.widget.TextView;
 import com.ing.software.ticketapp.OCR.OcrHandler;
 
 public class MainActivity extends AppCompatActivity {
-
-    private ServiceConnection serviceConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
