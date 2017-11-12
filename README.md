@@ -32,7 +32,7 @@ I metodi realizzati finora sono abbastanza basilari:
 	Restituisce una lista contenente sia i Text con la stringa (che ovviamente sono contenuti nel rettangolo esteso), sia eventuali altri Text contenuti nel rettangolo esteso.
 	La lista è non ordinata, nel senso i Text individuati in uno stesso rettangolo esteso sono "vicini", ma seguono l'ordinamento dei blocchi.
 
-##TO DO	
+## TO DO	
 * Inserire ordinamento per Text (è già scritto basta implementarlo)
 * Utilizzare griglie di decisione
 	
