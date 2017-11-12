@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini.OCR;
+package com.ing.software.ticketapp.OCR;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;

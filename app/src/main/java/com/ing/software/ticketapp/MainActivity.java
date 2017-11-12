@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini;
+package com.ing.software.ticketapp;
 
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -12,7 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.ing.software.appscontrini.OCR.OcrHandler;
+import com.ing.software.ticketapp.OCR.OcrHandler;
 
 public class MainActivity extends AppCompatActivity {
 

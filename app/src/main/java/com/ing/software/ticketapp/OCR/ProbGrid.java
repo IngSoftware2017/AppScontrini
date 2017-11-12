@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini.OCR;
+package com.ing.software.ticketapp.OCR;
 
 
 import java.util.HashMap;

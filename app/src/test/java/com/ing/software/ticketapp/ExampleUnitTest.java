@@ -1,4 +1,4 @@
-package com.ing.software.appscontrini;
+package com.ing.software.ticketapp;
 
 import org.junit.Test;
 
