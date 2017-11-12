@@ -14,7 +14,6 @@ import android.content.Context;
 
 @Database(entities = {TicketEntity.class}, version = 1)
 public abstract class TicketDatabase extends RoomDatabase {
-    private static final String DATABASE_NAME = "ticket-database";
 
     private static TicketDatabase INSTANCE; //Unique instance of the Database object
     public abstract DAO ticketDao(); //returns the DAO object that contains query methods. This method is automatically implemented by Room library
@@ -25,19 +24,18 @@ public abstract class TicketDatabase extends RoomDatabase {
      */
     public static TicketDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
-            INSTANCE =
-                    Room.databaseBuilder(context.getApplicationContext(), TicketDatabase.class, DATABASE_NAME).allowMainThreadQueries().build();
-                            // allow queries on the main thread.
-                            // Don't do this on a real app! See PersistenceBasicSample for an example.
+            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TicketDatabase.class, DatabaseConstants.DATABASE_NAME)
+                            .allowMainThreadQueries().build();
         }
         return INSTANCE;
     }
-    //Destroys the Database instance (by setting it to null). getAppDatabase(context) must be called before using the saved instance of Database again
+    /**Destroys the Database instance (by setting it to null). getAppDatabase(context) must be called before using the saved instance of Database again
+    **/
     public static void destroyInstance() {
         INSTANCE = null;
     }
 
-    //pecifications for this methods will arrive, do not use for now
+    //Specifications for this methods will arrive, do not use for now
     @Override
     protected SupportSQLiteOpenHelper createOpenHelper(DatabaseConfiguration config) {
         return null;
