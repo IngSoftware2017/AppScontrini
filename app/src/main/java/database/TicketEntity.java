@@ -1,5 +1,6 @@
 package database;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.net.Uri;
@@ -12,10 +13,10 @@ import java.util.Date;
  */
 //Entity class of Ticket. Should not be used outside of the database module.
 
-@Entity
+@Entity(tableName = DatabaseConstants.TICKET_TABLE_NAME)
 public class TicketEntity {
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = DatabaseConstants.TICKET_PRIMARY_KEY_NAME)
     private int ID;
 
     private Uri fileUri;
