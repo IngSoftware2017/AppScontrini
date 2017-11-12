@@ -1,6 +1,6 @@
 package com.ing.software.appscontrini.OCR;
 
-import android.app.Service;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.SparseArray;
@@ -22,26 +22,26 @@ public class OcrAnalyzer {
     /**
      * Test method for analysis
      * @param photo source photo to analyze
-     * @param service main service for the detector to run
+     * @param context main context for the detector to run
      */
-    static void execute(Bitmap photo, Service service) {
+    static void execute(Bitmap photo, Context context) {
         Log.d("OcrAnalyzer.execute:" , "Starting analyzing" );
-        analyzeSingleText(photo, service);
+        analyzeSingleText(photo, context);
         String testString = "TOTALE";
         int testPrecision = 100;
-        analyzeBruteFirstString(photo, service, testString);
-        analyzeBruteContinuousString(photo, service, testString);
-        analyzeBruteContHorizValue(photo, service, testString, testPrecision);
+        analyzeBruteFirstString(photo, context, testString);
+        analyzeBruteContinuousString(photo, context, testString);
+        analyzeBruteContHorizValue(photo, context, testString, testPrecision);
     }
 
     /**
      * Analyze a photo and returns everything it could decode
      * @param photo photo to analyze
-     * @param service main service for the detector to run
+     * @param context main context for the detector to run
      * @return string containing everything it found
      */
-    static String analyzeSingleText(Bitmap photo, Service service) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, service);
+    static String analyzeSingleText(Bitmap photo, Context context) {
+        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
         Log.d("OcrAnalyzer.analyzeST:" , "Blocks detected");
         orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
         Log.d("OcrAnalyzer.analyzeST:" , "Blocks ordered");
@@ -53,7 +53,7 @@ public class OcrAnalyzer {
         Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyzeST:" , "Photo cropped");
-        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, service);
+        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
         newOrderedTextBlocks = OCRUtils.orderBlocks(newOrderedTextBlocks);
         Log.d("OcrAnalyzer.analyzeST:" , "New Blocks ordered");
         List<RawBlock> rawBlocks = new ArrayList<>();
@@ -75,12 +75,12 @@ public class OcrAnalyzer {
     /**
      * Search for first occurrence of a string in chosen photo. Order is top->bottom, left->right
      * @param photo photo to analyze
-     * @param service main service for the detector to run
+     * @param context main context for the detector to run
      * @param testString string to search
      * @return string containing first RawBlock.RawText where it found the string
      */
-    static String analyzeBruteFirstString(Bitmap photo, Service service, String testString) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, service);
+    static String analyzeBruteFirstString(Bitmap photo, Context context, String testString) {
+        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
         Log.d("OcrAnalyzer.analyzeBFS:" , "Blocks detected");
         orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
         Log.d("OcrAnalyzer.analyzeBFS:" , "Blocks ordered");
@@ -92,7 +92,7 @@ public class OcrAnalyzer {
         Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyzeBFS:" , "Photo cropped");
-        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, service);
+        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
         newOrderedTextBlocks = OCRUtils.orderBlocks(newOrderedTextBlocks);
         Log.d("OcrAnalyzer.analyzeBFS:" , "New Blocks ordered");
         List<RawBlock> rawBlocks = new ArrayList<>();
@@ -116,12 +116,12 @@ public class OcrAnalyzer {
     /**
      * Search for all occurrences of a string in chosen photo. Order is top->bottom, left->right
      * @param photo photo to analyze
-     * @param service main service for the detector to run
+     * @param context main context for the detector to run
      * @param testString string to search
      * @return list of all RawBlock.RawText where it found the string
      */
-    static List<RawBlock.RawText> analyzeBruteContinuousString(Bitmap photo, Service service, String testString) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, service);
+    static List<RawBlock.RawText> analyzeBruteContinuousString(Bitmap photo, Context context, String testString) {
+        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
         Log.d("OcrAnalyzer.analyze:" , "Blocks detected");
         orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
         Log.d("OcrAnalyzer.analyze:" , "Blocks ordered");
@@ -133,7 +133,7 @@ public class OcrAnalyzer {
         Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyze:" , "Photo cropped");
-        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, service);
+        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
         newOrderedTextBlocks = OCRUtils.orderBlocks(newOrderedTextBlocks);
         Log.d("OcrAnalyzer.analyze:" , "New Blocks ordered");
         List<RawBlock> rawBlocks = new ArrayList<>();
@@ -164,13 +164,13 @@ public class OcrAnalyzer {
      * Searches for all occurrences of a string in chosen photo, then retrieves also text with similar
      * distance from top and bottom. Max difference from string detection is defined by precision. Order is top->bottom, left->right
      * @param photo photo to analyze
-     * @param service main service for the detector to run
+     * @param context main context for the detector to run
      * @param testString string to search
      * @param precision int > 0 percentage of the height of detected RawText to extend. See RawBlock.extendRect().
      * @return list of all RawBlock.RawText where it found the string and with similar distance from top and bottom.
      */
-    static List<RawBlock.RawText> analyzeBruteContHorizValue(Bitmap photo, Service service, String testString, int precision) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, service);
+    static List<RawBlock.RawText> analyzeBruteContHorizValue(Bitmap photo, Context context, String testString, int precision) {
+        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
         Log.d("OcrAnalyzer.analyze:" , "Blocks detected");
         orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
         Log.d("OcrAnalyzer.analyze:" , "Blocks ordered");
@@ -182,7 +182,7 @@ public class OcrAnalyzer {
         Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyze:" , "Photo cropped");
-        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, service);
+        List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
         newOrderedTextBlocks = OCRUtils.orderBlocks(newOrderedTextBlocks);
         Log.d("OcrAnalyzer.analyze:" , "New Blocks ordered");
         List<RawBlock> rawBlocks = new ArrayList<>();
@@ -234,12 +234,12 @@ public class OcrAnalyzer {
     /**
      * Starts and closes a TextRecognizer on chosen photo
      * @param photo photo to analyze
-     * @param service main service for the detector to run
+     * @param context main context for the detector to run
      * @return list of all blocks found
      */
-    static List<TextBlock> initAnalysis(Bitmap photo, Service service) {
+    static List<TextBlock> initAnalysis(Bitmap photo, Context context) {
         SparseArray<TextBlock> origTextBlocks;
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(service).build();
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
         try {
             Frame frame = new Frame.Builder().setBitmap(photo).build();
             origTextBlocks = textRecognizer.detect(frame);
