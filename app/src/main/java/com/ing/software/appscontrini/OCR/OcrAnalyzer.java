@@ -237,7 +237,7 @@ public class OcrAnalyzer {
      * @param context main context for the detector to run
      * @return list of all blocks found
      */
-    static List<TextBlock> initAnalysis(Bitmap photo, Context context) {
+    private static List<TextBlock> initAnalysis(Bitmap photo, Context context) {
         SparseArray<TextBlock> origTextBlocks;
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
         try {
