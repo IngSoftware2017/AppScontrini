@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 
-import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -26,6 +25,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
+    /*
     @Test
     public void useAppContext() throws Exception {
         // Context of the app under test.
@@ -69,4 +69,5 @@ public class ExampleInstrumentedTest {
         //Thread lock. If the counter reaches zero, the thread unlocks and the test ends.
         cdl.await();
     }
+    */
 }
