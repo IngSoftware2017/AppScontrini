@@ -16,7 +16,7 @@ import android.content.Context;
 public abstract class TicketDatabase extends RoomDatabase {
 
     private static TicketDatabase INSTANCE; //Unique instance of the Database object
-    public abstract DAO ticketDao(); //returns the DAO object that contains query methods. This method is automatically implemented by Room library
+    protected abstract DAO ticketDao(); //returns the DAO object that contains query methods. This method is automatically implemented by Room library
 
     /* Creates the unique instance of the Database object.
      * @param context not null, Context of the Activity that calls this method.
