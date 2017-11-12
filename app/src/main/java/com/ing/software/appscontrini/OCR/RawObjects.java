@@ -12,20 +12,25 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * WIP
- * WIP
- * WIP
- * WIP
+ * Class to store objects detected.
+ * Contains useful methods and variables that TextBlock does not provide.
+ * @author Michelon
  */
 class RawBlock {
 
-    private ArrayList<RawText> rawTexts = new ArrayList<>();
+    private List<RawText> rawTexts = new ArrayList<>();
     private List<? extends Text> textComponents;
     private RectF rectF;
     private int imageWidth;
     private int imageHeigth;
     private String grid;
 
+    /**
+     * Constructor, parameters must not be null
+     * @param textBlock source TextBlock
+     * @param imageMod source image
+     * @param grid grid from ProbGrid.gridMap
+     */
     RawBlock(TextBlock textBlock, Bitmap imageMod, String grid) {
         rectF = new RectF(textBlock.getBoundingBox());
         imageWidth = imageMod.getWidth();
@@ -35,6 +40,9 @@ class RawBlock {
         initialize();
     }
 
+    /**
+     * Populates this block with its Rawtexts
+     */
     private void initialize() {
         int index = 0;
         for (Text currentText : textComponents) {
@@ -43,11 +51,19 @@ class RawBlock {
         }
     }
 
+    /**
+     * Get rect of this block
+     * @return rect of this block
+     */
     RectF getRect() {
         return rectF;
     }
 
-    ArrayList<RawText> getRawTexts() {
+    /**
+     * Get Rawtexts in this block
+     * @return list of Rawtexts in this block
+     */
+    List<RawText> getRawTexts() {
         return rawTexts;
     }
 
@@ -86,7 +102,7 @@ class RawBlock {
     }
 
     /**
-     * Search string in blockall occurrecnces are returned returned (top -> bottom, left -> right)
+     * Search string in block, all occurrences are returned (top -> bottom, left -> right)
      * @param string string to search
      * @return list of RawText containing the string, null if nothing found
      */
@@ -103,7 +119,7 @@ class RawBlock {
     }
 
     /**
-     * Find all textblocks inside chosen rect with an error of percent (on width and height of chosen rect)
+     * Find all Rawtexts inside chosen rect with an error of 'percent' (on width and height of chosen rect)
      * @param rect rect where you want to find texts
      * @param percent error accepted on chosen rect
      * @return list of RawText in chosen rect, null if nothing found
@@ -125,10 +141,10 @@ class RawBlock {
 
     /**
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
-     * Min value for top and left is 0
+     * Note: Min value for top and left is 0
      * @param rect source rect
      * @param percent chosen percentage
-     * @return new rectangle extended
+     * @return new extended rectangle
      */
     private RectF extendRect(RectF rect, int percent) {
         Log.d("RawObjects.extendRect","Source rect: left " + rect.left + " top: "
@@ -143,36 +159,52 @@ class RawBlock {
             top = 0;
         float right = rect.right + extendedWidth/2;
         float bottom = rect.bottom + extendedHeight/2;
-        Log.d("RawObjects.extendRect","Extended rect: left " + left + " top: " + top + " right: " + right + " bottom: " + bottom);
+        Log.d("RawObjects.extendRect","Extended rect: left " + left + " top: " + top
+                + " right: " + right + " bottom: " + bottom);
         return new RectF(left, top, right, bottom);
     }
 
     class RawText {
 
         private RectF rectText;
-        private int index;
+        private int index; //useless as of now
         private Text text;
 
+        /**
+         * Constructor
+         * @param text current Text inside TextBlock
+         * @param position index of this Text
+         */
         RawText(Text text, int position) {
             rectText = new RectF(text.getBoundingBox());
             this.index = position;
             this.text = text;
         }
 
+        /**
+         * @return index of current Text
+         */
         int getIndex() {
             return index;
         }
 
+        /**
+         * @return string contained in this Text
+         */
         String getDetection() {
             return text.getValue();
         }
 
+        /**
+         * @return rect of this Text
+         */
         RectF getRect() {
             return rectText;
         }
 
         /**
-         * Check if current textbox is in a probability region, if yes checks if amount is present
+         * Check if current Text is in a box of the grid with probability region > 0, if yes
+         * checks if amount is present
          * @return string with detected amount, null if nothing found
          */
         private String findAmount() {
@@ -188,7 +220,7 @@ class RawBlock {
         }
 
         /**
-         * Find box of grid contianing the center of the text rect
+         * Find box of the grid containing the center of the text rect
          * @return coordinates of the grid, where int[0] = column, int[1] = row
          */
         private int[] getGridBox() {
@@ -228,6 +260,11 @@ class RawBlock {
                 return false;
         }
 
+        /**
+         * Check if this text is inside chosen rect
+         * @param rect target rect that could contain this text
+         * @return true if is inside
+         */
         private boolean isInside(RectF rect) {
             return rect.contains(rectText);
         }

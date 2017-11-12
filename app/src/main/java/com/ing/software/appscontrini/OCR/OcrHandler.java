@@ -13,7 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
+ * Temporary class to test analysis in OcrAnalyzer
+ * @author Michelon
  */
 
 public class OcrHandler extends Service {
@@ -27,7 +28,8 @@ public class OcrHandler extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO use cloud files
-        Bitmap test = getBitmapFromAsset("5.jpg");
+        String testPic = "5.jpg";
+        Bitmap test = getBitmapFromAsset(testPic);
         if (test==null) {
             Log.e("OcrHandler", "Received null image");
         }
@@ -42,16 +44,29 @@ public class OcrHandler extends Service {
         return null;
     }
 
+    /**
+     * Get a bitmap from assets folder
+     * @param strName name or path + name of the image (must be present)
+     * @return bitmap of chosen path, null if nothing found
+     */
     private Bitmap getBitmapFromAsset(String strName)
     {
         AssetManager assetManager = getAssets();
         InputStream istr = null;
+        Bitmap bitmap = null;
         try {
             istr = assetManager.open(strName);
+            bitmap = BitmapFactory.decodeStream(istr);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Bitmap bitmap = BitmapFactory.decodeStream(istr);
+        finally {
+            try {
+                istr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return bitmap;
     }
 }

@@ -12,19 +12,20 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Util class
+ * Util class to manage rects, blocks, images
+ * @author Michelon
  */
 
 public class OCRUtils {
 
     /**
-     * Crop image (values start from top and left)
-     * @param photo original photo
-     * @param startX x coordinate of top left point
-     * @param startY y coordinate of top left point
-     * @param endX x coordinate of bottom right point
-     * @param endY y coordinate of bottom right point
-     * @return cropped image
+     * Crop image (values start from top left)
+     * @param photo original photo not null
+     * @param startX x coordinate of top left point, int > 0
+     * @param startY y coordinate of top left point, int > 0
+     * @param endX x coordinate of bottom right point, int > 0
+     * @param endY y coordinate of bottom right point, int > 0
+     * @return cropped image, null if invalid coordinates
      */
     static Bitmap cropImage(Bitmap photo, int startX, int startY, int endX, int endY) {
         Log.d("UtilsMain.cropImage","Received crop: left " + startX + " top: " + startY + " right: " + endX + " bottom: " + endY);
@@ -35,16 +36,17 @@ public class OCRUtils {
         return Bitmap.createBitmap(photo, startX, startY, width, height);
     }
 
-    //Top e bottom sono misurati dall'alto, che due maroni
     /**
-     * Get rectangular containing all blocks detected (Temporary method)
-     * Note: top and bottom start from top
+     * Get rect containing all blocks detected (Temporary method)
+     * Note: counting starts from left and from top (not bottom)
      * @param orderedTextBlocks blocks detected
      * @param photo original photo
      * @return array of int where int[0] = left border, int[1] = top border, int[2] = right border, int[3] = bottom border
      */
     static int[] getRectBorders(List<TextBlock> orderedTextBlocks, Bitmap photo) {
-        int[] borders = new int[4];
+        int numberOfBorders = 4; //it's a rect
+        int[] borders = new int[numberOfBorders];
+        //Extreme borders for chosen photo (will be overwritten in foreach)
         int left = photo.getWidth();
         int right = 0;
         int top = photo.getHeight();
@@ -59,66 +61,85 @@ public class OCRUtils {
                 bottom = Math.round(rectF.bottom);
             if (rectF.top<top)
                 top = Math.round(rectF.top);
-            //Log.d("UtilsMain.getRectBorder","Value " + textBlock.getValue());
-            //Log.d("UtilsMain.getRectBorder","Temp rect: left " + rectF.left + " top: " + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
+            Log.d("UtilsMain.getRectBorder","Value: " + textBlock.getValue());
+            Log.d("UtilsMain.getRectBorder","Temp rect: (left, top, right, bottom): " + rectF.left + "; " + rectF.top + "; " + rectF.right + "; " + rectF.bottom);
         }
         borders[0] = left;
         borders[1] = top;
         borders[2] = right;
         borders[3] = bottom;
-        Log.d("UtilsMain.getRectBorder","New rect: left " + left + " top: " + top + " right: " + right + " bottom: " + bottom);
+        Log.d("UtilsMain.getRectBorder","New rect: (left, top, right, bottom): " + left + "; " + top + "; " + right + "; " + bottom);
         return borders;
     }
 
     /**
      * Get preferred grid according to height/width ratio
      * @param photo original photo
-     * @return preferred ratio defined in ProbGrid
+     * @return preferred ratio defined in ProbGrid, -1 if something went wrong
      */
     static String getPreferredGrid(Bitmap photo) {
-        int width = photo.getWidth();
-        int heigth = photo.getHeight();
-        if (width == 0 || heigth == 0)
-            return null;
-        double ratio = heigth/width;
-        ratio = Math.floor(ratio * 100) / 100;
-        List<Double> availableRatios = new ArrayList<>(ProbGrid.gridMap.keySet());
+        double width = photo.getWidth();
+        double heigth = photo.getHeight();
         String preferredRatio = "-1";
-        double scarto = Double.MAX_VALUE;
-        for(Double testratio : availableRatios) {
-            if (Math.abs(testratio-ratio)<scarto) {
-                scarto = Math.abs(testratio - ratio);
-                preferredRatio = ProbGrid.gridMap.get(testratio);
+        if (width <= 0 || heigth <= 0)
+            return preferredRatio;
+        double ratio = heigth/width;
+        List<Double> availableRatios = new ArrayList<>(ProbGrid.gridMap.keySet());
+        double diff = Double.MAX_VALUE;
+        for(Double testRatio : availableRatios) {
+            if (Math.abs(testRatio-ratio)<diff) {
+                diff = Math.abs(testRatio - ratio);
+                preferredRatio = ProbGrid.gridMap.get(testRatio);
             }
         }
-        Log.d("UtilsMain.getPrefGrid","Ratio is: " + ratio + " Grid is: " + preferredRatio);
+        Log.d("UtilsMain.getPrefGrid","Ratio is: " + ratio + " Grid is: " + preferredRatio + " Diff is: " + diff);
         return preferredRatio;
     }
 
     /**
-     * Order a list from top to bottom, left to right
+     * Order a list of TextBlock from top to bottom, left to right
      * @param textBlocks original list
      * @return ordered list
      */
     static List<TextBlock> orderBlocks(List<TextBlock> textBlocks) {
         Collections.sort(textBlocks, new Comparator<TextBlock>() {
             @Override
-            public int compare(TextBlock o1, TextBlock o2) {
-                int diffOfTops = o1.getBoundingBox().top - o2.getBoundingBox().top;
-                int diffOfLefts = o1.getBoundingBox().left - o2.getBoundingBox().left;
-                if (diffOfTops != 0) {
-                    return diffOfTops;
+            public int compare(TextBlock block1, TextBlock block2) {
+                int diffTops = block1.getBoundingBox().top - block2.getBoundingBox().top;
+                int diffLefts = block1.getBoundingBox().left - block2.getBoundingBox().left;
+                if (diffTops != 0) {
+                    return diffTops;
                 }
-                return diffOfLefts;
+                return diffLefts;
             }
         });
         return textBlocks;
     }
 
     /**
-     * Returns a rect with maxed width
+     * Order a list of RawTexts from top to bottom, left to right
+     * @param rawBlocks original list
+     * @return ordered list
+     */
+    static List<RawBlock.RawText> orderRawTexts(List<RawBlock.RawText> rawBlocks) {
+        Collections.sort(rawBlocks, new Comparator<RawBlock.RawText>() {
+            @Override
+            public int compare(RawBlock.RawText block1, RawBlock.RawText block2) {
+                int diffTops = Math.round(block1.getRect().top - block2.getRect().top);
+                int diffLefts = Math.round(block1.getRect().left - block2.getRect().left);
+                if (diffTops != 0) {
+                    return diffTops;
+                }
+                return diffLefts;
+            }
+        });
+        return rawBlocks;
+    }
+
+    /**
+     * Extends the width of a rect to the max allowed for chosen photo
      * @param rect source rect
-     * @param photo source photo for max width
+     * @param photo source photo (to get max width)
      * @return rect with max width
      */
     static RectF getExtendedRect(RectF rect, Bitmap photo) {
@@ -127,7 +148,8 @@ public class OCRUtils {
         float left = 0;
         float right = photo.getWidth();
         RectF rectF = new RectF(left, top, right, bottom);
-        Log.d("UtilsMain.getExtendRect","Extended rect: left " + rectF.left + " top: " + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
+        Log.d("UtilsMain.getExtendRect","Extended rect: left " + rectF.left + " top: "
+                + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
         return rectF;
     }
 }
