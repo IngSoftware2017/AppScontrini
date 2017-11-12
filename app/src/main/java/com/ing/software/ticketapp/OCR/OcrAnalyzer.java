@@ -102,16 +102,7 @@ public class OcrAnalyzer {
      * @return string containing everything it found
      */
     static String analyzeSingleText(Bitmap photo, Context context) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
-        Log.d("OcrAnalyzer.analyzeST:" , "Blocks detected");
-        orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
-        Log.d("OcrAnalyzer.analyzeST:" , "Blocks ordered");
-        int[] borders = OCRUtils.getRectBorders(orderedTextBlocks, photo);
-        int left = borders[0];
-        int right = borders[2];
-        int top = borders[1];
-        int bottom = borders[3];
-        Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
+        Bitmap croppedPhoto = getCroppedPhoto(photo, context);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyzeST:" , "Photo cropped");
         List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
@@ -141,16 +132,7 @@ public class OcrAnalyzer {
      * @return string containing first RawBlock.RawText where it found the string
      */
     static String analyzeBruteFirstString(Bitmap photo, Context context, String testString) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
-        Log.d("OcrAnalyzer.analyzeBFS:" , "Blocks detected");
-        orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
-        Log.d("OcrAnalyzer.analyzeBFS:" , "Blocks ordered");
-        int[] borders = OCRUtils.getRectBorders(orderedTextBlocks, photo);
-        int left = borders[0];
-        int right = borders[2];
-        int top = borders[1];
-        int bottom = borders[3];
-        Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
+        Bitmap croppedPhoto = getCroppedPhoto(photo, context);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyzeBFS:" , "Photo cropped");
         List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
@@ -182,16 +164,7 @@ public class OcrAnalyzer {
      * @return list of all RawBlock.RawText where it found the string
      */
     static List<RawBlock.RawText> analyzeBruteContinuousString(Bitmap photo, Context context, String testString) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
-        Log.d("OcrAnalyzer.analyze:" , "Blocks detected");
-        orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
-        Log.d("OcrAnalyzer.analyze:" , "Blocks ordered");
-        int[] borders = OCRUtils.getRectBorders(orderedTextBlocks, photo);
-        int left = borders[0];
-        int right = borders[2];
-        int top = borders[1];
-        int bottom = borders[3];
-        Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
+        Bitmap croppedPhoto = getCroppedPhoto(photo, context);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyze:" , "Photo cropped");
         List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
@@ -231,16 +204,7 @@ public class OcrAnalyzer {
      * @return list of all RawBlock.RawText where it found the string and with similar distance from top and bottom.
      */
     static List<RawBlock.RawText> analyzeBruteContHorizValue(Bitmap photo, Context context, String testString, int precision) {
-        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
-        Log.d("OcrAnalyzer.analyze:" , "Blocks detected");
-        orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
-        Log.d("OcrAnalyzer.analyze:" , "Blocks ordered");
-        int[] borders = OCRUtils.getRectBorders(orderedTextBlocks, photo);
-        int left = borders[0];
-        int right = borders[2];
-        int top = borders[1];
-        int bottom = borders[3];
-        Bitmap croppedPhoto = OCRUtils.cropImage(photo, left, top, right, bottom);
+        Bitmap croppedPhoto = getCroppedPhoto(photo, context);
         String grid = OCRUtils.getPreferredGrid(croppedPhoto);
         Log.d("OcrAnalyzer.analyze:" , "Photo cropped");
         List<TextBlock> newOrderedTextBlocks = initAnalysis(croppedPhoto, context);
@@ -252,7 +216,7 @@ public class OcrAnalyzer {
         }
         List<RawBlock.RawText> targetTextList = new ArrayList<>();
         for (RawBlock rawBlock : rawBlocks) {
-            List<RawBlock.RawText> tempTextList = new ArrayList<>();
+            List<RawBlock.RawText> tempTextList;
             tempTextList = rawBlock.bruteSearchContinuous(testString);
             if (tempTextList != null) {
                 for (int i = 0; i < tempTextList.size(); i++) {
@@ -313,5 +277,24 @@ public class OcrAnalyzer {
             orderedTextBlocks.add(origTextBlocks.valueAt(i));
         }
         return orderedTextBlocks;
+    }
+
+    /**
+     * Crops photo using the smallest rect that contains all TextBlock in source photo
+     * @param photo source photo
+     * @param context main context for the detector to run
+     * @return smallest cropped photo containing all TextBlocks
+     */
+    private static Bitmap getCroppedPhoto(Bitmap photo, Context context) {
+        List<TextBlock> orderedTextBlocks = initAnalysis(photo, context);
+        Log.d("OcrAnalyzer.analyze:" , "Blocks detected");
+        orderedTextBlocks = OCRUtils.orderBlocks(orderedTextBlocks);
+        Log.d("OcrAnalyzer.analyze:" , "Blocks ordered");
+        int[] borders = OCRUtils.getRectBorders(orderedTextBlocks, photo);
+        int left = borders[0];
+        int right = borders[2];
+        int top = borders[1];
+        int bottom = borders[3];
+        return OCRUtils.cropImage(photo, left, top, right, bottom);
     }
 }
