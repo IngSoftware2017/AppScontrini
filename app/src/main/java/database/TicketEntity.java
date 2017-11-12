@@ -3,6 +3,8 @@ package database;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 import android.net.Uri;
 
 import java.math.BigDecimal;
@@ -13,7 +15,7 @@ import java.util.Date;
  */
 //Entity class of Ticket. Should not be used outside of the database module.
 
-@Entity(tableName = DatabaseConstants.TICKET_TABLE_NAME)
+@Entity(tableName = DatabaseConstants.TICKET_TABLE_NAME) @TypeConverters(Converters.class)
 public class TicketEntity {
 
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = DatabaseConstants.TICKET_PRIMARY_KEY_NAME)
