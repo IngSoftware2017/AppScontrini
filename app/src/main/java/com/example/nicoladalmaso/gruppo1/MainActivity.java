@@ -20,6 +20,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -149,7 +150,9 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             switch (requestCode) {
-
+                /**
+                 * Cristian
+                 */
                 //Foto scattata da noi
                 case (REQUEST_TAKE_PHOTO):
                     Bundle extras = data.getExtras();
@@ -214,10 +217,18 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Cristian
+     * parametro di ingresso: Bitmap imageToCrop
+     * @return Uri
+     * il parametro Uri ritornato è preso dal file intermedio tra foto
+     * e resize(allocato in Documents per evitare
+     * venga visualizzato nella gallery)
+     */
     private Uri savePhotoForCrop (Bitmap imageToCrop) {
         String root = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString();
         File myDir = new File(root);
-      //  myDir.mkdirs();
         String imageFileName = "photoToCrop.jpg";
 
         File file = new File(myDir, imageFileName);
