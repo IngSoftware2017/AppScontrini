@@ -1,8 +1,6 @@
 package com.ing.software.ticketapp.OCR;
 
-import com.google.android.gms.vision.text.TextBlock;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,8 +8,21 @@ import java.util.List;
  */
 public class OcrResult {
 
-    /**
-     * List of TextBlock.
-     */
-    public List<TextBlock> blockList = new ArrayList<>();
+    private List<RawBlock.RawText> rawTexts;
+
+    public OcrResult(List<RawBlock.RawText> detectedTexts) {
+        this.rawTexts = detectedTexts;
+    }
+
+    public List<RawBlock.RawText> getRawTexts() {
+        return rawTexts;
+    }
+
+    public String toString() {
+        StringBuilder list = new StringBuilder();
+        for (RawBlock.RawText text : rawTexts) {
+            list.append(text.getDetection());
+        }
+        return list.toString();
+    }
 }

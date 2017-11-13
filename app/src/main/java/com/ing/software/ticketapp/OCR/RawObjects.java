@@ -20,8 +20,7 @@ class RawBlock {
     private List<RawText> rawTexts = new ArrayList<>();
     private List<? extends Text> textComponents;
     private RectF rectF;
-    private int imageWidth;
-    private int imageHeigth;
+    private RawImage rawImage;
     private String grid;
 
     /**
@@ -30,11 +29,10 @@ class RawBlock {
      * @param imageMod source image
      * @param grid grid from ProbGrid.gridMap
      */
-    RawBlock(TextBlock textBlock, Bitmap imageMod, String grid) {
+    RawBlock(TextBlock textBlock, RawImage imageMod, String grid) {
         rectF = new RectF(textBlock.getBoundingBox());
-        imageWidth = imageMod.getWidth();
-        imageHeigth = imageMod.getHeight();
         textComponents = textBlock.getComponents();
+        this.rawImage = imageMod;
         this.grid = grid;
         initialize();
     }
@@ -43,10 +41,8 @@ class RawBlock {
      * Populates this block with its Rawtexts
      */
     private void initialize() {
-        int index = 0;
         for (Text currentText : textComponents) {
-            rawTexts.add(new RawText(currentText, index));
-            ++index;
+            rawTexts.add(new RawText(currentText));
         }
     }
 
@@ -169,25 +165,14 @@ class RawBlock {
     class RawText {
 
         private RectF rectText;
-        private int index; //useless as of now
         private Text text;
-
         /**
          * Constructor
          * @param text current Text inside TextBlock
-         * @param position index of this Text
          */
-        RawText(Text text, int position) {
+        RawText(Text text) {
             rectText = new RectF(text.getBoundingBox());
-            this.index = position;
             this.text = text;
-        }
-
-        /**
-         * @return index of current Text
-         */
-        int getIndex() {
-            return index;
         }
 
         /**
@@ -202,6 +187,13 @@ class RawBlock {
          */
         RectF getRect() {
             return rectText;
+        }
+
+        /**
+         * @return rawImage of this Text
+         */
+        RawImage getRawImage() {
+            return rawImage;
         }
 
         /**
@@ -262,6 +254,7 @@ class RawBlock {
          * @return true if string is present
          */
         private boolean bruteSearch(String string) {
+            //Here Euristic search will be implemented
             if (text.getValue().contains(string))
                 return true;
             else
@@ -276,5 +269,24 @@ class RawBlock {
         private boolean isInside(RectF rect) {
             return rect.contains(rectText);
         }
+    }
+}
+
+class RawImage {
+
+    private int height;
+    private int width;
+
+    RawImage(Bitmap bitmap) {
+        height = bitmap.getHeight();
+        width = bitmap.getWidth();
+    }
+
+    int getHeight() {
+        return height;
+    }
+
+    int getWidth() {
+        return width;
     }
 }

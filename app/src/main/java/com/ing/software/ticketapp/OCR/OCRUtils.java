@@ -43,7 +43,7 @@ public class OCRUtils {
      * @param photo original photo
      * @return array of int where int[0] = left border, int[1] = top border, int[2] = right border, int[3] = bottom border
      */
-    static int[] getRectBorders(List<TextBlock> orderedTextBlocks, Bitmap photo) {
+    static int[] getRectBorders(List<TextBlock> orderedTextBlocks, RawImage photo) {
         int numberOfBorders = 4; //it's a rect
         int[] borders = new int[numberOfBorders];
         //Extreme borders for chosen photo (will be overwritten in foreach)
@@ -77,7 +77,7 @@ public class OCRUtils {
      * @param photo original photo
      * @return preferred ratio defined in ProbGrid, -1 if something went wrong
      */
-    static String getPreferredGrid(Bitmap photo) {
+    static String getPreferredGrid(RawImage photo) {
         double width = photo.getWidth();
         double heigth = photo.getHeight();
         String preferredRatio = "-1";
@@ -142,7 +142,7 @@ public class OCRUtils {
      * @param photo source photo (to get max width)
      * @return rect with max width
      */
-    static RectF getExtendedRect(RectF rect, Bitmap photo) {
+    static RectF getExtendedRect(RectF rect, RawImage photo) {
         float top = rect.top;
         float bottom = rect.bottom;
         float left = 0;

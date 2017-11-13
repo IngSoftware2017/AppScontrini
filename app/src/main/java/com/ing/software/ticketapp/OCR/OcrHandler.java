@@ -1,6 +1,7 @@
 package com.ing.software.ticketapp.OCR;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -8,9 +9,11 @@ import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Temporary class to test analysis in OcrAnalyzer
@@ -19,11 +22,13 @@ import java.io.InputStream;
 
 public class OcrHandler extends Service {
 
+    private Context context;
+
     @Override
     public void onCreate() {
         super.onCreate();
-
-    }
+        context = this;
+        }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -33,7 +38,25 @@ public class OcrHandler extends Service {
         if (test==null) {
             Log.e("OcrHandler", "Received null image");
         }
-        OcrAnalyzer.execute(test, this);
+        OcrAnalyzer analyzer = new OcrAnalyzer();
+        analyzer.initialize(this);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        analyzer.getOcrResult(test, new OnOcrResultReadyListener() {
+            @Override
+            public void onOcrResultReady(OcrResult result) {
+                Log.d("OcrHandler", "Detection complete");
+                List<RawBlock.RawText> receivedTexts = result.getRawTexts();
+                for (RawBlock.RawText text : receivedTexts) {
+                    Log.d("OcrHandler", "Text: " + text.getDetection());
+                }
+                Toast toast = Toast.makeText(context, result.toString(), Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
         return Service.START_NOT_STICKY;
     }
 
