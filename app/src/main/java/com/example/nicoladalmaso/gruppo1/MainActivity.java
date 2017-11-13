@@ -16,6 +16,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ListView;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -107,11 +109,16 @@ public class MainActivity extends AppCompatActivity {
         static final int REQUEST_TAKE_PHOTO = 1;
 
         private void dispatchTakePictureIntent() {
-            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
+         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .start(this);
+         /*   if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);
-            }
+           */
+
         }
+
 
     //----------------------------------------//
     //----------------------------------------//
@@ -148,7 +155,8 @@ public class MainActivity extends AppCompatActivity {
 
                     //Foto scattata da noi
                     case (REQUEST_TAKE_PHOTO):
-                        File description = new File(Environment.getExternalStorageDirectory(),
+
+                       /* File description = new File(Environment.getExternalStorageDirectory(),
                                 "photo"+String.valueOf(System.currentTimeMillis())+".jpg");
                         Uri  namePhoto= Uri.fromFile(description);
                         data.putExtra(MediaStore.EXTRA_OUTPUT,namePhoto);
