@@ -106,19 +106,16 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //------- Funzione che scatta foto -------//
     //----------------------------------------//
-        static final int REQUEST_TAKE_PHOTO = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
 
-        private void dispatchTakePictureIntent() {
-         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
-         /*   if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);
-           */
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
 
         }
-
+    }
 
     //----------------------------------------//
     //----------------------------------------//
@@ -128,13 +125,13 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //-------Selezione foto da galleria-------//
     //----------------------------------------//
-        public static final int PICK_PHOTO_FOR_AVATAR = 2;
+    public static final int PICK_PHOTO_FOR_AVATAR = 2;
 
-        public void pickImageFromGallery() {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
-        }
+    public void pickImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
+    }
     //----------------------------------------//
     //----------------------------------------//
     //----------------------------------------//
@@ -143,56 +140,52 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //-----Cattura risultato degli intent-----//
     //----------------------------------------//
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-            if (resultCode == Activity.RESULT_OK) {
-                if (data == null) {
-                    //Display an error
-                    return;
-                }
-                switch (requestCode) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                //Display an error
+                return;
+            }
+            switch (requestCode) {
 
-                    //Foto scattata da noi
-                    case (REQUEST_TAKE_PHOTO):
+                //Foto scattata da noi
+                case (REQUEST_TAKE_PHOTO):
+                    Bundle extras = data.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    Uri temp=savePhotoForCrop(imageBitmap);
+                    //invoco il resize
+                    CropImage.activity(temp)
+                            .start(this);
 
-                       /* File description = new File(Environment.getExternalStorageDirectory(),
-                                "photo"+String.valueOf(System.currentTimeMillis())+".jpg");
-                        Uri  namePhoto= Uri.fromFile(description);
-                        data.putExtra(MediaStore.EXTRA_OUTPUT,namePhoto);
-                        CropImage.activity(namePhoto).start(this);
-                      /* Bundle extras = data.getExtras();
-                        Bitmap imageBitmap = (Bitmap) extras.get("data");
-                        savePickedFile(imageBitmap);
+
+                    break;
+
+                //Foto presa da galleria
+                case (PICK_PHOTO_FOR_AVATAR):
+                    photoURI = data.getData();
+                    //Invoco la libreria che si occupa del resize
+                    CropImage.activity(photoURI)
+                            .start(this);
+                    break;
+
+                //Gestisco il risultato del Resize
+                case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
+                    Log.d("Alla", "okoko");
+                    CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                    Uri resultUri = result.getUri();
+                    try {
+                        Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
+                        savePickedFile(btm);
                         printLastImage();
-                        */
-
-                        break;
-
-                    //Foto presa da galleria
-                    case (PICK_PHOTO_FOR_AVATAR):
-                        photoURI = data.getData();
-                        //Invoco la libreria che si occupa del resize
-                        CropImage.activity(photoURI)
-                                .start(this);
-                        break;
-
-                    //Gestisco il risultato del Resize
-                    case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                        Log.d("Alla", "okoko");
-                        CropImage.ActivityResult result = CropImage.getActivityResult(data);
-                        Uri resultUri = result.getUri();
-                        try {
-                            Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
-                            savePickedFile(btm);
-                            printLastImage();
-                        }catch (Exception e){
-                            //Fai qualcosa
-                        }
-                        break;
-                }
+                    }catch (Exception e){
+                        //Fai qualcosa
+                    }
+                    break;
             }
         }
+    }
     //----------------------------------------//
     //----------------------------------------//
     //----------------------------------------//
@@ -202,25 +195,46 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //------Salva foto presa da galleria------//
     //----------------------------------------//
-        private void savePickedFile(Bitmap imageToSave) {
-            String root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-            File myDir = new File(root);
-            myDir.mkdirs();
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-            String fname = imageFileName+".jpg";
-            File file = new File(myDir, fname);
-            if (file.exists())
-                file.delete();
-            try {
-                FileOutputStream out = new FileOutputStream(file);
-                imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                out.flush();
-                out.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    private void savePickedFile(Bitmap imageToSave) {
+        String root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+        File myDir = new File(root);
+        myDir.mkdirs();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        String fname = imageFileName+".jpg";
+        File file = new File(myDir, fname);
+        if (file.exists())
+            file.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+    private Uri savePhotoForCrop (Bitmap imageToCrop) {
+        String root = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString();
+        File myDir = new File(root);
+      //  myDir.mkdirs();
+        String imageFileName = "photoToCrop.jpg";
+
+        File file = new File(myDir, imageFileName);
+        if (file.exists())
+            file.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            imageToCrop.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Uri uri=Uri.fromFile(file);
+        return uri;
+
+    }
     //----------------------------------------//
     //----------------------------------------//
     //----------------------------------------//
@@ -229,40 +243,40 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //-------Stampa delle foto salvate--------//
     //----------------------------------------//
-        //Legge tutte le immagini
-        private File[] readAllImages(){
-            String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+    //Legge tutte le immagini
+    private File[] readAllImages(){
+        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
 
-            Log.d("Files", "Path: " + path);
-            File directory = new File(path);
-            File[] files = directory.listFiles();
-            Log.d("Files", "Size: "+ files.length);
-            return files;
+        Log.d("Files", "Path: " + path);
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        Log.d("Files", "Size: "+ files.length);
+        return files;
+    }
+
+    //Stampa tutte le immagini
+    private void printAllImages(){
+        File[] files = readAllImages();
+
+        for (int i = 0; i < files.length; i++)
+        {
+            Bitmap myBitmap = BitmapFactory.decodeFile(files[i].getAbsolutePath());
+            addToList(files[i].getName(), "Descrizione della foto", myBitmap);
         }
 
-        //Stampa tutte le immagini
-        private void printAllImages(){
-            File[] files = readAllImages();
+    }
 
-            for (int i = 0; i < files.length; i++)
-            {
-                Bitmap myBitmap = BitmapFactory.decodeFile(files[i].getAbsolutePath());
-                addToList(files[i].getName(), "Descrizione della foto", myBitmap);
-            }
+    //Stampa l'ultima foto
+    private void printLastImage(){
+        File[] files = readAllImages();
+        Bitmap myBitmap = BitmapFactory.decodeFile(files[files.length-1].getAbsolutePath());
+        addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
+    }
 
-        }
-
-        //Stampa l'ultima foto
-        private void printLastImage(){
-            File[] files = readAllImages();
-            Bitmap myBitmap = BitmapFactory.decodeFile(files[files.length-1].getAbsolutePath());
-            addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
-        }
-
-        //Stampa il bitmap passato (Solo per testing)
-        private void printThisBitmap(Bitmap myBitmap){
-            addToList("Print this bitmap", "Descrizione della foto", myBitmap);
-        }
+    //Stampa il bitmap passato (Solo per testing)
+    private void printThisBitmap(Bitmap myBitmap){
+        addToList("Print this bitmap", "Descrizione della foto", myBitmap);
+    }
     //----------------------------------------//
     //----------------------------------------//
     //----------------------------------------//
@@ -270,5 +284,3 @@ public class MainActivity extends AppCompatActivity {
 
 
 }
-
-
