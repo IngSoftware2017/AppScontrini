@@ -10,6 +10,7 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * @author Michelon
  * @author Zaglia
  */
-public class OcrAnalyzer {
+public class OcrAnalyzer implements Serializable {
 
     private TextRecognizer ocrEngine = null;
     private OnOcrResultReadyListener ocrResultCb = null;

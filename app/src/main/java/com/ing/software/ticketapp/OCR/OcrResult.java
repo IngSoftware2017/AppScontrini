@@ -21,7 +21,7 @@ public class OcrResult {
     public String toString() {
         StringBuilder list = new StringBuilder();
         for (RawBlock.RawText text : rawTexts) {
-            list.append(text.getDetection());
+            list.append(text.getDetection()).append("\n");
         }
         return list.toString();
     }

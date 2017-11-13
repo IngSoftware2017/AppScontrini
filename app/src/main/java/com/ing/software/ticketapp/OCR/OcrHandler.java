@@ -1,5 +1,6 @@
 package com.ing.software.ticketapp.OCR;
 
+import android.app.IntentService;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.ing.software.ticketapp.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,38 +25,32 @@ import java.util.List;
 
 public class OcrHandler extends Service {
 
-    private Context context;
-
     @Override
     public void onCreate() {
         super.onCreate();
-        context = this;
-        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO use cloud files
-        String testPic = "5.jpg";
-        Bitmap test = getBitmapFromAsset(testPic);
-        if (test==null) {
-            Log.e("OcrHandler", "Received null image");
-        }
         OcrAnalyzer analyzer = new OcrAnalyzer();
+        Log.e("OcrHandler", "QUI?");
         analyzer.initialize(this);
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        String testPic = "5.jpg";
+        Bitmap test = getBitmapFromAsset(testPic);
+        if (test==null) {
+            Log.e("OcrHandler", "Received null image");
+        }
         analyzer.getOcrResult(test, new OnOcrResultReadyListener() {
             @Override
             public void onOcrResultReady(OcrResult result) {
                 Log.d("OcrHandler", "Detection complete");
-                List<RawBlock.RawText> receivedTexts = result.getRawTexts();
-                for (RawBlock.RawText text : receivedTexts) {
-                    Log.d("OcrHandler", "Text: " + text.getDetection());
-                }
-                Toast toast = Toast.makeText(context, result.toString(), Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(OcrHandler.this, result.toString(), Toast.LENGTH_LONG);
                 toast.show();
             }
         });
