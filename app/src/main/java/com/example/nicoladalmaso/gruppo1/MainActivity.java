@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
         static final int REQUEST_TAKE_PHOTO = 1;
 
         private void dispatchTakePictureIntent() {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);
             }
         }
 
@@ -148,10 +148,17 @@ public class MainActivity extends AppCompatActivity {
 
                     //Foto scattata da noi
                     case (REQUEST_TAKE_PHOTO):
-                        Bundle extras = data.getExtras();
+                        File description = new File(Environment.getExternalStorageDirectory(),
+                                "photo"+String.valueOf(System.currentTimeMillis())+".jpg");
+                        Uri  namePhoto= Uri.fromFile(description);
+                        data.putExtra(MediaStore.EXTRA_OUTPUT,namePhoto);
+                        CropImage.activity(namePhoto).start(this);
+                      /* Bundle extras = data.getExtras();
                         Bitmap imageBitmap = (Bitmap) extras.get("data");
                         savePickedFile(imageBitmap);
                         printLastImage();
+                        */
+
                         break;
 
                     //Foto presa da galleria
