@@ -107,6 +107,16 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
+    /**PICCOLO
+     * Metodo che "ripulisce" lo schermo dalle immagini
+     */
+    private void clearAllImages(){
+        Toast.makeText(getApplicationContext(), "TODO: CLEAR LIST ", Toast.LENGTH_SHORT).show();
+        ListView listView = (ListView)findViewById(R.id.list1);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        adapter.notifyDataSetChanged();
+        listView.setAdapter(adapter);
+    }//clearAllImages
 
     //----------------------------------------//
     //------- Funzione che scatta foto -------//
@@ -286,6 +296,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     //Stampa l'ultima foto
     private void printLastImage(){
         File[] files = readAllImages();
@@ -301,16 +313,19 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //----------------------------------------//
 
-    /**
+    /**PICCOLO
      * Metodo richiamato dal bottone per la cancellazione del file
      * @param v
      */
-    private void deletePhoto(View v) {
+    public void deletePhoto(View v) {
         int pos=0;
+        //Settare POS
         deleteFile(pos);
+        clearAllImages();
+        printAllImages();
     }//deleteFile
 
-    /**
+    /**PICCOLO
      * Metodo che cancella l'i-esimo file in una directory
      * @param toDelete l'indice del file da cancellare
      * @return se l'operazione è andata a buon fine

@@ -43,7 +43,6 @@
         android:tag="+id/buttonId"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:src="@mipmap/ic_launcher_round"
         app:layout_anchorGravity="right|end|bottom"
         android:layout_margin="16dp"
         android:onClick="deletePhoto"
