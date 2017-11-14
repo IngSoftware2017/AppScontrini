@@ -10,7 +10,7 @@ public final class DatabaseConstants {
     public static final String TICKET_TABLE_NAME = "tickets";
 
     //Entity constants
-    public static final String TICKET_PRIMARY_KEY_NAME = "tickets";
+    public static final String TICKET_PRIMARY_KEY_NAME = "ID";
 
 
 }
