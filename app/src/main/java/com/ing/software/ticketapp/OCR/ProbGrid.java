@@ -9,12 +9,12 @@ import java.util.HashMap;
  */
 public class ProbGrid {
 
-    static final int GRIDCOUNT = 2; //number of grids
-    static final String ratio16x9 = "16x9";
-    static final String ratio16x7 = "16x7";
-    static HashMap<Double, String> gridMap = new HashMap(GRIDCOUNT);
-    static HashMap<String, Integer[][]> amountMap = new HashMap(GRIDCOUNT);
-    static final Integer[][] AmountGrid16x9 = {
+    private static final int GRIDCOUNT = 2; //number of grids
+    private static final String ratio16x9 = "16x9";
+    private static final String ratio16x7 = "16x7";
+    static HashMap<Double, String> gridMap = new HashMap<>(GRIDCOUNT);
+    static HashMap<String, Integer[][]> amountMap = new HashMap<>(GRIDCOUNT);
+    private static final Integer[][] AmountGrid16x9 = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -32,7 +32,7 @@ public class ProbGrid {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
-    static final Integer[][] AmountGrid16x7 = {
+    private static final Integer[][] AmountGrid16x7 = {
             {0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0},
