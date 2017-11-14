@@ -5,26 +5,25 @@ import android.arch.persistence.room.DatabaseConfiguration;
 import android.arch.persistence.room.InvalidationTracker;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.Database;
 import android.content.Context;
 
 /**
  * Created by Taschin Federico on 08/11/2017.
  */
 
-@Database(entities = {TicketEntity.class}, version = 1)
-public abstract class TicketDatabase extends RoomDatabase {
+@android.arch.persistence.room.Database(entities = {TicketEntity.class}, version = 1)
+public abstract class Database extends RoomDatabase {
 
-    private static TicketDatabase INSTANCE; //Unique instance of the Database object
+    private static Database INSTANCE; //Unique instance of the Database object
     protected abstract DAO ticketDao(); //returns the DAO object that contains query methods. This method is automatically implemented by Room library
 
     /* Creates the unique instance of the Database object.
      * @param context not null, Context of the Activity that calls this method.
-     * @return TicketDatabase not null, single instance of the database
+     * @return Database not null, single instance of the database
      */
-    public static TicketDatabase getAppDatabase(Context context) {
+    public static Database getAppDatabase(Context context) {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TicketDatabase.class, Constants.DATABASE_NAME)
+            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), Database.class, Constants.DATABASE_NAME)
                             .allowMainThreadQueries().build();
         }
         return INSTANCE;
