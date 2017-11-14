@@ -11,6 +11,9 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    defaultConfig {
+        multiDexEnabled true
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -28,11 +31,9 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 
-    compile 'android.arch.persistence.room:runtime:1.0.0-alpha1'
-    annotationProcessor 'android.arch.persistence.room:compiler:1.0.0-alpha1'
-    compile 'android.arch.lifecycle:extensions:1.0.0-alpha1'
-    annotationProcessor 'android.arch.lifecycle:compiler:1.0.0-alpha1'
-    compile 'android.arch.persistence.room:rxjava2:1.0.0-alpha1'
-    testCompile'android.arch.persistence.room:testing:1.0.0-alpha1'
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
+    annotationProcessor 'android.arch.lifecycle:compiler:1.0.0'
+    compile 'android.arch.persistence.room:rxjava2:1.0.0'
+    testCompile'android.arch.persistence.room:testing:1.0.0'
 
 }
