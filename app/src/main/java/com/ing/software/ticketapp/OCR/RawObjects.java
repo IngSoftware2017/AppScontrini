@@ -47,46 +47,6 @@ class RawBlock {
     }
 
     /**
-     * Get rect of this block
-     * @return rect of this block
-     */
-    RectF getRect() {
-        return rectF;
-    }
-
-    /**
-     * Get Rawtexts in this block
-     * @return list of Rawtexts in this block
-     */
-    List<RawText> getRawTexts() {
-        return rawTexts;
-    }
-
-
-    /**
-     * Loops throw Rawtexts checking if their rect is in a box where probability
-     * to find amount is > 0
-     * @param level number of results to ignore (used for deeper analysis)
-     * @return string with detected amount, null if nothing is found
-     */
-    /*
-    String findAmount(int level) {
-        String amount = null;
-        int i = 0;
-        while (level > 0 && i < rawTexts.size()) {
-            RawText rawText = rawTexts.get(i);
-            amount = rawText.findAmount();
-            if (amount!=null) {
-                level--;
-                if (level == 0)
-                    return amount;
-            }
-        }
-        return null;
-    }
-    */
-
-    /**
      * Search string in block, only first occurrence is returned (top -> bottom, left -> right)
      * @param string string to search
      * @return RawText containing the string, null if nothing found
@@ -195,58 +155,6 @@ class RawBlock {
         RawImage getRawImage() {
             return rawImage;
         }
-
-        /**
-         * Check if current Text is in a box of the grid with probability region > 0, if yes
-         * checks if amount is present
-         * @return string with detected amount, null if nothing found
-         */
-        /*
-        private String findAmount() {
-            int[] gridBox = getGridBox();
-            int probability = ProbGrid.amountMap.get(grid)[gridBox[1]][gridBox[0]];
-            if (probability > 0)
-                if (checkAmountPresent())
-                    return getDetection();
-                else
-                    return null;
-            else
-                return null;
-        }
-        */
-
-        /**
-         * Find box of the grid containing the center of the text rect
-         * @return coordinates of the grid, where int[0] = column, int[1] = row
-         */
-        /*
-        private int[] getGridBox() {
-            Scanner gridder = new Scanner(grid);
-            gridder.useDelimiter("x");
-            int rows = Integer.parseInt(gridder.next());
-            int columns = Integer.parseInt(gridder.next());
-            gridder.close();
-            double rowsHeight = imageHeigth/rows;
-            double columnsWidth = imageWidth/columns;
-            int gridX = (int) (rectText.centerX()/columnsWidth);
-            int gridY = (int) (rectText.centerY()/rowsHeight);
-            return new int[] {gridX, gridY};
-        }
-        */
-
-        /**
-         * Checks if amount string is present
-         * @return true if amount string is present
-         */
-        /*
-        private boolean checkAmountPresent() {
-            String amount = getDetection();
-            if (amount.contains("TOTALE"))
-                return true;
-            else
-                return false;
-        }
-        */
 
         /**
          * Search string in text
