@@ -24,7 +24,7 @@ public abstract class TicketDatabase extends RoomDatabase {
      */
     public static TicketDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TicketDatabase.class, DatabaseConstants.DATABASE_NAME)
+            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TicketDatabase.class, Constants.DATABASE_NAME)
                             .allowMainThreadQueries().build();
         }
         return INSTANCE;
