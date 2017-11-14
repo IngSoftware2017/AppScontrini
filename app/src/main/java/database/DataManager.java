@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Created by Federico Taschin on 07/11/2017.
+ * Modified by Marco Olivieri on 14/11/2017
  */
 
 public class DataManager {

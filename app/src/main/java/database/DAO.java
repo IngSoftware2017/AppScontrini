@@ -22,6 +22,12 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.FAIL)
     long addTicket(TicketEntity ticket);
 
+    /***
+     * // AGGIUNGERE LE SPECIFICHE
+     *
+     * @param id
+     * @return
+     */
     @Query("DELETE FROM "+ Constants.TICKET_TABLE_NAME+" WHERE "+ Constants.TICKET_PRIMARY_KEY_NAME+" = :id")
     int deleteTicket(int id);
 
