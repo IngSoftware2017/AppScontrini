@@ -323,10 +323,11 @@ public class MainActivity extends AppCompatActivity {
         //TODO:Settare pos, ovvero l'indice della foto da cancellare
         ListView item= (ListView) v.getParent();
         int position = item.getId();
+        ListView lv = (ListView) findViewById(R.id.list1);
         Toast.makeText(getApplicationContext(), "ID:"+position, Toast.LENGTH_SHORT).show();
-        deleteFile(pos);
-        clearAllImages();
-        printAllImages();
+        //deleteFile(pos);
+       //clearAllImages();
+        //printAllImages();
     }//deleteFile
 
     /**PICCOLO
