@@ -53,4 +53,21 @@ public class DatabaseTest {
         assert (ticketDAO.getAllTickets().get(0).getDate().equals(testTicket.getDate()));
     }
 
+    @Test
+    public void updateTicketTest(){
+
+    }
+
+
+    @Test
+    public void deleteTicketTest(){
+        /*
+        TicketEntity testTicketDelete = new TicketEntity();
+        int id = testTicketDelete.getID();
+        ticketDAO.addTicket(testTicketDelete);
+        assert (id == ticketDAO.deleteTicket(testTicketDelete.getID()));
+        */
+        //TODO test with invalid ID, test with null ID (deleteTicket pre-conditions accept null)
+    }
+
 }
