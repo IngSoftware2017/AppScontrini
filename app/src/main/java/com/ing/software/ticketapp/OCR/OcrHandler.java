@@ -1,8 +1,7 @@
 package com.ing.software.ticketapp.OCR;
 
-import android.app.IntentService;
+
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -12,11 +11,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ing.software.ticketapp.MainActivity;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * Temporary class to test analysis in OcrAnalyzer
@@ -34,7 +30,6 @@ public class OcrHandler extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO use cloud files
         OcrAnalyzer analyzer = new OcrAnalyzer();
-        Log.e("OcrHandler", "QUI?");
         analyzer.initialize(this);
         try {
             Thread.sleep(2000);
