@@ -39,7 +39,7 @@ public abstract class Database extends RoomDatabase {
     protected SupportSQLiteOpenHelper createOpenHelper(DatabaseConfiguration config) {
         return null;
     }
-    //pecifications for this methods will arrive, do not use for now
+    //Specifications for this methods will arrive, do not use for now
     @Override
     protected InvalidationTracker createInvalidationTracker() {
         return null;
