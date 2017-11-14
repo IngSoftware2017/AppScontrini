@@ -1,28 +1,17 @@
-[![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=K_main)](https://travis-ci.org/Kraktun/AppScontrini)
-
-## BRANCH PER TEST PERSONALE  
-« Per me si va ne la città dolente,  
-per me si va ne l'etterno dolore,  
-per me si va tra la perduta gente.  
-Giustizia mosse il mio alto fattore:  
-fecemi la divina potestate,  
-la somma sapienza e 'l primo amore;  
-dinanzi a me non fuor cose create  
-se non etterne, e io etterna duro.  
-Lasciate ogni speranza, voi ch'entrate. »  
+[![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/Kraktun/AppScontrini)
 
 ## FUNZIONAMENTO ANALISI OCR:
 I metodi realizzati finora sono abbastanza basilari:  
-* [analyzeSingleText()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L90)  
+* [analyzeSingleText()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L90)  
 	Ordina i blocchi sparsi ricevuti dal detector in una lista seguendo l'ordinamento alto -> basso, sinistra -> destra
 	Nota: Sono ordinati solo i blocchi, quindi i RawText possono risultare complessivamente non ordinati.  
-* [analyzeBruteFirstString()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L113)  
+* [analyzeBruteFirstString()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L113)  
 	Cerca il primo RawText contenente la stringa passata come parametro nella lista ordinata da analyzeSingleText(). L'ordinamento (dall'alto verso il basso e da sinistra a destra) è eseguito solo sui blocchi, quindi il primo match non è detto che sia effettivamente nel primo Text.  
 	Restituisce il primo RawText individuato.  
-* [analyzeBruteContinuousString()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L135)  
+* [analyzeBruteContinuousString()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L135)  
 	Cerca tutti i RawText contenenti la stringa passata come parametro. Restituisce una lista contenente tutti i RawText che contengono quella stringa.  
 	L'ordinamento (dall'alto verso il basso e da sinistra a destra) è eseguito solo sui blocchi, quindi la lista può risultare complessivamente non ordinata.  
-* [analyzeBruteContHorizValue()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L165)  
+* [analyzeBruteContHorizValue()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L165)  
 	Riceve una lista dei RawText contenenti la stringa passata come parametro. Per ognuno di questi RawText:  
 		- estrae il rettangolo del RawText  
 		- estende la larghezza del rettangolo a quella della foto  
