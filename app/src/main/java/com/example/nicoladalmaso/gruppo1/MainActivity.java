@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void clearAllImages(){
         Toast.makeText(getApplicationContext(), "TODO: CLEAR LIST ", Toast.LENGTH_SHORT).show();
+        //TODO: Aggiornare la lista
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
         adapter.notifyDataSetChanged();
@@ -319,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void deletePhoto(View v) {
         int pos=0;
-        //Settare POS
+        //TODO:Settare pos, ovvero l'indice della foto da cancellare
         deleteFile(pos);
         clearAllImages();
         printAllImages();
