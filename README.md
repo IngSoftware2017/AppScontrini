@@ -13,27 +13,26 @@ Lasciate ogni speranza, voi ch'entrate. »
 
 ## FUNZIONAMENTO ANALISI OCR:
 I metodi realizzati finora sono abbastanza basilari:  
-* [analyzeSingleText()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L43)  
-	Analizza la foto e riporta sotto forma di stringa tutto ciò che trova, ordinando i blocchi dall'alto verso il basso e da sinistra a destra.  
-	La stringa è costruita andando a capo a ogni Text contenuto nel blocco, per cui la stringa finale risulta una lista di tutti i Text della foto.  
-	Nota: Sono ordinati solo i blocchi, quindi la lista può risultare complessivamente non ordinata.  
-* [analyzeBruteFirstString()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L82)  
-	Analizza la foto e cerca il primo Text contenente la stringa passata come parametro. L'ordinamento (dall'alto verso il basso e da sinistra a destra) è eseguito solo sui blocchi, quindi il primo match non è detto che sia effettivamente nel primo Text.  
-	Restituisce una stringa contenente il testo contenuto nel Text individuato.  
-* [analyzeBruteContinuousString()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L123)  
-	Analizza la foto e cerca tutti i Text contenenti la stringa passata come parametro. Restituisce una lista contenente tutti i Text che contengono quella stringa.  
+* [analyzeSingleText()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L90)  
+	Ordina i blocchi sparsi ricevuti dal detector in una lista seguendo l'ordinamento alto -> basso, sinistra -> destra
+	Nota: Sono ordinati solo i blocchi, quindi i RawText possono risultare complessivamente non ordinati.  
+* [analyzeBruteFirstString()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L113)  
+	Cerca il primo RawText contenente la stringa passata come parametro nella lista ordinata da analyzeSingleText(). L'ordinamento (dall'alto verso il basso e da sinistra a destra) è eseguito solo sui blocchi, quindi il primo match non è detto che sia effettivamente nel primo Text.  
+	Restituisce il primo RawText individuato.  
+* [analyzeBruteContinuousString()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L135)  
+	Cerca tutti i RawText contenenti la stringa passata come parametro. Restituisce una lista contenente tutti i RawText che contengono quella stringa.  
 	L'ordinamento (dall'alto verso il basso e da sinistra a destra) è eseguito solo sui blocchi, quindi la lista può risultare complessivamente non ordinata.  
-* [analyzeBruteContHorizValue()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L172)  
-	Analizza la foto e cerca tutti i Text contenenti la stringa passata come parametro. Per ognuno di questi Text:  
-		- estrae il rettangolo del Text  
+* [analyzeBruteContHorizValue()](https://github.com/Kraktun/AppScontrini/blob/K_main/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L165)  
+	Riceve una lista dei RawText contenenti la stringa passata come parametro. Per ognuno di questi RawText:  
+		- estrae il rettangolo del RawText  
 		- estende la larghezza del rettangolo a quella della foto  
 		- estende l'altezza del rettangolo in entrambi i sensi della metà della percentuale passata come parametro (ad esempio se si passa come precisione p e il rettangolo è alto h, questo verrà alzato di h*p/100 (verso l'alto e h*p/100 verso il basso))  
-		- cerca altri Text contenuti nel nuovo rettangolo  
-	Restituisce una lista contenente sia i Text con la stringa (che ovviamente sono contenuti nel rettangolo esteso), sia eventuali altri Text contenuti nel rettangolo esteso.  
-	La lista è non ordinata, nel senso i Text individuati in uno stesso rettangolo esteso sono "vicini", ma seguono l'ordinamento dei blocchi.  
+		- cerca altri RawText contenuti nel nuovo rettangolo  
+	Restituisce una lista contenente sia i RawText con la stringa (che ovviamente sono contenuti nel rettangolo esteso), sia eventuali altri RawText contenuti nel rettangolo esteso.  
+	La lista è non ordinata, nel senso i RawText individuati in uno stesso rettangolo esteso sono "vicini", ma seguono l'ordinamento dei blocchi.  
 
 ## TO DO	 
-* Inserire ordinamento per Text (è già scritto basta implementarlo)  
+* Inserire ordinamento per RawText (è già scritto basta implementarlo)  
 * Utilizzare griglie di decisione  
 	
 	
