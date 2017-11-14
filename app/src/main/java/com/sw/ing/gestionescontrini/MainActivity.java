@@ -3,7 +3,7 @@ package com.sw.ing.gestionescontrini;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import database.DatabaseManager;
+import database.DataManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -11,6 +11,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DatabaseManager dbm = new DatabaseManager(this);
+        DataManager dbm = new DataManager(this);
     }
 }
