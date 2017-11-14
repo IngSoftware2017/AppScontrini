@@ -13,8 +13,8 @@ public class ProbGrid {
     static final String ratio16x9 = "16x9";
     static final String ratio16x7 = "16x7";
     static HashMap<Double, String> gridMap = new HashMap(GRIDCOUNT);
-    static HashMap<String, int[][]> amountMap = new HashMap(GRIDCOUNT);
-    static final int[][] AmountGrid16x9 = {
+    static HashMap<String, Integer[][]> amountMap = new HashMap(GRIDCOUNT);
+    static final Integer[][] AmountGrid16x9 = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -32,7 +32,7 @@ public class ProbGrid {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
-    static final int[][] AmountGrid16x7 = {
+    static final Integer[][] AmountGrid16x7 = {
             {0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0},
