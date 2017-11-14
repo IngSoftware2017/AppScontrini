@@ -1,7 +1,9 @@
 package database;
 
 import android.arch.persistence.room.TypeConverter;
+import android.net.Uri;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -46,7 +48,19 @@ public final class Converters {
      * @param value not null
      * @return
      */
+    @TypeConverter
     public double bigDecimalToDoouble(BigDecimal value){
         return value.doubleValue();
+    }
+
+    @TypeConverter
+    public String toString(Uri uri){
+        return "AAA";
+        //return uri.getPath();
+    }
+
+    @TypeConverter
+    public Uri toUri(String path){
+        return Uri.fromFile(new File(path));
     }
 }
