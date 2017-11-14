@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class Ticket {
 
-    private int ID;
+    protected int ID;
     private Uri fileUri;
     private BigDecimal amount;
     private String shop;
