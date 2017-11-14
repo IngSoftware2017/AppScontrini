@@ -25,7 +25,7 @@ import java.util.concurrent.CountDownLatch;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-    /*
+    
     @Test
     public void useAppContext() throws Exception {
         // Context of the app under test.
@@ -69,5 +69,4 @@ public class ExampleInstrumentedTest {
         //Thread lock. If the counter reaches zero, the thread unlocks and the test ends.
         cdl.await();
     }
-    */
 }
