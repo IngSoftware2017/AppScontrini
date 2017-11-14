@@ -2,7 +2,7 @@ package com.sw.ing.gestionescontrini;
 import org.junit.Before;
 import org.junit.Test;
 
-import database.DatabaseManager;
+import database.DataManager;
 import database.Ticket;
 
 import static org.junit.Assert.*;
@@ -10,13 +10,13 @@ import static org.junit.Assert.*;
  * Created by Federico Taschin on 07/11/2017.
  */
 
-public class DatabaseManagerTest {
+public class DataManagerTest {
 
-    DatabaseManager dbm;
+    DataManager dbm;
     @Before
     public void beforeTest(){
-        dbm = new DatabaseManager();
-        DatabaseManager dbm = new DatabaseManager();
+        dbm = new DataManager();
+        DataManager dbm = new DataManager();
     }
 
     @Test

@@ -11,11 +11,11 @@ import java.util.List;
  * Created by Federico Taschin on 07/11/2017.
  */
 
-public class DatabaseManager {
+public class DataManager {
     private TicketDatabase database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 
-    public DatabaseManager(Context context){
+    public DataManager(Context context){
         //receives the instance of the database
         database = TicketDatabase.getAppDatabase(context);
     }
