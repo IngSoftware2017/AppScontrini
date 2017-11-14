@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -111,10 +112,9 @@ public class MainActivity extends AppCompatActivity {
      * Metodo che "ripulisce" lo schermo dalle immagini
      */
     private void clearAllImages(){
-        Toast.makeText(getApplicationContext(), "TODO: CLEAR LIST ", Toast.LENGTH_SHORT).show();
-        //TODO: Aggiornare la lista
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
     }//clearAllImages
@@ -321,6 +321,9 @@ public class MainActivity extends AppCompatActivity {
     public void deletePhoto(View v) {
         int pos=0;
         //TODO:Settare pos, ovvero l'indice della foto da cancellare
+        ListView item= (ListView) v.getParent();
+        int position = item.getId();
+        Toast.makeText(getApplicationContext(), "ID:"+position, Toast.LENGTH_SHORT).show();
         deleteFile(pos);
         clearAllImages();
         printAllImages();
