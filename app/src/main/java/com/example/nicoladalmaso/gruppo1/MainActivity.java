@@ -2,6 +2,8 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -15,6 +17,8 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -211,6 +215,11 @@ public class MainActivity extends AppCompatActivity {
         try {
             FileOutputStream out = new FileOutputStream(file);
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            //aggiungo il file al db
+            //DatabaseManager helper = DatabaseManager.getInstance(getApplicationContext());
+           // helper.addPhoto(root+fname); DB ALTERNATIVO
+            //DbManager db = new DbManager(getApplicationContext());
+            //db.addRecord(root+fname,"","","");
             out.flush();
             out.close();
         } catch (Exception e) {
@@ -292,6 +301,47 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------//
     //----------------------------------------//
 
+    /**
+     * Metodo richiamato dal bottone per la cancellazione del file
+     * @param v
+     */
+    private void deletePhoto(View v) {
+        int pos=0;
+        deleteFile(pos);
+    }//deleteFile
 
+    /**
+     * Metodo che cancella l'i-esimo file in una directory
+     * @param toDelete l'indice del file da cancellare
+     * @return se l'operazione è andata a buon fine
+     */
+    private boolean deleteFile(int toDelete){
+        boolean result= false;
+        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        for(int i=0; i< files.length;i++){
+            if(i==toDelete){
+                files[i].delete();
+                result=true;
+            }//if
+        }//for
+        return result;
+    }//deleteFile
+
+    /**
+     * VERSIONE DATABASE
+     *PICCOLO
+     * @param filename il id del file da cancellare a
+     */
+    private void deleteFileAndRow(String filename){
+        DbManager db = new DbManager(getApplicationContext());
+        //cancello il file associato solo se la query va a buon fine
+        if(db.delete(filename)){
+            File file = new File(filename);
+            boolean deleted = file.delete();
+        }//if
+
+    }//deletePickedFile
 
 }
