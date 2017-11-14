@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ing-software.iml" filepath="$PROJECT_DIR$/ing-software.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\ingegneria-software\ing-software.iml" filepath="D:\MARCO\Android\GitHub\ingegneria-software\ing-software.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ingegneria-software.iml" filepath="$PROJECT_DIR$/ingegneria-software.iml" />
     </modules>
   </component>
 </project>
