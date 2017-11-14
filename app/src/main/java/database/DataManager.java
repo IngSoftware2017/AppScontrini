@@ -1,7 +1,5 @@
 package database;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 
 import java.util.ArrayList;
@@ -12,12 +10,12 @@ import java.util.List;
  */
 
 public class DataManager {
-    private TicketDatabase database; //Database object. All operations on the database pass through this
+    private Database database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 
     public DataManager(Context context){
         //receives the instance of the database
-        database = TicketDatabase.getAppDatabase(context);
+        database = Database.getAppDatabase(context);
     }
 
     /** Adds a ticket into the database

@@ -2,7 +2,6 @@ package com.sw.ing.gestionescontrini;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
-import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -13,8 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import database.DAO;
-import database.Ticket;
-import database.TicketDatabase;
+import database.Database;
 import database.TicketEntity;
 
 /**
@@ -24,15 +22,15 @@ import database.TicketEntity;
 @RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
 
-    TicketDatabase database;
+    Database database;
     DAO ticketDAO;
 
     @Before
     public void setDatabase() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Context context = InstrumentationRegistry.getTargetContext();
-        database = Room.inMemoryDatabaseBuilder(context, TicketDatabase.class).build();
+        database = Room.inMemoryDatabaseBuilder(context, Database.class).build();
 
-        Method method = TicketDatabase.class.getDeclaredMethod("ticketDAO()");
+        Method method = Database.class.getDeclaredMethod("ticketDAO()");
         method.setAccessible(true);
         ticketDAO = (DAO) method.invoke(database, null);
     }
