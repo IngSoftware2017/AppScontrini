@@ -2,6 +2,9 @@ package com.ing.software.ticketapp.OCR;
 
 import com.ing.software.ticketapp.common.Ticket;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Class used to extract informations from raw data
  */
@@ -14,7 +17,8 @@ public class DataAnalyzer {
      */
     public void getTicket(OcrResult resultInput, OnTicketReadyListener ticketCb) {
         Ticket newTicket = new Ticket();
-
+        HashMap<RawBlock.RawText, Integer> dateMap = resultInput.getDateMap();
+        List<RawResult> amountResults = resultInput.getAmountResults();
 
         // todo: leggere resultInput e inserire le informazioni in newTicket
 

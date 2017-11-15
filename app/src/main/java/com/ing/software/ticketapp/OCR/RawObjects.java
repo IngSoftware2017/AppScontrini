@@ -8,7 +8,9 @@ import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Class to store objects detected.
@@ -21,19 +23,16 @@ class RawBlock {
     private List<? extends Text> textComponents;
     private RectF rectF;
     private RawImage rawImage;
-    private String grid;
 
     /**
      * Constructor, parameters must not be null
      * @param textBlock source TextBlock
      * @param imageMod source image
-     * @param grid grid from ProbGrid.gridMap
      */
-    RawBlock(TextBlock textBlock, RawImage imageMod, String grid) {
+    RawBlock(TextBlock textBlock, RawImage imageMod) {
         rectF = new RectF(textBlock.getBoundingBox());
         textComponents = textBlock.getComponents();
         this.rawImage = imageMod;
-        this.grid = grid;
         initialize();
     }
 
@@ -51,7 +50,7 @@ class RawBlock {
      * @param string string to search
      * @return RawText containing the string, null if nothing found
      */
-    RawText bruteSearch(String string) {
+    RawText findFirst(String string) {
         for (RawText rawText : rawTexts) {
             if (rawText.bruteSearch(string))
                 return rawText;
@@ -64,7 +63,7 @@ class RawBlock {
      * @param string string to search
      * @return list of RawText containing the string, null if nothing found
      */
-    List<RawText> bruteSearchContinuous(String string) {
+    List<RawText> findContinuous(String string) {
         List<RawText> rawTextList = new ArrayList<>();
         for (RawText rawText : rawTexts) {
             if (rawText.bruteSearch(string))
@@ -98,6 +97,19 @@ class RawBlock {
     }
 
     /**
+     * Get a map of rawTexts with the probability they contain the date non ordered
+     * @return map of texts + probability date is present
+     */
+    HashMap<RawText, Integer> getDateMap() {
+        HashMap<RawText, Integer> map = new HashMap<>();
+        for (RawText rawText : rawTexts) {
+            map.put(rawText, rawText.getDateProbability());
+        }
+        Log.d("MAP_SIZE_IS", " " + map.size());
+        return map;
+    }
+
+    /**
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
      * Note: Min value for top and left is 0
      * @param rect source rect
@@ -115,6 +127,7 @@ class RawBlock {
         float top = rect.top - extendedHeight/2;
         if (top < 0)
             top = 0;
+        //Doesn't matter if bottom and right are outside the photo
         float right = rect.right + extendedWidth/2;
         float bottom = rect.bottom + extendedHeight/2;
         Log.d("RawObjects.extendRect","Extended rect: left " + left + " top: " + top
@@ -157,13 +170,53 @@ class RawBlock {
         }
 
         /**
+         * Retrieves probability that date is present in current text
+         * @return probability that date is present
+         */
+        private int getDateProbability() {
+            Log.d("Value is: ", getDetection());
+            int[] gridBox = getGridBox();
+            Log.d("Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
+            int probability = ProbGrid.dateMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
+            Log.d("Probability is", " " +probability);
+            return probability;
+        }
+
+        /**
+         * Retrieves probability that amount is present in current text
+         * @return probability that amount is present
+         */
+        private int getAmountProbability() {
+            int[] gridBox = getGridBox();
+            int probability = ProbGrid.amountMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
+            return probability;
+        }
+
+        /**
+         * Find box of the grid containing the center of the text rect
+         * @return coordinates of the grid, where int[0] = column, int[1] = row
+         */
+        private int[] getGridBox() {
+            Scanner gridder = new Scanner(rawImage.getGrid());
+            gridder.useDelimiter("x");
+            int rows = Integer.parseInt(gridder.next());
+            int columns = Integer.parseInt(gridder.next());
+            gridder.close();
+            double rowsHeight = rawImage.getHeight()/rows;
+            double columnsWidth = rawImage.getWidth()/columns;
+            int gridX = (int) (rectText.centerX()/columnsWidth);
+            int gridY = (int) (rectText.centerY()/rowsHeight);
+            return new int[] {gridX, gridY};
+        }
+
+        /**
          * Search string in text
          * @param string string to search
          * @return true if string is present
          */
         private boolean bruteSearch(String string) {
             //Here Euristic search will be implemented
-            if (text.getValue().contains(string))
+            if (getDetection().contains(string))
                 return true;
             else
                 return false;
@@ -180,14 +233,19 @@ class RawBlock {
     }
 }
 
+/**
+ * Class to store only useful properties of source images
+ */
 class RawImage {
 
     private int height;
     private int width;
+    private String grid;
 
     RawImage(Bitmap bitmap) {
         height = bitmap.getHeight();
         width = bitmap.getWidth();
+        grid = OCRUtils.getPreferredGrid(bitmap);
     }
 
     int getHeight() {
@@ -196,5 +254,34 @@ class RawImage {
 
     int getWidth() {
         return width;
+    }
+
+    String getGrid() {
+        return grid;
+    }
+}
+
+/**
+ * Class to store results from amount search
+ */
+class RawResult {
+
+    private RawBlock.RawText sourceText;
+    private List<RawBlock.RawText> detectedTexts = null;
+
+    RawResult(RawBlock.RawText rawText) {
+        this.sourceText = rawText;
+    }
+
+    void setDetectedTexts(List<RawBlock.RawText> detectedTexts) {
+        this.detectedTexts = detectedTexts;
+    }
+
+    RawBlock.RawText getSourceText() {
+        return sourceText;
+    }
+
+    List<RawBlock.RawText> getDetectedTexts() {
+        return detectedTexts;
     }
 }
