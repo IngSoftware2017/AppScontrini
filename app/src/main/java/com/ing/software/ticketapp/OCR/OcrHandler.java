@@ -45,6 +45,7 @@ public class OcrHandler extends Service {
             @Override
             public void onOcrResultReady(OcrResult result) {
                 Log.d("OcrHandler", "Detection complete");
+                Log.d("OcrHandler", result.toString());
                 Toast toast = Toast.makeText(OcrHandler.this, result.toString(), Toast.LENGTH_LONG);
                 toast.show();
             }

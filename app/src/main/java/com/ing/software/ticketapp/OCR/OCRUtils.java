@@ -77,7 +77,7 @@ public class OCRUtils {
      * @param photo original photo
      * @return preferred ratio defined in ProbGrid, -1 if something went wrong
      */
-    static String getPreferredGrid(RawImage photo) {
+    static String getPreferredGrid(Bitmap photo) {
         double width = photo.getWidth();
         double heigth = photo.getHeight();
         String preferredRatio = "-1";
