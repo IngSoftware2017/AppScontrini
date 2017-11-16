@@ -19,8 +19,8 @@ public final class Converters {
      * @return the corresponding Date object
      */
     @TypeConverter
-    public Date fromTimestamp(long value) {
-        return new Date(value);
+    public Date fromTimestamp(Long value) {
+        return value == null ? null : new Date(value);
     }
 
     /**
@@ -29,8 +29,8 @@ public final class Converters {
      * @return the corresponding timestamp
      */
     @TypeConverter
-    public long dateToTimestamp(Date date) {
-        return date.getTime();
+    public Long dateToTimestamp(Date date) {
+        return date == null ? null : date.getTime();
     }
 
     /**
@@ -39,8 +39,8 @@ public final class Converters {
      * @return the corresponding BigDecimal
      */
     @TypeConverter
-    public BigDecimal fromDouble(double value){
-        return new BigDecimal(value);
+    public BigDecimal fromDouble(Double value){
+        return value == null ? null :  new BigDecimal(value);
     }
 
     /**
@@ -49,18 +49,18 @@ public final class Converters {
      * @return
      */
     @TypeConverter
-    public double bigDecimalToDoouble(BigDecimal value){
-        return value.doubleValue();
+    public Double bigDecimalToDoouble(BigDecimal value){
+        return value == null ? null:value.doubleValue();
     }
 
     @TypeConverter
     public String toString(Uri uri){
-        return "AAA";
+        return uri == null ? null: uri.getPath();
         //return uri.getPath();
     }
 
     @TypeConverter
     public Uri toUri(String path){
-        return Uri.fromFile(new File(path));
+        return path == null ? null : Uri.fromFile(new File(path));
     }
 }
