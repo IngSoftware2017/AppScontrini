@@ -27,7 +27,7 @@ public class OcrAnalyzer {
     private RawImage mainImage;
     private final String amountString = "TOTALE";
     private final int targetPrecision = 100; //Should be passed with image, or calculated with
-        //resolution of source image
+    //resolution of source image
 
 
     /**
@@ -119,7 +119,7 @@ public class OcrAnalyzer {
             targetText = rawBlock.findFirst(testString);
             if (targetText != null)
                 break;
-            }
+        }
         if (targetText != null) {
             Log.d("OcrAnalyzer.analyzeBFS", "Found first target string: "+ testString + " \nat: " + targetText.getDetection());
             Log.d("OcrAnalyzer.analyzeBFS", "Target text is at (left, top, right, bottom): "+ targetText.getRect().left + "; "
@@ -174,7 +174,7 @@ public class OcrAnalyzer {
                 if (tempResultList != null) {
                     singleResult.setDetectedTexts(tempResultList);
                     results.add(singleResult);
-                        Log.d("OcrAnalyzer", "Found target string in: " + rawText.getDetection() + "\nin " + tempResultList.size() + " blocks.");
+                    Log.d("OcrAnalyzer", "Found target string in: " + rawText.getDetection() + "\nin " + tempResultList.size() + " blocks.");
                 }
             }
         }
