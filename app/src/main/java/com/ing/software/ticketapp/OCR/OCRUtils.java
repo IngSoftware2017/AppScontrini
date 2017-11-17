@@ -16,7 +16,7 @@ import java.util.List;
  * @author Michelon
  */
 
-public class OCRUtils {
+class OCRUtils {
 
     /**
      * Crop image (values start from top left)

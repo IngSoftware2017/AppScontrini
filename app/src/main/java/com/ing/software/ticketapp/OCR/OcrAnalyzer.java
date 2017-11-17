@@ -19,7 +19,7 @@ import java.util.List;
  * @author Michelon
  * @author Zaglia
  */
-public class OcrAnalyzer {
+class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private OnOcrResultReadyListener ocrResultCb = null;
@@ -40,7 +40,7 @@ public class OcrAnalyzer {
      * @param ctx Android context.
      * @return 0 if successful, negative otherwise.
      */
-    public int initialize(Context ctx) {
+    int initialize(Context ctx) {
         context = ctx;
         ocrEngine = new TextRecognizer.Builder(ctx).build();
         ocrEngine.setProcessor(new Detector.Processor<TextBlock>() {
@@ -77,7 +77,7 @@ public class OcrAnalyzer {
      * @param frame Bitmap from which to extract an OcrResult. Not null.
      * @param resultCb Callback to get an OcrResult. Not null.
      */
-    public void getOcrResult(Bitmap frame, OnOcrResultReadyListener resultCb){
+    void getOcrResult(Bitmap frame, OnOcrResultReadyListener resultCb){
         ocrResultCb = resultCb;
         frame = getCroppedPhoto(frame, context);
         mainImage = new RawImage(frame);
@@ -91,7 +91,7 @@ public class OcrAnalyzer {
      * @param origTextBlocks detected blocks
      * @return list of ordered RawBlocks
      */
-    static List<RawBlock> orderBlocks(RawImage photo, SparseArray<TextBlock> origTextBlocks) {
+    private static List<RawBlock> orderBlocks(RawImage photo, SparseArray<TextBlock> origTextBlocks) {
         Log.d("OcrAnalyzer.analyzeST:" , "Preferred grid is: " + photo.getGrid());
         List<TextBlock> newOrderedTextBlocks = new ArrayList<>();
         for (int i = 0; i < origTextBlocks.size(); i++) {
@@ -113,7 +113,7 @@ public class OcrAnalyzer {
      * @param testString string to find
      * @return First RawText in first RawBlock with target string
      */
-    static RawBlock.RawText searchFirstString(List<RawBlock> rawBlocks, String testString) {
+    private static RawBlock.RawText searchFirstString(List<RawBlock> rawBlocks, String testString) {
         RawBlock.RawText targetText = null;
         for (RawBlock rawBlock : rawBlocks) {
             targetText = rawBlock.findFirst(testString);
@@ -135,7 +135,7 @@ public class OcrAnalyzer {
      * @param testString string to find
      * @return list of RawText where string is present
      */
-    static List<RawBlock.RawText> searchContinuousString(List<RawBlock> rawBlocks, String testString) {
+    private static List<RawBlock.RawText> searchContinuousString(List<RawBlock> rawBlocks, String testString) {
         List<RawBlock.RawText> targetTextList = new ArrayList<>();
         for (RawBlock rawBlock : rawBlocks) {
             List<RawBlock.RawText> tempTextList;
@@ -165,7 +165,7 @@ public class OcrAnalyzer {
      * @param precision precision to extend rect. See RawBlock.RawText.extendRect()
      * @return list of RawTexts in proximity of RawTexts containing target string
      */
-    static List<RawStringResult> searchContinuousStringExtended(List<RawBlock> rawBlocks, List<RawBlock.RawText> targetTextList, int precision) {
+    private static List<RawStringResult> searchContinuousStringExtended(List<RawBlock> rawBlocks, List<RawBlock.RawText> targetTextList, int precision) {
         List<RawStringResult> results = new ArrayList<>();
         for (RawBlock rawBlock : rawBlocks) {
             for (RawBlock.RawText rawText : targetTextList) {

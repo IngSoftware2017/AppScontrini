@@ -7,7 +7,7 @@ import java.util.HashMap;
  * Static class containing grids for probability regions (WIP)
  * @author Michelon
  */
-public class ProbGrid {
+class ProbGrid {
 
     private static final int GRIDCOUNT = 2; //number of grids
     private static final String RATIO16x9 = "16x9";
