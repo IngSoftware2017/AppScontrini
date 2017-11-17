@@ -1,11 +1,13 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.net.Uri;
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         initializeComponents();
     }
 
+    //Dal Maso
     //Gestione delle animazioni e visualizzazione delle foto salvate precedentemente
     public void initializeComponents(){
         printAllImages();
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Dal Maso
     //Animazioni per il Floating Action Button (FAB)
     public void animateFAB(){
 
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Dal Maso
     //Aggiunge una card alla lista
     //Accetta come input 2 string contenenti il titolo e la descrizione dello scontrino
     public void addToList(String title, String desc, Bitmap img){
@@ -108,10 +113,11 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
+
     /**PICCOLO
      * Metodo che "ripulisce" lo schermo dalle immagini
      */
-    private void clearAllImages(){
+    public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
         adapter.clear();
@@ -119,9 +125,9 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }//clearAllImages
 
-    //----------------------------------------//
-    //------- Funzione che scatta foto -------//
-    //----------------------------------------//
+
+    //Dal Maso
+    //Funzione che scatta foto
     static final int REQUEST_TAKE_PHOTO = 1;
 
     private void dispatchTakePictureIntent() {
@@ -133,14 +139,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //----------------------------------------//
-    //----------------------------------------//
-    //----------------------------------------//
 
-
-    //----------------------------------------//
-    //-------Selezione foto da galleria-------//
-    //----------------------------------------//
+    //Dal Maso
+    //Selezione foto da galleria
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
 
     public void pickImageFromGallery() {
@@ -148,14 +149,10 @@ public class MainActivity extends AppCompatActivity {
         intent.setType("image/*");
         startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
     }
-    //----------------------------------------//
-    //----------------------------------------//
-    //----------------------------------------//
 
 
-    //----------------------------------------//
-    //-----Cattura risultato degli intent-----//
-    //----------------------------------------//
+    //Dal Maso
+    //Cattura risultato degli intent
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -165,9 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             switch (requestCode) {
-                /**
-                 * Cristian
-                 */
+                //Cristian
                 //Foto scattata da noi
                 case (REQUEST_TAKE_PHOTO):
                     Bundle extras = data.getExtras();
@@ -179,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     break;
-
+                //Dal Maso
                 //Foto presa da galleria
                 case (PICK_PHOTO_FOR_AVATAR):
                     photoURI = data.getData();
@@ -187,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                     CropImage.activity(photoURI)
                             .start(this);
                     break;
-
+                //Dal Maso
                 //Gestisco il risultato del Resize
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     Log.d("Alla", "okoko");
@@ -204,15 +199,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    //----------------------------------------//
-    //----------------------------------------//
-    //----------------------------------------//
 
-
-
-    //----------------------------------------//
-    //------Salva foto presa da galleria------//
-    //----------------------------------------//
+    //Dal Maso
+    //Salva il bitmap passato nell'apposita cartella
     private void savePickedFile(Bitmap imageToSave) {
         String root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         File myDir = new File(root);
@@ -266,18 +255,11 @@ public class MainActivity extends AppCompatActivity {
         return uri;
 
     }
-    //----------------------------------------//
-    //----------------------------------------//
-    //----------------------------------------//
 
-
-    //----------------------------------------//
-    //-------Stampa delle foto salvate--------//
-    //----------------------------------------//
+    //Dal Maso
     //Legge tutte le immagini
     private File[] readAllImages(){
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files = directory.listFiles();
@@ -285,20 +267,18 @@ public class MainActivity extends AppCompatActivity {
         return files;
     }
 
+    //Dal Maso
     //Stampa tutte le immagini
-    private void printAllImages(){
+    public void printAllImages(){
         File[] files = readAllImages();
-
         for (int i = 0; i < files.length; i++)
         {
             Bitmap myBitmap = BitmapFactory.decodeFile(files[i].getAbsolutePath());
             addToList(files[i].getName(), "Descrizione della foto", myBitmap);
         }
-
     }
 
-
-
+    //Dal Maso
     //Stampa l'ultima foto
     private void printLastImage(){
         File[] files = readAllImages();
@@ -306,47 +286,24 @@ public class MainActivity extends AppCompatActivity {
         addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
     }
 
+    //Dal Maso
     //Stampa il bitmap passato (Solo per testing)
     private void printThisBitmap(Bitmap myBitmap){
         addToList("Print this bitmap", "Descrizione della foto", myBitmap);
     }
-    //----------------------------------------//
-    //----------------------------------------//
-    //----------------------------------------//
 
-    /**PICCOLO
-     * Metodo richiamato dal bottone per la cancellazione del file
-     * @param v
-     */
-    public void deletePhoto(View v) {
-        int pos=0;
-        //TODO:Settare pos, ovvero l'indice della foto da cancellare
-        ListView item= (ListView) v.getParent();
-        int position = item.getId();
-        ListView lv = (ListView) findViewById(R.id.list1);
-        Toast.makeText(getApplicationContext(), "ID:"+position, Toast.LENGTH_SHORT).show();
-        //deleteFile(pos);
-       //clearAllImages();
-        //printAllImages();
-    }//deleteFile
 
-    /**PICCOLO
+    /**PICCOLO_Edit by Dal Maso
      * Metodo che cancella l'i-esimo file in una directory
      * @param toDelete l'indice del file da cancellare
+     * @param path percorso del file da cancellare
      * @return se l'operazione è andata a buon fine
      */
-    private boolean deleteFile(int toDelete){
-        boolean result= false;
-        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+    public boolean deleteFile(int toDelete, String path){
+        boolean result = false;
         File directory = new File(path);
         File[] files = directory.listFiles();
-        for(int i=0; i< files.length;i++){
-            if(i==toDelete){
-                files[i].delete();
-                result=true;
-            }//if
-        }//for
-        return result;
+        return files[toDelete].delete();
     }//deleteFile
 
     /**

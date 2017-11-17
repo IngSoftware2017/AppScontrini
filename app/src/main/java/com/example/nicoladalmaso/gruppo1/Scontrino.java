@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 
 //CLASSE SCONTRINO CHE VIENE UTILIZZATA PER LA RAPPRESENTAZIONE GRAFICA SULLE CARDVIEW
 //Accetta titolo, descrizione e immagine che verranno prelevate dal db
-
+//Dal Maso
 public class Scontrino {
 
     private String titolo;

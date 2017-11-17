@@ -1,15 +1,23 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -17,12 +25,17 @@ import java.util.List;
  */
 
 //Classe utilizzata per dupplicare la view cardview all'interno della ListView
-
+//Dal Maso
 public class CustomAdapter extends ArrayAdapter<Scontrino> {
+
+    Context context;
+    String path = "";
+    int pos = 0;
 
     public CustomAdapter(Context context, int textViewResourceId,
                          List<Scontrino> objects) {
         super(context, textViewResourceId, objects);
+        this.context = context;
     }
 
     @Override
@@ -33,10 +46,45 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
         TextView titolo = (TextView)convertView.findViewById(R.id.title);
         TextView descrizione = (TextView)convertView.findViewById(R.id.description);
+        FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         Scontrino c = getItem(position);
         titolo.setText(c.getTitolo());
         descrizione.setText(c.getDescrizione());
         img.setImageBitmap(c.getImg());
+        fabDelete.setTag(position);
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                pos =  Integer.parseInt(v.getTag().toString());
+                Log.d("TAG", v.getTag().toString());
+                //context.deletePhoto(v);
+                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                Log.d("Dir", path);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage("Sei sicuro di voler eliminare lo scontrino?")
+                        .setTitle("Cancellazione");
+                // Add the buttons
+                builder.setPositiveButton("Cancella", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        File directory = new File(path);
+                        File[] files = directory.listFiles();
+                        if(files[pos].delete()){
+                            ((MainActivity)context).clearAllImages();
+                            ((MainActivity)context).printAllImages();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog alert = builder.show();
+                Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+                nbutton.setTextColor(Color.parseColor("#2196F3"));
+            }
+        });
         return convertView;
     }
+
 }
