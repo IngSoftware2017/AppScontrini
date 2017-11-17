@@ -9,7 +9,6 @@ import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -278,10 +277,6 @@ class RawImage {
     }
 }
 
-/**
-<<<<<<< HEAD
- * Class to store results from string search
- */
 /**
  * Class to store results from string search
  */
