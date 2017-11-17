@@ -29,6 +29,7 @@ public class DatabaseTest {
      Database database;
      DAO ticketDAO;
      TicketEntity testTicket;
+     TicketEntity testTicketDelete;
 
     @Before
     public  void setDatabase() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -45,6 +46,8 @@ public class DatabaseTest {
         testTicket.setShop("Decathlon");
         testTicket.setTitle("Football shoes");
         ticketDAO.addTicket(testTicket);
+        testTicketDelete = new TicketEntity();
+        ticketDAO.addTicket(testTicketDelete);
     }
 
 
@@ -61,12 +64,10 @@ public class DatabaseTest {
 
     @Test
     public void deleteTicketTest(){
-        /*
-        TicketEntity testTicketDelete = new TicketEntity();
+
         int id = testTicketDelete.getID();
-        ticketDAO.addTicket(testTicketDelete);
         assert (id == ticketDAO.deleteTicket(testTicketDelete.getID()));
-        */
+
         //TODO test with invalid ID, test with null ID (deleteTicket pre-conditions accept null)
     }
 
