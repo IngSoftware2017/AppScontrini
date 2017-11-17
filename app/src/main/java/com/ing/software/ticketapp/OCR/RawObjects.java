@@ -2,13 +2,13 @@ package com.ing.software.ticketapp.OCR;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -97,16 +97,16 @@ class RawBlock {
     }
 
     /**
-     * Get a map of rawTexts with the probability they contain the date non ordered
-     * @return map of texts + probability date is present
+     * Get a list of rawTexts with the probability they contain the date non ordered
+     * @return list of texts + probability date is present
      */
-    HashMap<RawText, Integer> getDateMap() {
-        HashMap<RawText, Integer> map = new HashMap<>();
+    List<RawGridResult> getDateList() {
+        List<RawGridResult> list = new ArrayList<>();
         for (RawText rawText : rawTexts) {
-            map.put(rawText, rawText.getDateProbability());
+            list.add(new RawGridResult(rawText, rawText.getDateProbability()));
         }
-        Log.d("MAP_SIZE_IS", " " + map.size());
-        return map;
+        Log.d("LIST_SIZE_IS", " " + list.size());
+        return list;
     }
 
     /**
@@ -135,7 +135,7 @@ class RawBlock {
         return new RectF(left, top, right, bottom);
     }
 
-    class RawText{
+    class RawText implements Comparable{
 
         private RectF rectText;
         private Text text;
@@ -230,6 +230,22 @@ class RawBlock {
         private boolean isInside(RectF rect) {
             return rect.contains(rectText);
         }
+
+        @Override
+        public int compareTo(@NonNull Object o) {
+            RawText text2 = (RawText) o;
+            RectF text2Rect = text2.getRect();
+            if (text2Rect.top != rectF.top)
+                return Math.round(text2Rect.top - rectF.top);
+            else if (text2Rect.left != rectF.left)
+                return Math.round(text2Rect.left - rectF.left);
+            else if (text2Rect.bottom != rectF.bottom)
+                return Math.round(text2Rect.bottom - rectF.bottom);
+            else if (text2Rect.right != rectF.right)
+                return Math.round(text2Rect.right - rectF.right);
+            else
+                return 0;
+        }
     }
 }
 
@@ -262,14 +278,14 @@ class RawImage {
 }
 
 /**
- * Class to store results from amount search
+ * Class to store results from string search
  */
-class RawResult {
+class RawStringResult {
 
     private RawBlock.RawText sourceText;
     private List<RawBlock.RawText> detectedTexts = null;
 
-    RawResult(RawBlock.RawText rawText) {
+    RawStringResult(RawBlock.RawText rawText) {
         this.sourceText = rawText;
     }
 
@@ -283,5 +299,36 @@ class RawResult {
 
     List<RawBlock.RawText> getDetectedTexts() {
         return detectedTexts;
+    }
+}
+
+/**
+ * Class to store results from grid search
+ */
+class RawGridResult implements Comparable{
+	
+	private int percentage;
+	private RawBlock.RawText singleText;
+	
+	RawGridResult(RawBlock.RawText singleText, int percentage) {
+		this.percentage = percentage;
+		this.singleText = singleText;
+	}
+	
+	int getPercentage() {
+		return percentage;
+	}
+	
+	RawBlock.RawText getText() {
+		return singleText;
+	}
+
+    @Override
+    public int compareTo(@NonNull Object o) {
+        RawGridResult res2 = (RawGridResult) o;
+        if (getPercentage() == res2.getPercentage())
+            return getText().compareTo(res2.getText());
+        else
+            return res2.getPercentage() - getPercentage();
     }
 }

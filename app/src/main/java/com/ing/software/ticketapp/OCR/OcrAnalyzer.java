@@ -11,7 +11,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -56,11 +56,11 @@ public class OcrAnalyzer {
                     SparseArray<TextBlock> tempArray = detections.getDetectedItems();
                     List<RawBlock> rawBlocks = orderBlocks(mainImage, tempArray);
                     List<RawBlock.RawText> rawTexts = searchContinuousString(rawBlocks, amountString);
-                    List<RawResult> valuedTexts = searchContinuousStringExtended(rawBlocks, rawTexts, targetPrecision);
+                    List<RawStringResult> valuedTexts = searchContinuousStringExtended(rawBlocks, rawTexts, targetPrecision);
                     OcrResult newOcrResult = new OcrResult();
                     newOcrResult.setAmountResults(valuedTexts);
-                    HashMap<RawBlock.RawText, Integer> dateMap = getDateMap(rawBlocks);
-                    newOcrResult.setDateMap(dateMap);
+                    List<RawGridResult> dateList = getDateList(rawBlocks);
+                    newOcrResult.setDateMap(dateList);
                     ocrResultCb.onOcrResultReady(newOcrResult);
                 }
             }
@@ -165,11 +165,11 @@ public class OcrAnalyzer {
      * @param precision precision to extend rect. See RawBlock.RawText.extendRect()
      * @return list of RawTexts in proximity of RawTexts containing target string
      */
-    static List<RawResult> searchContinuousStringExtended(List<RawBlock> rawBlocks, List<RawBlock.RawText> targetTextList, int precision) {
-        List<RawResult> results = new ArrayList<>();
+    static List<RawStringResult> searchContinuousStringExtended(List<RawBlock> rawBlocks, List<RawBlock.RawText> targetTextList, int precision) {
+        List<RawStringResult> results = new ArrayList<>();
         for (RawBlock rawBlock : rawBlocks) {
             for (RawBlock.RawText rawText : targetTextList) {
-                RawResult singleResult = new RawResult(rawText);
+                RawStringResult singleResult = new RawStringResult(rawText);
                 List<RawBlock.RawText> tempResultList = rawBlock.findByPosition(OCRUtils.getExtendedRect(rawText.getRect(), rawText.getRawImage()), precision);
                 if (tempResultList != null) {
                     singleResult.setDetectedTexts(tempResultList);
@@ -183,8 +183,8 @@ public class OcrAnalyzer {
         }
         else {
             Log.d("OcrAnalyzer", "Final list: ");
-            for (RawResult rawResult : results) {
-                List<RawBlock.RawText> textList = rawResult.getDetectedTexts();
+            for (RawStringResult rawStringResult : results) {
+                List<RawBlock.RawText> textList = rawStringResult.getDetectedTexts();
                 if (textList == null)
                     Log.d("OcrAnalyzer", "Value not found.");
                 else {
@@ -198,17 +198,19 @@ public class OcrAnalyzer {
     }
 
     /**
-     * Merges Maps with RawText + probability to find date from all blocks. As maps, equal RawTexts are overwritten.
+     * Merges Lists with RawText + probability to find date from all blocks.
+     * And orders it. Equal RawText are overwritten.
      * @param rawBlocks blocks from which retrieve maps
      * @return HashMap containing RawText + probability
      */
-    private HashMap<RawBlock.RawText, Integer> getDateMap(List<RawBlock> rawBlocks) {
-        HashMap<RawBlock.RawText, Integer> map = new HashMap<>();
+    private List<RawGridResult> getDateList(List<RawBlock> rawBlocks) {
+        List<RawGridResult> fullList = new ArrayList<>();
         for (RawBlock rawBlock : rawBlocks) {
-            map.putAll(rawBlock.getDateMap());
+            fullList.addAll(rawBlock.getDateList());
         }
-        Log.d("FINAL_MAP_SIZE_IS", " " + map.size());
-        return map;
+        Log.d("FINAL_LIST_SIZE_IS", " " + fullList.size());
+        Collections.sort(fullList);
+        return fullList;
     }
 
     /**

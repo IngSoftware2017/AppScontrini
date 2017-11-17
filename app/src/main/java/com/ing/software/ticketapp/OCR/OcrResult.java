@@ -3,8 +3,6 @@ package com.ing.software.ticketapp.OCR;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -12,32 +10,32 @@ import java.util.List;
  */
 public class OcrResult {
 
-    private List<RawResult> amountResults;
-    private HashMap<RawBlock.RawText, Integer> dateMap;
+    private List<RawStringResult> amountResults;
+    private List<RawGridResult> dateList;
 
     OcrResult() {
     }
 
-    void setAmountResults(List<RawResult> amountResults) {
+    void setAmountResults(List<RawStringResult> amountResults) {
         this.amountResults = amountResults;
     }
 
-    void setDateMap(HashMap<RawBlock.RawText, Integer> dateMap) {
-        this.dateMap = dateMap;
+    void setDateMap(List<RawGridResult> dateList) {
+        this.dateList = dateList;
     }
 
-    List<RawResult> getAmountResults() {
+    List<RawStringResult> getAmountResults() {
         return amountResults;
     }
 
-    HashMap<RawBlock.RawText, Integer> getDateMap() {
-        return dateMap;
+    List<RawGridResult> getDateList() {
+        return dateList;
     }
 
     public String toString() {
         StringBuilder list = new StringBuilder();
         list.append("AMOUNT FOUND IN:");
-        for (RawResult result : amountResults) {
+        for (RawStringResult result : amountResults) {
             List<RawBlock.RawText> rawTexts = result.getDetectedTexts();
             if (rawTexts != null)
             {
@@ -58,11 +56,10 @@ public class OcrResult {
             list.append("\n");
         }
         */
-        List<RawBlock.RawText> datesTexts = new ArrayList<>(dateMap.keySet());
-        for (RawBlock.RawText text : datesTexts) {
-            int probability = dateMap.get(text);
-            list.append("POSSIBLE DATE: " + text.getDetection() + " with probability: " + probability);
-            Log.d("POSSIBLE DATE: ", text.getDetection() + " with probability: " + probability);
+        for (RawGridResult result : dateList) {
+            int probability = result.getPercentage();
+            list.append("POSSIBLE DATE: " + result.getText().getDetection() + " with probability: " + probability);
+            Log.d("POSSIBLE DATE: ", result.getText().getDetection() + " with probability: " + probability);
             list.append("\n");
         }
         return list.toString();
