@@ -15,9 +15,9 @@ import java.util.Date;
  */
 //Entity class of Ticket. Should not be used outside of the database module.
 
-@Entity(tableName = Constants.TICKET_TABLE_NAME, primaryKeys = {"ID"}) @TypeConverters(Converters.class)
-public class TicketEntity extends Ticket {
+@Entity(tableName = Constants.TICKET_TABLE_NAME) @TypeConverters(Converters.class)
 
+public class TicketEntity extends Ticket {
     //@PrimaryKey(autoGenerate = true) @ColumnInfo(name = Constants.TICKET_PRIMARY_KEY_NAME)
     //private int ID;
 
