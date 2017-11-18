@@ -3,7 +3,7 @@ package com.ing.software.ticketapp.OCR;
 /**
  * Callback interface used to get an OcrResult from OcrAnalyzer.
  */
-public interface OnOcrResultReadyListener {
+interface OnOcrResultReadyListener {
 
     /**
      * Get an OcrResult
