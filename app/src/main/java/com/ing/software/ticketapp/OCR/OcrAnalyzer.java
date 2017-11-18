@@ -27,7 +27,7 @@ class OcrAnalyzer {
     private RawImage mainImage;
     private final String amountString = "TOTALE";
     private final int targetPrecision = 100; //Should be passed with image, or calculated with
-    //resolution of source image
+        //resolution of source image
 
 
     /**

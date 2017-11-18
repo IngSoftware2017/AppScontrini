@@ -45,17 +45,6 @@ class OcrResult {
             }
         }
         list.append("\n");
-        /*
-        List<RawBlock.RawText> datesTexts = new ArrayList<>(dateMap.keySet());
-        List<Integer> probList = new ArrayList<>(dateMap.values());
-        for (int i = 0; i < dateMap.size(); ++i) {
-            RawBlock.RawText text = datesTexts.get(i);
-            int probability = probList.get(i);
-            list.append("POSSIBLE DATE: " + text.getDetection() + " with probability: " + probability);
-            Log.d("POSSIBLE DATE: ", text.getDetection() + " with probability: " + probability);
-            list.append("\n");
-        }
-        */
         for (RawGridResult result : dateList) {
             int probability = result.getPercentage();
             list.append("POSSIBLE DATE: " + result.getText().getDetection() + " with probability: " + probability);
