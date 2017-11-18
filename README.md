@@ -1,17 +1,17 @@
-[![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/Kraktun/AppScontrini)
+[![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/Kraktun/AppScontrini)
 
 ## FUNZIONAMENTO ANALISI OCR:
 I metodi realizzati finora sono abbastanza basilari:  
-* [orderBlocks()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L94)  
+* [orderBlocks()](https://github.com/IngSoftware2017/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/ticketapp/OCR/OcrAnalyzer.java#L94)  
 	Ordina i blocchi sparsi ricevuti dal detector in una lista seguendo l'ordinamento alto -> basso, sinistra -> destra
 	Nota: Sono ordinati solo i blocchi, quindi i RawText possono risultare complessivamente non ordinati.  
-* [searchFirstString()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L116)  
+* [searchFirstString()](https://github.com/IngSoftware2017/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/ticketapp/OCR/OcrAnalyzer.java#L116)  
 	Cerca il primo RawText contenente la stringa passata come parametro nella lista ordinata da analyzeSingleText(). L'ordinamento (dall'alto verso il basso e da sinistra a destra) è eseguito solo sui blocchi, quindi il primo match non è detto che sia effettivamente nel primo Text.  
 	Restituisce il primo RawText individuato.  
-* [searchContinuousString()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L138)  
+* [searchContinuousString()](https://github.com/IngSoftware2017/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/ticketapp/OCR/OcrAnalyzer.java#L138)  
 	Cerca tutti i RawText contenenti la stringa passata come parametro. Restituisce una lista contenente tutti i RawText che contengono quella stringa.  
 	L'ordinamento (dall'alto verso il basso e da sinistra a destra) è eseguito solo sui blocchi, quindi la lista può risultare complessivamente non ordinata.  
-* [searchContinuousStringExtended()](https://github.com/Kraktun/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/appscontrini/OCR/OcrAnalyzer.java#L168)  
+* [searchContinuousStringExtended()](https://github.com/IngSoftware2017/AppScontrini/blob/gruppo2/app/src/main/java/com/ing/software/ticketapp/OCR/OcrAnalyzer.java#L168)  
 	Riceve una lista dei RawText contenenti la stringa passata come parametro. Per ognuno di questi RawText:  
 		- estrae il rettangolo del RawText  
 		- estende la larghezza del rettangolo a quella della foto  
@@ -21,7 +21,8 @@ I metodi realizzati finora sono abbastanza basilari:
 	La lista è non ordinata, nel senso i RawText individuati in uno stesso rettangolo esteso sono "vicini", ma seguono l'ordinamento dei blocchi.  
 
 ## TO DO	 
-* Inserire ordinamento per RawText (è già scritto basta implementarlo)  
-* Utilizzare griglie di decisione  
+[X] Inserire ordinamento per RawText (Ora sono comparable)  
+[X] Inizializzare griglie di decisione 
+[ ] Applicare analisi a griglie di decisione 
 	
 	
