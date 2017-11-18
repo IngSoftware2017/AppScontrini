@@ -24,7 +24,7 @@ public class DataAnalyzer {
      * @param photo Bitmap. Not null.
      * @param ticketCb callback to get the ticket. Not null.
      */
-    public void getTicket(Bitmap photo, OnTicketReadyListener ticketCb) {
+    public void getTicket(Bitmap photo, final OnTicketReadyListener ticketCb) {
         analyzer.getOcrResult(photo, new OnOcrResultReadyListener() {
             @Override
             public void onOcrResultReady(OcrResult result) {

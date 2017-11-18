@@ -20,7 +20,7 @@ class OcrResult {
         this.amountResults = amountResults;
     }
 
-    void setDateMap(List<RawGridResult> dateList) {
+    void setDateList(List<RawGridResult> dateList) {
         this.dateList = dateList;
     }
 

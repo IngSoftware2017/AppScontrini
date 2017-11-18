@@ -60,7 +60,7 @@ class OcrAnalyzer {
                     OcrResult newOcrResult = new OcrResult();
                     newOcrResult.setAmountResults(valuedTexts);
                     List<RawGridResult> dateList = getDateList(rawBlocks);
-                    newOcrResult.setDateMap(dateList);
+                    newOcrResult.setDateList(dateList);
                     ocrResultCb.onOcrResultReady(newOcrResult);
                 }
             }
