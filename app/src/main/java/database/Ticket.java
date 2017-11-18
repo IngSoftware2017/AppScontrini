@@ -1,5 +1,6 @@
 package database;
 
+import android.arch.persistence.room.PrimaryKey;
 import android.net.Uri;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
 
 public class Ticket {
 
+    @PrimaryKey(autoGenerate = true)
     protected int ID;
     private Uri fileUri;
     private BigDecimal amount;
