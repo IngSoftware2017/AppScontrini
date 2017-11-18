@@ -135,7 +135,7 @@ class RawBlock {
         return new RectF(left, top, right, bottom);
     }
 
-    class RawText implements Comparable{
+    class RawText implements Comparable<RawText>{
 
         private RectF rectText;
         private Text text;
@@ -232,9 +232,8 @@ class RawBlock {
         }
 
         @Override
-        public int compareTo(@NonNull Object o) {
-            RawText text2 = (RawText) o;
-            RectF text2Rect = text2.getRect();
+        public int compareTo(@NonNull RawText rawText) {
+            RectF text2Rect = rawText.getRect();
             if (text2Rect.top != rectF.top)
                 return Math.round(text2Rect.top - rectF.top);
             else if (text2Rect.left != rectF.left)
@@ -306,7 +305,7 @@ class RawStringResult {
 /**
  * Class to store results from grid search
  */
-class RawGridResult implements Comparable{
+class RawGridResult implements Comparable<RawGridResult>{
 	
 	private int percentage;
 	private RawBlock.RawText singleText;
@@ -325,11 +324,10 @@ class RawGridResult implements Comparable{
 	}
 
     @Override
-    public int compareTo(@NonNull Object o) {
-        RawGridResult res2 = (RawGridResult) o;
-        if (getPercentage() == res2.getPercentage())
-            return getText().compareTo(res2.getText());
+    public int compareTo(@NonNull RawGridResult rawGridResult) {
+        if (getPercentage() == rawGridResult.getPercentage())
+            return getText().compareTo(rawGridResult.getText());
         else
-            return res2.getPercentage() - getPercentage();
+            return rawGridResult.getPercentage() - getPercentage();
     }
 }
