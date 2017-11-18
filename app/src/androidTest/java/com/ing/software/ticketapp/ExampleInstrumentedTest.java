@@ -1,21 +1,11 @@
 package com.ing.software.ticketapp;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.ing.software.ticketapp.OCR.DataAnalyzer;
-import com.ing.software.ticketapp.OCR.OcrAnalyzer;
-import com.ing.software.ticketapp.OCR.OcrResult;
-import com.ing.software.ticketapp.OCR.OnOcrResultReadyListener;
-import com.ing.software.ticketapp.OCR.OnTicketReadyListener;
-import com.ing.software.ticketapp.common.Ticket;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.concurrent.CountDownLatch;
 
 import static junit.framework.Assert.assertEquals;
 
