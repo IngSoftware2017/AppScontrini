@@ -79,16 +79,17 @@ public class Reflect {
 
     @Test
     public void testInvokeInnerClass() throws Exception {
-        TestClass tc =
-        invoke(new TestClass(), "testPublicReturnVoid", new TestClass());
+        TestClass tc = new TestClass();
+        invoke(tc, "testPublicReturnVoid");
+        assertEquals(1, tc.field);
     }
 
-    //These tests are not exaustive but invoke will be used enough to be certain it's bug free
+    //These tests are not exhaustive but invoke will be used enough to be certain it's bug free
 }
 
 class TestClass {
 
-    public int field = 0;
+    int field = 0;
 
     private int testPrivateWithParams(int a, Float b){
         return a + b.intValue();
@@ -98,7 +99,7 @@ class TestClass {
         return new TestClass();
     }
 
-    public void testPublicReturnVoid(TestClass a){
-        a.field = 1;
+    public void testPublicReturnVoid(){
+        field = 1;
     }
 }
