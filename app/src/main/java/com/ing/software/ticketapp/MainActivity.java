@@ -24,14 +24,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(view, "Service started", Snackbar.LENGTH_LONG)
+                        .setAction("Service", null).show();
             }
         });
-
-        // Example of a call to a native method
-        TextView tv = findViewById(R.id.sample_text);
-        //tv.setText(stringFromJNI());
     }
 
     @Override
