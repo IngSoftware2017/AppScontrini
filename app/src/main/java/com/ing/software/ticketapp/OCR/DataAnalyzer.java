@@ -5,6 +5,8 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.ing.software.ticketapp.OCR.OcrObjects.RawGridResult;
+import com.ing.software.ticketapp.OCR.OcrObjects.RawStringResult;
 import com.ing.software.ticketapp.common.Ticket;
 
 

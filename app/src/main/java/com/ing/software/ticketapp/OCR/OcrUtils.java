@@ -7,6 +7,7 @@ import android.support.annotation.Size;
 import android.util.Log;
 
 import com.google.android.gms.vision.text.TextBlock;
+import com.ing.software.ticketapp.OCR.OcrObjects.RawImage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import java.util.List;
  * @author Michelon
  */
 
-class OcrUtils {
+public class OcrUtils {
 
     /**
      * Crop image (values start from top left)
@@ -79,7 +80,7 @@ class OcrUtils {
      * @param photo original photo
      * @return preferred ratio defined in ProbGrid, -1 if something went wrong
      */
-    static String getPreferredGrid(Bitmap photo) {
+     public static String getPreferredGrid(Bitmap photo) {
         double width = photo.getWidth();
         double heigth = photo.getHeight();
         String preferredRatio = "-1";
@@ -140,7 +141,7 @@ class OcrUtils {
      * @param tag tag of the message to log, must be less than 23 chars long
      * @param message message to log
      */
-    static void log(@Size(max = 23) String tag, String message) {
+    public static void log(@Size(max = 23) String tag, String message) {
         if (OcrVars.ISDEBUGENABLED)
             Log.d(tag, message);
     }

@@ -10,6 +10,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.ing.software.ticketapp.OCR.OcrObjects.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,7 +59,7 @@ class OcrAnalyzer {
                 if (ocrResultCb != null) {
                     SparseArray<TextBlock> tempArray = detections.getDetectedItems();
                     List<RawBlock> rawBlocks = orderBlocks(mainImage, tempArray);
-                    List<RawBlock.RawText> rawTexts = searchContinuousString(rawBlocks, amountString);
+                    List<RawText> rawTexts = searchContinuousString(rawBlocks, amountString);
                     List<RawStringResult> valuedTexts = searchContinuousStringExtended(rawBlocks, rawTexts, targetPrecision);
                     OcrResult newOcrResult = new OcrResult();
                     newOcrResult.setAmountResults(valuedTexts);
@@ -119,8 +120,8 @@ class OcrAnalyzer {
      * @param testString string to find
      * @return First RawText in first RawBlock with target string
      */
-    private static RawBlock.RawText searchFirstString(@NonNull List<RawBlock> rawBlocks, @Size(min = 1) String testString) {
-        RawBlock.RawText targetText = null;
+    private static RawText searchFirstString(@NonNull List<RawBlock> rawBlocks, @Size(min = 1) String testString) {
+        RawText targetText = null;
         for (RawBlock rawBlock : rawBlocks) {
             targetText = rawBlock.findFirst(testString);
             if (targetText != null)
@@ -141,17 +142,17 @@ class OcrAnalyzer {
      * @param testString string to find.
      * @return list of RawText where string is present. Note: this list is not ordered.
      */
-    private static List<RawBlock.RawText> searchContinuousString(@NonNull List<RawBlock> rawBlocks, @Size(min = 1) String testString) {
-        List<RawBlock.RawText> targetTextList = new ArrayList<>();
+    private static List<RawText> searchContinuousString(@NonNull List<RawBlock> rawBlocks, @Size(min = 1) String testString) {
+        List<RawText> targetTextList = new ArrayList<>();
         for (RawBlock rawBlock : rawBlocks) {
-            List<RawBlock.RawText> tempTextList;
+            List<RawText> tempTextList;
             tempTextList = rawBlock.findContinuous(testString);
             if (tempTextList != null) {
                 targetTextList.addAll(tempTextList);
             }
         }
         if (targetTextList.size() >0 && ISDEBUGENABLED) {
-            for (RawBlock.RawText text : targetTextList) {
+            for (RawText text : targetTextList) {
                 log("OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getDetection());
                 log("OcrAnalyzer", "Target text is at (left, top, right, bottom): " + text.getRect().left
                         + "; " + text.getRect().top + "; " + text.getRect().right + "; " + text.getRect().bottom + ".");
@@ -169,12 +170,12 @@ class OcrAnalyzer {
      * @param precision precision to extend rect. See RawBlock.RawText.extendRect()
      * @return list of RawTexts in proximity of target RawTexts. Note: this list is not ordered.
      */
-    private static List<RawStringResult> searchContinuousStringExtended(@NonNull List<RawBlock> rawBlocks, @NonNull List<RawBlock.RawText> targetTextList, int precision) {
+    private static List<RawStringResult> searchContinuousStringExtended(@NonNull List<RawBlock> rawBlocks, @NonNull List<RawText> targetTextList, int precision) {
         List<RawStringResult> results = new ArrayList<>();
         for (RawBlock rawBlock : rawBlocks) {
-            for (RawBlock.RawText rawText : targetTextList) {
+            for (RawText rawText : targetTextList) {
                 RawStringResult singleResult = new RawStringResult(rawText);
-                List<RawBlock.RawText> tempResultList = rawBlock.findByPosition(OcrUtils.getExtendedRect(rawText.getRect(), rawText.getRawImage()), precision);
+                List<RawText> tempResultList = rawBlock.findByPosition(OcrUtils.getExtendedRect(rawText.getRect(), rawText.getRawImage()), precision);
                 if (tempResultList != null) {
                     singleResult.setDetectedTexts(tempResultList);
                     results.add(singleResult);
@@ -188,11 +189,11 @@ class OcrAnalyzer {
         else if (ISDEBUGENABLED){
             log("OcrAnalyzer", "Final list: ");
             for (RawStringResult rawStringResult : results) {
-                List<RawBlock.RawText> textList = rawStringResult.getDetectedTexts();
+                List<RawText> textList = rawStringResult.getDetectedTexts();
                 if (textList == null)
                     log("OcrAnalyzer", "Value not found.");
                 else {
-                    for (RawBlock.RawText rawText : textList) {
+                    for (RawText rawText : textList) {
                         log("OcrAnalyzer", "Value: " + rawText.getDetection());
                     }
                 }

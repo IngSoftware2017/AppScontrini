@@ -8,6 +8,4 @@ public class OcrVars {
 
     static final boolean ISDEBUGENABLED = true;
     static final String amountString = "TOTALE";
-
-
 }
