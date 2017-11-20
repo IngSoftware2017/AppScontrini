@@ -167,10 +167,8 @@ public class MainActivity extends AppCompatActivity {
                 case (REQUEST_TAKE_PHOTO):
                     Bundle extras = data.getExtras();
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    Uri temp=savePhotoForCrop(imageBitmap);
-                    //invoco il resize
-                    CropImage.activity(temp)
-                            .start(this);
+                  savePickedFile(imageBitmap);
+                  printLastImage();
 
 
                     break;
