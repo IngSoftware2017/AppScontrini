@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         //Camera button
         fab1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                dispatchTakePictureIntent();
+                takePhotoIntent();
             }
         });
         //Gallery button
@@ -126,16 +128,43 @@ public class MainActivity extends AppCompatActivity {
     }//clearAllImages
 
 
-    //Dal Maso
-    //Funzione che scatta foto
+
+    /**Lazzarin
+     * This function creates the allocation for the photo we'll take.
+     * @Framing Directory Pictures
+     *
+     */
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String time = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + time + "_";
+        File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File imageAllocation = File.createTempFile(imageFileName, ".jpg", storageDirectory);
+        return imageAllocation;
+    }
     static final int REQUEST_TAKE_PHOTO = 1;
+    /**
+     * Lazzarin
+     * This function opens the camera,assigns to the photo the correct file
+     * @Framing Camera, directory modified by createImageFile
+     */
+    private void takePhotoIntent() {
+        Intent takePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePhoto.resolveActivity(getPackageManager()) != null)
+        {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            }
+            catch (IOException e) {}
 
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-
+            if (photoFile != null) {
+                Uri photoUri = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
+            }
         }
     }
 
@@ -162,16 +191,23 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             switch (requestCode) {
-                //Cristian
-                //Foto scattata da noi
+
+                /**Lazzarin
+                 * Photo taken with camera: this function reads the Uri from the Intent
+                 *
+                 *@Framing adds photo into ViewList
+                 */
                 case (REQUEST_TAKE_PHOTO):
                     Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                  savePickedFile(imageBitmap);
-                  printLastImage();
-
-
+                    Uri imageUri = (Uri) extras.get("data");
+                    try{
+                        Bitmap bitFromUri = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                        savePickedFile(bitFromUri);
+                        printLastImage();}
+                    catch(IOException e)
+                    {}
                     break;
+
                 //Dal Maso
                 //Foto presa da galleria
                 case (PICK_PHOTO_FOR_AVATAR):
@@ -226,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Cristian
+     * Lazzarin
      * parametro di ingresso: Bitmap imageToCrop
      * @return Uri
      * il parametro Uri ritornato è preso dal file intermedio tra foto
@@ -234,24 +270,29 @@ public class MainActivity extends AppCompatActivity {
      * venga visualizzato nella gallery)
      */
     private Uri savePhotoForCrop (Bitmap imageToCrop) {
-        String root = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString();
-        File myDir = new File(root);
-        String imageFileName = "photoToCrop.jpg";
-
-        File file = new File(myDir, imageFileName);
-        if (file.exists())
-            file.delete();
+        File allocation=temporaryFile();
         try {
-            FileOutputStream out = new FileOutputStream(file);
+            FileOutputStream out = new FileOutputStream(allocation);
             imageToCrop.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Uri uri=Uri.fromFile(file);
+        Uri uri=Uri.fromFile(allocation);
         return uri;
 
+    }
+
+    private File temporaryFile()
+    {
+        String root = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString();
+        File myDir = new File(root);
+        String imageFileName = "photoToCrop.jpg";
+        File file = new File(myDir, imageFileName);
+        if (file.exists())
+            file.delete();
+        return file;
     }
 
     //Dal Maso
