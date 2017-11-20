@@ -2,6 +2,7 @@ package database;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.net.Uri;
@@ -22,6 +23,7 @@ public class TicketEntity extends Ticket {
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = Constants.TICKET_PRIMARY_KEY_NAME)
     private int ID;
 
+    @Ignore
     /**
      * Constructor
      */
@@ -30,15 +32,32 @@ public class TicketEntity extends Ticket {
     }
 
     /**
+     * Parametric constructor
+     *
+     * @param fileUri Path associated with the the ticket file stored in the memory
+     * @param amount total amount
+     * @param shop Name of the shop in which the ticket was issued
+     * @param date the issue date of the ticket
+     * @param title name given
+     */
+    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title) {
+        super(fileUri, amount, shop, date   ,title);
+    }
+
+    /**
      * Returns the ticket ID
      * @return  ID
      */
-    public int getID() { return ID; }
+    public int getID() {
+        return ID;
+    }
 
     /**
      * DO NOT USE
      * @param ID
      */
-    public void setID(int ID) { this.ID = ID; }
+    protected void setID(int ID) {
+        this.ID = ID;
+    }
 
 }
