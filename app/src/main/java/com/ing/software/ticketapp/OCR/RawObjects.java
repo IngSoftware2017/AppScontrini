@@ -140,7 +140,7 @@ class RawBlock {
 
         private RectF rectText;
         private Text text;
-
+      
         /**
          * Constructor
          * @param text current Text inside TextBlock

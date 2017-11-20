@@ -24,5 +24,3 @@ I metodi realizzati finora sono abbastanza basilari:
 - [x] Inserire ordinamento per RawText (Ora sono comparable)  
 - [x] Inizializzare griglie di decisione  
 - [ ] Applicare analisi a griglie di decisione  
-	
-	
