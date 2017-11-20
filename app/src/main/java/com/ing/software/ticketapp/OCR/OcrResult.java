@@ -1,8 +1,6 @@
 package com.ing.software.ticketapp.OCR;
 
-
 import android.util.Log;
-
 import java.util.List;
 
 /**

@@ -1,11 +1,11 @@
 package com.ing.software.ticketapp.OCR;
 
+import java.util.List;
 import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.ing.software.ticketapp.common.Ticket;
 
-import java.util.List;
 
 /**
  * Class used to extract informations from raw data
