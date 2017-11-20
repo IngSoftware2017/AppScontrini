@@ -3,7 +3,6 @@ package com.ing.software.ticketapp.OCR;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
@@ -11,6 +10,8 @@ import com.google.android.gms.vision.text.TextBlock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import static com.ing.software.ticketapp.OCR.OcrUtils.log;
 
 /**
  * Class to store objects detected.
@@ -37,7 +38,7 @@ class RawBlock {
     }
 
     /**
-     * Populates this block with its Rawtexts
+     * Populates this block with its RawTexts
      */
     private void initialize() {
         for (Text currentText : textComponents) {
@@ -76,10 +77,10 @@ class RawBlock {
     }
 
     /**
-     * Find all Rawtexts inside chosen rect with an error of 'percent' (on width and height of chosen rect)
+     * Find all RawTexts inside chosen rect with an error of 'percent' (on width and height of chosen rect)
      * @param rect rect where you want to find texts
      * @param percent error accepted on chosen rect
-     * @return list of RawText in chosen rect, null if nothing found
+     * @return list of RawTexts in chosen rect, null if nothing found
      */
     List<RawText> findByPosition(RectF rect, int percent) {
         List<RawText> rawTextList = new ArrayList<>();
@@ -87,7 +88,7 @@ class RawBlock {
         for (RawText rawText : rawTexts) {
             if (rawText.isInside(newRect)) {
                 rawTextList.add(rawText);
-                Log.d("OcrAnalyzer", "Found target rect: " + rawText.getDetection());
+                log("OcrAnalyzer", "Found target rect: " + rawText.getDetection());
             }
         }
         if (rawTextList.size()>0)
@@ -97,7 +98,7 @@ class RawBlock {
     }
 
     /**
-     * Get a list of rawTexts with the probability they contain the date non ordered
+     * Get a list of RawTexts with the probability they contain the date, non ordered
      * @return list of texts + probability date is present
      */
     List<RawGridResult> getDateList() {
@@ -105,7 +106,7 @@ class RawBlock {
         for (RawText rawText : rawTexts) {
             list.add(new RawGridResult(rawText, rawText.getDateProbability()));
         }
-        Log.d("LIST_SIZE_IS", " " + list.size());
+        log("LIST_SIZE_IS", " " + list.size());
         return list;
     }
 
@@ -117,7 +118,7 @@ class RawBlock {
      * @return new extended rectangle
      */
     private RectF extendRect(RectF rect, int percent) {
-        Log.d("RawObjects.extendRect","Source rect: left " + rect.left + " top: "
+        log("RawObjects.extendRect","Source rect: left " + rect.left + " top: "
                 + rect.top + " right: " + rect.right + " bottom: " + rect.bottom);
         float extendedHeight = rect.height()*percent/100;
         float extendedWidth = rect.width()*percent/100;
@@ -130,7 +131,7 @@ class RawBlock {
         //Doesn't matter if bottom and right are outside the photo
         float right = rect.right + extendedWidth/2;
         float bottom = rect.bottom + extendedHeight/2;
-        Log.d("RawObjects.extendRect","Extended rect: left " + left + " top: " + top
+        log("RawObjects.extendRect","Extended rect: left " + left + " top: " + top
                 + " right: " + right + " bottom: " + bottom);
         return new RectF(left, top, right, bottom);
     }
@@ -139,6 +140,7 @@ class RawBlock {
 
         private RectF rectText;
         private Text text;
+      
         /**
          * Constructor
          * @param text current Text inside TextBlock
@@ -174,11 +176,11 @@ class RawBlock {
          * @return probability that date is present
          */
         private int getDateProbability() {
-            Log.d("Value is: ", getDetection());
+            log("Value is: ", getDetection());
             int[] gridBox = getGridBox();
-            Log.d("Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
+            log("Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
             int probability = ProbGrid.dateMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
-            Log.d("Probability is", " " +probability);
+            log("Probability is", " " +probability);
             return probability;
         }
 
@@ -216,10 +218,7 @@ class RawBlock {
          */
         private boolean bruteSearch(String string) {
             //Here Euristic search will be implemented
-            if (getDetection().contains(string))
-                return true;
-            else
-                return false;
+            return getDetection().contains(string);
         }
 
         /**
@@ -260,7 +259,7 @@ class RawImage {
     RawImage(Bitmap bitmap) {
         height = bitmap.getHeight();
         width = bitmap.getWidth();
-        grid = OCRUtils.getPreferredGrid(bitmap);
+        grid = OcrUtils.getPreferredGrid(bitmap);
     }
 
     int getHeight() {

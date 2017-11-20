@@ -1,5 +1,6 @@
 package com.ing.software.ticketapp.OCR;
 
+
 import java.util.List;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,7 +15,11 @@ public class DataAnalyzer {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
 
-
+    /**
+     * Initialize OcrAnalyzer
+     * @param context Android context
+     * @return 0 if everything ok, negative number if an error occurred
+     */
     public int initialize(Context context) {
         return analyzer.initialize(context);
     }
@@ -34,6 +39,11 @@ public class DataAnalyzer {
         });
     }
 
+    /**
+     * Coverts an OcrResult into a Ticket analyzing its data
+     * @param result OcrResult to analyze. Not null.
+     * @return Ticket. Some fields can be null;
+     */
     private Ticket getTicketFromResult(OcrResult result) {
         List<RawGridResult> dateMap = result.getDateList();
         List<RawStringResult> amountResults = result.getAmountResults();
