@@ -1,6 +1,10 @@
 package com.ing.software.ticketapp.OCR;
 
 
+import com.ing.software.ticketapp.OCR.OcrObjects.RawGridResult;
+import com.ing.software.ticketapp.OCR.OcrObjects.RawStringResult;
+import com.ing.software.ticketapp.OCR.OcrObjects.RawText;
+
 import java.util.List;
 
 import static com.ing.software.ticketapp.OCR.OcrUtils.log;
@@ -55,9 +59,9 @@ class OcrResult {
         list.append("AMOUNT FOUND IN:");
         if (amountResults != null) {
             for (RawStringResult result : amountResults) {
-                List<RawBlock.RawText> rawTexts = result.getDetectedTexts();
+                List<RawText> rawTexts = result.getDetectedTexts();
                 if (rawTexts != null) {
-                    for (RawBlock.RawText text : rawTexts) {
+                    for (RawText text : rawTexts) {
                         list.append(text.getDetection()).append("\n");
                     }
                 }
