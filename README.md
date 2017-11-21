@@ -1,12 +1,7 @@
-### Gruppo2
-[![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/IngSoftware2017/AppScontrini)
-### Gruppo2_dev
-[![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_dev)](https://travis-ci.org/IngSoftware2017/AppScontrini)
-### K_main
-[![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=K_main)](https://travis-ci.org/Kraktun/AppScontrini)
-### K_gruppo2
-[![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/Kraktun/AppScontrini)
- 
+| Gruppo2  | Gruppo2_dev | K_main | K_gruppo2 |
+| ------------- | ------------- | ------------- | ------------- |
+| [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/IngSoftware2017/AppScontrini)  | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_dev)](https://travis-ci.org/IngSoftware2017/AppScontrini)  | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=K_main)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/Kraktun/AppScontrini) |
+
  
 ## BRANCH PER TEST PERSONALE  
 « Per me si va ne la città dolente,  
