@@ -4,11 +4,10 @@ import android.support.annotation.NonNull;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
- * Linkedlist iterator for simplify the code testing of OCR module
+ * Linkedlist iterator of bitmap for simplify the code testing of OCR module
  *
  * Created by matteo.mascotto on 18/11/2017.
  */
@@ -36,7 +35,7 @@ public class TicketsIterator<Bitmap> implements Iterable<Bitmap> {
     }
 
     /**
-     * Return the Bitmap element of the actual Node
+     * Return the Bitmap element of a specific Node
      *
      * @param element the bitmap image we want to obtain from the LinkedList
      */
@@ -85,26 +84,35 @@ public class TicketsIterator<Bitmap> implements Iterable<Bitmap> {
         }
     }
 
+    /*
+     * Interface of the iterator of the class
+     */
     @NonNull
     @Override
     public Iterator<Bitmap> iterator() {
         return new LinkedListIterator();
     }
 
+    /*
+     * Operations to do for each element of the LinkedList - actual empty (18/11/2017)
+     */
     @Override
     public void forEach(Consumer<? super Bitmap> action) {
 
     }
 
-    @Override
-    public Spliterator<Bitmap> spliterator() {
-        return null;
-    }
-
+    /*
+     * Iterator of Bitmap for the iterable class TicketsIterator
+     *
+     * Created by matteo.mascotto on 18/11/2017.
+     */
     private class LinkedListIterator implements Iterator<Bitmap> {
 
         Node<Bitmap> current = null;
 
+        /*
+         * Verify if there's one more element into the LinkedList
+         */
         @Override
         public boolean hasNext() {
             if (current == null && head != null) {
@@ -115,6 +123,9 @@ public class TicketsIterator<Bitmap> implements Iterable<Bitmap> {
             return false;
         }
 
+        /*
+         * It return the next bitmap element in the LinkedList
+         */
         @Override
         public Bitmap next() {
             if (current == null && head != null) {
