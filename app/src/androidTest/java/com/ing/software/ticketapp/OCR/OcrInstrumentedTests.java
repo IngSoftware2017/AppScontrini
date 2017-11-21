@@ -10,6 +10,6 @@ import static junit.framework.Assert.*;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-class OcrInstrumentedTests {
+public class OcrInstrumentedTests {
 
 }
