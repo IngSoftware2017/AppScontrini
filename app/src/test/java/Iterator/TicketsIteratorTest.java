@@ -80,7 +80,7 @@ public class TicketsIteratorTest {
     @Test
     public void iterate_throught_TicketsIterator_in_right_order() {
 
-        int i = 0;
+        int i = 0, count = 0;
         int minHeight = 100, maxHeight = 500;
         int minWeight = 100, maxWeight = 500;
         Random numR = new Random();
