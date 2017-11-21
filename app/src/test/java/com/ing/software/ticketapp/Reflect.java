@@ -78,7 +78,7 @@ public class Reflect {
     }
 
     @Test
-    public void testInvokeInnerClass() throws Exception {
+    public void testInvokeReturnVoid() throws Exception {
         TestClass tc = new TestClass();
         invoke(tc, "testPublicReturnVoid");
         assertEquals(1, tc.field);

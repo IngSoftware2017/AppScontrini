@@ -1,13 +1,27 @@
 package com.ing.software.ticketapp;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+
+import com.ing.software.ticketapp.OCR.DataAnalyzer;
+import com.ing.software.ticketapp.OCR.OnTicketReadyListener;
+import com.ing.software.ticketapp.common.Ticket;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static junit.framework.Assert.assertEquals;
+import java.io.InputStream;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+
+import static junit.framework.Assert.*;
 
 
 /**
@@ -20,50 +34,33 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void useAppContext() throws Exception {
-        /* Commented waiting for a proper test, this one hangs indefinitely
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
+        final Semaphore sem = new Semaphore(0);
 
-        OcrAnalyzer ocrAnalyzer = new OcrAnalyzer();
-        while (ocrAnalyzer.initialize(appContext) != 0)
+        final String folder = "photos";
+        AssetManager mgr = InstrumentationRegistry.getInstrumentation()
+                .getContext().getResources().getAssets();
+        final int imgTot = mgr.list(folder).length;
+        //todo: load dataset infos
+
+        DataAnalyzer analyzer = new DataAnalyzer();
+        while (analyzer.initialize(appContext) != 0)
             Thread.sleep(10);
-        final DataAnalyzer dataAnalyzer = new DataAnalyzer();
 
+        for (int i = 0; i < imgTot; i++) {
+            InputStream is = mgr.open(folder + "/" + String.valueOf(i) + ".jpg");
+            Bitmap bm = BitmapFactory.decodeStream(is);
 
-        // number of Tickets
-        int imgsTot = 1;
-        // Object used to lock current thread until all photos are processed.
-        final CountDownLatch cdl = new CountDownLatch(imgsTot);
+            analyzer.getTicket(bm, new OnTicketReadyListener() {
+                @Override
+                public void onTicketReady(Ticket ticket) {
 
+                    //todo: compare Ticket to dataset
 
-        // todo: assegnare la bitmap con una foto di uno scontrino.
-        // cancellare questa riga e assegnare una bitmap valida.
-        Bitmap bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
-
-
-        ocrAnalyzer.getOcrResult(bitmap, new OnOcrResultReadyListener() {
-            @Override
-            public void onOcrResultReady(OcrResult result) {
-                dataAnalyzer.getTicket(result, new OnTicketReadyListener() {
-                    @Override
-                    public void onTicketReady(Ticket ticket) {
-
-
-                        //todo: controllare che i dati contenuti in ticket sono corretti.
-
-
-                        //decreases the counter
-                        cdl.countDown();
-                    }
-                });
-            }
-        });
-
-        //Thread lock. If the counter reaches zero, the thread unlocks and the test ends.
-        cdl.await();
-        */
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.ing.software.ticketapp", appContext.getPackageName());
+                    sem.release();
+                }
+            });
+            sem.acquire();
+        }
     }
 }

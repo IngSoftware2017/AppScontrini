@@ -34,6 +34,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'org.bytedeco:javacv-platform:1.3.3'
+    implementation 'org.bytedeco:javacv-platform:1.3.3'
     //compile 'org.bytedeco.javacpp-presets:opencv:3.2.0-1.3'
 }
+
+task copyDataset(type: Copy){
+    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
+        exclude '**/desktop.ini' //desktop.ini files break AssetManager
+    }
+    into "${projectDir}/src/androidTest/assets"
+}
+
+tasks.preBuild.dependsOn('copyDataset')
