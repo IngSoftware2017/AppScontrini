@@ -143,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
     /**
      * Lazzarin
-     * This function opens the camera,assigns to the photo the correct file
+     * Funzione che apre la fotocamera e assegna alla foto il File restituito
+     * dal metodo createImageFile.
      * @Framing Camera, directory modified by createImageFile
      */
     private void takePhotoIntent() {
