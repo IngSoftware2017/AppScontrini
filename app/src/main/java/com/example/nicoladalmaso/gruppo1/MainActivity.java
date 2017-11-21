@@ -130,16 +130,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**Lazzarin
-     * This function creates the allocation for the photo we'll take.
+     * crea un file temporaneo dove salvare la foto scattata
      * @Framing Directory Pictures
      *
      */
     private File createImageFile() throws IOException {
-        // Create an image file name
-        String time = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + time + "_";
+
         File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File imageAllocation = File.createTempFile(imageFileName, ".jpg", storageDirectory);
+        File imageAllocation = File.createTempFile("temp", ".jpg", storageDirectory);
         return imageAllocation;
     }
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -162,8 +160,24 @@ public class MainActivity extends AppCompatActivity {
                 Uri photoUri = FileProvider.getUriForFile(this,
                         "com.example.android.fileprovider",
                         photoFile);
+
                 takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                CropImage.activity(photoURI).start(this);
+
                 startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+      //Dal Maso
+    public void deleteTempFiles(){
+        File[] files = readAllImages();
+        String filename = "";
+        for (int i = 0; i < files.length; i++)
+        {
+            filename = files[i].getName();
+            Log.d("Sub", filename.substring(0,4));
+            if(filename.substring(0,4).equals("temp")){
+                files[i].delete();
             }
         }
     }
@@ -193,11 +207,11 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode) {
 
                 /**Lazzarin
-                 * Photo taken with camera: this function reads the Uri from the Intent
-                 *
+                 * Gestisce l'intent prodotto dalla fotocamera
+                 *Per il momento lo tengo buono, per una futura implementazione senza crop ad ogni scatto
                  *@Framing adds photo into ViewList
                  */
-                case (REQUEST_TAKE_PHOTO):
+              /*  case (REQUEST_TAKE_PHOTO):
                     Bundle extras = data.getExtras();
                     Uri imageUri = (Uri) extras.get("data");
                     try{
@@ -206,6 +220,13 @@ public class MainActivity extends AppCompatActivity {
                         printLastImage();}
                     catch(IOException e)
                     {}
+                    break;*/
+                /**lazzarin
+                 * Gestisce l'intent prodotto dalla fotocamera,andando ad eliminare il file temporaneo
+                 * che è già stato passato al metodo di crop
+                 */
+                case(REQUEST_TAKE_PHOTO):
+                    deleteTempFiles();
                     break;
 
                 //Dal Maso
@@ -284,9 +305,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *
+     * @return temporary allocation with a File object.
+     */
     private File temporaryFile()
     {
-        String root = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString();
+        String root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         File myDir = new File(root);
         String imageFileName = "photoToCrop.jpg";
         File file = new File(myDir, imageFileName);
