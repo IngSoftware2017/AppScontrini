@@ -145,4 +145,144 @@ public class OcrUtils {
         if (OcrVars.ISDEBUGENABLED)
             Log.d(tag, message);
     }
+
+
+    /**
+     * Returns the maximum between |i| e |j|
+     *
+     * @param i The first integer not null to be compared
+     * @param j The second integer not null to be compared
+     * @return maximum number
+     */
+    private static int maxLenghtStrings(int i, int j)
+    {
+        return (i>j ? i : j);
+    }
+
+    /**
+     * Returns the minimum between |i|, |j| e |k|
+     *
+     * @param i The first integer not null to be compared
+     * @param j The second integer not null to be compared
+     * @param k The third integer not null to be compared
+     * @return minimum number
+     */
+    private static int minLenghtStrings(int i, int j, int k)
+    {
+        int result = i;
+        if (j < result) result = j;
+        if (k < result) result = k;
+        return result;
+    }
+
+    /**
+     * Returns the distance of Levenshtein between two strings | S | e | T |.
+     * The distance is an integer between 0 and the maximum length of the two strings.
+     * If only one string is null then return -1
+     *
+     * @param S The first string to be compared
+     * @param T The second string to be compared
+     * @return distance between two strings
+     */
+    private static int levDistance(String S, String T )
+    {
+        if(S == null || T == null)
+            return -1;
+
+        int i, j;
+        final int n = S.length(), m = T.length();
+        int L[][] = new int[n+1][m+1];
+        for ( i=0; i<n+1; i++ ) {
+            for ( j=0; j<m+1; j++ ) {
+                if ( i==0 || j==0 ) {
+                    L[i][j] = maxLenghtStrings(i, j);
+                } else {
+                    L[i][j] = minLenghtStrings(L[i-1][j] + 1, L[i][j-1] + 1,
+                            L[i-1][j-1] + (S.charAt(i-1) != T.charAt(j-1) ? 1 : 0) );
+                }
+            }
+        }
+
+        return L[n][m];
+    }
+
+    /**
+     * Check if there is a substring in the text
+     * The text is subdivided into tokens and each token is checked
+     * If only one string is null then return -1
+     * If text lenght is 0 then return -1
+     *
+     * @param text The text to be compared
+     * @param substring The second string to be compared
+     * @return the slightest difference between strings and text
+     */
+    private static int findSubstring(String text, String substring)
+    {
+        if(text.length() == 0)
+            return -1;
+
+        if(text == null || substring == null)
+            return -1;
+
+        int minDistance = text.length();
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        for (String p: pack){
+
+            //Convert string to uppercase
+            int distanceNow = levDistance(p.toUpperCase(), substring.toUpperCase());
+            if(distanceNow<minDistance)
+                minDistance = distanceNow;
+        }
+
+        return minDistance;
+
+    }
+
+
+
+
+    /**
+     * Passa un testo e controlla se è presente una compbinazione di date
+     * controllo se la distanza della data riconoscituta ed una data standard va tra 6 e 8/9
+     * controllo per tutte le combinazioni con
+     * xx/xx/xxxx o xx/xx/xxxx o xxxx/xx/xx
+     * xx-xx-xxxx o xx-xx-xxxx o xxxx-xx-xx
+     * xx.xx.xxxx o xx.xx.xxxx xxxx.xx.xx
+     *
+     *
+     * @param text The first string to be compared
+     * @return la minima distanza trovata tra tutte le combinazioni
+     */
+    private static int findDate(String text) {
+        if (text.length() == 0)
+            return -1;
+
+        int minDistance = text.length();
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        //String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        String[] formatDate = {"xx/xx/xx","xx-xx-xx", "xx.xx.xx"};
+
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                    minDistance = distanceNow;
+            }
+        }
+
+        if(minDistance >= 6 && minDistance <= 8)
+            return minDistance;
+        else
+            return -1;
+
+    }
 }
