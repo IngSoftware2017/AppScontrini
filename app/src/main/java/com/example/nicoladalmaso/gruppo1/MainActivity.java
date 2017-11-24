@@ -271,9 +271,10 @@ public class MainActivity extends AppCompatActivity {
         try {
             FileOutputStream out = new FileOutputStream(file);
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            //aggiungo il file al db
+            //PICCOLO
+            // aggiungo il file al db
             //DatabaseManager helper = DatabaseManager.getInstance(getApplicationContext());
-           // helper.addPhoto(root+fname); DB ALTERNATIVO
+            //helper.addPhoto(root+fname); DB ALTERNATIVO
             //DbManager db = new DbManager(getApplicationContext());
             //db.addRecord(root+fname,"","","");
             out.flush();
@@ -365,11 +366,24 @@ public class MainActivity extends AppCompatActivity {
      * @return se l'operazione è andata a buon fine
      */
     public boolean deleteFile(int toDelete, String path){
-        boolean result = false;
         File directory = new File(path);
         File[] files = directory.listFiles();
         return files[toDelete].delete();
     }//deleteFile
+
+
+    /**PICCOLO_Edit by Dal Maso
+     * Metodo che cancella permette all'utente di ridimensionare la foto
+     * @param toCrop l'indice della foto di cui fire il resize
+     * @param path percorso della foto
+     */
+    public void cropFile(int toCrop, String path){
+        Toast.makeText(getApplicationContext(), "aaaaaaaaaaaaaaaaaaaaa", Toast.LENGTH_SHORT).show();
+        boolean result = false;
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
+    }//cropFile
 
     /**
      * VERSIONE DATABASE

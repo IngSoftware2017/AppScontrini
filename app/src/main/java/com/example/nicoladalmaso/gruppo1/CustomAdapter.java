@@ -3,6 +3,7 @@ package com.example.nicoladalmaso.gruppo1;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.util.List;
@@ -47,6 +50,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         TextView titolo = (TextView)convertView.findViewById(R.id.title);
         TextView descrizione = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
+        FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
         Scontrino c = getItem(position);
         titolo.setText(c.getTitolo());
         descrizione.setText(c.getDescrizione());
@@ -84,7 +88,30 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 nbutton.setTextColor(Color.parseColor("#2196F3"));
             }
         });
+        //PICCOLO
+        fabCrop.setTag(position);
+        fabCrop.setOnClickListener(new View.OnClickListener(){
+            public void onClick (View v){
+                pos = Integer.parseInt(v.getTag().toString());
+                path=getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                cropFile(pos,path);
+                /*File directory =new File(path);
+                File[] files =directory.listFiles();
+                CropImage.activity(Uri.fromFile(files[pos])).start(MainActivity.this);*/
+            }//onClick
+        });
         return convertView;
     }
-
+    /**PICCOLO_Edit by Dal Maso
+     * Metodo che cancella permette all'utente di ridimensionare la foto
+     * @param toCrop l'indice della foto di cui fire il resize
+     * @param path percorso della foto
+     */
+    public void cropFile(int toCrop, String path){
+        Toast.makeText(context, "aaaaaaaaaaaaaaaaaaaaa", Toast.LENGTH_SHORT).show();
+        boolean result = false;
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        CropImage.activity(Uri.fromFile(files[toCrop])).start(MainActivity.this);
+    }//cropFile
 }
