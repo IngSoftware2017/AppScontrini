@@ -3,13 +3,25 @@
  */
 
 package com.ing.software.ticketapp.OCR;
+
+import com.ing.software.ticketapp.*;
+import android.content.res.AssetManager;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import static com.ing.software.ticketapp.ExampleInstrumentedTest.*;
 
 import static junit.framework.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-class OcrInstrumentedTests {
+public class OcrInstrumentedTests {
 
+    @Test
+    public void findCornersTest() throws Exception {
+        ImagePreprocessor.findCorners(getBitmap(0));
+        assertEquals(4, 2 + 2);
+    }
 }
