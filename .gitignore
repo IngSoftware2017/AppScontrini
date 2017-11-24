@@ -9,3 +9,4 @@
 .externalNativeBuild
 desktop.ini
 **/photos
+.idea/vcs.xml

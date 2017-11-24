@@ -7,14 +7,14 @@ import java.util.HashMap;
  * Static class containing grids for probability regions (WIP)
  * @author Michelon
  */
-class ProbGrid {
+public class ProbGrid {
 
     private static final int GRIDCOUNT = 2; //number of grids
     private static final String RATIO16x9 = "16x9";
     private static final String RATIO16x7 = "16x7";
     static HashMap<Double, String> gridMap = new HashMap<>(GRIDCOUNT);
-    static HashMap<String, Integer[][]> amountMap = new HashMap<>(GRIDCOUNT);
-    static HashMap<String, Integer[][]> dateMap = new HashMap<>(GRIDCOUNT);
+    public static HashMap<String, Integer[][]> amountMap = new HashMap<>(GRIDCOUNT);
+    public static HashMap<String, Integer[][]> dateMap = new HashMap<>(GRIDCOUNT);
     private static final Integer[][] AmountGrid16x9 = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
