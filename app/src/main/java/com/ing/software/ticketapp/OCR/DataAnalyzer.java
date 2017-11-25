@@ -3,6 +3,9 @@ package com.ing.software.ticketapp.OCR;
 import java.util.List;
 import android.content.Context;
 import android.graphics.Bitmap;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import com.ing.software.ticketapp.OCR.OcrObjects.RawGridResult;
 import com.ing.software.ticketapp.OCR.OcrObjects.RawStringResult;
