@@ -57,22 +57,29 @@ public class ExampleInstrumentedTest {
         int imgsTot = getTotImgs();
 
         DataAnalyzer analyzer = new DataAnalyzer();
-        while (analyzer.initialize(appContext) != 0)
-            Thread.sleep(10);
 
-        for (int i = 0; i < imgsTot; i++) {
-            final Ticket target = null; //todo: initialize
-            analyzer.getTicket(getBitmap(i), new OnTicketReadyListener() {
-                @Override
-                public void onTicketReady(Ticket ticket) {
+        int c = 0;
+        int TIMEOUT = 60; // 1 min
+        while (analyzer.initialize(appContext) != 0) {
+            Thread.sleep(1000); // 1 sec
+            c++;
+        }
 
-                    //todo: compare Ticket to dataset
-                    //assertEquals(target, ticket);
+        if (c < TIMEOUT) {
+            for (int i = 0; i < imgsTot; i++) {
+                final Ticket target = null; //todo: initialize
+                analyzer.getTicket(getBitmap(i), new OnTicketReadyListener() {
+                    @Override
+                    public void onTicketReady(Ticket ticket) {
 
-                    sem.release();
-                }
-            });
-            sem.acquire();
+                        //todo: compare Ticket to dataset
+                        //assertEquals(target, ticket);
+
+                        sem.release();
+                    }
+                });
+                sem.acquire();
+            }
         }
     }
 }
