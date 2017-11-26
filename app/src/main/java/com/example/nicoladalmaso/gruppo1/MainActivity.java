@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     public void addToList(String title, String desc, Bitmap img){
         list.add(new Scontrino(title, desc, img));
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list,this);
         listView.setAdapter(adapter);
     }
 
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list,this);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
 
                 takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 CropImage.activity(photoURI).start(this);
-
                 startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
             }
         }
