@@ -115,7 +115,6 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         File[] files = directory.listFiles();
         String filename=files[toCrop].getName();
         CropImage.activity(Uri.fromFile(files[toCrop])).start(act);
-        //files[toCrop].delete();
         //TODO: Sistemare il cambio di nome della foto ritagliata
         ((MainActivity)context).clearAllImages();
         ((MainActivity)context).printAllImages();
