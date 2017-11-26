@@ -1,24 +1,30 @@
 package database;
 
-import android.arch.persistence.room.PrimaryKey;
 import android.net.Uri;
 import java.math.BigDecimal;
 import java.util.Date;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.TypeConverters;
+import android.arch.persistence.room.PrimaryKey;
+
 
 /**
  * Represents the ticket and its associated information
  * @author Marco Olivieri (Team 3)
  */
 
+@Entity(tableName = Constants.TICKET_TABLE_NAME) @TypeConverters(Converters.class)
+
 public class Ticket {
 
     @PrimaryKey(autoGenerate = true)
-    protected int ID;
+    private int ID;
     private Uri fileUri;
     private BigDecimal amount;
     private String shop;
     private Date date;
     private String title;
+    private String category;
 
     /**
      * Non parametric constructor
@@ -120,6 +126,20 @@ public class Ticket {
      * @param title not null
      */
     public void setTitle (String title) { this.title = title; }
+
+    /**
+     * Restituisce la categoria del Ticket
+     *
+     * @return title
+     */
+    public String getCategory() { return category; }
+
+    /**
+     * Imposta la categoria del Ticket
+     *
+     * @param category not null
+     */
+    public void setCategory (String category) { this.category = category; }
 
     /**
      * Returns a String with Ticket data formatted as follows:

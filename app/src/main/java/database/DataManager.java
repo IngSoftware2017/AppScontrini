@@ -24,7 +24,7 @@ public class DataManager {
      * @return ID of the created record, -1 if the method fails
      */
     public int addTicket(Ticket ticket){
-        return (int)database.ticketDao().addTicket((TicketEntity) ticket);
+        return (int)database.ticketDao().addTicket(ticket);
     }
 
     /**Modifies the values (with the exception of ID) of a ticket stored in the database
@@ -34,26 +34,26 @@ public class DataManager {
     * @return true if the update is executed, false otherwise (i.e. invalid ID)
     */
     public boolean updateTicket(Ticket ticket){
-         return database.ticketDao().updateTicket((TicketEntity) ticket)>0; //true if at least a ticket is updated
+         return database.ticketDao().updateTicket(ticket)>0; //true if at least a ticket is updated
     }
 
     /**
      * @return List<Ticket> not null, which contains all the tickets in the database
      */
     public List<Ticket> getAllTickets(){
-        return toTicket(database.ticketDao().getAllTickets());
+        return database.ticketDao().getAllTickets();
     }
 
-    /**
-     Turns a List of TicketEntity into a List of Ticket
-     * @param ticketEntities not null
-     * @return an instance of Ticket with values from the TicketEntity received
-     */
-    private List<Ticket> toTicket(List<TicketEntity> ticketEntities){
-        ArrayList<Ticket> tickets = new ArrayList<Ticket>();
-        for(TicketEntity entity : ticketEntities){
-            tickets.add((TicketEntity) entity);
-        }
-        return tickets;
-    }
+//    /**
+//     Turns a List of TicketEntity into a List of Ticket
+//     * @param ticketEntities not null
+//     * @return an instance of Ticket with values from the TicketEntity received
+//     */
+//    private List<Ticket> toTicket(List<TicketEntity> ticketEntities){
+//        ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+//        for(Ticket entity : ticketEntities){
+//            tickets.add((Ticket) entity);
+//        }
+//        return tickets;
+//    }
 }

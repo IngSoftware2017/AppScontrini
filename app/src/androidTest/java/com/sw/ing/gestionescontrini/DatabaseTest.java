@@ -19,7 +19,7 @@ import java.util.Date;
 
 import database.DAO;
 import database.Database;
-import database.TicketEntity;
+import database.Ticket;
 
 /**
  * Created by Federico Taschin on 12/11/2017.
@@ -30,7 +30,7 @@ public class DatabaseTest {
 
      static Database database;
      static DAO ticketDAO;
-     static TicketEntity testTicket1, testTicket2;
+     static Ticket testTicket1, testTicket2;
 
     @Before
     public static void setDatabase() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -44,13 +44,13 @@ public class DatabaseTest {
 
     @Before
     public void setTicket(){
-        testTicket1 = new TicketEntity();
+        testTicket1 = new Ticket();
         testTicket1.setAmount(new BigDecimal(12));
         testTicket1.setDate(new Date(1996,10,12));
         testTicket1.setShop("Decathlon");
         testTicket1.setTitle("Football shoes");
 
-        testTicket2 = new TicketEntity();
+        testTicket2 = new Ticket();
         testTicket2.setAmount(new BigDecimal(12));
         testTicket2.setDate(new Date(1966,11,12));
         testTicket2.setShop("wwww");

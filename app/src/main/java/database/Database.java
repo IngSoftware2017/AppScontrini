@@ -11,7 +11,7 @@ import android.content.Context;
  * Created by Taschin Federico on 08/11/2017.
  */
 
-@android.arch.persistence.room.Database(entities = {TicketEntity.class}, version = 1)
+@android.arch.persistence.room.Database(entities = {Ticket.class}, version = 1)
 public abstract class Database extends RoomDatabase {
 
     private static Database INSTANCE; //Unique instance of the Database object
