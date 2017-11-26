@@ -197,19 +197,147 @@ public class DistanceStringUnitTest {
 
     }
 
+    @Test
+    public void haveSubstring4() throws Exception {
+
+        String text = "Il cane corre nel prato";
+        String substring = "pato";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(1, r);
+
+    }
+
+    @Test
+    public void haveSubstring5() throws Exception {
+
+        String text = "totole";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(1, r);
+
+    }
+
+    @Test
+    public void haveSubstring6() throws Exception {
+
+        String text = "i";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(-1, r);
+
+    }
+
 
     @Test
     public void FindDateTest1() throws Exception {
+
+        String a = "il questo testo la data 23-06-19";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(0, r);
+    }
+
+    @Test
+    public void FindDateTest2() throws Exception {
 
         String a = "il questo testo la 23-06-1995";
         Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
-        assertEquals(6, r);
-        //assertTrue((r >= 6) && (r <= 8));
+        assertEquals(0, r);
     }
-    
+
+    @Test
+    public void FindDateTest3() throws Exception {
+
+        String a = "il questo testo la data non è presenteuytr";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(-1, r);
+    }
+
+    @Test
+    public void FindDateTest4() throws Exception {
+
+        String a = "il questo testo la data non è 10 -";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(1, r);
+    }
+
+    @Test
+    public void FindDateTest5() throws Exception {
+
+        String a = "il questo testo la data non è 10- dsad ty23-06-m";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(0, r);
+    }
+
+    @Test
+    public void FindDateTest6() throws Exception {
+
+        String a = "il questo testo la data non è 10- dsad 2376-06-95";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(0, r);
+    }
+
+    @Test
+    public void FindDateTest7() throws Exception {
+
+        String a = "il questo testo la data non è  dsad 2jk hjh3-6-19";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(0, r);
+    }
+
+    @Test
+    public void FindDateTest8() throws Exception {
+
+        String a = "il questo test33-20-29od la data non è  dsad 2jk hjh3-6-19";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(0, r);
+    }
+
+    @Test
+    public void FindDateTest9() throws Exception {
+
+        String a = "il questo test33-20-29od la data non è  dsad 2jk hj h3-6-19";
+        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a);
+
+        assertEquals(0, r);
+    }
 
 
 }

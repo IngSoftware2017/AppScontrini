@@ -224,6 +224,9 @@ public class OcrUtils {
         if(text == null || substring == null)
             return -1;
 
+        if(text.length() < substring.length())
+            return -1;
+
         int minDistance = text.length();
 
         //Splits the string into tokens
@@ -245,16 +248,15 @@ public class OcrUtils {
 
 
     /**
-     * Passa un testo e controlla se è presente una compbinazione di date
-     * controllo se la distanza della data riconoscituta ed una data standard va tra 6 e 8/9
-     * controllo per tutte le combinazioni con
+     * Accept a text and check if there is a combination of date format.
+     * Controllo per tutte le combinazioni simili a
      * xx/xx/xxxx o xx/xx/xxxx o xxxx/xx/xx
      * xx-xx-xxxx o xx-xx-xxxx o xxxx-xx-xx
      * xx.xx.xxxx o xx.xx.xxxx xxxx.xx.xx
      *
-     *
-     * @param text The first string to be compared
-     * @return la minima distanza trovata tra tutte le combinazioni
+     * @param text The text to find the date format
+     * @return the absolute value of the minimum distance found between all combinations,
+     * if the distance is >= 10 or the inserted text is empty returns -1
      */
     private static int findDate(String text) {
         if (text.length() == 0)
@@ -265,9 +267,7 @@ public class OcrUtils {
         //Splits the string into tokens
         String[] pack = text.split("\\s");
 
-        //String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
-
-        String[] formatDate = {"xx/xx/xx","xx-xx-xx", "xx.xx.xx"};
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
 
 
         for (String p : pack) {
@@ -279,10 +279,13 @@ public class OcrUtils {
             }
         }
 
-        if(minDistance >= 6 && minDistance <= 8)
-            return minDistance;
-        else
+        if(minDistance==10)
             return -1;
+        else
+            return Math.abs(8-minDistance); //Returns the absolute value of the distance by subtracting 8 which is the minimum of number combinations
+
+
+
 
     }
 }
