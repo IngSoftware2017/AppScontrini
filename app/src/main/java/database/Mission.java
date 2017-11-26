@@ -7,6 +7,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
+import android.net.Uri;
 
 /**
  * Represents one mission and its associated information
@@ -26,6 +27,7 @@ public class Mission {
     private Date endMission;
     private String locality;
     private boolean isRepay;
+    private Uri excel;
 
     @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
     private int personID;
@@ -51,6 +53,7 @@ public class Mission {
         this.endMission = endMission;
         this.locality = locality;
         isRepay = false;
+        excel = null;
         this.personID = personID;
     }
 
@@ -133,6 +136,22 @@ public class Mission {
      */
     public void setRepay(boolean isRepay) {
         this.isRepay = isRepay;
+    }
+
+    /**
+     * Returns path of the file excel format
+     * @return excel
+     */
+    public Uri getExcel() {
+        return excel;
+    }
+
+    /**
+     * Sets path of the file excel format
+     * @param excel
+     */
+    public void setExcel(Uri excel) {
+        this.excel = excel;
     }
 
     /**
