@@ -2,18 +2,33 @@ package database;
 
 import java.util.Date;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.TypeConverters;
+import android.arch.persistence.room.PrimaryKey;
+
 /**
  * Represents one mission and its associated information
  * @author Marco Olivieri on 26/11/2017 (Team 3)
  */
 
+@Entity(tableName = Constants.MISSION_TABLE_NAME,
+        foreignKeys = @ForeignKey(entity = Person.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
+@TypeConverters(Converters.class)
+
 public class Mission {
 
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
     private int ID;
     private Date startMission;
     private Date endMission;
     private String locality;
     private boolean isRepay;
+
+    @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
+    private int personID;
 
     /**
      * Non parametric constructor
@@ -28,13 +43,15 @@ public class Mission {
      * @param startMission Date of the beginning of the mission
      * @param endMission Date of the end of the mission
      * @param locality Name of locality where the mission took place
+     * @param personID code of the person of this mission
      */
-    public Mission(int ID, Date startMission, Date endMission, String locality) {
+    public Mission(int ID, Date startMission, Date endMission, String locality, int personID) {
         this.ID = ID;
         this.startMission = startMission;
         this.endMission = endMission;
         this.locality = locality;
         isRepay = false;
+        this.personID = personID;
     }
 
     /**
@@ -116,6 +133,22 @@ public class Mission {
      */
     public void setRepay(boolean isRepay) {
         this.isRepay = isRepay;
+    }
+
+    /**
+     * Returns person id of this mission
+     * @return personID
+     */
+    public int getPersonID() {
+        return personID;
+    }
+
+    /**
+     * Sets person id of this mission
+     * @param personID
+     */
+    public void setPersonID(int personID) {
+        this.personID = personID;
     }
 }
 

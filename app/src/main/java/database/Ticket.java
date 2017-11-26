@@ -1,11 +1,13 @@
 package database;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.TypeConverters;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.ColumnInfo;
 import android.net.Uri;
 import java.math.BigDecimal;
 import java.util.Date;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.TypeConverters;
-import android.arch.persistence.room.PrimaryKey;
 
 
 /**
@@ -13,7 +15,9 @@ import android.arch.persistence.room.PrimaryKey;
  * @author Marco Olivieri (Team 3)
  */
 
-@Entity(tableName = Constants.TICKET_TABLE_NAME) @TypeConverters(Converters.class)
+@Entity(tableName = Constants.TICKET_TABLE_NAME,
+        foreignKeys = @ForeignKey(entity = Mission.class, parentColumns = Constants.MISSION_PRIMARY_KEY_NAME, childColumns = Constants.MISSION_CHILD_COLUMNS))
+@TypeConverters(Converters.class)
 
 public class Ticket {
 
@@ -25,6 +29,9 @@ public class Ticket {
     private Date date;
     private String title;
     private String category;
+
+    @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
+    private int missionID;
 
     /**
      * Non parametric constructor
@@ -41,14 +48,16 @@ public class Ticket {
      * @param shop Name of the shop in which the ticket was issued
      * @param date the issue date of the ticket
      * @param title name given
+     * @param missionID code of the mission
      */
-    public Ticket(int id, Uri fileUri, BigDecimal amount, String shop, Date date, String title) {
+    public Ticket(int id, Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
         this.ID = id;
         this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
         this.shop = shop;
         this.title = title;
+        this.missionID = missionID;
     }
 
     /**
@@ -140,6 +149,23 @@ public class Ticket {
      * @param category not null
      */
     public void setCategory (String category) { this.category = category; }
+
+    /**
+     * Returns the mission id of this ticket
+     * @return missionID
+     */
+    public int getMissionID() {
+        return missionID;
+    }
+
+    /**
+     * Sets mission id of this Ticket
+     * @param missionID
+     */
+    public void setMissionID(int missionID) {
+        this.missionID = missionID;
+    }
+
 
     /**
      * Returns a String with Ticket data formatted as follows:

@@ -1,12 +1,21 @@
 package database;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.TypeConverters;
+import android.arch.persistence.room.PrimaryKey;
+
 /**
  * Represents one person that does some missions
  * @author Marco Olivieri on 26/11/2017 (Team 3)
  */
 
+@Entity(tableName = Constants.PERSON_TABLE_NAME) @TypeConverters(Converters.class)
+
 public class Person {
 
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = Constants.PERSON_PRIMARY_KEY_NAME)
     private int ID;
     private String name;
     private String lastName;
