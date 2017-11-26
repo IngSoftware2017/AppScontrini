@@ -60,7 +60,7 @@ public class ExampleInstrumentedTest {
 
         int c = 0;
         int TIMEOUT = 60; // 1 min
-        while (analyzer.initialize(appContext) != 0) {
+        while (analyzer.initialize(appContext) != 0 && c < TIMEOUT) {
             Thread.sleep(1000); // 1 sec
             c++;
         }
