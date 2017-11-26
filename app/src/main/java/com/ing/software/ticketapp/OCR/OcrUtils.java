@@ -210,7 +210,7 @@ public class OcrUtils {
      * Check if there is a substring in the text
      * The text is subdivided into tokens and each token is checked
      * If only one string is null then return -1
-     * If text lenght is 0 then return -1
+     * If the token length is less than 2 then returns -1
      *
      * @param text The text to be compared
      * @param substring The second string to be compared
@@ -218,13 +218,10 @@ public class OcrUtils {
      */
     private static int findSubstring(String text, String substring)
     {
-        if(text.length() == 0)
+        if(text.length() <= 2 )
             return -1;
 
         if(text == null || substring == null)
-            return -1;
-
-        if(text.length() < substring.length())
             return -1;
 
         int minDistance = text.length();
