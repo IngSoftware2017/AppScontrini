@@ -7,4 +7,6 @@
 /build
 /captures
 .externalNativeBuild
+desktop.ini
+**/photos
 .idea/vcs.xml

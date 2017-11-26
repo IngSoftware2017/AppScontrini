@@ -1,6 +1,5 @@
 package com.ing.software.ticketapp.OCR;
 
-
 import com.ing.software.ticketapp.OCR.OcrObjects.RawGridResult;
 import com.ing.software.ticketapp.OCR.OcrObjects.RawStringResult;
 import com.ing.software.ticketapp.OCR.OcrObjects.RawText;
