@@ -34,14 +34,11 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
     Context context;
     String path = "";
     int pos = 0;
-    MainActivity act= null;
-
 
     public CustomAdapter(Context context, int textViewResourceId,
-                         List<Scontrino> objects,MainActivity actual) {
+                         List<Scontrino> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
-        act=actual;
     }
 
     @Override
@@ -105,18 +102,19 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         });
         return convertView;
     }
-    /**PICCOLO
+    /**PICCOLO_Edit by Dal Maso
      * Metodo che cancella permette all'utente di ridimensionare la foto
      * @param toCrop l'indice della foto di cui fire il resize
      * @param path percorso della foto
      */
     public void cropFile(int toCrop, String path){
+        Log.d("Crop", "Start crop activity");
+        boolean result = false;
         File directory = new File(path);
         File[] files = directory.listFiles();
-        String filename=files[toCrop].getName();
-        CropImage.activity(Uri.fromFile(files[toCrop])).start(act);
-        //TODO: Sistemare il cambio di nome della foto ritagliata
-        ((MainActivity)context).clearAllImages();
-        ((MainActivity)context).printAllImages();
+        CropImage.activity(Uri.fromFile(files[toCrop]))
+                .setOutputUri(Uri.fromFile(files[toCrop]))
+                .start(((MainActivity)context));
+        //files[toCrop].delete();
     }//cropFile
 }
