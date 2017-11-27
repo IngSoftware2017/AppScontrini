@@ -1,11 +1,10 @@
 package com.ing.software.ticketapp.OCR;
 
 
-import android.support.annotation.NonNull;
-
 import com.ing.software.ticketapp.OCR.OcrObjects.RawGridResult;
 import com.ing.software.ticketapp.OCR.OcrObjects.RawStringResult;
 import com.ing.software.ticketapp.OCR.OcrObjects.RawText;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 

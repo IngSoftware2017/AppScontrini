@@ -3,7 +3,8 @@
  */
 
 package com.ing.software.ticketapp.OCR;
-import android.content.Context;
+import com.ing.software.ticketapp.*;
+import android.content.res.AssetManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -15,11 +16,8 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class OcrInstrumentedTests {
 
-    @Test
-    public void useAppContext() throws Exception {
-        //There must be a test
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.ing.software.ticketapp", appContext.getPackageName());
+    public void findCornersTest() throws Exception {
+        //ImagePreprocessor.findCorners(getBitmap(0));
+        assertEquals(4, 2 + 2);
     }
 }
