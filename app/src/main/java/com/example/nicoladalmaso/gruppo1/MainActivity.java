@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean isFabOpen = false;
     static final int REQUEST_TAKE_PHOTO = 1;
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
-    String mCurrentPhotoPath;
+    String tempPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 storageDir      /* directory */
         );
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
+        tempPhotoPath = image.getAbsolutePath();
         return image;
     }
 
@@ -205,18 +205,15 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            if (data == null) {
-                //Display an error
-                return;
-            }
+
             switch (requestCode) {
                 /**lazzarin
                  * Gestisce l'intent prodotto dalla fotocamera,andando ad eliminare il file temporaneo
                  */
                 case(REQUEST_TAKE_PHOTO):
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath,bmOptions);
-                    savePickedFile(bitmap);
+                    Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
+                    savePickedFile(bitmapPhoto);
                     deleteTempFiles();
                     clearAllImages();
                     printAllImages();
