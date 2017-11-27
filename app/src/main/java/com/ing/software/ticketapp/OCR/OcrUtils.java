@@ -218,24 +218,23 @@ public class OcrUtils {
      */
     private static int findSubstring(String text, String substring)
     {
-        if(text.length() < 3)
+        if(text.length() == 0)
             return -1;
 
         if(text == null || substring == null)
             return -1;
 
-        int minDistance = text.length();
+        int minDistance = substring.length();
 
         //Splits the string into tokens
         String[] pack = text.split("\\s");
 
         for (String p: pack){
-            if(p.length() > 2) {
                 //Convert string to uppercase
                 int distanceNow = levDistance(p.toUpperCase(), substring.toUpperCase());
                 if (distanceNow < minDistance)
                     minDistance = distanceNow;
-            }
+
         }
 
         return minDistance;

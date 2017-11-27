@@ -96,6 +96,19 @@ public class DistanceStringUnitTest {
         assertEquals(-1, r);
     }
 
+    @Test
+    public void SubstringDistanceTest7() throws Exception {
+
+        String a = "i";
+        String b = "Totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a,b);
+
+        assertEquals(6, r);
+    }
+
 
     @Test
     public void maxLenghtStringsTest1() throws Exception {
@@ -235,7 +248,7 @@ public class DistanceStringUnitTest {
         method.setAccessible(true);
         int r = (int)method.invoke(null,text,substring);
 
-        assertEquals(-1, r);
+        assertEquals(6, r);
 
     }
 
