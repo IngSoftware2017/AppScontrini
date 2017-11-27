@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.0_Ray"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -17,9 +17,17 @@ android {
         }
     }
 
-    //fix JavaCV
+    //remove useless libraries
     packagingOptions {
-        pickFirst 'org/bytedeco/javacpp/macosx-x86_64/libusb-1.0.dylib'
+        //pickFirst 'org/bytedeco/javacpp/macosx-x86_64/libusb-1.0.dylib'
+        exclude 'org/bytedeco/javacpp/macosx-x86_64/*'
+        exclude 'org/bytedeco/javacpp/windows-x86/*'
+        exclude 'org/bytedeco/javacpp/windows-x86_64/*'
+        exclude 'org/bytedeco/javacpp/linux-x86_64/*'
+        exclude 'org/bytedeco/javacpp/linux-x86/*'
+        exclude 'org/bytedeco/javacpp/linux-armhf/*'
+        exclude 'org/bytedeco/javacpp/linux-ppc64le/*'
+        exclude 'lib/x86/*'
     }
 	
 	//for javacv

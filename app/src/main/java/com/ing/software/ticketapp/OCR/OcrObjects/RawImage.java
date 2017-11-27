@@ -1,11 +1,13 @@
 package com.ing.software.ticketapp.OCR.OcrObjects;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 import com.ing.software.ticketapp.OCR.OcrUtils;
 
 /**
  * Class to store only useful properties of source images
+ * @author Michelon
  */
 
 public class RawImage {
@@ -14,7 +16,11 @@ public class RawImage {
     private int width;
     private String grid;
 
-    public RawImage(Bitmap bitmap) {
+    /**
+     * Constructor, initializes variables
+     * @param bitmap source photo. Not null.
+     */
+    public RawImage(@NonNull Bitmap bitmap) {
         height = bitmap.getHeight();
         width = bitmap.getWidth();
         grid = OcrUtils.getPreferredGrid(bitmap);
