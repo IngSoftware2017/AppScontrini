@@ -259,13 +259,13 @@ public class OcrUtils {
         if (text.length() == 0)
             return -1;
 
-        int minDistance = text.length();
-
         //Splits the string into tokens
         String[] pack = text.split("\\s");
 
         String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
 
+        //Maximum number of characters in the date format
+        int minDistance = 10;
 
         for (String p : pack) {
             for (String d : formatDate) {
@@ -280,9 +280,42 @@ public class OcrUtils {
             return -1;
         else
             return Math.abs(8-minDistance); //Returns the absolute value of the distance by subtracting 8 which is the minimum of number combinations
+    }
 
 
+    /**
+     * It takes a text and returns the date if a similarity is found with a date format
+     *
+     * @param text The text to find the date
+     * @return date or null if the date is not there
+     */
+    private static String getDate(String text) {
+        if (text.length() == 0)
+            return null;
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        //Maximum number of characters in the date format
+        int minDistance = 10;
+        String dataSearch = null;
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                {
+                    minDistance = distanceNow;
+                    dataSearch = p.toUpperCase();
+                }
+
+            }
+        }
 
 
+        return dataSearch;
     }
 }

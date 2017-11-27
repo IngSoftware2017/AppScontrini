@@ -352,5 +352,60 @@ public class DistanceStringUnitTest {
         assertEquals(0, r);
     }
 
+    @Test
+    public void GetDateTest1() throws Exception {
+
+        String a = "la data è 23-06-1995";
+        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        method.setAccessible(true);
+        String r = (String) method.invoke(null,a);
+
+        assertEquals("23-06-1995", r);
+    }
+
+    @Test
+    public void GetDateTest2() throws Exception {
+
+        String a = "il questo testo la data non è presenteuytr";
+        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        method.setAccessible(true);
+        String r = (String) method.invoke(null,a);
+
+        assertEquals(null, r);
+    }
+
+    @Test
+    public void GetDateTest3() throws Exception {
+
+        String a = "il questo testo la data non è 10- dsad 2376-06-95";
+        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        method.setAccessible(true);
+        String r = (String) method.invoke(null,a);
+
+        assertEquals("2376-06-95", r);
+    }
+
+    @Test
+    public void GetDateTest4() throws Exception {
+
+        String a = "il questo testo la data non è  dsad 2jk hjh3-6-19";
+        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        method.setAccessible(true);
+        String r = (String) method.invoke(null,a);
+
+        assertEquals("HJH3-6-19", r);
+    }
+
+    @Test
+    public void GetDateTest5() throws Exception {
+
+        String a = "il questo test33-20-29od la data non è dsad 2jk hj 95-6-19";
+        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        method.setAccessible(true);
+        String r = (String) method.invoke(null,a);
+
+        assertEquals("95-6-19", r);
+    }
+
 
 }
