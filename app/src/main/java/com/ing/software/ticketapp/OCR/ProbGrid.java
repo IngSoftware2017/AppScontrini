@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 /**
  * Static class containing grids for probability regions (WIP)
+ * Note: these grids are note definitive yet, they'll be updated according to the dataset
+ * More ratios are going to be added for next step
  * @author Michelon
  */
 public class ProbGrid {
@@ -36,20 +38,20 @@ public class ProbGrid {
     private static final Integer[][] AmountGrid16x7 = {
             {0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {40, 50, 30, 10, 0, 0, 0},
-            {60, 60, 50, 30, 10, 0, 0},
-            {60, 70, 60, 40, 20, 0, 0},
-            {40, 50, 30, 20, 0, 0, 0},
-            {30, 40, 20, 10, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0}
+            {5, 0, 0, 0, 0, 0, 0},
+            {10, 10, 10, 0, 0, 0, 0},
+            {20, 20, 10, 0, 0, 0, 0},
+            {20, 20, 5, 0, 0, 0, 0},
+            {20, 20, 10, 0, 0, 0, 0},
+            {40, 40, 10, 0, 0, 0, 0},
+            {50, 50, 10, 0, 0, 0, 0},
+            {20, 20, 10, 0, 0, 0, 0},
+            {30, 30, 10, 0, 0, 0, 0},
+            {70, 40, 10, 0, 0, 0, 0},
+            {70, 40, 10, 0, 0, 0, 0},
+            {20, 30, 20, 0, 0, 0, 0},
+            {10, 20, 10, 0, 0, 0, 0},
+            {10, 10, 0, 0, 0, 0, 0}
     };
     private static final Integer[][] DateGrid16x9 = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
