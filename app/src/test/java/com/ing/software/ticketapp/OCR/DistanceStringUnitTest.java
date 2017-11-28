@@ -111,12 +111,12 @@ public class DistanceStringUnitTest {
 
 
     @Test
-    public void maxLenghtStringsTest1() throws Exception {
+    public void maxLengthStringsTest1() throws Exception {
 
         Integer a = 6;
         Integer b = 2;
 
-        Method method = OcrUtils.class.getDeclaredMethod("maxLenghtStrings", int.class, int.class );
+        Method method = OcrUtils.class.getDeclaredMethod("maxLengthStrings", int.class, int.class );
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b);
 
@@ -126,12 +126,12 @@ public class DistanceStringUnitTest {
 
 
     @Test
-    public void maxLenghtStringsTest2() throws Exception {
+    public void maxLengthStringsTest2() throws Exception {
 
         Integer a = 0;
         Integer b = 2;
 
-        Method method = OcrUtils.class.getDeclaredMethod("maxLenghtStrings", int.class, int.class );
+        Method method = OcrUtils.class.getDeclaredMethod("maxLengthStrings", int.class, int.class );
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b);
 
@@ -139,13 +139,13 @@ public class DistanceStringUnitTest {
     }
 
     @Test
-    public void minLenght3StringsTest1() throws Exception {
+    public void minLength3StringsTest1() throws Exception {
 
         Integer a = 1;
         Integer b = 2;
         Integer c = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("minLenghtStrings", int.class, int.class, int.class );
+        Method method = OcrUtils.class.getDeclaredMethod("minLengthStrings", int.class, int.class, int.class );
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b,c);
 
@@ -153,13 +153,13 @@ public class DistanceStringUnitTest {
 
     }
     @Test
-    public void minLenght3StringsTest2() throws Exception {
+    public void minLength3StringsTest2() throws Exception {
 
         Integer a = 1;
         Integer b = 0;
         Integer c = 1000;
 
-        Method method = OcrUtils.class.getDeclaredMethod("minLenghtStrings", int.class, int.class, int.class );
+        Method method = OcrUtils.class.getDeclaredMethod("minLengthStrings", int.class, int.class, int.class );
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b,c);
 

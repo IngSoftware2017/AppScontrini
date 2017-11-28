@@ -154,7 +154,7 @@ public class OcrUtils {
      * @param j The second integer not null to be compared
      * @return maximum number
      */
-    private static int maxLenghtStrings(int i, int j)
+    private static int maxLengthStrings(int i, int j)
     {
         return (i>j ? i : j);
     }
@@ -167,7 +167,7 @@ public class OcrUtils {
      * @param k The third integer not null to be compared
      * @return minimum number
      */
-    private static int minLenghtStrings(int i, int j, int k)
+    private static int minLengthStrings(int i, int j, int k)
     {
         int result = i;
         if (j < result) result = j;
@@ -195,9 +195,9 @@ public class OcrUtils {
         for ( i=0; i<n+1; i++ ) {
             for ( j=0; j<m+1; j++ ) {
                 if ( i==0 || j==0 ) {
-                    L[i][j] = maxLenghtStrings(i, j);
+                    L[i][j] = maxLengthStrings(i, j);
                 } else {
-                    L[i][j] = minLenghtStrings(L[i-1][j] + 1, L[i][j-1] + 1,
+                    L[i][j] = minLengthStrings(L[i-1][j] + 1, L[i][j-1] + 1,
                             L[i-1][j-1] + (S.charAt(i-1) != T.charAt(j-1) ? 1 : 0) );
                 }
             }
@@ -266,6 +266,8 @@ public class OcrUtils {
 
         //Maximum number of characters in the date format
         int minDistance = 10;
+        //Th eminimum of number combinations of date format without symbols like '/' or '.' or '-'
+        int minCharaterDate = 8;
 
         for (String p : pack) {
             for (String d : formatDate) {
@@ -279,7 +281,9 @@ public class OcrUtils {
         if(minDistance==10)
             return -1;
         else
-            return Math.abs(8-minDistance); //Returns the absolute value of the distance by subtracting 8 which is the minimum of number combinations
+            //Returns the absolute value of the distance by subtracting the minimum character
+            return Math.abs(minCharaterDate-minDistance);
+
     }
 
 
