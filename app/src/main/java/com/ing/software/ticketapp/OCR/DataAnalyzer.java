@@ -70,7 +70,7 @@ public class DataAnalyzer {
      * Search through results from the research of amount string and retrieves the text with highest
      * probability to contain the amount calculated with (probability from grid - distanceFromTarget*10).
      * If no amount was found in first result iterate through all results following previous ordering.
-     * @param amountResults list of RawStringResult from amount search
+     * @param amountResults list of RawStringResult from amount search. Not null.
      * @return BigDecimal containing the amount found. Null if nothing found
      */
     private static BigDecimal getPossibleAmount(@NonNull List<RawStringResult> amountResults) {
@@ -118,7 +118,7 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * Tries to find a BigDecimal from string
-     * @param amountString string containing possible amount.
+     * @param amountString string containing possible amount. Length > 0.
      * @return BigDecimal containing the amount, null if no number was found
      */
     private static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
@@ -141,7 +141,7 @@ public class DataAnalyzer {
      * @author Michelon
      * Tries to find a number in string that may contain also letters (ex. '€' recognized as 'e')
      * Note: numbers written with exponential expressions (3E+10) are decoded right only if 1 exponential is present
-     * @param targetAmount string containing possible amount.
+     * @param targetAmount string containing possible amount. Length > 0.
      * @return string containing the amount, null if no number was found
      */
     private static String deepAnalyzeAmount(@Size(min = 1) String targetAmount){
@@ -177,8 +177,8 @@ public class DataAnalyzer {
      * E+'num'
      * E-'num'
      * where 'num' is a number
-     * @param text source string
-     * @param startingPoint position of 'E' (from 0 to text.length-1)
+     * @param text source string. Length > 0.
+     * @param startingPoint position of 'E' (from 0 to text.length-1). Int >= 0.
      * @return true if it's a valid exponential form
      */
     private static boolean isExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
@@ -198,8 +198,8 @@ public class DataAnalyzer {
      * @author Michelon
      * Get exponential form from chosen string.
      * Note: isExp() must return true for these same text and startingPoint
-     * @param text source text
-     * @param startingPoint position of 'E'
+     * @param text source text. Length > 0.
+     * @param startingPoint position of 'E'. Int >= 0.
      * @return String containing the exponential form (only 'E' and, if present, '+' or '-')
      */
     private static String getExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {

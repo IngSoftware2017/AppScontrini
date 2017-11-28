@@ -91,8 +91,8 @@ class OcrAnalyzer {
      * @author Michelon
      * Orders TextBlock decoded by detector in a list of RawBlocks
      * Order is from top to bottom, from left to right
-     * @param photo RawImage of the photo
-     * @param origTextBlocks detected blocks
+     * @param photo RawImage of the photo. Not null.
+     * @param origTextBlocks detected blocks. Not null.
      * @return list of ordered RawBlocks
      */
     private static List<RawBlock> orderBlocks(@NonNull RawImage photo, @NonNull SparseArray<TextBlock> origTextBlocks) {
@@ -114,8 +114,8 @@ class OcrAnalyzer {
      * @author Michelon
      * Find first (RawTexts in RawBlocks are ordered from top to bottom, left to right)
      * occurrence (exact match) of chosen string in a list of RawBlocks
-     * @param rawBlocks list of RawBlocks
-     * @param testString string to find
+     * @param rawBlocks list of RawBlocks. Not null.
+     * @param testString string to find. Length > 0.
      * @return First RawText in first RawBlock with target string
      */
     private static RawText searchFirstExactString(@NonNull List<RawBlock> rawBlocks, @Size(min = 1) String testString) {
@@ -136,8 +136,8 @@ class OcrAnalyzer {
     /**
      * @author Michelon
      * Search for all occurrences of target string in detected (and ordered) RawBlocks according to OcrVars.MAX_STRING_DISTANCE
-     * @param rawBlocks list of RawBlocks
-     * @param testString string to find.
+     * @param rawBlocks list of RawBlocks. Not null.
+     * @param testString string to find. Length > 0.
      * @return list of RawStringResult containing only source RawText where string is present. Note: this list is not ordered.
      */
     private static List<RawStringResult> searchContinuousString(@NonNull List<RawBlock> rawBlocks, @Size(min = 1) String testString) {
@@ -164,8 +164,8 @@ class OcrAnalyzer {
      * @author Michelon
      * From a list of RawTexts, retrieves also RawTexts with similar distance from top and bottom of the photo.
      * 'Similar' is defined by precision. See {@link RawBlock findByPosition()} for details.
-     * @param rawBlocks list of RawBlocks from original photo
-     * @param targetStringList list of target RawTexts
+     * @param rawBlocks list of RawBlocks from original photo. Not null.
+     * @param targetStringList list of target RawTexts. Not null.
      * @param precision precision to extend rect. See RawBlock.RawText.extendRect()
      * @return list of RawStringResults. Adds to the @param targetStringList objects the detected RawTexts
      * in proximity of source RawTexts. Note: this list is not ordered.
@@ -217,7 +217,7 @@ class OcrAnalyzer {
      * @author Michelon
      * Merges Lists with RawTexts + probability to find date from all blocks.
      * And orders it according to they probability (fallback is position).
-     * @param rawBlocks blocks from which retrieve lists
+     * @param rawBlocks blocks from which retrieve lists. Not null.
      * @return List of RawGridResults containing RawTexts + probability
      */
     private List<RawGridResult> getDateList(@NonNull List<RawBlock> rawBlocks) {
@@ -233,7 +233,7 @@ class OcrAnalyzer {
     /**
      * @author Michelon
      * Performs a quick detection on chosen photo and returns blocks detected
-     * @param photo photo to analyze
+     * @param photo photo to analyze. Not null.
      * @param context context to run analyzer
      * @return list of all blocks found (ordered from top to bottom, left to right)
      */
@@ -258,7 +258,7 @@ class OcrAnalyzer {
      * NOTE: This is a temporary method.
      * @author Michelon
      * Crops photo using the smallest rect that contains all TextBlock in source photo
-     * @param photo source photo
+     * @param photo source photo. Not null.
      * @param context context to run first analyzer
      * @return smallest cropped photo containing all TextBlocks
      */

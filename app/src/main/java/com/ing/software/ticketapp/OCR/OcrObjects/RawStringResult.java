@@ -29,7 +29,7 @@ public class RawStringResult {
 
     /**
      * Adds rawTexts found in extended rect
-     * @param detectedTexts list of rawTexts detected. Not null
+     * @param detectedTexts list of rawTexts detected. Not null.
      */
     public void addDetectedTexts(@NonNull List<RawText> detectedTexts) {
         if (this.detectedTexts == null)

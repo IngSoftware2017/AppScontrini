@@ -20,8 +20,8 @@ class OcrResult {
 
     /**
      * Constructor
-     * @param amountResults list of possible amounts
-     * @param dateList list of possible dates
+     * @param amountResults list of possible amounts. Not null.
+     * @param dateList list of possible dates. Not null.
      */
     OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList) {
         this.amountResults = amountResults;

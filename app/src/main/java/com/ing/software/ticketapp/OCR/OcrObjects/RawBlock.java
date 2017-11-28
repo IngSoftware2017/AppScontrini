@@ -28,8 +28,8 @@ public class RawBlock implements Comparable<RawBlock> {
 
     /**
      * Constructor, parameters must not be null
-     * @param textBlock source TextBlock
-     * @param imageMod source image
+     * @param textBlock source TextBlock. Not null.
+     * @param imageMod source image. Not null.
      */
     public RawBlock(@NonNull TextBlock textBlock, @NonNull RawImage imageMod) {
         rectF = new RectF(textBlock.getBoundingBox());
@@ -56,7 +56,7 @@ public class RawBlock implements Comparable<RawBlock> {
 
     /**
      * Search string in block, only first occurrence is returned (top -> bottom, left -> right)
-     * @param string string to search
+     * @param string string to search. Length > 0.
      * @return RawText containing the string, null if nothing found
      */
     public RawText findFirstExact(@Size(min = 1) String string) {
@@ -69,7 +69,7 @@ public class RawBlock implements Comparable<RawBlock> {
 
     /**
      * Search string in block, all occurrences are returned ordered(top -> bottom, left -> right)
-     * @param string string to search
+     * @param string string to search. Length > 0.
      * @param maxDistance max distance (included) allowed for the target string. Int >= 0
      * @return list of RawStringResult containing the string with corresponding distance from target, null if nothing found
      */

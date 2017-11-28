@@ -26,7 +26,8 @@ public class RawText implements Comparable<RawText> {
 
     /**
      * Constructor
-     * @param text current Text inside TextBlock
+     * @param text current Text inside TextBlock. Not null.
+     * @param rawImage source image. Not null.
      */
     RawText(@NonNull Text text, @NonNull RawImage rawImage) {
         rectText = new RectF(text.getBoundingBox());
@@ -100,7 +101,7 @@ public class RawText implements Comparable<RawText> {
 
     /**
      * Search string in text
-     * @param string string to search
+     * @param string string to search. Length > 0.
      * @return int according to OcrUtils.findSubstring()
      */
     int bruteSearch(@Size(min = 1) String string) {
@@ -109,7 +110,7 @@ public class RawText implements Comparable<RawText> {
 
     /**
      * Check if this text is inside chosen rect
-     * @param rect target rect that could contain this text
+     * @param rect target rect that could contain this text. Not null.
      * @return true if is inside
      */
     boolean isInside(@NonNull RectF rect) {

@@ -27,11 +27,11 @@ public class OcrUtils {
     /**
      * @author Michelon
      * Crop image (values start from top left)
-     * @param photo original photo not null
+     * @param photo original photo not null. Not null.
      * @param startX x coordinate of top left point, int >= 0
      * @param startY y coordinate of top left point, int >= 0
-     * @param endX x coordinate of bottom right point, int > 0
-     * @param endY y coordinate of bottom right point, int > 0
+     * @param endX x coordinate of bottom right point, int >= 0
+     * @param endY y coordinate of bottom right point, int >= 0
      * @return cropped image, null if invalid coordinates
      */
     static Bitmap cropImage(@NonNull Bitmap photo, @IntRange(from = 0) int startX, @IntRange(from = 0) int startY, @IntRange(from = 0) int endX, @IntRange(from = 0) int endY) {
@@ -47,8 +47,8 @@ public class OcrUtils {
      * @author Michelon
      * Get rect containing all blocks detected (Temporary method)
      * Note: counting starts from left and from top
-     * @param orderedTextBlocks blocks detected
-     * @param photo original photo
+     * @param orderedTextBlocks blocks detected. Not null.
+     * @param photo original photo. Not null.
      * @return array of int where int[0] = left border, int[1] = top border, int[2] = right border, int[3] = bottom border
      */
     static int[] getRectBorders(@NonNull List<TextBlock> orderedTextBlocks, @NonNull RawImage photo) {
@@ -83,7 +83,7 @@ public class OcrUtils {
     /**
      * @author Michelon
      * Get preferred grid according to height/width ratio
-     * @param photo original photo
+     * @param photo original photo. Not null.
      * @return preferred ratio defined in ProbGrid, -1 if something went wrong
      */
      public static String getPreferredGrid(@NonNull Bitmap photo) {
@@ -108,7 +108,7 @@ public class OcrUtils {
     /**
      * @author Michelon
      * Order a list of TextBlock from top to bottom, left to right
-     * @param textBlocks original list
+     * @param textBlocks original list. Not null.
      * @return ordered list
      */
     static List<TextBlock> orderBlocks(@NonNull List<TextBlock> textBlocks) {
@@ -136,8 +136,8 @@ public class OcrUtils {
     /**
      * @author Michelon
      * Extends the width of a rect to the max allowed for chosen photo
-     * @param rect source rect
-     * @param photo source photo (to get max width)
+     * @param rect source rect. Not null.
+     * @param photo source photo (to get max width). Not null.
      * @return rect with max width
      */
     static RectF getExtendedRect(@NonNull RectF rect, @NonNull RawImage photo) {
