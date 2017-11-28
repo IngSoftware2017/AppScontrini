@@ -1,4 +1,7 @@
 package com.sw.ing.gestionescontrini;
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,11 +15,12 @@ import static org.junit.Assert.*;
 
 public class DataManagerTest {
 
+    static Context context;
     DataManager dbm;
     @Before
     public void beforeTest(){
-        dbm = new DataManager();
-        DataManager dbm = new DataManager();
+        context = InstrumentationRegistry.getTargetContext();
+        dbm = new DataManager(context);
     }
 
     @Test

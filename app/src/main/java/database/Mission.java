@@ -5,6 +5,7 @@ import java.util.Date;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
 import android.net.Uri;
@@ -32,6 +33,7 @@ public class Mission {
     @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
     private int personID;
 
+    @Ignore
     /**
      * Non parametric constructor
      */
@@ -167,5 +169,7 @@ public class Mission {
     public void setPersonID(int personID) {
         this.personID = personID;
     }
+
+    //TODO override toString
 }
 

@@ -2,6 +2,7 @@ package database;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.ColumnInfo;
@@ -33,6 +34,7 @@ public class Ticket {
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
 
+    @Ignore
     /**
      * Non parametric constructor
      */

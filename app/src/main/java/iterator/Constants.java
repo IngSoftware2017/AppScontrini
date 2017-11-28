@@ -1,4 +1,4 @@
-package iterator;
+package Iterator;
 
 /**
  * Created by Federico Taschin on 17/11/2017.

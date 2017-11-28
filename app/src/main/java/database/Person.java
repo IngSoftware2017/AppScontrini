@@ -2,6 +2,7 @@ package database;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -21,6 +22,7 @@ public class Person {
     private String lastName;
     private String academicTitle;
 
+    @Ignore
     /**
      * Non parametric constructor
      */
@@ -104,4 +106,6 @@ public class Person {
     public void setAcademicTitle(String academicTitle) {
         this.academicTitle = academicTitle;
     }
+
+    //TODO override toString
 }

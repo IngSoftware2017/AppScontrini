@@ -49,12 +49,14 @@ public class DatabaseTest {
         testTicket1.setDate(new Date(1996,10,12));
         testTicket1.setShop("Decathlon");
         testTicket1.setTitle("Football shoes");
+        testTicket1.setMissionID(1);
 
         testTicket2 = new Ticket();
         testTicket2.setAmount(new BigDecimal(12));
         testTicket2.setDate(new Date(1966,11,12));
         testTicket2.setShop("wwww");
         testTicket2.setTitle("wwwwwwwww shoes");
+        testTicket2.setMissionID(2);
 
         ticketDAO.addTicket(testTicket1);
         ticketDAO.addTicket(testTicket2);
@@ -83,15 +85,14 @@ public class DatabaseTest {
 
 
     @Test
-    public void deleteTicketTest(){
-        /*
-        TicketEntity testTicketDelete = new TicketEntity();
+    public void deleteExistingTicketTest(){
+        Ticket testTicketDelete = new Ticket();
+        testTicketDelete.setID((int)ticketDAO.addTicket(testTicketDelete));
         int id = testTicketDelete.getID();
-        ticketDAO.addTicket(testTicketDelete);
         assert (id == ticketDAO.deleteTicket(testTicketDelete.getID()));
-        */
-        //TODO test with invalid ID, test with null ID (deleteTicket pre-conditions accept null)
     }
+    //TODO test with invalid ID, test with null ID (deleteTicket pre-conditions accept null)
+
 
     @Test
     public void insertMissionTest(){}
