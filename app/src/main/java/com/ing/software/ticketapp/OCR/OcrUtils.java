@@ -151,14 +151,6 @@ public class OcrUtils {
         return rectF;
     }
 
-    //Dummy, waiting for implementation
-    public static int findSubstring(@Size(min = 1) String text, @Size(min = 1) String substring )
-    {
-        if (text.contains(substring))
-            return 0;
-        return 1;
-    }
-
     /**
      * @author Michelon
      * Logs messages only if debug is enabled
