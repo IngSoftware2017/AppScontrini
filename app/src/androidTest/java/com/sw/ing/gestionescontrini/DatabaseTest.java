@@ -93,4 +93,22 @@ public class DatabaseTest {
         //TODO test with invalid ID, test with null ID (deleteTicket pre-conditions accept null)
     }
 
+    @Test
+    public void insertMissionTest(){}
+
+    @Test
+    public void updateMissionTest(){}
+
+    @Test
+    public void deleteMissionTest(){}
+
+    @Test
+    public void insertPersonTest(){}
+
+    @Test
+    public void updatePersonTest(){}
+
+    @Test
+    public void deletePersonTest(){}
+
 }
