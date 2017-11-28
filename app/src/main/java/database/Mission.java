@@ -41,14 +41,12 @@ public class Mission {
     /**
      * Parametric constructor
      *
-     * @param ID Unique ID of the Mission
      * @param startMission Date of the beginning of the mission
      * @param endMission Date of the end of the mission
      * @param locality Name of locality where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(int ID, Date startMission, Date endMission, String locality, int personID) {
-        this.ID = ID;
+    public Mission(Date startMission, Date endMission, String locality, int personID) {
         this.startMission = startMission;
         this.endMission = endMission;
         this.locality = locality;

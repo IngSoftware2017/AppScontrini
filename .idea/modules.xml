@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://D:\MARCO\Android\GitHub\gruppo3\app\app.iml" filepath="D:\MARCO\Android\GitHub\gruppo3\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/gruppo3.iml" filepath="$PROJECT_DIR$/gruppo3.iml" />
       <module fileurl="file://D:\MARCO\Android\GitHub\gruppo3\ing-software.iml" filepath="D:\MARCO\Android\GitHub\gruppo3\ing-software.iml" />
       <module fileurl="file://D:\MARCO\Android\GitHub\ingegneria-software\ing-software.iml" filepath="D:\MARCO\Android\GitHub\ingegneria-software\ing-software.iml" />

@@ -42,7 +42,6 @@ public class Ticket {
     /**
      * Parametric constructor
      *
-     * @param id Unique ID of the ticket
      * @param fileUri Path associated with the the ticket file stored in the memory
      * @param amount total amount
      * @param shop Name of the shop in which the ticket was issued
@@ -50,8 +49,7 @@ public class Ticket {
      * @param title name given
      * @param missionID code of the mission
      */
-    public Ticket(int id, Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
-        this.ID = id;
+    public Ticket(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
         this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
