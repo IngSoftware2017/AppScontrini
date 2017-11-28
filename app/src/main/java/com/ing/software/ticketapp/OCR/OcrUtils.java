@@ -145,4 +145,181 @@ public class OcrUtils {
         if (OcrVars.ISDEBUGENABLED)
             Log.d(tag, message);
     }
+
+
+    /**
+     * Returns the maximum between |i| e |j|
+     *
+     * @param i The first integer not null to be compared
+     * @param j The second integer not null to be compared
+     * @return maximum number
+     */
+    private static int maxLengthStrings(int i, int j)
+    {
+        return (i>j ? i : j);
+    }
+
+    /**
+     * Returns the minimum between |i|, |j| e |k|
+     *
+     * @param i The first integer not null to be compared
+     * @param j The second integer not null to be compared
+     * @param k The third integer not null to be compared
+     * @return minimum number
+     */
+    private static int minLengthStrings(int i, int j, int k)
+    {
+        int result = i;
+        if (j < result) result = j;
+        if (k < result) result = k;
+        return result;
+    }
+
+    /**
+     * Returns the distance of Levenshtein between two strings | S | e | T |.
+     * The distance is an integer between 0 and the maximum length of the two strings.
+     * If only one string is null then return -1
+     *
+     * @param S The first string to be compared
+     * @param T The second string to be compared
+     * @return distance between two strings
+     */
+    private static int levDistance(String S, String T )
+    {
+        if(S == null || T == null)
+            return -1;
+
+        int i, j;
+        final int n = S.length(), m = T.length();
+        int L[][] = new int[n+1][m+1];
+        for ( i=0; i<n+1; i++ ) {
+            for ( j=0; j<m+1; j++ ) {
+                if ( i==0 || j==0 ) {
+                    L[i][j] = maxLengthStrings(i, j);
+                } else {
+                    L[i][j] = minLengthStrings(L[i-1][j] + 1, L[i][j-1] + 1,
+                            L[i-1][j-1] + (S.charAt(i-1) != T.charAt(j-1) ? 1 : 0) );
+                }
+            }
+        }
+
+        return L[n][m];
+    }
+
+    /**
+     * Check if there is a substring in the text
+     * The text is subdivided into tokens and each token is checked
+     * If only one string is null then return -1
+     * If the token length is less than 2 then returns -1 -1
+     *
+     * @param text The text to be compared
+     * @param substring The second string to be compared
+     * @return the slightest difference between strings and text
+     */
+    private static int findSubstring(String text, String substring)
+    {
+        if(text.length() == 0)
+            return -1;
+
+        if(text == null || substring == null)
+            return -1;
+
+        int minDistance = substring.length();
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        for (String p: pack){
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), substring.toUpperCase());
+                if (distanceNow < minDistance)
+                    minDistance = distanceNow;
+
+        }
+
+        return minDistance;
+
+    }
+
+
+
+
+    /**
+     * Accept a text and check if there is a combination of date format.
+     * Controllo per tutte le combinazioni simili a
+     * xx/xx/xxxx o xx/xx/xxxx o xxxx/xx/xx
+     * xx-xx-xxxx o xx-xx-xxxx o xxxx-xx-xx
+     * xx.xx.xxxx o xx.xx.xxxx xxxx.xx.xx
+     *
+     * @param text The text to find the date format
+     * @return the absolute value of the minimum distance found between all combinations,
+     * if the distance is >= 10 or the inserted text is empty returns -1
+     */
+    private static int findDate(String text) {
+        if (text.length() == 0)
+            return -1;
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        //Maximum number of characters in the date format
+        int minDistance = 10;
+        //Th eminimum of number combinations of date format without symbols like '/' or '.' or '-'
+        int minCharaterDate = 8;
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                    minDistance = distanceNow;
+            }
+        }
+
+        if(minDistance==10)
+            return -1;
+        else
+            //Returns the absolute value of the distance by subtracting the minimum character
+            return Math.abs(minCharaterDate-minDistance);
+
+    }
+
+
+    /**
+     * It takes a text and returns the date if a similarity is found with a date format
+     *
+     * @param text The text to find the date
+     * @return date or null if the date is not there
+     */
+    private static String getDate(String text) {
+        if (text.length() == 0)
+            return null;
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        //Maximum number of characters in the date format
+        int minDistance = 10;
+        String dataSearch = null;
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                {
+                    minDistance = distanceNow;
+                    dataSearch = p.toUpperCase();
+                }
+
+            }
+        }
+
+
+        return dataSearch;
+    }
 }
