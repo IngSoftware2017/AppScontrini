@@ -233,7 +233,7 @@ public class OcrUtils {
      * @param substring The second string to be compared
      * @return the slightest difference between strings and text
      */
-    private static int findSubstring(String text, String substring)
+    public static int findSubstring(String text, String substring)
     {
         if(text.length() == 0)
             return -1;
