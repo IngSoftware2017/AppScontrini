@@ -2,6 +2,9 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -56,6 +59,8 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         descrizione.setText(c.getDescrizione());
         img.setImageBitmap(c.getImg());
         fabDelete.setTag(position);
+        convertView.setTag(position);
+        //Dal Maso
         fabDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 pos =  Integer.parseInt(v.getTag().toString());
@@ -93,11 +98,23 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         fabCrop.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path=getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
                 cropFile(pos,path);
                 /*File directory =new File(path);
                 File[] files =directory.listFiles();
                 CropImage.activity(Uri.fromFile(files[pos])).start(MainActivity.this);*/
+            }//onClick
+        });
+        //Dal Maso
+        convertView.setOnClickListener(new View.OnClickListener(){
+            public void onClick (View v){
+                pos = Integer.parseInt(v.getTag().toString());
+                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                File directory = new File(path);
+                File[] files = directory.listFiles();
+                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
+                startImageView.putExtra("imagePath", files[pos].getPath());
+                context.startActivity(startImageView);
             }//onClick
         });
         return convertView;
@@ -117,4 +134,5 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 .start(((MainActivity)context));
         //files[toCrop].delete();
     }//cropFile
+
 }
