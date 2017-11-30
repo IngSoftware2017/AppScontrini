@@ -1,5 +1,7 @@
 package com.ing.software.ocr;
 
+import static com.ing.software.common.Reflect.*;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;

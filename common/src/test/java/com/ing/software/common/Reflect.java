@@ -1,4 +1,4 @@
-package com.ing.software.ocr;
+package com.ing.software.common;
 
 import org.junit.Test;
 
@@ -8,6 +8,9 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * @author Riccardo Zaglia
+ */
 public class Reflect {
 
     public static class UnknownException extends Exception {
@@ -30,8 +33,13 @@ public class Reflect {
     public static <T> T invoke(Object clazz, String methodName, Object... params)
             throws NoSuchMethodException, NullPointerException, ClassCastException, UnknownException {
         List<Class<?>> paramsTypes = new ArrayList<>(params.length);
-        for (Object p : params)
-            paramsTypes.add(p.getClass());
+        for (Object p : params) {
+            if (p != null)
+                paramsTypes.add(p.getClass());
+            else
+                paramsTypes.add(null);
+
+        }
 
         boolean isType = clazz instanceof Class<?>;
         Method[] methods = (isType ? (Class<?>)clazz : clazz.getClass()).getDeclaredMethods();
@@ -76,8 +84,9 @@ public class Reflect {
     }
 
     @Test
+    @SuppressWarnings("UnnecessaryBoxing")
     public void testInvokeWithInstance() throws Exception {
-        int r = invoke(new TestClass(), "testPrivateWithParams", 10, 20.0f);
+        int r = invoke(new TestClass(), "testPrivateWithParams", new Integer(10), 20.0f);
         assertEquals(30, r);
     }
 
@@ -94,6 +103,13 @@ public class Reflect {
         assertEquals(1, tc.field);
     }
 
+    @Test
+    public void testInvokeNullParam() throws Exception {
+        //int r = invoke(new TestClass(), "testPrivateWithParams", 0, null);
+        Object.class.isAssignableFrom(null);
+        //assertEquals(-1, r);
+    }
+
     //These tests are not exhaustive but invoke will be used enough to be certain it's bug free
 }
 
@@ -102,7 +118,10 @@ class TestClass {
     int field = 0;
 
     private int testPrivateWithParams(int a, Float b){
-        return a + b.intValue();
+        if (b != null)
+            return a + b.intValue();
+        else
+            return -1;
     }
 
     protected static TestClass testProtectedNoParamsReturnObject(){
