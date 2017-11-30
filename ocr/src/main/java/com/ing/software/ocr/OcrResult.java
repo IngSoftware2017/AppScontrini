@@ -3,6 +3,7 @@ package com.ing.software.ocr;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
 import com.ing.software.ocr.OcrObjects.RawText;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -16,22 +17,13 @@ class OcrResult {
     private List<RawStringResult> amountResults;
     private List<RawGridResult> dateList;
 
-    OcrResult() {
-    }
-
     /**
-     * Set the possible RawTexts where amount is present
-     * @param amountResults possible RawTexts where amount is present
+     * Constructor
+     * @param amountResults list of possible amounts. Not null.
+     * @param dateList list of possible dates. Not null.
      */
-    void setAmountResults(List<RawStringResult> amountResults) {
+    OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList) {
         this.amountResults = amountResults;
-    }
-
-    /**
-     * Set the possible RawTexts where date is present
-     * @param dateList possible RawTexts where date is present
-     */
-    void setDateList(List<RawGridResult> dateList) {
         this.dateList = dateList;
     }
 
@@ -71,7 +63,7 @@ class OcrResult {
             for (RawGridResult result : dateList) {
                 int probability = result.getPercentage();
                 list.append("POSSIBLE DATE: " + result.getText().getDetection() + " with probability: " + probability);
-                log("POSSIBLE DATE: ", result.getText().getDetection() + " with probability: " + probability);
+                log(2,"POSSIBLE DATE: ", result.getText().getDetection() + " with probability: " + probability);
                 list.append("\n");
             }
         }

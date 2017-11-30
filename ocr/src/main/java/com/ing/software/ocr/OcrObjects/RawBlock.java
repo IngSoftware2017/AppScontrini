@@ -1,6 +1,9 @@
 package com.ing.software.ocr.OcrObjects;
 
 import android.graphics.RectF;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
+import android.support.annotation.Size;
 
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
@@ -16,7 +19,7 @@ import static com.ing.software.ocr.OcrUtils.log;
  * @author Michelon
  */
 
-public class RawBlock {
+public class RawBlock implements Comparable<RawBlock> {
 
     private List<RawText> rawTexts = new ArrayList<>();
     private List<? extends Text> textComponents;
@@ -25,14 +28,21 @@ public class RawBlock {
 
     /**
      * Constructor, parameters must not be null
-     * @param textBlock source TextBlock
-     * @param imageMod source image
+     * @param textBlock source TextBlock. Not null.
+     * @param imageMod source image. Not null.
      */
-    public RawBlock(TextBlock textBlock, RawImage imageMod) {
+    public RawBlock(@NonNull TextBlock textBlock, @NonNull RawImage imageMod) {
         rectF = new RectF(textBlock.getBoundingBox());
         textComponents = textBlock.getComponents();
         this.rawImage = imageMod;
         initialize();
+    }
+
+    /**
+     * @return rect containing this block
+     */
+    private RectF getRectF() {
+        return rectF;
     }
 
     /**
@@ -46,27 +56,29 @@ public class RawBlock {
 
     /**
      * Search string in block, only first occurrence is returned (top -> bottom, left -> right)
-     * @param string string to search
+     * @param string string to search. Length > 0.
      * @return RawText containing the string, null if nothing found
      */
-    public RawText findFirst(String string) {
+    public RawText findFirstExact(@Size(min = 1) String string) {
         for (RawText rawText : rawTexts) {
-            if (rawText.bruteSearch(string))
+            if (rawText.bruteSearch(string) == 0)
                 return rawText;
         }
         return null;
     }
 
     /**
-     * Search string in block, all occurrences are returned (top -> bottom, left -> right)
-     * @param string string to search
-     * @return list of RawText containing the string, null if nothing found
+     * Search string in block, all occurrences are returned ordered(top -> bottom, left -> right)
+     * @param string string to search. Length > 0.
+     * @param maxDistance max distance (included) allowed for the target string. Int >= 0
+     * @return list of RawStringResult containing the string with corresponding distance from target, null if nothing found
      */
-    public List<RawText> findContinuous(String string) {
-        List<RawText> rawTextList = new ArrayList<>();
+    public List<RawStringResult> findContinuous(@Size(min = 1) String string, @IntRange(from = 0) int maxDistance) {
+        List<RawStringResult> rawTextList = new ArrayList<>();
         for (RawText rawText : rawTexts) {
-            if (rawText.bruteSearch(string))
-                rawTextList.add(rawText);
+            int distanceFromString = rawText.bruteSearch(string);
+            if (distanceFromString <= maxDistance)
+                rawTextList.add(new RawStringResult(rawText, distanceFromString));
         }
         if (rawTextList.size()>0)
             return rawTextList;
@@ -77,16 +89,16 @@ public class RawBlock {
     /**
      * Find all RawTexts inside chosen rect with an error of 'percent' (on width and height of chosen rect)
      * @param rect rect where you want to find texts
-     * @param percent error accepted on chosen rect
+     * @param percent error accepted on chosen rect. Int >= 0
      * @return list of RawTexts in chosen rect, null if nothing found
      */
-    public List<RawText> findByPosition(RectF rect, int percent) {
+    public List<RawText> findByPosition(RectF rect, @IntRange(from = 0) int percent) {
         List<RawText> rawTextList = new ArrayList<>();
         RectF newRect = extendRect(rect, percent);
         for (RawText rawText : rawTexts) {
             if (rawText.isInside(newRect)) {
                 rawTextList.add(rawText);
-                log("OcrAnalyzer", "Found target rect: " + rawText.getDetection());
+                log(3,"OcrAnalyzer", "Found target rect: " + rawText.getDetection());
             }
         }
         if (rawTextList.size()>0)
@@ -97,26 +109,26 @@ public class RawBlock {
 
     /**
      * Get a list of RawTexts with the probability they contain the date, non ordered
-     * @return list of texts + probability date is present
+     * @return list of RawGridResult (texts + probability date is present)
      */
     public List<RawGridResult> getDateList() {
         List<RawGridResult> list = new ArrayList<>();
         for (RawText rawText : rawTexts) {
             list.add(new RawGridResult(rawText, rawText.getDateProbability()));
         }
-        log("LIST_SIZE_IS", " " + list.size());
+        log(2,"LIST_SIZE_IS", " " + list.size());
         return list;
     }
 
     /**
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
      * Note: Min value for top and left is 0
-     * @param rect source rect
-     * @param percent chosen percentage
+     * @param rect source rect. Not null
+     * @param percent chosen percentage. Int >= 0
      * @return new extended rectangle
      */
-    private RectF extendRect(RectF rect, int percent) {
-        log("RawObjects.extendRect","Source rect: left " + rect.left + " top: "
+    private RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
+        log(4, "RawObjects.extendRect","Source rect: left " + rect.left + " top: "
                 + rect.top + " right: " + rect.right + " bottom: " + rect.bottom);
         float extendedHeight = rect.height()*percent/100;
         float extendedWidth = rect.width()*percent/100;
@@ -129,8 +141,21 @@ public class RawBlock {
         //Doesn't matter if bottom and right are outside the photo
         float right = rect.right + extendedWidth/2;
         float bottom = rect.bottom + extendedHeight/2;
-        log("RawObjects.extendRect","Extended rect: left " + left + " top: " + top
+        log(4, "RawObjects.extendRect","Extended rect: left " + left + " top: " + top
                 + " right: " + right + " bottom: " + bottom);
         return new RectF(left, top, right, bottom);
+    }
+
+    @Override
+    public int compareTo(@NonNull RawBlock rawBlock) {
+        RectF block2Rect = rawBlock.getRectF();
+        if (block2Rect.top != rectF.top)
+            return Math.round(rectF.top - block2Rect.top);
+        else if (block2Rect.left != rectF.left)
+            return Math.round(rectF.left - block2Rect.left);
+        else if (block2Rect.bottom != rectF.bottom)
+            return Math.round(rectF.bottom - block2Rect.bottom);
+        else
+            return Math.round(rectF.right - block2Rect.right);
     }
 }

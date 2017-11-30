@@ -2,9 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-
-
-
     defaultConfig {
         applicationId "com.ing.software.test.opencvtestapp"
         minSdkVersion 21
@@ -19,6 +16,46 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    //for javacv
+    lintOptions {
+        warning 'InvalidPackage'
+    }
+
+    //for javacv
+    lintOptions {
+        warning 'InvalidPackage'
+    }
+
+    //cartesian product of flavour dimensions
+    flavorDimensions "all", "isEmulator"
+    productFlavors {
+        allFlav {
+            dimension "all"
+
+            //exclude all unwanted stuff for real phones or emulator
+            packagingOptions {
+                exclude 'org/bytedeco/javacpp/macosx-x86_64/*'
+                exclude 'org/bytedeco/javacpp/windows-x86/*'
+                exclude 'org/bytedeco/javacpp/windows-x86_64/*'
+                exclude 'org/bytedeco/javacpp/linux-x86_64/*'
+                exclude 'org/bytedeco/javacpp/linux-x86/*'
+                exclude 'org/bytedeco/javacpp/linux-armhf/*'
+                exclude 'org/bytedeco/javacpp/linux-ppc64le/*'
+            }
+        }
+        realPhone {
+            dimension "isEmulator"
+
+            // exclude also libraries for emulator
+            packagingOptions {
+                exclude 'lib/x86/*'
+            }
+        }
+        emululator {
+            dimension "isEmulator"
         }
     }
 }
