@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
@@ -25,6 +27,19 @@ public class DataAnalyzer {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
 
+    class AnalyzeRequest {
+        Bitmap photo;
+        OnTicketReadyListener ticketCb;
+
+        AnalyzeRequest(Bitmap bm, OnTicketReadyListener cb) {
+            photo = bm;
+            ticketCb = cb;
+        }
+    }
+
+    private Queue<AnalyzeRequest> analyzeQueue = new ConcurrentLinkedQueue<>();
+    private boolean analyzing = false;
+
     /**
      * Initialize OcrAnalyzer
      * @param context Android context
@@ -40,17 +55,29 @@ public class DataAnalyzer {
      * @param ticketCb callback to get the ticket. Not null.
      */
     public void getTicket(@NonNull Bitmap photo, final OnTicketReadyListener ticketCb) {
-        final long startTime = System.nanoTime();
-        analyzer.getOcrResult(photo, new OnOcrResultReadyListener() {
-            @Override
-            public void onOcrResultReady(OcrResult result) {
-                // for now, let's invoke the callback syncronously.
-                ticketCb.onTicketReady(getTicketFromResult(result));
-                long endTime = System.nanoTime();
-                long duration = (endTime - startTime)/1000000;
-                OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
+        analyzeQueue.add(new AnalyzeRequest(photo, ticketCb));
+        dispatchAnalysis();
+    }
+
+    private void dispatchAnalysis() {
+        if (!analyzing){
+            analyzing = true;
+            while (!analyzeQueue.isEmpty()) {
+                final AnalyzeRequest req = analyzeQueue.remove();
+                final long startTime = System.nanoTime();
+                analyzer.getOcrResult(req.photo, new OnOcrResultReadyListener() {
+                    @Override
+                    public void onOcrResultReady(OcrResult result) {
+                        // for now, let's invoke the callback syncronously.
+                        req.ticketCb.onTicketReady(getTicketFromResult(result));
+                        long endTime = System.nanoTime();
+                        long duration = (endTime - startTime)/1000000;
+                        OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
+                    }
+                });
             }
-        });
+            analyzing = false;
+        }
     }
 
     /**
