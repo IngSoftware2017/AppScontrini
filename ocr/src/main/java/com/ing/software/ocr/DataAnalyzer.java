@@ -79,7 +79,7 @@ public class DataAnalyzer {
                         });
                     }
                 }
-            });
+            }).start();
             analyzing = false;
         }
     }
