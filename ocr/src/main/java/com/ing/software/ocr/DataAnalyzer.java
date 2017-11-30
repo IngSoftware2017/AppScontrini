@@ -62,20 +62,24 @@ public class DataAnalyzer {
     private void dispatchAnalysis() {
         if (!analyzing){
             analyzing = true;
-            while (!analyzeQueue.isEmpty()) {
-                final AnalyzeRequest req = analyzeQueue.remove();
-                final long startTime = System.nanoTime();
-                analyzer.getOcrResult(req.photo, new OnOcrResultReadyListener() {
-                    @Override
-                    public void onOcrResultReady(OcrResult result) {
-                        // for now, let's invoke the callback syncronously.
-                        req.ticketCb.onTicketReady(getTicketFromResult(result));
-                        long endTime = System.nanoTime();
-                        long duration = (endTime - startTime)/1000000;
-                        OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!analyzeQueue.isEmpty()) {
+                        final AnalyzeRequest req = analyzeQueue.remove();
+                        final long startTime = System.nanoTime();
+                        analyzer.getOcrResult(req.photo, new OnOcrResultReadyListener() {
+                            @Override
+                            public void onOcrResultReady(OcrResult result) {
+                                req.ticketCb.onTicketReady(getTicketFromResult(result));
+                                long endTime = System.nanoTime();
+                                long duration = (endTime - startTime)/1000000;
+                                OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
+                            }
+                        });
                     }
-                });
-            }
+                }
+            });
             analyzing = false;
         }
     }
