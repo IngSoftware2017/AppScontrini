@@ -4,4 +4,8 @@
     <string name="title_activity_collapse">Collapse</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="hint_missionName">Nome</string>
+    <string name="hint_missionDesc">Descrizione</string>
+    <string name="action_addMission">Aggiungi Missione</string>
+
 </resources>

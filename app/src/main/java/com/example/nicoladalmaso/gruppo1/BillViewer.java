@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 public class BillViewer extends AppCompatActivity {
 
+    //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +29,7 @@ public class BillViewer extends AppCompatActivity {
         imgView.setImageBitmap(bitmap);
 
     }
+    //Dal Maso
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

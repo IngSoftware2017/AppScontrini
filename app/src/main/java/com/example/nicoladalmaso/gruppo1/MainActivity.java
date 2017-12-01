@@ -38,7 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public List<Missione> list = new LinkedList<Missione>();
-
+    //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +60,21 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Dir", inFile.toString());
             }
         }
+        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
+        fab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
+                startActivity(addMission);
+            }
+        });
         printAllMissions();
     }
 
+    /** Dal Maso
+     * Aggiunge alla lista la nuova missione
+     * @param title Tilolo missione
+     * @param desc descrizione missione
+     */
     public void addToList(String title, String desc){
         list.add(new Missione(title, desc));
         ListView listView = (ListView)findViewById(R.id.listMission);
@@ -70,7 +82,11 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
-    private File[] readAllImages(){
+    /** Dal Maso
+     * Legge tutte le missioni disponibili
+     * @return ritorna array di missioni
+     */
+    private File[] readAllMissions(){
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
@@ -84,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
      *  Stampa tutte le immagini
      */
     public void printAllMissions(){
-        File[] files = readAllImages();
+        File[] files = readAllMissions();
         for (int i = 0; i < files.length; i++)
         {
             if(files[i].isDirectory())
