@@ -137,7 +137,7 @@ public class BillActivity extends AppCompatActivity {
         if (takePhoto.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = createImageFile(getStorageDir());
             } catch (IOException e) {}
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
@@ -155,10 +155,10 @@ public class BillActivity extends AppCompatActivity {
      * @Framing Directory Pictures
      * @Return the temporary file
      *
-     */
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        File storageDir = new File(Variables.getInstance().getCurrentMissionDir());
+     */private File getStorageDir()
+    {   return new File(Variables.getInstance().getCurrentMissionDir());}
+
+    protected File createImageFile(File storageDir) throws IOException {
         File image = File.createTempFile(
                 "temp",  /* prefix */
                 ".jpg",         /* suffix */
@@ -255,7 +255,7 @@ public class BillActivity extends AppCompatActivity {
      * Salva il bitmap passato nell'apposita cartella
      * @param imageToSave bitmap da salvare come jpeg
      */
-    private void savePickedFile(Bitmap imageToSave) {
+    protected void savePickedFile(Bitmap imageToSave) {
         String root = Variables.getInstance().getCurrentMissionDir();
         File myDir = new File(root);
         myDir.mkdirs();
@@ -306,7 +306,7 @@ public class BillActivity extends AppCompatActivity {
      * Lazzarin
      * @return temporary allocation with a File object.
      */
-    private File temporaryFile()
+    protected File temporaryFile()
     {
         String root = Variables.getInstance().getCurrentMissionDir();
         File myDir = new File(root);
@@ -334,7 +334,7 @@ public class BillActivity extends AppCompatActivity {
      * Legge tutte le immagini
      * @return ritorna tutti i file letti nella cartella
      */
-    private File[] readAllImages(){
+    protected File[] readAllImages(){
         String path = Variables.getInstance().getCurrentMissionDir();
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
