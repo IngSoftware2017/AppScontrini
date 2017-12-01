@@ -13,6 +13,7 @@ public class AddNewMission extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("Aggiungi una missione");
         setContentView(R.layout.activity_add_new_mission);
     }
 
