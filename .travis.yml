@@ -12,7 +12,7 @@ before_install:
  - # export GDRIVE='GDrive'
  - bash download_dataset.sh
  - ls -lR
- - echo GDrive path is $GDRIVE
+ - echo "GDrive path is $GDRIVE"
  - echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
  - echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
 before_script:

@@ -21,7 +21,7 @@ public class Reflect {
      *
      * @param clazz A class instance or class type. Not null
      * @param methodName Method name. Not null
-     * @param params List of arguments of the method. For now they can't be "null".
+     * @param params List of arguments of the method. They can be null.
      * @param <T> return type of the method.
      * @return return of the method or void.
      * @throws NoSuchMethodException: The method name, the number or type of parameters is wrong
@@ -38,7 +38,6 @@ public class Reflect {
                 paramsTypes.add(p.getClass());
             else
                 paramsTypes.add(null);
-
         }
 
         boolean isType = clazz instanceof Class<?>;
@@ -53,18 +52,19 @@ public class Reflect {
 
                     //Problem: since params is an array of objects, primitive types are boxed to respective wrappers.
                     // so if a wrapper is passed, we accept the match with the primitive type.
-                    paramsMatch &= need.isAssignableFrom(got)
-                            || (boolean.class.equals(need) && Boolean.class.equals(got))
+                    paramsMatch &= (boolean.class.equals(need) && Boolean.class.equals(got))
                             || (byte.class.equals(need) && Byte.class.equals(got))
                             || (short.class.equals(need) && Short.class.equals(got))
                             || (int.class.equals(need) && Integer.class.equals(got))
                             || (long.class.equals(need) && Long.class.equals(got))
                             || (float.class.equals(need) && Float.class.equals(got))
                             || (double.class.equals(need) && Double.class.equals(got))
-                            || (char.class.equals(need) && Character.class.equals(got));
+                            || (char.class.equals(need) && Character.class.equals(got))
+                            //now we know "need" is an object
+                            || got == null || need.isAssignableFrom(got);
                 }
                 if (paramsMatch) {
-                    //m.setAccessible(true);
+                    m.setAccessible(true);
 
                     //Exception if there is a return type mismatch (cannot handle it in unit tests)
                     try {
@@ -105,12 +105,11 @@ public class Reflect {
 
     @Test
     public void testInvokeNullParam() throws Exception {
-        //int r = invoke(new TestClass(), "testPrivateWithParams", 0, null);
-        Object.class.isAssignableFrom(null);
-        //assertEquals(-1, r);
+        int r = invoke(new TestClass(), "testPrivateWithParams", 0, null);
+        assertEquals(-1, r);
     }
 
-    //These tests are not exhaustive but invoke will be used enough to be certain it's bug free
+    //These tests are not exhaustive but invoke will be used enough in other tests.
 }
 
 class TestClass {
