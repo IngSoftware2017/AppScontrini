@@ -9,8 +9,8 @@ pushd $GDRIVE_DIR
 popd
 
 # Copy photo where needed
-PATHS = ('ocr/src/androidTest' 'ocrtestapp/src/main')
-for p in $DESTS; do
+PATHS=('ocr/src/androidTest' 'ocrtestapp/src/main')
+for p in $PATHS; do
 	mkdir -p "${p}/assets/photos"
 	cp -avr "${GDRIVE_DIR}/." "${p}/assets/photos"
 done
