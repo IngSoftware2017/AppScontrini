@@ -46,7 +46,7 @@ public class OcrInstrumentedTests {
     }
 
     @Test
-    public void useAppContext() throws Exception {
+    public void ocrMainTest() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
         final Semaphore sem = new Semaphore(0);
         int imgsTot = getTotImgs();
@@ -62,6 +62,7 @@ public class OcrInstrumentedTests {
 
         if (c < TIMEOUT) {
             for (int i = 0; i < imgsTot; i++) {
+                final int idx = i;
                 final Ticket target = null; //todo: initialize
                 Bitmap photo = getBitmap(i);
                 if (photo != null) {
@@ -73,6 +74,7 @@ public class OcrInstrumentedTests {
                             //assertEquals(target, ticket);
 
                             sem.release();
+                            System.out.println("Done img " + String.valueOf(idx));
                         }
                     });
                 }
