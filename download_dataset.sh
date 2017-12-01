@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Download a dummy photo
 GDRIVE_DIR='GDrive/Ingegneria del software/DataSet/photos'

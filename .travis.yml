@@ -10,7 +10,7 @@ before_install:
  - chmod +x gradlew
  - chmod +x download_dataset.sh
  - # export GDRIVE='GDrive'
- - sh download_dataset.sh
+ - bash download_dataset.sh
  - ls -lR
  - echo GDrive path is $GDRIVE
  - echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
