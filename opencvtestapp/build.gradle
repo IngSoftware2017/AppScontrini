@@ -8,7 +8,6 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -24,32 +23,15 @@ android {
         warning 'InvalidPackage'
     }
 
-    //for javacv
-    lintOptions {
-        warning 'InvalidPackage'
+    packagingOptions {
+        exclude 'org/bytedeco/javacpp/**'
+        exclude '**/libav*.so'
     }
 
-    //cartesian product of flavour dimensions
-    flavorDimensions "all", "isEmulator"
+    flavorDimensions "isEmulator"
     productFlavors {
-        allFlav {
-            dimension "all"
-
-            //exclude all unwanted stuff for real phones or emulator
-            packagingOptions {
-                exclude 'org/bytedeco/javacpp/macosx-x86_64/*'
-                exclude 'org/bytedeco/javacpp/windows-x86/*'
-                exclude 'org/bytedeco/javacpp/windows-x86_64/*'
-                exclude 'org/bytedeco/javacpp/linux-x86_64/*'
-                exclude 'org/bytedeco/javacpp/linux-x86/*'
-                exclude 'org/bytedeco/javacpp/linux-armhf/*'
-                exclude 'org/bytedeco/javacpp/linux-ppc64le/*'
-            }
-        }
         realPhone {
             dimension "isEmulator"
-
-            // exclude also libraries for emulator
             packagingOptions {
                 exclude 'lib/x86/*'
             }

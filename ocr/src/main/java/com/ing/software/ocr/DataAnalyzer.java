@@ -19,6 +19,13 @@ import com.ing.software.common.Ticket;
 import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
+/*
+USAGE:
+1) Instantiate DataAnalyzer;
+2) Call initialize() until it returns 0;
+3) Call getTicket ad libitum to extract information (Ticket object) from a photo of a ticket.
+4) Call release() to release internal resources.
+ */
 
 /**
  * Class used to extract informations from raw data
@@ -59,6 +66,11 @@ public class DataAnalyzer {
         dispatchAnalysis();
     }
 
+    /**
+     * Handle analysis requests
+     * @author Michelon
+     * @author Zaglia
+     */
     private void dispatchAnalysis() {
         if (!analyzing){
             analyzing = true;
@@ -68,15 +80,11 @@ public class DataAnalyzer {
                     while (!analyzeQueue.isEmpty()) {
                         final AnalyzeRequest req = analyzeQueue.remove();
                         final long startTime = System.nanoTime();
-                        analyzer.getOcrResult(req.photo, new OnOcrResultReadyListener() {
-                            @Override
-                            public void onOcrResultReady(OcrResult result) {
-                                req.ticketCb.onTicketReady(getTicketFromResult(result));
-                                long endTime = System.nanoTime();
-                                long duration = (endTime - startTime)/1000000;
-                                OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
-                            }
-                        });
+                        OcrResult result = analyzer.analyze(req.photo);
+                        req.ticketCb.onTicketReady(getTicketFromResult(result));
+                        long endTime = System.nanoTime();
+                        long duration = (endTime - startTime)/1000000;
+                        OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
                     }
                 }
             }).start();

@@ -1,4 +1,5 @@
 package com.ing.software.ocr;
+
 import static org.bytedeco.javacpp.opencv_core.*;
 import org.bytedeco.javacv.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
@@ -111,5 +112,5 @@ public class ImagePreprocessor {
     }
 
 
-
+    
 }

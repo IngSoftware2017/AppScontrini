@@ -27,7 +27,6 @@ import static com.ing.software.ocr.OcrVars.*;
 class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
-    private OnOcrResultReadyListener ocrResultCb = null;
     private Context context;
     private RawImage mainImage;
     private final int targetPrecision = 100; //Should be passed with image, or calculated with
@@ -38,36 +37,15 @@ class OcrAnalyzer {
      * @author Michelon
      * @author Zaglia
      * Initialize the component.
-     * If this call returns -1, check if the device has enough free disk space.
-     * If so, try to call this method again.
-     * When this method returned 0, it will be possible to call getOcrResult.
+     * If this method returns -1, check if the device has enough free disk space.
+     * In this case, try to call this method again.
+     * When this method returns 0, it is possible to call getOcrResult.
      * @param ctx Android context.
      * @return 0 if successful, negative otherwise.
      */
     int initialize(Context ctx) {
         context = ctx;
         ocrEngine = new TextRecognizer.Builder(ctx).build();
-        ocrEngine.setProcessor(new Detector.Processor<TextBlock>() {
-            @Override
-            public void release() {
-                ocrEngine.release();
-            }
-
-            @Override
-            public void receiveDetections(Detector.Detections<TextBlock> detections) {
-                //check if getOcrResult has been called to assign ocrResultCb.
-                if (ocrResultCb != null) {
-                    SparseArray<TextBlock> tempArray = detections.getDetectedItems();
-                    List<RawBlock> rawBlocks = orderBlocks(mainImage, tempArray);
-                    List<RawStringResult> valuedTexts = searchContinuousString(rawBlocks, AMOUNT_STRING);
-                    valuedTexts = searchContinuousStringExtended(rawBlocks, valuedTexts, targetPrecision);
-                    List<RawGridResult> dateList = getDateList(rawBlocks);
-                    OcrResult newOcrResult = new OcrResult(valuedTexts, dateList);
-                    ocrResultCb.onOcrResultReady(newOcrResult);
-                }
-            }
-        });
-
         return ocrEngine.isOperational() ? 0 : -1;
         //failure causes: GSM package is not yet downloaded due to lack of time or lack of space.
     }
@@ -76,15 +54,22 @@ class OcrAnalyzer {
      * @author Michelon
      * @author Zaglia
      * Get an OcrResult from a Bitmap
-     * @param frame Bitmap from which to extract an OcrResult. Not null.
-     * @param resultCb Callback to get an OcrResult. Not null.
+     * @param frame Bitmap used to create an OcrResult. Not null.
+     * @return OcrResult containing raw data to be further analyzed.
      */
-    void getOcrResult(@NonNull Bitmap frame, OnOcrResultReadyListener resultCb){
-        ocrResultCb = resultCb;
+    OcrResult analyze(@NonNull Bitmap frame){
         //cropping must be used somewhere else (if used with textRecognizer). Can be used here is using opencv
         //frame = getCroppedPhoto(frame, context);
         mainImage = new RawImage(frame);
-        ocrEngine.receiveFrame(new Frame.Builder().setBitmap(frame).build());
+
+        //ocrEngine analysis
+        SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(frame).build());
+
+        List<RawBlock> rawBlocks = orderBlocks(mainImage, tempArray);
+        List<RawStringResult> valuedTexts = searchContinuousString(rawBlocks, AMOUNT_STRING);
+        valuedTexts = searchContinuousStringExtended(rawBlocks, valuedTexts, targetPrecision);
+        List<RawGridResult> dateList = getDateList(rawBlocks);
+        return new OcrResult(valuedTexts, dateList);
     }
 
     /**

@@ -8,12 +8,11 @@ env:
  - GDRIVE=GDrive
 before_install:
  - chmod +x gradlew
- - chmod +x prepare_env.sh
- - sh prepare_env.sh
+ - chmod +x download_dataset.sh
+ - # export GDRIVE='GDrive'
  - sh download_dataset.sh
  - ls -lR
- - echo GDrive path is 
- - echo $GDRIVE
+ - echo GDrive path is $GDRIVE
  - echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
  - echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
 before_script:

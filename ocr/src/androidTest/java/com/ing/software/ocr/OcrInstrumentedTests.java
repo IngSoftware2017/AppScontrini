@@ -63,16 +63,20 @@ public class OcrInstrumentedTests {
         if (c < TIMEOUT) {
             for (int i = 0; i < imgsTot; i++) {
                 final Ticket target = null; //todo: initialize
-                analyzer.getTicket(getBitmap(i), new OnTicketReadyListener() {
-                    @Override
-                    public void onTicketReady(Ticket ticket) {
+                Bitmap photo = getBitmap(i);
+                if (photo != null) {
+                    analyzer.getTicket(photo, new OnTicketReadyListener() {
+                        @Override
+                        public void onTicketReady(Ticket ticket) {
 
-                        //todo: compare Ticket to dataset
-                        //assertEquals(target, ticket);
+                            //todo: compare Ticket to dataset
+                            //assertEquals(target, ticket);
 
-                        sem.release();
-                    }
-                });
+                            sem.release();
+                        }
+                    });
+                }
+
                 sem.acquire();
             }
         }
