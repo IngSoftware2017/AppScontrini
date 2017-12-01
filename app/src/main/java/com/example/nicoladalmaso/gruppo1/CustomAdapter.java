@@ -66,7 +66,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 pos =  Integer.parseInt(v.getTag().toString());
                 Log.d("TAG", v.getTag().toString());
                 //context.deletePhoto(v);
-                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                path = Variables.getInstance().getCurrentMissionDir();
                 Log.d("Dir", path);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -78,8 +78,8 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                         File directory = new File(path);
                         File[] files = directory.listFiles();
                         if(files[pos].delete()){
-                            ((MainActivity)context).clearAllImages();
-                            ((MainActivity)context).printAllImages();
+                            ((BillActivity)context).clearAllImages();
+                            ((BillActivity)context).printAllImages();
                         }
                     }
                 });
@@ -98,7 +98,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         fabCrop.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                path = Variables.getInstance().getCurrentMissionDir();
                 cropFile(pos,path);
                 /*File directory =new File(path);
                 File[] files =directory.listFiles();
@@ -109,7 +109,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                path = Variables.getInstance().getCurrentMissionDir();
                 File directory = new File(path);
                 File[] files = directory.listFiles();
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
@@ -131,7 +131,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop]))
                 .setOutputUri(Uri.fromFile(files[toCrop]))
-                .start(((MainActivity)context));
+                .start(((BillActivity)context));
         //files[toCrop].delete();
     }//cropFile
 

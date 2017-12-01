@@ -24,6 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
@@ -40,10 +41,12 @@
 
         <activity
             android:name=".BillViewer"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.ActionBar.Transparent">
+            android:parentActivityName=".BillActivity"
+            android:theme="@style/AppTheme.ActionBar.Transparent" />
 
-        </activity>
+        <activity
+            android:name=".BillActivity"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>
