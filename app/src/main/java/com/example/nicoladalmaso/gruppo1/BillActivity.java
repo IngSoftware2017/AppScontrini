@@ -129,8 +129,7 @@ public class BillActivity extends AppCompatActivity {
 
 
     /**Lazzarin
-     * Funzione che apre la fotocamera e assegna alla foto il File restituito
-     * dal metodo createImageFile.
+     * It Opens the camera,takes the photo and puts as Extra Uri created by createImageFile method.
      * @Framing Camera, directory modified by createImageFile
      */
     private void takePhotoIntent() {
@@ -152,8 +151,9 @@ public class BillActivity extends AppCompatActivity {
 
 
     /**Lazzarin
-     * crea un file temporaneo dove salvare la foto scattata
+     * It creates a temporary file where to save the photo on.
      * @Framing Directory Pictures
+     * @Return the temporary file
      *
      */
     private File createImageFile() throws IOException {
@@ -210,7 +210,9 @@ public class BillActivity extends AppCompatActivity {
 
             switch (requestCode) {
                 /**lazzarin
-                 * Gestisce l'intent prodotto dalla fotocamera,andando ad eliminare il file temporaneo
+                 * Saves definitely the photo without losing quality, deletes the temporary file and shows
+                 * the new photo.
+                 * @Framing Add the photo on the directory using savePickedFile()
                  */
                 case(REQUEST_TAKE_PHOTO):
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -281,11 +283,9 @@ public class BillActivity extends AppCompatActivity {
 
     /** NOT USED
      * Lazzarin
-     * parametro di ingresso: Bitmap imageToCrop
-     * @return Uri
-     * il parametro Uri ritornato è preso dal file intermedio tra foto
-     * e resize(allocato in Documents per evitare
-     * venga visualizzato nella gallery)
+     * @param  imageToCrop is the photo we want to resize. It has to be a Bitmap object.
+     * @return an Uri object taken to the file allocated in "documents",so it isn't show on the gallery
+     *
      */
     private Uri savePhotoForCrop (Bitmap imageToCrop) {
         File allocation = temporaryFile();
