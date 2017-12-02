@@ -27,7 +27,6 @@ import static com.ing.software.ocr.OcrVars.*;
 class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
-    private Context context;
     private RawImage mainImage;
     private final int targetPrecision = 75; //Should be passed with image, or calculated with
         //resolution of source image
@@ -44,10 +43,13 @@ class OcrAnalyzer {
      * @return 0 if successful, negative otherwise.
      */
     int initialize(Context ctx) {
-        context = ctx;
         ocrEngine = new TextRecognizer.Builder(ctx).build();
         return ocrEngine.isOperational() ? 0 : -1;
         //failure causes: GSM package is not yet downloaded due to lack of time or lack of space.
+    }
+
+    void release() {
+        ocrEngine.release();
     }
 
     /**

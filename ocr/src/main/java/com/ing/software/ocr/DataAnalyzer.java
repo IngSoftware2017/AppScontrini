@@ -58,6 +58,10 @@ public class DataAnalyzer {
         return analyzer.initialize(context);
     }
 
+    public void release() {
+        analyzer.release();
+    }
+
     /**
      * Get a Ticket from a Bitmap. Some fields of the new ticket can be null.
      * @param photo Bitmap. Not null.
