@@ -39,6 +39,7 @@ public class BillActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         Intent intent = getIntent();
@@ -46,6 +47,7 @@ public class BillActivity extends AppCompatActivity {
         String missionName = intent.getExtras().getString("missionName");
         setTitle(missionName);
         initializeComponents();
+        Log.d("fin qui","corretto");
     }
 
     /** Dal Maso
@@ -338,7 +340,12 @@ public class BillActivity extends AppCompatActivity {
         String path = Variables.getInstance().getCurrentMissionDir();
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
-        File[] files = directory.listFiles();
+        File[] files=null;
+        if(directory.listFiles()==null) {
+            Log.d("Files", "hai trovato l'errore");
+        }
+         else
+         files = directory.listFiles();
         Log.d("Files", "Size: "+ files.length);
         return files;
     }
