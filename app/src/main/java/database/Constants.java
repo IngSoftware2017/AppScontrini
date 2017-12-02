@@ -8,6 +8,7 @@ package database;
 public final class Constants {
 
     //Database Contasts
+
     public static final String DATABASE_NAME = "ticket-database";
     public static final String TICKET_TABLE_NAME = "tickets";
     public static final String MISSION_TABLE_NAME = "missions";
