@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ public class AddNewMission extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTitle("Nuova missione");
         setContentView(R.layout.activity_add_new_mission);
+
     }
 
     /** Dal Maso
@@ -46,14 +48,21 @@ public class AddNewMission extends AppCompatActivity {
             case R.id.action_addMission:
                 //read input text
                 String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-                EditText editName =findViewById(R.id.input_missionName);
-                EditText editDescription = findViewById(R.id.input_missionDescription);
+                EditText editName =(EditText)findViewById(R.id.input_missionName);
+                EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
                 String name=editName.toString();
                 String description=editDescription.toString();
                 //create new directory with input text
                 File newMissionPath=new File(path+"/"+name);
                 newMissionPath.mkdir();
+                Context context=this.getApplicationContext();
 
+                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
+                startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Variables.getInstance().setCurrentMissionDir(newMissionPath.getAbsolutePath());
+                Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
+                startImageView.putExtra("missionName", name);
+                context.startActivity(startImageView);
                 Log.d("AddMission", "OK");
                 return true;
             default:
