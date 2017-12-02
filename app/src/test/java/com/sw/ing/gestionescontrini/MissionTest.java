@@ -47,14 +47,14 @@ public class MissionTest {
     }
 
     @Test
-    public void getLocalitySetTheLocality(){
-        assertTrue(mission1.getLocality().equals("Venice"));
+    public void getLocationSetTheLocation(){
+        assertTrue(mission1.getLocation().equals("Venice"));
     }
 
     @Test
-    public void setLocalitySetTheLocality(){
-        mission2.setLocality("Venice");
-        assertTrue(mission2.getLocality().equals(mission1.getLocality()));
+    public void setLocationSetTheLocation(){
+        mission2.setLocation("Venice");
+        assertTrue(mission2.getLocation().equals(mission1.getLocation()));
     }
 
     @Test

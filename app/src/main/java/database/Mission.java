@@ -26,7 +26,7 @@ public class Mission {
     private int ID;
     private Date startMission;
     private Date endMission;
-    private String locality;
+    private String location;
     private boolean isRepay;
     private Uri excel;
 
@@ -45,13 +45,13 @@ public class Mission {
      *
      * @param startMission Date of the beginning of the mission
      * @param endMission Date of the end of the mission
-     * @param locality Name of locality where the mission took place
+     * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(Date startMission, Date endMission, String locality, int personID) {
+    public Mission(Date startMission, Date endMission, String location, int personID) {
         this.startMission = startMission;
         this.endMission = endMission;
-        this.locality = locality;
+        this.location = location;
         isRepay = false;
         excel = null;
         this.personID = personID;
@@ -107,19 +107,19 @@ public class Mission {
     }
 
     /**
-     * Returns the locality where the mission took place
-     * @return locality
+     * Returns the location where the mission took place
+     * @return location
      */
-    public String getLocality() {
-        return locality;
+    public String getLocation() {
+        return location;
     }
 
     /**
-     * Sets the locality where the mission took place
-     * @param locality
+     * Sets the location where the mission took place
+     * @param location
      */
-    public void setLocality(String locality) {
-        this.locality = locality;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     /**
