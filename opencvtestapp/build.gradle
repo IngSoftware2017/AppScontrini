@@ -1,0 +1,63 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.ing.software.test.opencvtestapp"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    //for javacv
+    lintOptions {
+        warning 'InvalidPackage'
+    }
+
+    packagingOptions {
+        exclude 'org/bytedeco/javacpp/**'
+        exclude '**/libav*.so'
+    }
+
+    flavorDimensions "isEmulator"
+    productFlavors {
+        realPhone {
+            dimension "isEmulator"
+            packagingOptions {
+                exclude 'lib/x86/*'
+            }
+        }
+        emululator {
+            dimension "isEmulator"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    implementation project(':ocr')
+}
+
+task copyDataset(type: Copy){
+    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
+        exclude '**/desktop.ini' //desktop.ini files break AssetManager
+    }
+    into "${projectDir}/src/main/assets"
+}
+
+tasks.preBuild.dependsOn('copyDataset')

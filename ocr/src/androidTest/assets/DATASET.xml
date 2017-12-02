@@ -1,0 +1,655 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSet>
+  
+  <Ticket>
+    <ID>0</ID>
+    <Date>16-10-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>2,58</Amount>
+    <Shop>PANIFICIO BACCHIN</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>1</ID>
+    <Date>22/09/17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>114,80</Amount>
+    <Shop>PITTARELLO</Shop>
+    <Features>Contiene valori negativi di riga generati da sconti presenti sull’articolo</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>2</ID>
+    <Date>18/10/17</Date>
+    <PositionDate>A piè di scontrino, centro-dx della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>3,50</Amount>
+    <Shop>Gocce di Miele</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>3</ID>
+    <Date>18-10-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>7,60</Amount>
+    <Shop>PARADISE CAFFE</Shop>
+    <Features>Scolorato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>4</ID>
+    <Date>18/10/17</Date>
+    <PositionDate>Nella terza riga del corpo dello scontrino tra la parola “Data” e “Ora” seguita dall’ora</PositionDate>
+    <Amount>15,89</Amount>
+    <Shop>DISTRIBUTORE DELL’AGLIO</Shop>
+    <Features>Non è uno scontrino fiscale classico</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>5</ID>
+    <Date>18-10-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino (SCO.FISC.)</PositionDate>
+    <Amount>24,74</Amount>
+    <Shop>ALIMENTARI</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>6</ID>
+    <Date>18-10-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>2,50</Amount>
+    <Shop>MERCERIA ABBIGLIAMENTO</Shop>
+    <Features>Elevato contrasto</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>7</ID>
+    <Date>10-10-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>9,90</Amount>
+    <Shop>RE SOLE</Shop>
+    <Features>Orizzontale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>8</ID>
+    <Date>10-10-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>9,90</Amount>
+    <Shop>RE SOLE</Shop>
+    <Features>Un po’ strappato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>9</ID>
+    <Date>05.09.2017</Date>
+    <PositionDate>Prima riga dopo il totale, tra “Data :” e “Ora: ” seguita dall’ora e “Buo: 147”</PositionDate>
+    <Amount>40.75</Amount>
+    <Shop>DEICHMANN CALZATURE S.r.l.</Shop>
+    <Features>Non è uno scontrino fiscale classico</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>10</ID>
+    <Date>20/09/2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>25,00</Amount>
+    <Shop>TOKUNO SHIMA</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>11</ID>
+    <Date>13/10/17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>5,00</Amount>
+    <Shop>LE CHAT NOIR</Shop>
+    <Features>Un po’ sfuocato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>12</ID>
+    <Date>20-09-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>16,99</Amount>
+    <Shop>UNIVERSO MODA</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>13</ID>
+    <Date>12-10-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>46,00</Amount>
+    <Shop>MENARDO GIUSEPPE</Shop>
+    <Features>Sbiadito</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>14</ID>
+    <Date>17/10/17</Date>
+    <PositionDate>A piè di scontrino, al centro-dx della riga, dopo il numero scontrino e prima dell’ora</PositionDate>
+    <Amount>3,50</Amount>
+    <Shop>Gocce di Miele</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>15</ID>
+    <Date>31/10/17</Date>
+    <PositionDate>A piè di scontrino, al centro-dx della riga, dopo il numero scontrino e prima dell’ora</PositionDate>
+    <Amount>42,70</Amount>
+    <Shop>PIZZERIA LAURA</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>16</ID>
+    <Date>31/10/2017</Date>
+    <PositionDate>A piè di scontrino, dati intabellati (operatore, cassa, data, ora)</PositionDate>
+    <Amount>16,99</Amount>
+    <Shop>MEDIA WORLD</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>17</ID>
+    <Date>31-10-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>6,00</Amount>
+    <Shop>UNO DUE TRE EURO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>18</ID>
+    <Date>18.10.17</Date>
+    <PositionDate>Nel corpo dello scontrino come prima riga, a sx prima dell’ora</PositionDate>
+    <Amount>35.22</Amount>
+    <Shop>IPERSIMPLY</Shop>
+    <Features>Molto lungo e fotografato con ombre</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>19</ID>
+    <Date>06-11-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>3,60</Amount>
+    <Shop>PANIFICIO BACCHIN</Shop>
+    <Features>Orizzontale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>20</ID>
+    <Date>09-11-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>40,56</Amount>
+    <Shop>MACELLERIA</Shop>
+    <Features>Obliquo a sinistra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>21</ID>
+    <Date>09-11-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora</PositionDate>
+    <Amount>3,60</Amount>
+    <Shop>PAN PER FOCACCIA</Shop>
+    <Features>Molto luminoso</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>22</ID>
+    <Date>08-11-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>27,43</Amount>
+    <Shop>ALIMENTARI</Shop>
+    <Features>Obliquo a destra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>23</ID>
+    <Date>13/11/17</Date>
+    <PositionDate>A piè di scontrino (metà), dopo “Il”, prima dell’ora, della cassa e della transazione</PositionDate>
+    <Amount>15,99</Amount>
+    <Shop>DECATHLON</Shop>
+    <Features>Foto laterale e simbolo € a destra del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>24</ID>
+    <Date>13/11/17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>9,55</Amount>
+    <Shop>LIDL</Shop>
+    <Features>Foto laterale, con ombra e con asterisco di fianco al totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>25</ID>
+    <Date>09/11/17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>6,00</Amount>
+    <Shop>BAR POLLINI</Shop>
+    <Features>Sezione di altro scontrino sopra, differisce da 30 solo per numero di scontrino</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>26</ID>
+    <Date>09/11/17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>8,00</Amount>
+    <Shop>BAR POLLINI</Shop>
+    <Features>Sezione di altro scontrino sulla parte inferiore della foto</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>27</ID>
+    <Date>31.10.17</Date>
+    <PositionDate>A piè di scontrino (metà), a metà della riga, dopo numero a 14 cifre e prima dell’ora</PositionDate>
+    <Amount>7,50</Amount>
+    <Shop>INTERSPAR</Shop>
+    <Features>Parzialmente coperto dalle dita</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>28</ID>
+    <Date>10-11-2017</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>125,70</Amount>
+    <Shop>CORNARO</Shop>
+    <Features>
+      Parte superiore tranciata e inferiore in ombra.
+      Data in ombra
+    </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>29</ID>
+    <Date>10/11/17</Date>
+    <PositionDate>A piè di scontrino, metà della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>24,20</Amount>
+    <Shop>CAFE’ MANIN</Shop>
+    <Features>Voci multiple, un po piegato sulla riga del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>30</ID>
+    <Date>09/11/17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>6,00</Amount>
+    <Shop>BAR POLLINI</Shop>
+    <Features>Scontrino consecutivo e uguale nei dati al numero 25</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>31</ID>
+    <Date>06/11/17</Date>
+    <PositionDate>A piè di scontrino, metà della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>54,00</Amount>
+    <Shop>DEMENEGO SRL</Shop>
+    <Features>Sconto su articoli (anche sconto 0)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>32</ID>
+    <Date>14/11/17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>7,99</Amount>
+    <Shop>LIDL</Shop>
+    <Features>Piegato sulla riga del Totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>33</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>13,00</Amount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a Sx di 90°, colorato di rosso vicino al totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>34</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>14,30</Amount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a Sx di 90 °, stropicciato e piegato al centro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>35</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>2,25</Amount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Senza bordi</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>36</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>1,10</Amount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Macchiato e sbiadito sull’intestazione, tagliato sulla parte superiore e ai lati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>37</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>2,20</Amount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Piegato al centro, leggermente ruotato a sx e rigato vicino al totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>38</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>A piè di scontrino, inizio della riga, prima dell’ora e del numero scontrino</PositionDate>
+    <Amount>1,60</Amount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Piegato al centro, immagine orizzontale con ampio spazio vuoto ai lati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>39</ID>
+    <Date>17-11-2017</Date>
+    <PositionDate>A piè di scontrino, all’inizio della riga</PositionDate>
+    <Amount>5,00</Amount>
+    <Shop>ZEROLITE SAS</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>40</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>11,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato sul totale e con dati sbiaditi</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>41</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>48,70</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Dati di riga cancellati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>42</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>28,60</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>43</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>108,30</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Scontrino lungo (15-20 righe) e stropicciato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>44</ID>
+    <Date>17/11/17</Date>
+    <PositionDate>A metà scontrino, tra ‘Data’ e ‘Ora’</PositionDate>
+    <Amount>67,24</Amount>
+    <Shop>DISTRIBUTORE REPSOL</Shop>
+    <Features>Ricevuta di pagamento bancomat</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>45</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>33,60</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato in centro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>46</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>16,50</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Sporco sulla parola TOTALE</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>47</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>23,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Con subtotale (SUB-TOTALE)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>48</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>8,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro e ruotato di 180°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>49</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>16,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro e con secondo scontrino sotto di cui non si vedono dati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>50</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>25,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>51</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>12,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro, stropicciato e con subtotale (SUB-TOTALE)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>52</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>6,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Scritte sul retro, ruotato di 180° a destra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>53</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>96,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato in centro e con 15-20 righe</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>54</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>164,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato e leggermente stropicciato con 20 righe</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>55</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>26,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato e con la riga del totale sulla piega</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>56</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>37,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato e sporco</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>57</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>27,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piega diagonale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>58</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>14,94</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro, con subtotale (SUB-TOTALE)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>59</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>22,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>60</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>14,50</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Ruotato a destra di 45° </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>61</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>7,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Tenuto in mano</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>62</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>8,50</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Tenuto in mano</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>63</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>6,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Tenuto in mano, piega sull’angolo in fondo a destra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>64</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>54,20</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Scontrino con più di 10 righe e piegato sul totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>65</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>28,50</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>66</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>31,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Ruotato a destra di 90° e leggermente sporco</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>67</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>9,50</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Ruotato a destra di 90° </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>68</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>28,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Secondo scontrino sullo sfondo di cui si vede la riga del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>69</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>37,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>70</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>23,00</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Secondo scontrino sotto di cui si vede parte del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>71</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>A piè di scontrino, verso la fine della riga, tra il numero scontrino e l’ora</PositionDate>
+    <Amount>27,10</Amount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato, sporco e con svariati riflessi</Features>
+  </Ticket>
+  
+</DataSet>
