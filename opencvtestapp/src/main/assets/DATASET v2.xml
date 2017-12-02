@@ -1,0 +1,837 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataSet>
+  
+  <Ticket>
+    <ID>0</ID>
+    <Date>16-10-2017</Date>
+    <PositionDate>(723, 2261)</PositionDate>
+    <Amount>2,58</Amount>
+    <PositionAmount>(1773, 1829)</PositionAmount>
+    <Shop>PANIFICIO BACCHIN</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>1</ID>
+    <Date>22/09/17</Date>
+    <PositionDate>(719, 2931)</PositionDate>
+    <Amount>114,80</Amount>
+    <PositionAmount>(1771, 2589)</PositionAmount>
+    <Shop>PITTARELLO</Shop>
+    <Features>Contiene valori negativi di riga generati da sconti presenti sull’articolo</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>2</ID>
+    <Date>18/10/17</Date>
+    <PositionDate>(1795, 2765)</PositionDate>
+    <Amount>3,50</Amount>
+    <PositionAmount>(2185, 2421)</PositionAmount>
+    <Shop>Gocce di Miele</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>3</ID>
+    <Date>18-10-2017</Date>
+    <PositionDate>(449, 2897)</PositionDate>
+    <Amount>7,60</Amount>
+    <PositionAmount>(2103, 2279)</PositionAmount>
+    <Shop>PARADISE CAFFE</Shop>
+    <Features>Scolorato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>4</ID>
+    <Date>18/10/17</Date>
+    <PositionDate>(1031, 2706)</PositionDate>
+    <Amount>15,89</Amount>
+    <PositionAmount>(1745, 2739)</PositionAmount>
+    <Shop>DISTRIBUTORE DELL’AGLIO</Shop>
+    <Features>Non è uno scontrino fiscale classico</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>5</ID>
+    <Date>18-10-2017</Date>
+    <PositionDate>(849, 2809)</PositionDate>
+    <Amount>24,74</Amount>
+    <PositionAmount>(1913, 2293)</PositionAmount>
+    <Shop>ALIMENTARI</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>6</ID>
+    <Date>18-10-2017</Date>
+    <PositionDate>(779, 2369)</PositionDate>
+    <Amount>2,50</Amount>
+    <PositionAmount>(1983, 1891)</PositionAmount>
+    <Shop>MERCERIA ABBIGLIAMENTO</Shop>
+    <Features>Elevato contrasto</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>7</ID>
+    <Date>10-10-17</Date>
+    <PositionDate>(2179, 1963)</PositionDate>
+    <Amount>9,90</Amount>
+    <PositionAmount>(1685, 349)</PositionAmount>
+    <Shop>RE SOLE</Shop>
+    <Features>Orizzontale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>8</ID>
+    <Date>10-10-17</Date>
+    <PositionDate>(381, 2371)</PositionDate>
+    <Amount>9,90</Amount>
+    <PositionAmount>(2185, 1909)</PositionAmount>
+    <Shop>RE SOLE</Shop>
+    <Features>Un po’ strappato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>9</ID>
+    <Date>05.09.2017</Date>
+    <PositionDate>(909, 2375)</PositionDate>
+    <Amount>40.75</Amount>
+    <PositionAmount>(1815, 2083)</PositionAmount>
+    <Shop>DEICHMANN CALZATURE S.r.l.</Shop>
+    <Features>Non è uno scontrino fiscale classico</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>10</ID>
+    <Date>20/09/2017</Date>
+    <PositionDate>(585, 1823)</PositionDate>
+    <Amount>25,00</Amount>
+    <PositionAmount>(2131, 1387)</PositionAmount>
+    <Shop>TOKUNO SHIMA</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>11</ID>
+    <Date>13/10/17</Date>
+    <PositionDate>(713, 2569)</PositionDate>
+    <Amount>5,00</Amount>
+    <PositionAmount>(1909, 2287)</PositionAmount>
+    <Shop>LE CHAT NOIR</Shop>
+    <Features>Un po’ sfuocato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>12</ID>
+    <Date>20-09-2017</Date>
+    <PositionDate>(423, 2755)</PositionDate>
+    <Amount>16,99</Amount>
+    <PositionAmount>(2155, 2045)</PositionAmount>
+    <Shop>UNIVERSO MODA</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>13</ID>
+    <Date>12-10-2017</Date>
+    <PositionDate>(907, 2731)</PositionDate>
+    <Amount>46,00</Amount>
+    <PositionAmount>(1893, 2225)</PositionAmount>
+    <Shop>MENARDO GIUSEPPE</Shop>
+    <Features>Sbiadito</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>14</ID>
+    <Date>17/10/17</Date>
+    <PositionDate>(1793, 2545)</PositionDate>
+    <Amount>3,50</Amount>
+    <PositionAmount>(2177, 2227)</PositionAmount>
+    <Shop>Gocce di Miele</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>15</ID>
+    <Date>31/10/17</Date>
+    <PositionDate>(1777, 2757)</PositionDate>
+    <Amount>42,70</Amount>
+    <PositionAmount>(2131, 2321)</PositionAmount>
+    <Shop>PIZZERIA LAURA</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>16</ID>
+    <Date>31/10/2017</Date>
+    <PositionDate>(1507, 3173)</PositionDate>
+    <Amount>16,99</Amount>
+    <PositionAmount>(1919, 1261)</PositionAmount>
+    <Shop>MEDIA WORLD</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>17</ID>
+    <Date>31-10-2017</Date>
+    <PositionDate>(519, 2241)</PositionDate>
+    <Amount>6,00</Amount>
+    <PositionAmount>(2147, 1575)</PositionAmount>
+    <Shop>UNO DUE TRE EURO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>18</ID>
+    <Date>18.10.17</Date>
+    <PositionDate>(795, 787)</PositionDate>
+    <Amount>35.22</Amount>
+    <PositionAmount>(1711, 2393)</PositionAmount>
+    <Shop>IPERSIMPLY</Shop>
+    <Features>Molto lungo e fotografato con ombre</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>19</ID>
+    <Date>06-11-2017</Date>
+    <PositionDate>(845, 2317)</PositionDate>
+    <Amount>3,60</Amount>
+    <PositionAmount>(1805, 1917)</PositionAmount>
+    <Shop>PANIFICIO BACCHIN</Shop>
+    <Features>Orizzontale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>20</ID>
+    <Date>09-11-2017</Date>
+    <PositionDate>(1277, 2317)</PositionDate>
+    <Amount>40,56</Amount>
+    <PositionAmount>(1775, 1491)</PositionAmount>
+    <Shop>MACELLERIA</Shop>
+    <Features>Obliquo a sinistra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>21</ID>
+    <Date>09-11-2017</Date>
+    <PositionDate>(815, 1695)</PositionDate>
+    <Amount>3,60</Amount>
+    <PositionAmount>(1817, 1219)</PositionAmount>
+    <Shop>PAN PER FOCACCIA</Shop>
+    <Features>Molto luminoso</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>22</ID>
+    <Date>08-11-2017</Date>
+    <PositionDate>(567, 2709)</PositionDate>
+    <Amount>27,43</Amount>
+    <PositionAmount>(1645, 2530)</PositionAmount>
+    <Shop>ALIMENTARI</Shop>
+    <Features>Obliquo a destra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>23</ID>
+    <Date>13/11/17</Date>
+    <PositionDate>(967, 1975)</PositionDate>
+    <Amount>15,99</Amount>
+    <PositionAmount>(1663, 1173)</PositionAmount>
+    <Shop>DECATHLON</Shop>
+    <Features>Foto laterale e simbolo € a destra del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>24</ID>
+    <Date>13/11/17</Date>
+    <PositionDate>(727, 3601)</PositionDate>
+    <Amount>9,55</Amount>
+    <PositionAmount>(1755, 1969)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features>Foto laterale, con ombra e con asterisco di fianco al totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>25</ID>
+    <Date>09/11/17</Date>
+    <PositionDate>(393, 2495)</PositionDate>
+    <Amount>6,00</Amount>
+    <PositionAmount>(2055, 2071)</PositionAmount>
+    <Shop>BAR POLLINI</Shop>
+    <Features>Sezione di altro scontrino sopra, differisce da 30 solo per numero di scontrino</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>26</ID>
+    <Date>09/11/17</Date>
+    <PositionDate>(407, 2349)</PositionDate>
+    <Amount>8,00</Amount>
+    <PositionAmount>(2111, 1911)</PositionAmount>
+    <Shop>BAR POLLINI</Shop>
+    <Features>Sezione di altro scontrino sulla parte inferiore della foto</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>27</ID>
+    <Date>31.10.17</Date>
+    <PositionDate>(1381, 1791)</PositionDate>
+    <Amount>7,50</Amount>
+    <PositionAmount>(2013, 1543)</PositionAmount>
+    <Shop>INTERSPAR</Shop>
+    <Features>Parzialmente coperto dalle dita</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>28</ID>
+    <Date>10-11-2017</Date>
+    <PositionDate>(917, 3171)</PositionDate>
+    <Amount>125,70</Amount>
+    <PositionAmount>(1917, 2757)</PositionAmount>
+    <Shop>CORNARO</Shop>
+    <Features>
+      Parte superiore tranciata e inferiore in ombra.
+      Data in ombra
+    </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>29</ID>
+    <Date>10/11/17</Date>
+    <PositionDate>(1633, 2961)</PositionDate>
+    <Amount>24,20</Amount>
+    <PositionAmount>(2094, 2645)</PositionAmount>
+    <Shop>CAFE’ MANIN</Shop>
+    <Features>Voci multiple, un po piegato sulla riga del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>30</ID>
+    <Date>09/11/17</Date>
+    <PositionDate>(471, 2501)</PositionDate>
+    <Amount>6,00</Amount>
+    <PositionAmount>(2069, 2063)</PositionAmount>
+    <Shop>BAR POLLINI</Shop>
+    <Features>Scontrino consecutivo e uguale nei dati al numero 25</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>31</ID>
+    <Date>06/11/17</Date>
+    <PositionDate>(1607, 2829)</PositionDate>
+    <Amount>54,00</Amount>
+    <PositionAmount>(1861, 2603)</PositionAmount>
+    <Shop>DEMENEGO SRL</Shop>
+    <Features>Sconto su articoli (anche sconto 0)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>32</ID>
+    <Date>14/11/17</Date>
+    <PositionDate>(531, 3451)</PositionDate>
+    <Amount>7,99</Amount>
+    <PositionAmount>(1683, 1759)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features>Piegato sulla riga del Totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>33</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>(3023, 1797)</PositionDate>
+    <Amount>13,00</Amount>
+    <PositionAmount>(2685, 327)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a Sx di 90°, colorato di rosso vicino al totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>34</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>(2743, 1871)</PositionDate>
+    <Amount>14,30</Amount>
+    <PositionAmount>(2305, 291)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a Sx di 90 °, stropicciato e piegato al centro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>35</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>(235, 3301)</PositionDate>
+    <Amount>2,25</Amount>
+    <PositionAmount>(2213, 2855)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Senza bordi</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>36</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>(310, 2409)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(2693, 2025)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Macchiato e sbiadito sull’intestazione, tagliato sulla parte superiore e ai lati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>37</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>(453, 2837)</PositionDate>
+    <Amount>2,20</Amount>
+    <PositionAmount>(1929, 2285)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Piegato al centro, leggermente ruotato a sx e rigato vicino al totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>38</ID>
+    <Date>15-11-17</Date>
+    <PositionDate>(1465, 1845)</PositionDate>
+    <Amount>1,60</Amount>
+    <PositionAmount>(2837, 1563)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Piegato al centro, immagine orizzontale con ampio spazio vuoto ai lati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>39</ID>
+    <Date>17-11-2017</Date>
+    <PositionDate>(803, 2193)</PositionDate>
+    <Amount>5,00</Amount>
+    <PositionAmount>(1653, 1831)</PositionAmount>
+    <Shop>ZEROLITE SAS</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>40</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1707, 2409)</PositionDate>
+    <Amount>11,00</Amount>
+    <PositionAmount>(1999, 2151)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato sul totale e con dati sbiaditi</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>41</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1659, 2767)</PositionDate>
+    <Amount>48,70</Amount>
+    <PositionAmount>(1921, 2507)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Dati di riga cancellati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>42</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1739, 2875)</PositionDate>
+    <Amount>28,60</Amount>
+    <PositionAmount>(2005, 2611)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>43</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1539, 3223)</PositionDate>
+    <Amount>108,30</Amount>
+    <PositionAmount>(1755, 3009)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Scontrino lungo (15-20 righe) e stropicciato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>44</ID>
+    <Date>17/11/17</Date>
+    <PositionDate>(1043, 2005)</PositionDate>
+    <Amount>67,24</Amount>
+    <PositionAmount>(1569, 2875)</PositionAmount>
+    <Shop>DISTRIBUTORE REPSOL</Shop>
+    <Features>Ricevuta di pagamento bancomat</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>45</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1651, 2687)</PositionDate>
+    <Amount>33,60</Amount>
+    <PositionAmount>(1875, 2481)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato in centro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>46</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1709, 2319)</PositionDate>
+    <Amount>16,50</Amount>
+    <PositionAmount>(1969, 2079)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Sporco sulla parola TOTALE</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>47</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1739, 2805)</PositionDate>
+    <Amount>23,00</Amount>
+    <PositionAmount>(1705, 2565)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Con subtotale (SUB-TOTALE)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>48</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(819, 1555)</PositionDate>
+    <Amount>8,00</Amount>
+    <PositionAmount>(551, 1799)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro e ruotato di 180°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>49</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1763, 2301)</PositionDate>
+    <Amount>16,00</Amount>
+    <PositionAmount>(2033, 2039)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro e con secondo scontrino sotto di cui non si vedono dati</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>50</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1389, 2709)</PositionDate>
+    <Amount>25,00</Amount>
+    <PositionAmount>(1673, 2443)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>51</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1757, 2429)</PositionDate>
+    <Amount>12,00</Amount>
+    <PositionAmount>(2039, 2169)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro, stropicciato e con subtotale (SUB-TOTALE)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>52</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1705, 1701)</PositionDate>
+    <Amount>6,00</Amount>
+    <PositionAmount>(1965, 1989)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Scritte sul retro, ruotato di 180° a destra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>53</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1621, 2953)</PositionDate>
+    <Amount>96,00</Amount>
+    <PositionAmount>(1885, 2703)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato in centro e con 15-20 righe</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>54</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1587, 3347)</PositionDate>
+    <Amount>164,00</Amount>
+    <PositionAmount>(1829, 3141)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato e leggermente stropicciato con 20 righe</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>55</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1697, 2419)</PositionDate>
+    <Amount>26,00</Amount>
+    <PositionAmount>(1967, 2231)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato e con la riga del totale sulla piega</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>56</ID>
+    <Date>18/11/17</Date>
+    <PositionDate>(1647, 2617)</PositionDate>
+    <Amount>37,00</Amount>
+    <PositionAmount>(1941, 2331)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato e sporco</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>57</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1637, 2579)</PositionDate>
+    <Amount>27,00</Amount>
+    <PositionAmount>(1929, 2295)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piega diagonale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>58</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1699, 2641)</PositionDate>
+    <Amount>14,94</Amount>
+    <PositionAmount>(2005, 2345)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Piegato al centro, con subtotale (SUB-TOTALE)</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>59</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1643, 2309)</PositionDate>
+    <Amount>22,00</Amount>
+    <PositionAmount>(1939, 2027)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>60</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(2027, 2155)</PositionDate>
+    <Amount>14,50</Amount>
+    <PositionAmount>(1659, 2655)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Ruotato a destra di 45° </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>61</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1639, 2567)</PositionDate>
+    <Amount>7,00</Amount>
+    <PositionAmount>(1971, 2289)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Tenuto in mano</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>62</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1639, 2563)</PositionDate>
+    <Amount>8,50</Amount>
+    <PositionAmount>(1971, 2287)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Tenuto in mano</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>63</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1659, 2265)</PositionDate>
+    <Amount>6,00</Amount>
+    <PositionAmount>(1971, 2001)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Tenuto in mano, piega sull’angolo in fondo a destra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>64</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1609, 3087)</PositionDate>
+    <Amount>54,20</Amount>
+    <PositionAmount>(1869, 2843)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Scontrino con più di 10 righe e piegato sul totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>65</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1741, 2613)</PositionDate>
+    <Amount>28,50</Amount>
+    <PositionAmount>(2035, 2321)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>66</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1321, 1725)</PositionDate>
+    <Amount>31,00</Amount>
+    <PositionAmount>(1565, 2029)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Ruotato a destra di 90° e leggermente sporco</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>67</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1657, 1499)</PositionDate>
+    <Amount>9,50</Amount>
+    <PositionAmount>(1935, 1785)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Ruotato a destra di 90° </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>68</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1573, 2333)</PositionDate>
+    <Amount>28,00</Amount>
+    <PositionAmount>(1847, 2083)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Secondo scontrino sullo sfondo di cui si vede la riga del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>69</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1703, 2501)</PositionDate>
+    <Amount>37,00</Amount>
+    <PositionAmount>(2001, 2215)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>70</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1619, 2721)</PositionDate>
+    <Amount>23,00</Amount>
+    <PositionAmount>(1893, 2473)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Secondo scontrino sotto di cui si vede parte del totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>71</ID>
+    <Date>19/11/17</Date>
+    <PositionDate>(1629, 2413)</PositionDate>
+    <Amount>27,10</Amount>
+    <PositionAmount>(1915, 2131)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Stropicciato, sporco e con svariati riflessi</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>72</ID>
+    <Date>22.11.17</Date>
+    <PositionDate>(1323, 1673)</PositionDate>
+    <Amount>9,18</Amount>
+    <PositionAmount>(1841, 1391)</PositionAmount>
+    <Shop>INTERSPAR</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>73</ID>
+    <Date>22.11.17</Date>
+    <PositionDate>(1359, 2181)</PositionDate>
+    <Amount>4.75</Amount>
+    <PositionAmount>(1917, 1891)</PositionAmount>
+    <Shop>INTERSPAR</Shop>
+    <Features>Foto leggermente sfuocata</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>74</ID>
+    <Date>23/11/17</Date>
+    <PositionDate>(2339, 1701)</PositionDate>
+    <Amount>12,00</Amount>
+    <PositionAmount>(2211, 397)</PositionAmount>
+    <Shop>PANETTERIA CARLOTTA</Shop>
+    <Features>Ruotato a sinistra di 90° e sfuocato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>75</ID>
+    <Date>22-11-17</Date>
+    <PositionDate>(2669, 1645)</PositionDate>
+    <Amount>19,60</Amount>
+    <PositionAmount>(2405, 407)</PositionAmount>
+    <Shop>Galloway</Shop>
+    <Features>Ruotato a sinistra di 90°, sfuocato e con piega sul totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>76</ID>
+    <Date>22-11-17</Date>
+    <PositionDate>(649, 2235)</PositionDate>
+    <Amount>13,80</Amount>
+    <PositionAmount>(1955, 1999)</PositionAmount>
+    <Shop>Galloway</Shop>
+    <Features>Rigato in vari punti</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>77</ID>
+    <Date>22-11-17</Date>
+    <PositionDate>(647, 2441)</PositionDate>
+    <Amount>23,50</Amount>
+    <PositionAmount>(1997, 2173)</PositionAmount>
+    <Shop>Galloway</Shop>
+    <Features>Foto sfuocata</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>78</ID>
+    <Date>22-11-17</Date>
+    <PositionDate>(421, 2995)</PositionDate>
+    <Amount>22,30</Amount>
+    <PositionAmount>(2191, 2608)</PositionAmount>
+    <Shop>Galloway</Shop>
+    <Features>Sfuocato, piegato sul valore del totale e il valore del totale è a filo sell'immagine</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>79</ID>
+    <Date>23-11-17</Date>
+    <PositionDate>(423, 3097)</PositionDate>
+    <Amount>3,40</Amount>
+    <PositionAmount>(2029, 2743)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Leggermente rigato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>80</ID>
+    <Date>23-11-17</Date>
+    <PositionDate>(425, 3053)</PositionDate>
+    <Amount>16,00</Amount>
+    <PositionAmount>(2031, 2685)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>81</ID>
+    <Date>23/11/17</Date>
+    <PositionDate>(880, 1466)</PositionDate>
+    <Amount>3,43</Amount>
+    <PositionAmount>(1421, 1274)</PositionAmount>
+    <Shop>PRIX</Shop>
+    <Features>Molto lungo ma con valori significativi solo nella prima metà</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>82</ID>
+    <Date>25/11/17</Date>
+    <PositionDate>(3601, 523)</PositionDate>
+    <Amount>4,83</Amount>
+    <PositionAmount>(1711, 523)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features>Ruotato a sinistra di 90° e piegato sulla parte superiore sinistra</Features>
+  </Ticket>
+  
+</DataSet>
