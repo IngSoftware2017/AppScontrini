@@ -36,6 +36,7 @@ public class AddNewMission extends AppCompatActivity {
     }
 
     /** Dal Maso
+     * Edit by Lazzarin
      * Cattura degli eventi nella toolbar
      * @param item oggetto nella toolbar catturato
      * @return flag di successo
@@ -50,10 +51,12 @@ public class AddNewMission extends AppCompatActivity {
                 String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
                 EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
-                String name=editName.toString();
-                String description=editDescription.toString();
+                String name=editName.getText().toString();
+                String description=editDescription.getText().toString();
                 //create new directory with input text
                 File newMissionPath=new File(path+"/"+name);
+                Log.d("name",name);
+                Log.d("description",description);
                 newMissionPath.mkdir();
                 Context context=this.getApplicationContext();
 
