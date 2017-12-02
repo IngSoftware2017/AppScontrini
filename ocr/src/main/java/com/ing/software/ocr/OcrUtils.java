@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.google.android.gms.vision.text.TextBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
+import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -111,7 +112,7 @@ public class OcrUtils {
      * @param textBlocks original list. Not null.
      * @return ordered list
      */
-    static List<TextBlock> orderBlocks(@NonNull List<TextBlock> textBlocks) {
+    static List<TextBlock> orderTextBlocks(@NonNull List<TextBlock> textBlocks) {
         Collections.sort(textBlocks, new Comparator<TextBlock>() {
             @Override
             public int compare(TextBlock block1, TextBlock block2) {
@@ -131,6 +132,35 @@ public class OcrUtils {
             }
         });
         return textBlocks;
+    }
+
+    /**
+     * @author Michelon
+     * Order a list of rawText following its distance (of its center) from the center of another rect.
+     * Order is based only on y coordinate.
+     * @param rawTexts original list. Not null.
+     * @param sourceRect Rect from which check the distance
+     * @return ordered list
+     */
+    static List<RawText> orderRawTextFromRect(@NonNull List<RawText> rawTexts, final RectF sourceRect) {
+        Collections.sort(rawTexts, new Comparator<RawText>() {
+            @Override
+            public int compare(RawText text1, RawText text2) {
+                float centerPoint = sourceRect.centerY();
+                float center1 = text1.getRect().centerY();
+                float center2 = text2.getRect().centerY();
+                float diff1 = Math.abs(center1 - centerPoint);
+                float diff2 = Math.abs(center2 - centerPoint);
+                if (Math.round(diff1 - diff2) == 0) {
+                    if (Math.round(center1 - center2) == 0)
+						return -1; //same center
+					else //return the one on top
+						return Math.round(center1 - center2);
+				}
+                return Math.round(diff1 - diff2);
+            }
+        });
+        return rawTexts;
     }
 
     /**
