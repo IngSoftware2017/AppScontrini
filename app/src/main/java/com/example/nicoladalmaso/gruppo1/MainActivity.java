@@ -45,14 +45,14 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Le tue missioni");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        File newDir1 = new File(path + "/Missione 1");
+       /* File newDir1 = new File(path + "/Missione 1");
         File newDir2 = new File(path + "/Missione 2");
         File newDir3 = new File(path + "/Missione 3");
         File newDir4 = new File(path + "/Missione 4");
         newDir1.mkdir();
         newDir2.mkdir();
         newDir3.mkdir();
-        newDir4.mkdir();
+        newDir4.mkdir();*/
         File f = new File(path);
         File[] files = f.listFiles();
         for (File inFile : files) {
@@ -95,16 +95,27 @@ public class MainActivity extends AppCompatActivity {
         return files;
     }
 
+    /**Lazzarin
+     * clear the view after I've eliminated a mission(before to call printAllMissions)
+     *
+     */
+    public void clearAllMissions(){
+        ListView listView = (ListView)findViewById(R.id.listMission);
+        MissionAdapter emptyAdapter = new MissionAdapter(this, R.layout.mission_card, list);
+        emptyAdapter.clear();
+        emptyAdapter.notifyDataSetChanged();
+        listView.setAdapter(emptyAdapter);}
 
     /** Dal Maso
      *  Stampa tutte le immagini
      */
     public void printAllMissions(){
         File[] files = readAllMissions();
-        for (int i = 0; i < files.length; i++)
+        for (int i = files.length-1; i>=0; i--)
         {
             if(files[i].isDirectory())
-                addToList(files[i].getName(), "Descrizione della missione");
+
+                addToList(files[i].getName(),"descrizione");
         }
     }
 }

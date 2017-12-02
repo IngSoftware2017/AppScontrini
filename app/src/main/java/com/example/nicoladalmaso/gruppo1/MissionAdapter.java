@@ -44,6 +44,8 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
         CardView card = (CardView) convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView description = (TextView)convertView.findViewById(R.id.missionDescription);
+        FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
+        missionDelete.setTag(position);
         Missione c = getItem(position);
         title.setText(c.getTitolo());
         description.setText(c.getDescrizione());
@@ -66,6 +68,7 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
                 path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                Log.d("Directory Mission",path);
                 File directory = new File(path);
                 File[] files = directory.listFiles();
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
@@ -74,6 +77,43 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
                 startImageView.putExtra("missionName", files[pos].getName());
                 context.startActivity(startImageView);
             }//onClick
+        });
+            //lazzarin
+            missionDelete.setOnClickListener(new View.OnClickListener(){
+              public void onClick(View v){
+               pos=  Integer.parseInt(v.getTag().toString());
+                //check if position is right
+                Log.d("tagMission", ""+pos);
+                //path = Variables.getInstance().getCurrentMissionDir();
+                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+
+                //check if directory is right
+                Log.d("Dir", path);
+
+                AlertDialog.Builder toast = new AlertDialog.Builder(context);
+                toast.setMessage("Sei sicuro di voler eliminare la missione?Tutti gli scontrini verranno eliminati")
+                        .setTitle("Cancellazione");
+
+                toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        File directory = new File(path);
+                        File[] files = directory.listFiles();
+                        if(files[pos].delete()){
+                            ((MainActivity)context).clearAllMissions();
+                            ((MainActivity)context).printAllMissions();
+                        }
+                    }
+                });
+                toast.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing to do
+                    }
+                });
+                AlertDialog alert = toast.show();
+                Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+                nbutton.setTextColor(Color.parseColor("#2196F3"));
+
+            }
         });
         return convertView;
     }

@@ -36,6 +36,7 @@ public class BillActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
     String tempPhotoPath;
+    String description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,9 @@ public class BillActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Log.d("Memes", Variables.getInstance().getCurrentMissionDir());
         String missionName = intent.getExtras().getString("missionName");
+        String missionDescription=intent.getExtras().getString("missionDescription");
         setTitle(missionName);
+        description=missionDescription;
         initializeComponents();
         Log.d("fin qui","corretto");
     }
