@@ -231,7 +231,7 @@ public class OcrUtils {
      * Check if there is a substring in the text
      * The text is subdivided into tokens and each token is checked
      * If only one string is null then return -1
-     * If the token length is less than 2 then returns -1 -1
+     * If the token length is less than 2 then returns -1
      *
      * @param text The text to be compared
      * @param substring The second string to be compared
@@ -243,7 +243,9 @@ public class OcrUtils {
             return -1;
 
         int minDistance = substring.length();
+        int subLength = minDistance;
 
+        /*
         //Splits the string into tokens
         String[] pack = text.split("\\s");
 
@@ -254,6 +256,28 @@ public class OcrUtils {
                     minDistance = distanceNow;
 
         }
+        */
+
+        //Analyze the text by removing the spaces
+        String text_w_o_space =  text.replace(" ", "");
+
+        //If the text is smaller than the searched string, invert the strings
+        if(text_w_o_space.length() < minDistance)
+        {
+            String temp_text = text_w_o_space;
+            text_w_o_space = substring;
+            substring = temp_text;
+        }
+
+        //Search a piece of string as long as the length of the searched string in the text
+        int start=0;
+        for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
+            String token = text_w_o_space.substring( start, finish);
+            int distanceNow = levDistance(token.toUpperCase(), substring.toUpperCase());
+            if (distanceNow < minDistance)
+                minDistance = distanceNow;
+            start++;
+            }
 
         return minDistance;
 

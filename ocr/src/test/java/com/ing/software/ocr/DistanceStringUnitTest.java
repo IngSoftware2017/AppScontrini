@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Created by matteosalvagno on 17/11/17.
+ * @author Salvagno
  */
 
 public class DistanceStringUnitTest {
@@ -251,6 +252,79 @@ public class DistanceStringUnitTest {
         assertEquals(6, r);
 
     }
+
+    @Test
+    public void haveSubstring7() throws Exception {
+
+        String text = "In questa frase c'è la parola totale";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(0, r);
+
+    }
+
+    @Test
+    public void haveSubstring8() throws Exception {
+
+        String text = "t o t a l e";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(0, r);
+
+    }
+
+
+
+    @Test
+    public void haveSubstring9() throws Exception {
+
+        String text = "Nella frase c'è la parola t q t a l e";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(1, r);
+
+    }
+
+    @Test
+    public void haveSubstring10() throws Exception {
+
+        String text = "Nella frase c'è la parola t q t";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(4, r);
+
+    }
+
+    @Test
+    public void haveSubstring11() throws Exception {
+
+        String text = "tot";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(3, r);
+
+    }
+
 
 
     @Test
