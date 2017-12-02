@@ -22,6 +22,7 @@ import java.util.Date;
 
 public class Ticket {
 
+    @ColumnInfo(name = Constants.TICKET_PRIMARY_KEY_NAME)
     @PrimaryKey(autoGenerate = true)
     private int ID;
     private Uri fileUri;
