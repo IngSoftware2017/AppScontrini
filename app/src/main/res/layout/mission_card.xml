@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -58,10 +57,22 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/missionTitle" />
 
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/dltMission"
+                        android:layout_height="40dp"
+                        android:layout_width="40dp"
+                        app:layout_anchorGravity="left|end|bottom"
+                        android:clickable="true"
+                        android:scaleType="center"
+                        app:srcCompat="@drawable/ic_clear_white_24px"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"/>
+
                 </android.support.constraint.ConstraintLayout>
 
 
             </RelativeLayout>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
+
 </RelativeLayout>

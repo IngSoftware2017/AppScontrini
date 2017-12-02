@@ -40,7 +40,7 @@ public class AddNewMission extends AppCompatActivity {
      * Cattura degli eventi nella toolbar
      * @param item oggetto nella toolbar catturato
      * @return flag di successo
-     * TODO: gestire l'aggiunta di una missione (Creo una cartella con il nome inserito nell'editText all'interno di getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString()
+     *
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -65,6 +65,7 @@ public class AddNewMission extends AppCompatActivity {
                 Variables.getInstance().setCurrentMissionDir(newMissionPath.getAbsolutePath());
                 Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
                 startImageView.putExtra("missionName", name);
+                startImageView.putExtra("missionDescription",description);
                 context.startActivity(startImageView);
                 Log.d("AddMission", "OK");
                 return true;
