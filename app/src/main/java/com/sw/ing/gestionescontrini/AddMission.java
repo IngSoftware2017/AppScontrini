@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
 /**
  * Created by Marco Olivieri on 03/12/2017
@@ -18,6 +19,7 @@ public class AddMission extends AppCompatActivity {
     EditText nameMissionText;
     EditText startDateMissionText;
     EditText endDateMissionText;
+    ListView personsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +32,7 @@ public class AddMission extends AppCompatActivity {
         nameMissionText = findViewById(R.id.nameText);
         startDateMissionText = findViewById(R.id.starMissionText);
         endDateMissionText = findViewById(R.id.endMissionText);
-
+        personsList = findViewById(R.id.personsList);
     }
 
     /**
