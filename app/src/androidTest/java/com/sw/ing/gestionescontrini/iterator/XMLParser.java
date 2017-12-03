@@ -20,14 +20,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import database.Ticket;
-
 /**
  * Created by Federico Taschin on 02/12/2017.
  */
 
 public class XMLParser {
-    private static final String XML_NAME = "DATASET v2.xml";
     private static final String TICKET_TAG = "Ticket";
     private static final String ID_TAG = "ID";
     private static final String DATE_TAG = "Date";
@@ -39,14 +36,16 @@ public class XMLParser {
 
     private int current;
     private ArrayList<TicketInfo> tickets;
+    private String xmlName;
 
-    public XMLParser(){
+    public XMLParser(String xmlName){
+        this.xmlName = xmlName;
         tickets = new ArrayList<TicketInfo>();
     }
 
 
     /**
-     *
+     *Created by Federico Taschin
      * @throws IOException if an error in the opening of the xml file occurs
      * @throws ParserConfigurationException
      * @throws SAXException if an error in the parsing of the xml occurs
@@ -54,7 +53,7 @@ public class XMLParser {
     public void parseXML() throws IOException, ParserConfigurationException, SAXException {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
     /* Parse the xml-data from our URL. */
-            InputStream inputStream = InstrumentationRegistry.getInstrumentation().getContext().getResources().getAssets().open(XML_NAME);
+            InputStream inputStream = InstrumentationRegistry.getInstrumentation().getContext().getResources().getAssets().open(xmlName);
     /*Get Document Builder*/
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             Document dom = builder.parse(inputStream);
@@ -72,6 +71,7 @@ public class XMLParser {
 
 
     /**
+     *Created by Federico Taschin
      * @param node the node to be parsed
      * @return TicketInfo with the information about the xml Ticket element
      * @throws ParseException if a field of the <Ticket> element is in the wrong format
@@ -83,15 +83,28 @@ public class XMLParser {
         String idValue = element.getElementsByTagName(ID_TAG).item(0).getTextContent();
         String dateValue = element.getElementsByTagName(DATE_TAG).item(0).getTextContent();
         String positionDateValue = element.getElementsByTagName(POSITION_DATE_TAG).item(0).getTextContent();
-        String amountValue = element.getElementsByTagName(AMOUNT_TAG).item(0).getTextContent();
+        String amountValue = element.getElementsByTagName(AMOUNT_TAG).item(0).getTextContent().replace(",",".");
         String positionAmountValue = element.getElementsByTagName(POSITION_AMOUNT_TAG).item(0).getTextContent();
         //Already valid values
         String shop = element.getElementsByTagName(SHOP_TAG).item(0).getTextContent();
         String features = element.getElementsByTagName(FEATURES_TAG).item(0).getTextContent();
         //Parsing values
         int id = Integer.parseInt(idValue);
-        SimpleDateFormat dateformat = new SimpleDateFormat("dd-mm-yyyy");
-        Date date = dateformat.parse(dateValue);
+        SimpleDateFormat dateformat = null;
+        Date date = null;
+        try{
+            dateformat = new SimpleDateFormat("dd-mm-yyyy");
+            date = dateformat.parse(dateValue);
+        }catch(Exception e){
+            try {
+                dateformat = new SimpleDateFormat("dd/mm/yyyy");
+                date = dateformat.parse(dateValue);
+            }catch(Exception ex){
+                dateformat = new SimpleDateFormat("dd.mm.yyyy");
+                date = dateformat.parse(dateValue);
+            }
+        }
+
         int[] positionDate = readCoordinates(positionDateValue);
         BigDecimal amount = new BigDecimal(Double.parseDouble(amountValue));
         int[] positionAmount = readCoordinates(positionAmountValue);
@@ -107,19 +120,20 @@ public class XMLParser {
     }
 
     /**
+     * Created by Federico Taschin
      * @param coords String in the format (xcoord, ycoord)
      * @return array of x and y values
      */
     private int[] readCoordinates(String coords){
         coords = coords.substring(1,coords.length());
         String x = coords.substring(0,coords.indexOf(","));
-        String y = coords.substring(coords.indexOf(",")+1,coords.length());
+        String y = coords.substring(coords.indexOf(",")+1,coords.length()-1);
         x = x.replace(" ","");
         y = y.replace(" ","");
         return new int[]{Integer.parseInt(x), Integer.parseInt(y)};
     }
 
-    /**
+    /**Created by Federico Taschin
      * @return an ArrayList<TicketInfo> containing all the TicketInfo of the xml
      */
     public ArrayList<TicketInfo> getTicketInfos (){
@@ -127,6 +141,7 @@ public class XMLParser {
     }
 
     /**
+     * Created by Federico Taschin
      * @param id the id of the ticket
      * @return TicketInfo of the desired ticket, null if id is not valid
      */

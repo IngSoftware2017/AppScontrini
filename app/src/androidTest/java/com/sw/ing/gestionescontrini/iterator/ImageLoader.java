@@ -16,9 +16,10 @@ public class ImageLoader {
     private static final String IMAGE_DIR = "photos";
 
     /**
+     * Created by Federico Taschin
      * @param ticketInfo the ticket of which the bitmap is needed
      * @return the corresponding Bitmap
-     * @throws IOException if bitmap called <ticketInfo.getID()>/.jpg doesn't exist
+     * @throws IOException if no bitmap for the ticketInfo exists
      */
     public static Bitmap getBitmap(TicketInfo ticketInfo) throws IOException {
         AssetManager mgr = InstrumentationRegistry.getInstrumentation().getContext().getResources().getAssets();

@@ -1,9 +1,10 @@
-package Iterator;
+package com.sw.ing.gestionescontrini.iterator.iterator.test;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import org.hamcrest.Matcher;
+import com.sw.ing.gestionescontrini.iterator.TicketsIterator;
+
 import org.junit.Test;
 
 import java.util.Iterator;
