@@ -24,6 +24,7 @@ public class Mission {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
     private int ID;
+    private String name;
     private Date startMission;
     private Date endMission;
     private String locality;
@@ -72,6 +73,22 @@ public class Mission {
      */
     public void setID(int ID) {
         this.ID = ID;
+    }
+
+    /**
+     * Returns the name descrition of the mission
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name descrition of the mission
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
