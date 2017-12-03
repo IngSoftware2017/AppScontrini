@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">GestioneScontrini</string>
+    <string name="app_name">Missions</string>
+    <string name="emptyMissionNotice">Nessun missione presente.\nAggiungi una missione con il tasto +</string>
 </resources>

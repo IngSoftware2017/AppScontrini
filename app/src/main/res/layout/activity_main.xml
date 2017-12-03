@@ -7,12 +7,31 @@
     tools:context="com.sw.ing.gestionescontrini.MainActivity">
 
     <TextView
+        android:id="@+id/emptyNoticeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="visible"
+        tools:layout_editor_absoluteX="82dp"
+        tools:layout_editor_absoluteY="62dp"
+        tools:text="@string/emptyMissionNotice"
+        tools:ignore="MissingConstraints" />
+
+    <ListView
+        android:id="@+id/missionsList"
+        android:layout_width="384dp"
+        android:layout_height="515dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-3dp"
+        tools:ignore="MissingConstraints" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addMissionButton"
+        android:layout_width="45dp"
+        android:layout_height="47dp"
+        android:clickable="true"
+        app:srcCompat="@android:drawable/ic_input_add"
+        tools:layout_editor_absoluteX="323dp"
+        tools:layout_editor_absoluteY="450dp"
+        tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>
