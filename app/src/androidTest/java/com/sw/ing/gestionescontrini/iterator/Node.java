@@ -1,6 +1,4 @@
-package Iterator;
-
-import android.graphics.Bitmap;
+package com.sw.ing.gestionescontrini.iterator;
 
 /**
  * Define the the single node of a LinkedList that will contain the bitmap of the Ticket and the
@@ -9,17 +7,17 @@ import android.graphics.Bitmap;
  * Created by matteo.mascotto on 18/11/2017.
  */
 
-public class Node<Bitmap> {
+public class Node<Bundle> {
 
-    public Node<Bitmap> next;
-    public Bitmap Element;
+    public Node<Bundle> next;
+    public Bundle Element;
 
-    public Node(Bitmap Element, Node next) {
+    public Node(Bundle Element, Node next) {
         this.Element = Element;
         this.next = next;
     }
 
-    public Bitmap getElement() {
+    public Bundle getElement() {
         return this.Element;
     }
 
@@ -28,6 +26,6 @@ public class Node<Bitmap> {
     }
 
     public void setNext(Node next) {
-
+        this.next = next;
     }
 }
