@@ -68,14 +68,14 @@
         tools:ignore="MissingConstraints" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/addPersonButton"
         android:layout_width="34dp"
         android:layout_height="34dp"
         android:clickable="true"
         app:srcCompat="@android:drawable/ic_input_add"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="238dp"
-        tools:layout_editor_absoluteY="238dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="238dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/saveButton"
