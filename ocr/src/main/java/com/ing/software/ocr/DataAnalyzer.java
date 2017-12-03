@@ -105,7 +105,7 @@ public class DataAnalyzer {
      */
     private static Ticket getTicketFromResult(OcrResult result) {
         Ticket ticket = new Ticket();
-        List<RawGridResult> dateMap = result.getDateList();
+        List<RawGridResult> dateList = result.getDateList();
         ticket.amount = getPossibleAmount(result.getAmountResults());
         return ticket;
     }

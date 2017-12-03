@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.DataAnalyzer;
 import com.ing.software.ocr.OcrUtils;
-import com.ing.software.ocr.OcrVars;
 import com.ing.software.ocr.OnTicketReadyListener;
 
 import java.io.File;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocrtestapp.StatusVars.*;
 
 
 public class MainActivity extends AppCompatActivity implements OcrResultReceiver.Receiver {
@@ -135,15 +134,15 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
         switch (resultCode) {
-            case OcrVars.STATUS_RUNNING:
+            case STATUS_RUNNING:
                 Toast.makeText(this, "Starting img: " + resultData.getString(IMAGE_RECEIVED), Toast.LENGTH_LONG).show();
                 break;
-            case OcrVars.STATUS_FINISHED:
+            case STATUS_FINISHED:
                 /* Hide progress & extract result from bundle */
                 Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                         "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
                 break;
-            case OcrVars.STATUS_ERROR:
+            case STATUS_ERROR:
                 /* Handle the error */
                 String error = resultData.getString(ERROR_RECEIVED);
                 Toast.makeText(this, "Error: " + error, Toast.LENGTH_LONG).show();
