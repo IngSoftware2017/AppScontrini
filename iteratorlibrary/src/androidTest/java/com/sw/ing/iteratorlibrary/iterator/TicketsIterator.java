@@ -23,14 +23,9 @@ import javax.xml.parsers.ParserConfigurationException;
 public class TicketsIterator<Type> implements Iterable<Type> {
     private Node<Type> head, tail;
 
-    /**
-     * Created by Federico Taschin
-     *
-     */
     public TicketsIterator(){
-
     }
-    /**
+    /**Created by matteo.mascotto
      * Add a new Ticket at the LinkedList
      *
      * @param element the bitmap image we want to insert in the LinkedList
@@ -48,7 +43,7 @@ public class TicketsIterator<Type> implements Iterable<Type> {
         }
     }
 
-    /**
+    /**Created by matteo.mascotto
      * Return the Type element of a specific Node
      *
      * @param element the bitmap image we want to obtain from the LinkedList
@@ -58,20 +53,17 @@ public class TicketsIterator<Type> implements Iterable<Type> {
             return (Type) head.getElement();
         } else {
             Node current = head.getNext();
-
             while (current.getNext() != null) {
-                if (current.getElement().equals(element)) { return (Type) current.getElement(); }
-
+                if (current.getElement().equals(element))
+                    return (Type) current.getElement();
                 current.getNext();
             }
-
             if (current.getElement().equals(element)) { return (Type) current.getElement(); }
         }
-
         return null;
     }
 
-    /**
+    /**Created by matteo.mascotto
      * Remove the element from the LinkedList
      *
      * @param element the element to remove
@@ -98,7 +90,7 @@ public class TicketsIterator<Type> implements Iterable<Type> {
         }
     }
 
-    /*
+    /*Created by matteo.mascotto
      * Interface of the iterator of the class
      */
     @NonNull
@@ -107,7 +99,7 @@ public class TicketsIterator<Type> implements Iterable<Type> {
         return new LinkedListIterator();
     }
 
-    /*
+    /*Created by matteo.mascotto
      * Operations to do for each element of the LinkedList - actual empty (18/11/2017)
      */
     @Override
@@ -128,13 +120,29 @@ public class TicketsIterator<Type> implements Iterable<Type> {
         return cont;
     }
 
+    /** Created by Federico Taschin
+     *  This class is the iterator builder.
+     */
     public static class IteratorBuilder{
         private String xmlName;
 
+        /**Created by Federico Taschin
+         * sets the XML file on which the iterator is based
+         * @param xmlName not null, only the name (not the path) of the xml file WITH EXTENSION
+         * @return istance of IteratorBuilder
+         */
         public IteratorBuilder setXML(String xmlName){
             this.xmlName = xmlName;
             return this;
         }
+
+        /** Created by Federico Taschin
+         * Builds the iterator by loading the xml file and parsing it
+         * @return Iterator<Bundle> not null
+         * @throws ParserConfigurationException
+         * @throws SAXException
+         * @throws IOException if the xml file is unreachable
+         */
         public Iterator<Bundle> build() throws ParserConfigurationException, SAXException, IOException {
             TicketsIterator ticketsIterator = new TicketsIterator();
             XMLParser parser = new XMLParser(xmlName);
@@ -145,29 +153,18 @@ public class TicketsIterator<Type> implements Iterable<Type> {
                 bundle.setTicketInfo(info);
                 ticketsIterator.add(bundle);
             }
-
-            Iterator<Bundle> iterator = ticketsIterator.iterator();
-
-
-            while(iterator.hasNext()){
-                Bundle b = iterator.next();
-                Bitmap bitmap = b.getBitmap();
-                Log.d("ABCDEF","ticket id:"+b.getTicketInfo().getID()+" dim:"+b.getBitmap().getWidth()+","+b.getBitmap().getHeight());
-            }
             return ticketsIterator.iterator();
         }
     }
 
     /*
      * Iterator of Type for the iterable class TicketsIterator
-     *
      * Created by matteo.mascotto on 18/11/2017.
      */
     private class LinkedListIterator implements Iterator<Type> {
-
         Node<Type> current = null;
 
-        /*
+        /*Created by matteo.mascotto
          * Verify if there's one more element into the LinkedList
          */
         @Override
@@ -180,7 +177,7 @@ public class TicketsIterator<Type> implements Iterable<Type> {
             return false;
         }
 
-        /*
+        /*Created by matteo.mascotto
          * It return the next bitmap element in the LinkedList
          */
         @Override
@@ -192,7 +189,6 @@ public class TicketsIterator<Type> implements Iterable<Type> {
                 current = current.getNext();
                 return current.getElement();
             }
-
             throw new NoSuchElementException();
         }
     }
