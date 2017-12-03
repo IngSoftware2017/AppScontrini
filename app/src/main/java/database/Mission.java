@@ -27,7 +27,7 @@ public class Mission {
     private String name;
     private Date startMission;
     private Date endMission;
-    private String locality;
+    private String location;
     private boolean isRepay;
     private Uri excel;
 
@@ -43,16 +43,17 @@ public class Mission {
 
     /**
      * Parametric constructor
-     *
+     * @param name Description of the mission
      * @param startMission Date of the beginning of the mission
      * @param endMission Date of the end of the mission
-     * @param locality Name of locality where the mission took place
+     * @param location Name of locality where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(Date startMission, Date endMission, String locality, int personID) {
+    public Mission(String name,Date startMission, Date endMission, String location, int personID) {
+        this.name = name;
         this.startMission = startMission;
         this.endMission = endMission;
-        this.locality = locality;
+        this.location = location;
         isRepay = false;
         excel = null;
         this.personID = personID;
@@ -76,7 +77,7 @@ public class Mission {
     }
 
     /**
-     * Returns the name descrition of the mission
+     * Returns the name description of the mission
      * @return name
      */
     public String getName() {
@@ -84,7 +85,7 @@ public class Mission {
     }
 
     /**
-     * Sets the name descrition of the mission
+     * Sets the name description of the mission
      * @param name
      */
     public void setName(String name) {
@@ -124,19 +125,19 @@ public class Mission {
     }
 
     /**
-     * Returns the locality where the mission took place
+     * Returns the location where the mission took place
      * @return locality
      */
-    public String getLocality() {
-        return locality;
+    public String getLocation() {
+        return location;
     }
 
     /**
      * Sets the locality where the mission took place
-     * @param locality
+     * @param location
      */
-    public void setLocality(String locality) {
-        this.locality = locality;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     /**

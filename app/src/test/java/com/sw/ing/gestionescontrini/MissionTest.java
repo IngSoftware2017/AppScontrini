@@ -21,10 +21,11 @@ public class MissionTest {
     public void beforeTest(){
         dateI = new Date(2017,11,20);
         dateF = new Date(2017,11,30);
-        mission1 = new Mission(dateI,dateF,"Venice",1);
+        mission1 = new Mission("name",dateI,dateF,"Venice",1);
         mission2 = new Mission();
     }
 
+    //TODO test getName() and setName()
     @Test
     public void getStartMissionReturnTheDateOfBeginning(){
         assertTrue(mission1.getStartMission().equals(dateI));
@@ -47,14 +48,14 @@ public class MissionTest {
     }
 
     @Test
-    public void getLocalitySetTheLocality(){
-        assertTrue(mission1.getLocality().equals("Venice"));
+    public void getLocationSetTheLocation(){
+        assertTrue(mission1.getLocation().equals("Venice"));
     }
 
     @Test
     public void setLocalitySetTheLocality(){
-        mission2.setLocality("Venice");
-        assertTrue(mission2.getLocality().equals(mission1.getLocality()));
+        mission2.setLocation("Venice");
+        assertTrue(mission2.getLocation().equals(mission1.getLocation()));
     }
 
     @Test
