@@ -2,7 +2,9 @@ package com.ing.software.common;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Structure containing information about a single ticket.
@@ -33,4 +35,9 @@ public class Ticket {
      * Purchase amount.
      */
     public BigDecimal amount;
+
+    /**
+     * List of errors related to the creation or manipulation of the Ticket
+     */
+    public List<TicketError> errors = new ArrayList<>();
 }
