@@ -75,12 +75,12 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
                 Log.d("Directory Mission",path);
                 File directory = new File(path);
                 File[] files = directory.listFiles();
-                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
+                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 Variables.getInstance().setCurrentMissionDir(files[pos].getPath());
                 Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
-                startImageView.putExtra("missionName", files[pos].getName());
-                startImageView.putExtra("missionId", pos);
-                context.startActivity(startImageView);
+                startMissionView.putExtra("missionName", files[pos].getName());
+                startMissionView.putExtra("missionId", pos);
+                context.startActivity(startMissionView);
             }//onClick
         });
 

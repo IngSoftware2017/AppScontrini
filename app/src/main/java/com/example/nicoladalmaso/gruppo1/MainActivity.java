@@ -113,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
         File[] files = readAllMissions();
         for (int i = 0; i < files.length; i++)
         {
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat("HH:mm'\n'dd/MM/yyyy");
             if(files[i].isDirectory())
-
-                addToList(files[i].getName(),"descrizione");
+                addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
         }
     }
 }

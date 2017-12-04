@@ -4,9 +4,9 @@
     <string name="title_activity_collapse">Collapse</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="hint_missionName">Nome</string>
-    <string name="hint_missionDesc">Descrizione</string>
     <string name="action_addMission">Aggiungi Missione</string>
     <string name="action_deleteMission">Elimina Missione</string>
-
+    <string name="billTitle">Il tuo scontrino</string>
+    <string name="name">Nome</string>
+    <string name="description">Descrizione</string>
 </resources>

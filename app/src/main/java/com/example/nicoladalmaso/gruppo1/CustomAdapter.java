@@ -114,6 +114,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 File[] files = directory.listFiles();
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
                 startImageView.putExtra("imagePath", files[pos].getPath());
+                startImageView.putExtra("imageName", files[pos].getName());
                 context.startActivity(startImageView);
             }//onClick
         });

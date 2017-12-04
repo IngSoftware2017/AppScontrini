@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class BillViewer extends AppCompatActivity {
 
@@ -23,6 +24,8 @@ public class BillViewer extends AppCompatActivity {
         setContentView(R.layout.activity_bill_viewer);
         Intent intent = getIntent();
         String imgPath = intent.getExtras().getString("imagePath");
+        String imgName = intent.getExtras().getString("imageName");
+        setTitle(imgName);
         ImageView imgView = (ImageView) findViewById(R.id.billImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         Bitmap bitmap = BitmapFactory.decodeFile(imgPath,bmOptions);
