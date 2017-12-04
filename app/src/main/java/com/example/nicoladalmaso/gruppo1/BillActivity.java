@@ -176,23 +176,37 @@ public class BillActivity extends AppCompatActivity {
         //Lazzarin
         Log.d("tagMission", "" + pos);
         AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
+
         toast.setMessage("Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati")
                 .setTitle("Cancellazione");
+
         toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
                 File[] files = directory.listFiles();
-                if(files[pos].delete()){
-                    Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
-                    context.startActivity(startMissionView);
+                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
+                File[] bill = files[pos].listFiles();
+                Log.d("number of elements", bill.length+"");
+                int count = bill.length;
+                while(count > 0){
+                    //remove internal file
+                    if(bill[count-1].delete()){
+                        Log.d("eliminated file number",count + "");
+                        count--;
+                    }
                 }
+                Log.d("flag",count+"qui ci arrivo");
+                files[pos].delete();
+                context.startActivity(startMissionView);
             }
         });
+
         toast.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //Nothing to do
             }
         });
+        
         AlertDialog alert = toast.show();
         Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
         nbutton.setTextColor(Color.parseColor("#2196F3"));
