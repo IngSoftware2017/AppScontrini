@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Created by matteosalvagno on 17/11/17.
+ * @author Salvagno
  */
 
 public class DistanceStringUnitTest {
@@ -252,12 +253,85 @@ public class DistanceStringUnitTest {
 
     }
 
+    @Test
+    public void haveSubstring7() throws Exception {
+
+        String text = "In questa frase c'è la parola totale";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(0, r);
+
+    }
+
+    @Test
+    public void haveSubstring8() throws Exception {
+
+        String text = "t o t a l e";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(0, r);
+
+    }
+
+
+
+    @Test
+    public void haveSubstring9() throws Exception {
+
+        String text = "Nella frase c'è la parola t q t a l e";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(1, r);
+
+    }
+
+    @Test
+    public void haveSubstring10() throws Exception {
+
+        String text = "Nella frase c'è la parola t q t";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(4, r);
+
+    }
+
+    @Test
+    public void haveSubstring11() throws Exception {
+
+        String text = "tot";
+        String substring = "totale";
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring);
+
+        assertEquals(3, r);
+
+    }
+
+
 
     @Test
     public void FindDateTest1() throws Exception {
 
         String a = "il questo testo la data 23-06-19";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -268,7 +342,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest2() throws Exception {
 
         String a = "il questo testo la 23-06-1995";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -279,7 +353,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest3() throws Exception {
 
         String a = "il questo testo la data non è presenteuytr";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -290,7 +364,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest4() throws Exception {
 
         String a = "il questo testo la data non è 10 -";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -301,7 +375,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest5() throws Exception {
 
         String a = "il questo testo la data non è 10- dsad ty23-06-m";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -312,7 +386,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest6() throws Exception {
 
         String a = "il questo testo la data non è 10- dsad 2376-06-95";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -323,7 +397,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest7() throws Exception {
 
         String a = "il questo testo la data non è  dsad 2jk hjh3-6-19";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -334,7 +408,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest8() throws Exception {
 
         String a = "il questo test33-20-29od la data non è  dsad 2jk hjh3-6-19";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -345,7 +419,7 @@ public class DistanceStringUnitTest {
     public void FindDateTest9() throws Exception {
 
         String a = "il questo test33-20-29od la data non è  dsad 2jk hj h3-6-19";
-        Method method = OcrUtils.class.getDeclaredMethod("findDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("findDate", String.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a);
 
@@ -356,7 +430,7 @@ public class DistanceStringUnitTest {
     public void GetDateTest1() throws Exception {
 
         String a = "la data è 23-06-1995";
-        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
         String r = (String) method.invoke(null,a);
 
@@ -367,7 +441,7 @@ public class DistanceStringUnitTest {
     public void GetDateTest2() throws Exception {
 
         String a = "il questo testo la data non è presenteuytr";
-        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
         String r = (String) method.invoke(null,a);
 
@@ -378,7 +452,7 @@ public class DistanceStringUnitTest {
     public void GetDateTest3() throws Exception {
 
         String a = "il questo testo la data non è 10- dsad 2376-06-95";
-        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
         String r = (String) method.invoke(null,a);
 
@@ -389,7 +463,7 @@ public class DistanceStringUnitTest {
     public void GetDateTest4() throws Exception {
 
         String a = "il questo testo la data non è  dsad 2jk hjh3-6-19";
-        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
         String r = (String) method.invoke(null,a);
 
@@ -400,7 +474,7 @@ public class DistanceStringUnitTest {
     public void GetDateTest5() throws Exception {
 
         String a = "il questo test33-20-29od la data non è dsad 2jk hj 95-6-19";
-        Method method = OcrUtils.class.getDeclaredMethod("getDate", String.class);
+        Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
         String r = (String) method.invoke(null,a);
 
