@@ -200,6 +200,7 @@ public class DataAnalyzer {
     private static String deepAnalyzeAmount(@Size(min = 1) String targetAmount){
         targetAmount = targetAmount.replaceAll(",", ".");
         StringBuilder manipulatedAmount = new StringBuilder();
+        OcrUtils.log(3,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
         boolean numberPresent = false; //used because length can be > 0 if '.' was found but no number
         for (int i = 0; i < targetAmount.length(); ++i) {
             char singleChar = targetAmount.charAt(i);
