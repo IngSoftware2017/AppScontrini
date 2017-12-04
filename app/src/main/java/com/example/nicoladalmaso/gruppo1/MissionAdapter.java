@@ -98,10 +98,24 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
                     public void onClick(DialogInterface dialog, int id) {
                         File directory = new File(path);
                         File[] files = directory.listFiles();
+                        File[] bill=files[pos].listFiles();
+                        Log.d("number of elements", bill.length+"");
+                        int count=bill.length;
+                         while(count>0)
+                         {
+                            //remove internal file
+                        if(bill[count-1].delete()){
+                          Log.d("eliminated file number",count+"");
+                          count--;
+                            }
+                         }
+                        Log.d("flag",count+"qui ci arrivo");
+
                         if(files[pos].delete()){
                             ((MainActivity)context).clearAllMissions();
                             ((MainActivity)context).printAllMissions();
                         }
+
                     }
                 });
                 toast.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {

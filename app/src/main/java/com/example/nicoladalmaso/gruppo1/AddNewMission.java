@@ -3,6 +3,7 @@ package com.example.nicoladalmaso.gruppo1;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,6 +53,31 @@ public class AddNewMission extends AppCompatActivity {
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
                 EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
                 String name=editName.getText().toString();
+              /*  if(name==null||name.equals("")||name.equals(" "))
+                {
+                    AlertDialog.Builder toast = new AlertDialog.Builder(this.getApplicationContext());
+                    toast.setMessage("Inserire il nome della missione!")
+                            .setTitle("Cancellazione");
+                    return super.onOptionsItemSelected(item);
+
+                }
+
+                    String space=" ";
+                    for(int i=0;i<100;i++)
+                    {
+
+                        space=space+" ";
+                        if(name.equals("space"))
+                        {
+                            AlertDialog.Builder toast = new AlertDialog.Builder(this.getApplicationContext());
+                            toast.setMessage("Inserire il nome della missione!")
+                                    .setTitle("Cancellazione");
+                            return super.onOptionsItemSelected(item);
+
+                        }
+
+                    }*/
+
                 String description=editDescription.getText().toString();
                 //create new directory with input text
                 File newMissionPath=new File(path+"/"+name);
