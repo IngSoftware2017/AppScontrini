@@ -11,9 +11,10 @@ import java.util.List;
  * @author Michelon
  */
 
-public class RawStringResult {
+public class RawStringResult implements Comparable<RawStringResult>{
 
     private RawText sourceText;
+    private String sourceString;
     private int distanceFromTarget;
     private List<RawText> detectedTexts = null;
 
@@ -22,7 +23,8 @@ public class RawStringResult {
      * @param rawText source RawText
      * @param distanceFromTarget distance from target String
      */
-    RawStringResult(RawText rawText, int distanceFromTarget) {
+    RawStringResult(RawText rawText, int distanceFromTarget, String sourceString) {
+        this.sourceString = sourceString;
         this.sourceText = rawText;
         this.distanceFromTarget = distanceFromTarget;
     }
@@ -48,5 +50,17 @@ public class RawStringResult {
 
     public List<RawText> getDetectedTexts() {
         return detectedTexts;
+    }
+
+    public String getSourceString() {
+        return sourceString;
+    }
+
+    @Override
+    public int compareTo(@NonNull RawStringResult rawStringResult) {
+        if (distanceFromTarget != rawStringResult.getDistanceFromTarget())
+            return distanceFromTarget - rawStringResult.getDistanceFromTarget();
+        else
+            return -1; //Follow order from AMOUNT_STRINGS array
     }
 }
