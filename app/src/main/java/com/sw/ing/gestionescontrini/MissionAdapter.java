@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import database.Mission;
@@ -17,6 +16,8 @@ import database.Mission;
  */
 
 public class MissionAdapter extends ArrayAdapter<Mission> {
+
+    MissionViewerHolder holder;
 
     /**
      * Parametric constructor
@@ -37,13 +38,26 @@ public class MissionAdapter extends ArrayAdapter<Mission> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
+
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.mission_row_custom,null);
-        TextView name = convertView.findViewById(R.id.textViewName);
-        TextView location = convertView.findViewById(R.id.textViewLocation);
+        if (convertView == null){
+            convertView = inflater.inflate(R.layout.mission_row_custom,null);
+            holder = new MissionViewerHolder();
+            holder.nameTextView = convertView.findViewById(R.id.textViewName);
+            holder.locationTextView = convertView.findViewById(R.id.textViewLocation);
+            convertView.setTag(holder);
+        }
+        else{
+            holder = (MissionViewerHolder)convertView.getTag();
+        }
+
         Mission mis = getItem(position);
-        name.setText(mis.getName());
-        location.setText(mis.getLocation());
+        holder.nameTextView.setText(mis.getName());
+        holder.locationTextView.setText(mis.getLocation());
         return convertView;
+    }
+    static class MissionViewerHolder{
+        private TextView nameTextView;
+        private TextView locationTextView;
     }
 }
