@@ -20,6 +20,9 @@ import com.ing.software.common.Ticket;
 import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
+import static com.ing.software.ocr.OcrUtils.levDistance;
+
+
 /*
 USAGE:
 1) Instantiate DataAnalyzer;
@@ -272,5 +275,86 @@ public class DataAnalyzer {
             if (Character.isDigit(text.charAt(startingPoint + 2)))
                 return text.substring(startingPoint, startingPoint + 2);
         return "";
+    }
+
+    /**
+     * @author Salvagno
+     * Accept a text and check if there is a combination of date format.
+     * Controllo per tutte le combinazioni simili a
+     * xx/xx/xxxx o xx/xx/xxxx o xxxx/xx/xx
+     * xx-xx-xxxx o xx-xx-xxxx o xxxx-xx-xx
+     * xx.xx.xxxx o xx.xx.xxxx xxxx.xx.xx
+     *
+     * @param text The text to find the date format
+     * @return the absolute value of the minimum distance found between all combinations,
+     * if the distance is >= 10 or the inserted text is empty returns -1
+     */
+    private static int findDate(String text) {
+        if (text.length() == 0)
+            return -1;
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        //Maximum number of characters in the date format
+        int minDistance = 10;
+        //Th eminimum of number combinations of date format without symbols like '/' or '.' or '-'
+        int minCharaterDate = 8;
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                    minDistance = distanceNow;
+            }
+        }
+
+        if(minDistance==10)
+            return -1;
+        else
+            //Returns the absolute value of the distance by subtracting the minimum character
+            return Math.abs(minCharaterDate-minDistance);
+
+    }
+
+
+    /**
+     * @author Salvagno
+     * It takes a text and returns the date if a similarity is found with a date format
+     *
+     * @param text The text to find the date
+     * @return date or null if the date is not there
+     */
+    private static String getDate(String text) {
+        if (text.length() == 0)
+            return null;
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        //Maximum number of characters in the date format
+        int minDistance = 10;
+        String dataSearch = null;
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                {
+                    minDistance = distanceNow;
+                    dataSearch = p.toUpperCase();
+                }
+
+            }
+        }
+
+
+        return dataSearch;
     }
 }
