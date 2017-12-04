@@ -7,5 +7,6 @@
     <string name="hint_missionName">Nome</string>
     <string name="hint_missionDesc">Descrizione</string>
     <string name="action_addMission">Aggiungi Missione</string>
+    <string name="action_deleteMission">Elimina Missione</string>
 
 </resources>

@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void printAllMissions(){
         File[] files = readAllMissions();
-        for (int i = files.length-1; i>=0; i--)
+        for (int i = 0; i < files.length; i++)
         {
             if(files[i].isDirectory())
 

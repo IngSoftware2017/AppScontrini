@@ -1,20 +1,29 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -36,7 +45,9 @@ public class BillActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
     String tempPhotoPath;
-    String description;
+    Integer pos;
+    Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +57,36 @@ public class BillActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Log.d("Memes", Variables.getInstance().getCurrentMissionDir());
         String missionName = intent.getExtras().getString("missionName");
-        String missionDescription=intent.getExtras().getString("missionDescription");
+        pos = intent.getExtras().getInt("missionId");
+        context = this.getApplicationContext();
         setTitle(missionName);
-        description=missionDescription;
         initializeComponents();
         Log.d("fin qui","corretto");
+    }
+
+    //Dal Maso (adding menu delete option)
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.deletemission_menu, menu);
+        return true;
+    }
+
+    /** Dal Maso
+     * Edit by Lazzarin
+     * Cattura degli eventi nella toolbar
+     * @param item oggetto nella toolbar catturato
+     * @return flag di successo
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_deleteMission:
+                deleteMission();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /** Dal Maso
@@ -132,6 +168,34 @@ public class BillActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
+    /** Dal Maso (Using Lazzarin code)
+     * Delete the mission from the bills viewer (inside the mission)
+     */
+    public void deleteMission(){
+        //Lazzarin
+        Log.d("tagMission", "" + pos);
+        AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
+        toast.setMessage("Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati")
+                .setTitle("Cancellazione");
+        toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
+                File[] files = directory.listFiles();
+                if(files[pos].delete()){
+                    Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
+                    context.startActivity(startMissionView);
+                }
+            }
+        });
+        toast.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Nothing to do
+            }
+        });
+        AlertDialog alert = toast.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        nbutton.setTextColor(Color.parseColor("#2196F3"));
+    }
 
     /**Lazzarin
      * It Opens the camera,takes the photo and puts as Extra Uri created by createImageFile method.
