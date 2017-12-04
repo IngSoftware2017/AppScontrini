@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                         drawMat(imgResized);
 
                         //List<Point> pts = new ArrayList<>();
-                        //findCorners(bm, pts);
+                        //findRectangle(bm, pts);
 
                     }
                 }

@@ -228,12 +228,13 @@ public class ImagePreprocessor {
     //PUBLIC:
 
     /**
-     * Find the four corners of a ticket, oredered clockwise from the top-left corner
+     * Find the four corners of a ticket, ordered clockwise from the top-left corner
      * @param bm input image. Not null.
      * @param corners List of points in bitmap space (range from (0,0) to (width, height) ).
-     *                null if corners cannot be found or more than four sised are found.
+     *                null if corners cannot be found or more than four sides are found.
+     * @return TicketError NONE or RECT_NOT_FOUND
      */
-    public static TicketError findCorners(Bitmap bm, @NonNull List<Point> corners) {
+    public static TicketError findRectangle(Bitmap bm, @NonNull List<Point> corners) {
         Mat orig = bitmapToMatBGR(bm);
         Mat resized = downScaleBGR(orig);
         Mat contour = findBiggestContour(resized);
@@ -263,11 +264,11 @@ public class ImagePreprocessor {
     /**
      * Get a Bitmap with a perspective correction applied, with a border.
      * @param bm Original photo
-     * @param corners corners of the ticket found with findCorners().
+     * @param corners corners of the ticket found with findRectangle().
      * @param borderMul fraction/percentage of length of smallest side to be used as border
      * @return Bitmap with perspective distortion removed
      */
-    public Bitmap undistort(Bitmap bm, List<Point> corners, double borderMul) {
+    public static Bitmap undistort(Bitmap bm, List<Point> corners, double borderMul) {
         Mat orig = bitmapToMatBGR(bm);
         return null;
     }
@@ -275,10 +276,10 @@ public class ImagePreprocessor {
     /**
      * Rotate a bitmap
      * @param src Source bitmap
-     * @param angle rotation angle (degrees)
+     * @param angle Rotation angle (degrees)
      * @return Rotated bitmap
      */
-    public Bitmap rotate(Bitmap src, float angle) {
+    public static Bitmap rotate(Bitmap src, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
