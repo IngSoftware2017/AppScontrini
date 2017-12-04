@@ -11,7 +11,7 @@ import android.view.View;
 
 /**
  * @author M
- * Inspired by https://github.com/Fotoapparat/Fotoapparat/blob/master/sample/src/main/java/io/fotoapparat/sample/PermissionsDelegate.java
+ * From https://github.com/Fotoapparat/Fotoapparat/blob/master/sample/src/main/java/io/fotoapparat/sample/PermissionsDelegate.java
  */
 public class PermissionsHandler {
 

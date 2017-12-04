@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.common.Ticket;
@@ -36,7 +38,12 @@ import java.util.List;
 
 import static com.ing.software.ocrtestapp.StatusVars.*;
 
-
+/**
+ * This class analyze all pics in folder 'sdcard/TestOCR' for now it does not handle errors
+ * (missing folder, invalid files, subdirectories etc).
+ * When floating button is clicked, a new background service is created, with the path of a single
+ * file.
+ */
 public class MainActivity extends AppCompatActivity implements OcrResultReceiver.Receiver {
 
     final OcrResultReceiver mReceiver = new OcrResultReceiver(new Handler());
@@ -55,10 +62,16 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         dataAnalyzer = new DataAnalyzer();
-        dataAnalyzer.initialize(this); //should check == 0
+        while (dataAnalyzer.initialize(this) != 0) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         mReceiver.setReceiver(this);
         OcrUtils.log(1, "MAIN", "STARTING: " + getDate());
-        List<File> listFile = loadImage();
+        List<File> listFile = loadImage(testFolder);
         final List<String> listNames = new ArrayList<>();
         for (File aFile : listFile)
             listNames.add(aFile.getAbsolutePath());
@@ -67,9 +80,11 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (counter == listNames.size())
+                if (counter == listNames.size()) {
                     dataAnalyzer.release();
-                if (counter < listNames.size()) {
+                    Snackbar.make(view, "DataAnalyzer released", Snackbar.LENGTH_LONG)
+                            .setAction("Service", null).show();
+                } else if (counter < listNames.size()) {
                     Intent intent = new Intent(MainActivity.this, TestService.class);
                     intent.putExtra("receiver", mReceiver);
                     OcrUtils.log(1, "OcrHandler", "ANALYZING: " + listNames.get(counter));
@@ -131,32 +146,55 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Shows results from service in a scrollview
+     * @param resultCode code received
+     * @param resultData bundle associated with code
+     */
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
+        //ScrollView scrollView = (ScrollView) findViewById(R.id.scroller);
+        TextView tv = (TextView) findViewById(R.id.scrollerText);;
+        String s = "";
         switch (resultCode) {
             case STATUS_RUNNING:
-                Toast.makeText(this, "Starting img: " + resultData.getString(IMAGE_RECEIVED), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Starting img: " + resultData.getString(IMAGE_RECEIVED), Toast.LENGTH_LONG).show();
+                tv.append("\n");
+                s = "\nStarting img: " + resultData.getString(IMAGE_RECEIVED);
                 break;
             case STATUS_FINISHED:
-                /* Hide progress & extract result from bundle */
-                Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
-                        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
+                //        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
+                s = "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
+                        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds";
                 break;
             case STATUS_ERROR:
                 /* Handle the error */
                 String error = resultData.getString(ERROR_RECEIVED);
-                Toast.makeText(this, "Error: " + error, Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Error: " + error, Toast.LENGTH_LONG).show();
+                s = "\nError: " + error;
                 break;
         }
+        tv.append(s);
+        //scrollView.addView(tv);
     }
 
+    /**
+     * Get current date, for logging purposes
+     * @return current date as string
+     */
     private String getDate() {
         Calendar cal = Calendar.getInstance();
         return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(cal.getTime());
     }
 
-    private List<File> loadImage() {
-        File appDir = new File(Environment.getExternalStorageDirectory().toString() + testFolder);
+    /**
+     * Retrieves list of files in dir
+     * @param dir directory containing files. Must be a non empty directory with only files
+     * @return list of files in current dir
+     */
+    private List<File> loadImage(String dir) {
+        File appDir = new File(Environment.getExternalStorageDirectory().toString() + dir);
         if (appDir.isDirectory())
             Log.e("listFileInfolder", "File is directory. Path is: " + appDir.getPath());
         else
@@ -174,7 +212,10 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
     }
 
 
-
+    /**
+     * Service to manage requests to analyze tickets
+     * When ticket is ready, send message to the receiver.
+     */
     public static class TestService extends IntentService {
 
         public TestService() {
@@ -187,12 +228,12 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
 
         @Override
         protected void onHandleIntent(final Intent workIntent) {
-            final long startTime = System.nanoTime();
             OcrUtils.log(1, "TestService", "Entering service");
             final ResultReceiver receiver = workIntent.getParcelableExtra("receiver");
             final String testPic = workIntent.getExtras().getString("imagePath");
             Bitmap testBmp = getBitmapFromFile(getFileFromPath(testPic));
             //test = OcrAnalyzer.getCroppedPhoto(test, this);
+            final long startTime = System.nanoTime();
             final Bundle bundle = new Bundle();
             if (testBmp != null) {
                 bundle.putString(IMAGE_RECEIVED, testPic);
@@ -227,6 +268,11 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             return new File(path);
         }
 
+        /**
+         * Decode bitmap from file
+         * @param file not null and must be an image
+         * @return bitmap from file
+         */
         private Bitmap getBitmapFromFile(File file) {
             FileInputStream fis = null;
             try {

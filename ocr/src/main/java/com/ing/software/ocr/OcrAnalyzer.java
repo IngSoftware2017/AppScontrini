@@ -28,7 +28,7 @@ class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
-    private final int targetPrecision = 75; //Should be passed with image, or calculated with
+    private final int targetPrecision = 100; //Should be passed with image, or calculated with
         //resolution of source image
 
 

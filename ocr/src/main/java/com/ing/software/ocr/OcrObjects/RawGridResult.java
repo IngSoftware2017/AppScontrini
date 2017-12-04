@@ -39,10 +39,21 @@ public class RawGridResult implements Comparable<RawGridResult>{
 
     @Override
     public int compareTo(@NonNull RawGridResult rawGridResult) {
-        if (getPercentage() == rawGridResult.getPercentage())
+        //if (getPercentage() == rawGridResult.getPercentage())
             //return getText().compareTo(rawGridResult.getText());
-            return -1;
-        else
+        //    return -1;
+       // else
             return  rawGridResult.getPercentage() - getPercentage();
+    }
+
+    @Override
+    public boolean equals(@NonNull Object o) {
+        if (o instanceof RawGridResult) {
+            RawGridResult e2 = (RawGridResult) o;
+            return singleText.getDetection().equals(e2.getText().getDetection()) &&
+                    singleText.getRect().equals(e2.getText().getRect());
+        }
+        else
+            return false;
     }
 }

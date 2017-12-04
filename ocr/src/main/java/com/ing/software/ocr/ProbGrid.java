@@ -91,9 +91,8 @@ public class ProbGrid {
     };
 
     static {
-        //Key in gridMap is Math.floor(height/width*100)/100 of corresponding grid
-        gridMap.put(Math.floor(16/9*100)/100, RATIO16x9);
-        gridMap.put(Math.floor(16/7*100)/100, RATIO16x7);
+        gridMap.put((double)16/9, RATIO16x9);
+        gridMap.put((double)16/7, RATIO16x7);
         amountMap.put(RATIO16x9, AmountGrid16x9);
         amountMap.put(RATIO16x7, AmountGrid16x7);
         dateMap.put(RATIO16x9, DateGrid16x9);
