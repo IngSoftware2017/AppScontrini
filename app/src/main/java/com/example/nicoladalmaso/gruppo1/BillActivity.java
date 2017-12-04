@@ -25,6 +25,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -423,10 +424,19 @@ public class BillActivity extends AppCompatActivity {
      */
     public void printAllImages(){
         File[] files = readAllImages();
+        TextView noBills = (TextView)findViewById(R.id.noBills);
+        if(files.length == 0){
+            noBills.setVisibility(View.VISIBLE);
+        }
+        else{
+            noBills.setVisibility(View.INVISIBLE);
+        }
         for (int i = 0; i < files.length; i++)
         {
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
             Bitmap myBitmap = BitmapFactory.decodeFile(files[i].getAbsolutePath());
-            addToList(files[i].getName(), "Descrizione della foto", myBitmap);
+            addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()), myBitmap);
         }
     }
 

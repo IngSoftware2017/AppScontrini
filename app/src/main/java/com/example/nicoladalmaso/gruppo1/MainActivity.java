@@ -22,6 +22,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -111,6 +112,13 @@ public class MainActivity extends AppCompatActivity {
      */
     public void printAllMissions(){
         File[] files = readAllMissions();
+        TextView noMissions = (TextView)findViewById(R.id.noMissions);
+        if(files.length == 0){
+            noMissions.setVisibility(View.VISIBLE);
+        }
+        else{
+            noMissions.setVisibility(View.INVISIBLE);
+        }
         for (int i = 0; i < files.length; i++)
         {
             SimpleDateFormat simpleDateFormat =

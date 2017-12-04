@@ -26,7 +26,9 @@ public class BillViewer extends AppCompatActivity {
         String imgPath = intent.getExtras().getString("imagePath");
         String imgName = intent.getExtras().getString("imageName");
         setTitle(imgName);
-        ImageView imgView = (ImageView) findViewById(R.id.billImage);
+        TextView billName = (TextView)findViewById(R.id.billName);
+        billName.setText(imgName);
+        ImageView imgView = (ImageView)findViewById(R.id.billImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         Bitmap bitmap = BitmapFactory.decodeFile(imgPath,bmOptions);
         imgView.setImageBitmap(bitmap);

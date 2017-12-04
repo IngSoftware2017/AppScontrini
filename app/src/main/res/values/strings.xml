@@ -9,4 +9,6 @@
     <string name="billTitle">Il tuo scontrino</string>
     <string name="name">Nome</string>
     <string name="description">Descrizione</string>
+    <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
 </resources>
