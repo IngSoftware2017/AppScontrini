@@ -2,12 +2,15 @@ package com.example.ingsw.gruppo3;
 
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -19,7 +22,7 @@ import database.PersonEntity;
 /** Created by Marco Olivieri
  *
  */
-public class AddMission extends AppCompatActivity implements View.OnClickListener{
+public class AddMission extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener{
 
     //Components
     FloatingActionButton saveMissionButton;
@@ -32,6 +35,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     ListView personsList;
     ArrayList<PersonEntity> personEntityArrayList;
     AddMissionAdapter adapter;
+    DatePickerDialog.OnDateSetListener dateListener;
+    DatePickerDialog startDatePicker, endDatePicker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         endDateMissionText = findViewById(R.id.endMissionEditText);
         personsList = findViewById(R.id.personsList);
         personsList.setAdapter(adapter);
+        startDateMissionText.setOnClickListener(this);
+        endDateMissionText.setOnClickListener(this);
     }
 
 
@@ -95,6 +102,12 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 alertDialog.show();
             }
 
+        }else if(view.getId() == R.id.startDateEditText){
+             startDatePicker = new DatePickerDialog(this, this, 2017, 12, 6);
+            startDatePicker.show();
+        }else if(view.getId() == R.id.endMissionEditText){
+             endDatePicker = new DatePickerDialog(this, this, 2017, 12, 6);
+             endDatePicker.show();
         }
 
     }
@@ -117,6 +130,15 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 nameMissionText.getText().equals("")||startDateMissionText.getText().equals("")||endDateMissionText.getText().equals(""))
             return false;
         return true;
+    }
+
+    @Override
+    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+        if(datePicker.equals(startDatePicker)){
+            startDateMissionText.setText(i+"-"+i1+"-"+i2);
+        }else if(datePicker.equals(endDatePicker)){
+            endDateMissionText.setText(i+"-"+i1+"-"+i2);
+        }
     }
 }
 
