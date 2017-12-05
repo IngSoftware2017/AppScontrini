@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
@@ -40,10 +41,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newMissionButton = findViewById(R.id.newMissionButton);
         missionsList = findViewById(R.id.missionsList);
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
-
-        MissionEntity test = new MissionEntity("name",null,null,"location",1);
         missions = new ArrayList<MissionEntity>();
-        missions.add(test);
+        //MissionEntity test = new MissionEntity("name",null,null,"location",1);
+        //missions.add(test);
         adapter = new MissionAdapter(this, R.layout.mission_row_custom, missions);
         missionsList.setAdapter(adapter);
         newMissionButton.setOnClickListener(this);
@@ -57,8 +57,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void checkInitialization(){
         if(missionsList.getAdapter().getCount()==0){
-            noticeEmptyText.setEnabled(Boolean.TRUE);
-            missionsList.setEnabled(Boolean.FALSE);
+            noticeEmptyText.setVisibility(View.VISIBLE);
+        }
+        else{
+            noticeEmptyText.setVisibility(View.INVISIBLE);
         }
     }
 

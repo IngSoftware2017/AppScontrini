@@ -53,15 +53,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         personsList.setAdapter(adapter);
     }
 
-    /**
-     * @author Marco Olivieri on 03/12/2017 (Team 3)
-     * return boolean - if setting field is ok
-     */
-    private boolean checkCorrectField(){
-        if(nameMissionText.getText().equals("Nome")||startDateMissionText.getText().equals("Data Inizio")||endDateMissionText.getText().equals("Data Fine") )
-            return false;
-        return true;
-    }
+
 
     @Override
     public void onClick(View view) {
@@ -76,8 +68,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
             }
             else {
                 AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-                alertDialog.setTitle("Errore");
-                alertDialog.setMessage("Nome non valido");
+                alertDialog.setTitle("Attenzione!");
+                alertDialog.setMessage("Inserire un cognome valido");
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -90,6 +82,18 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
             if(checkCorrectField()){
                 //campi ok
             }
+            else{
+                AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Attenzione!");
+                alertDialog.setMessage("Campi obbligatori");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
 
         }
 
@@ -99,7 +103,18 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
      * @return boolean
      */
     private boolean isCorrectCognomePerson(){
-        if(namePerson.getText().equals("Cognome"))
+        if(namePerson.getText().equals("Cognome")|| namePerson.getText().equals(""))
+            return false;
+        return true;
+    }
+
+    /**
+     * @author Marco Olivieri on 03/12/2017 (Team 3)
+     * return boolean - if setting field is ok
+     */
+    private boolean checkCorrectField(){
+        if(nameMissionText.getText().equals("Nome")||startDateMissionText.getText().equals("Data Inizio")||endDateMissionText.getText().equals("Data Fine")||
+                nameMissionText.getText().equals("")||startDateMissionText.getText().equals("")||endDateMissionText.getText().equals(""))
             return false;
         return true;
     }
