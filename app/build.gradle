@@ -34,4 +34,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:21.0.+'
     testCompile "org.mockito:mockito-core:2.+"
     compile project(path: ':database')
+    compile project(path: ':ocr')
 }

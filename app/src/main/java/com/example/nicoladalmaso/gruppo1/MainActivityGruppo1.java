@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ing.software.ocr.DataAnalyzer;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -42,6 +43,7 @@ import database.DataManager;
 public class MainActivityGruppo1 extends AppCompatActivity {
     public List<Missione> list = new LinkedList<Missione>();
     DataManager dataManager;
+    DataAnalyzer anaz;
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
