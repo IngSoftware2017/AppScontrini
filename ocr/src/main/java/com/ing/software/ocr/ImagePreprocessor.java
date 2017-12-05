@@ -245,11 +245,11 @@ public class ImagePreprocessor {
         approxPolyDP(contour, polyApprox, polyMaxErr/*polyMaxErrMul * perimeter*/, true);
         polyApprox = multiply(polyApprox, scaleMul).asMat();
         corners.clear();
-        if (polyApprox.rows() != 4) {
-            // polyApprox has not 4 sides. Return bounding box.
-            Rect box = boundingRect(polyApprox);
-            return TicketError.RECT_NOT_FOUND;
-        }
+//        if (polyApprox.rows() != 4) {
+//            // polyApprox has not 4 sides. Return bounding box.
+//            Rect box = boundingRect(polyApprox);
+//            return TicketError.RECT_NOT_FOUND;
+//        }
         //else it's a quadrilateral
 
         //List<Point> pts = new ArrayList<>(4);
@@ -262,13 +262,13 @@ public class ImagePreprocessor {
     //tests: is corners input non empty? does corners output have 4 elements?
 
     /**
-     * Get a Bitmap with a perspective correction applied, with a border.
+     * Get a Bitmap with a perspective correction applied, with a margin.
      * @param bm Original photo
      * @param corners corners of the ticket found with findRectangle().
-     * @param borderMul fraction/percentage of length of smallest side to be used as border
+     * @param marginMul fraction/percentage of length of smallest side to be used as margin
      * @return Bitmap with perspective distortion removed
      */
-    public static Bitmap undistort(Bitmap bm, List<Point> corners, double borderMul) {
+    public static Bitmap undistort(Bitmap bm, List<Point> corners, double marginMul) {
         Mat orig = bitmapToMatBGR(bm);
         return null;
     }
