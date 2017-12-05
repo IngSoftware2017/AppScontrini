@@ -312,14 +312,4 @@ public class OcrUtils {
         return minDistance;
 
     }
-
-
-
-
-
-
-
-
-
-
 }

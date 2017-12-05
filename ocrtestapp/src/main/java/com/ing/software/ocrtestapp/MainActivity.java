@@ -18,12 +18,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.DataAnalyzer;
+import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
 import com.ing.software.ocr.OnTicketReadyListener;
 
@@ -35,6 +35,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.ing.software.ocrtestapp.StatusVars.*;
 
@@ -47,10 +49,11 @@ import static com.ing.software.ocrtestapp.StatusVars.*;
 public class MainActivity extends AppCompatActivity implements OcrResultReceiver.Receiver {
 
     final OcrResultReceiver mReceiver = new OcrResultReceiver(new Handler());
-    private static DataAnalyzer dataAnalyzer;
+    private static OcrManager ocrAnalyzer;
     private final String testFolder = "/TestOCR";
     private int counter = 0;
     private final PermissionsHandler permissionsHandler = new PermissionsHandler(this);
+    private static final Semaphore sem = new Semaphore(0);
 
 
     @Override
@@ -61,8 +64,8 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             permissionsHandler.requestStoragePermission();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        dataAnalyzer = new DataAnalyzer();
-        while (dataAnalyzer.initialize(this) != 0) {
+        ocrAnalyzer = new OcrManager();
+        while (ocrAnalyzer.initialize(this) != 0) {
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -81,7 +84,8 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             @Override
             public void onClick(View view) {
                 if (counter == listNames.size()) {
-                    dataAnalyzer.release();
+                    ocrAnalyzer.release();
+                    ++counter;
                     Snackbar.make(view, "DataAnalyzer released", Snackbar.LENGTH_LONG)
                             .setAction("Service", null).show();
                 } else if (counter < listNames.size()) {
@@ -238,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             if (testBmp != null) {
                 bundle.putString(IMAGE_RECEIVED, testPic);
                 receiver.send(STATUS_RUNNING, bundle);
-                dataAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
+                ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
                     @Override
                     public void onTicketReady(Ticket result) {
                         OcrUtils.log(1, "OcrHandler", "Detection complete");
@@ -255,11 +259,17 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                             bundle.putString(DURATION_RECEIVED, duration + "");
                             receiver.send(STATUS_FINISHED, bundle);
                         }
+                        sem.release();
                     }
                 });
             } else {
                 bundle.putString("ErrorMessage", "Error null image");
                 receiver.send(STATUS_ERROR, bundle);
+            }
+            try {
+                sem.acquire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             this.stopSelf();
         }
