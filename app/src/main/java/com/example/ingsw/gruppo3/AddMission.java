@@ -26,6 +26,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     EditText nameMissionText;
     EditText startDateMissionText;
     EditText endDateMissionText;
+    EditText namePerson;
     EditText addPerson;
     ListView personsList;
     ArrayList<PersonEntity> personEntityArrayList;
@@ -45,6 +46,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         cancelMissionButton = findViewById(R.id.deleteButton);
         nameMissionText = findViewById(R.id.nameText);
         startDateMissionText = findViewById(R.id.starMissionText);
+        namePerson = findViewById(R.id.addPersonEditText);
         endDateMissionText = findViewById(R.id.endMissionText);
         personsList = findViewById(R.id.personsList);
         personsList.setAdapter(adapter);
@@ -72,4 +74,14 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         }
 
     }
+    /**
+     * Tests if the user wrote something
+     * @return boolean
+     */
+    private boolean isCorrectCognomePerson(){
+        if(namePerson.getText().equals("Cognome"))
+            return false;
+        return true;
+    }
 }
+
