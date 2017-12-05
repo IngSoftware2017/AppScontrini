@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import database.Ticket;
+import database.TicketEntity;
 
 import static org.junit.Assert.*;
 
@@ -16,8 +16,8 @@ import static org.junit.Assert.*;
  */
 
 public class TicketTest {
-    Ticket ticket1;
-    Ticket ticket2;
+    TicketEntity ticket1;
+    TicketEntity ticket2;
     Date date;
     BigDecimal amount;
 
@@ -25,9 +25,8 @@ public class TicketTest {
     public void beforeTest(){
         amount = new BigDecimal(100);
         date = new Date(2017,11,20);
-        ticket1=new Ticket(null,amount,"Shop",date,"Title",1);
-
-        ticket2=new Ticket();
+        ticket1=new TicketEntity(null,amount,"Shop",date,"Title",1);
+        ticket2=new TicketEntity();
     }
 
     @Test

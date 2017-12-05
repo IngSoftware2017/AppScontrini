@@ -29,6 +29,7 @@ public class MissionEntity {
     private String location;
     private boolean isRepay;
     private Uri excel;
+    private String name;
 
     @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
     private int personID;
@@ -48,13 +49,14 @@ public class MissionEntity {
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public MissionEntity(Date startMission, Date endMission, String location, int personID) {
+    public MissionEntity(String name, Date startMission, Date endMission, String location, int personID) {
         this.startMission = startMission;
         this.endMission = endMission;
         this.location = location;
         isRepay = false;
         excel = null;
         this.personID = personID;
+        this.name = name;
     }
 
     /**
@@ -170,6 +172,13 @@ public class MissionEntity {
         this.personID = personID;
     }
 
-    //TODO override toString
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+//TODO override toString
 }
 

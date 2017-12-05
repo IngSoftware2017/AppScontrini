@@ -6,23 +6,23 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import database.Mission;
+import database.MissionEntity;
 
 /**
  * Created by Step on 28/11/2017.
  */
 
 public class MissionTest {
-    Mission mission1;
-    Mission mission2;
+    MissionEntity mission1;
+    MissionEntity mission2;
     Date dateI,dateF;
 
     @Before
     public void beforeTest(){
         dateI = new Date(2017,11,20);
         dateF = new Date(2017,11,30);
-        mission1 = new Mission("name",dateI,dateF,"Venice",1);
-        mission2 = new Mission();
+        mission1 = new MissionEntity("name",dateI,dateF,"Venice",1);
+        mission2 = new MissionEntity();
     }
 
     //TODO test getName() and setName()

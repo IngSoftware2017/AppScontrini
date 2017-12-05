@@ -3,8 +3,7 @@ package com.sw.ing.gestionescontrini;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import database.Person;
+import database.PersonEntity;
 
 
 /**
@@ -12,12 +11,12 @@ import database.Person;
  */
 
 public class PersonTest {
-    Person person1,person2;
+    PersonEntity person1,person2;
 
     @Before
     public void beforeTest() {
-        person1 = new Person("Name","LastName","student");
-        person2 = new Person();
+        person1 = new PersonEntity("Name","LastName","student");
+        person2 = new PersonEntity();
     }
 
     //TODO test person ID with mock test

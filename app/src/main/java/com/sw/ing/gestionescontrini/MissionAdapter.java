@@ -9,13 +9,13 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import database.Mission;
+import database.MissionEntity;
 
 /**
  * Created by Step on 03/12/2017.
  */
 
-public class MissionAdapter extends ArrayAdapter<Mission> {
+public class MissionAdapter extends ArrayAdapter<MissionEntity> {
 
     MissionViewerHolder holder;
 
@@ -25,7 +25,7 @@ public class MissionAdapter extends ArrayAdapter<Mission> {
      * @param textViewResourceId id of the textView
      * @param missions array of Mission class objects
      */
-    public MissionAdapter(Context context, int textViewResourceId, List<Mission> missions){
+    public MissionAdapter(Context context, int textViewResourceId, List<MissionEntity> missions){
         super(context,textViewResourceId,missions);
     }
 
@@ -51,7 +51,7 @@ public class MissionAdapter extends ArrayAdapter<Mission> {
             holder = (MissionViewerHolder)convertView.getTag();
         }
 
-        Mission mis = getItem(position);
+        MissionEntity mis = getItem(position);
         holder.nameTextView.setText(mis.getName());
         holder.locationTextView.setText(mis.getLocation());
         return convertView;

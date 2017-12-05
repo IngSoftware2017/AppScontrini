@@ -17,9 +17,9 @@ import java.util.Date;
 
 import database.DAO;
 import database.Database;
-import database.Mission;
-import database.Person;
-import database.Ticket;
+import database.MissionEntity;
+import database.PersonEntity;
+import database.TicketEntity;
 
 /**
  * Created by Federico Taschin on 12/11/2017.
@@ -30,10 +30,10 @@ public class DatabaseTest {
 
      static Database database;
      static DAO ticketDAO;
-     static Ticket testTicket1;
+     static TicketEntity testTicket1;
     // static Ticket testTicket2;
-     static Mission mission;
-     static Person person;
+     static MissionEntity mission;
+     static PersonEntity person;
 
     @Before
     public void setDatabaseAndCreateTickets() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -48,16 +48,16 @@ public class DatabaseTest {
 
 
     public void createTicket1AndInsert(){
-        person = new Person();
+        person = new PersonEntity();
         person.setName("Albert");
 
         person.setID((int) ticketDAO.addPerson(person));
 
-        mission = new Mission();
+        mission = new MissionEntity();
         mission.setPersonID(person.getID());
         mission.setID((int) ticketDAO.addMission(mission));
 
-        testTicket1 = new Ticket();
+        testTicket1 = new TicketEntity();
         testTicket1.setAmount(new BigDecimal(12));
         testTicket1.setDate(new Date(1996,10,12));
         testTicket1.setShop("Decathlon");
@@ -100,7 +100,7 @@ public class DatabaseTest {
 
     @Test
     public void updateTicketShouldNullEmptyFields(){
-        Ticket emptyTicket = new Ticket();
+        TicketEntity emptyTicket = new TicketEntity();
         emptyTicket.setID(testTicket1.getID());
         emptyTicket.setMissionID(testTicket1.getMissionID());
         emptyTicket.setTitle("modified value");
@@ -110,13 +110,13 @@ public class DatabaseTest {
 
     @Test
     public void updateNullTicketIDShouldReturnZero(){
-        Ticket ticket = new Ticket();
+        TicketEntity ticket = new TicketEntity();
         Assert.assertTrue(0 == ticketDAO.updateTicket(ticket));
     }
 
     @Test
     public void updateInvalidTicketIDShouldReturnZero(){
-        Ticket ticket = new Ticket();
+        TicketEntity ticket = new TicketEntity();
         ticket.setID(123);
         Assert.assertTrue(0 == ticketDAO.updateTicket(ticket));
     }
