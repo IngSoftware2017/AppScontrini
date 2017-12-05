@@ -21,7 +21,6 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     //Components
     FloatingActionButton saveMissionButton;
-    FloatingActionButton cancelMissionButton;
     FloatingActionButton addPersonButton;
     EditText nameMissionText;
     EditText startDateMissionText;
@@ -41,9 +40,9 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         personEntityArrayList.add(new PersonEntity());//fake person
         adapter = new AddMissionAdapter(this, R.layout.person_row_custom, personEntityArrayList);
 
+        addPersonButton = findViewById(R.id.addPersonButton);
         addPerson = findViewById(R.id.addPersonEditText);
         saveMissionButton = findViewById(R.id.saveButton);
-        cancelMissionButton = findViewById(R.id.deleteButton);
         nameMissionText = findViewById(R.id.nameText);
         startDateMissionText = findViewById(R.id.starMissionText);
         namePerson = findViewById(R.id.addPersonEditText);
