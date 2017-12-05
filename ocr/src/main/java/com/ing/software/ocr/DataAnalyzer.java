@@ -26,8 +26,8 @@ import static com.ing.software.ocr.OcrUtils.levDistance;
 /*
 USAGE:
 1) Instantiate DataAnalyzer;
-2) Call initialize() until it returns 0;
-3) Call getTicket ad libitum to extract information (Ticket object) from a photo of a ticket.
+2) Call initialize(context) until it returns 0;
+3) Call getTicket(bitmap, callback) ad libitum to extract information (Ticket object) from a photo of a ticket.
 4) Call release() to release internal resources.
  */
 
