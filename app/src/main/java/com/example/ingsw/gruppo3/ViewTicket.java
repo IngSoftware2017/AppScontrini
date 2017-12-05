@@ -24,6 +24,8 @@ public class ViewTicket extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_ticket);
 
+        setTitle("Ticket");
+
         image = findViewById(R.id.ticketView);
         name = findViewById(R.id.nameText);
         category = findViewById(R.id.categoryText);
@@ -41,7 +43,7 @@ public class ViewTicket extends AppCompatActivity {
         image.setImageURI(ticket.getFileUri());
         name.setText(ticket.getTitle());
         category.setText(ticket.getCategory());
-        amount.setText(ticket.getAmount().toString());
+        amount.setText((CharSequence) ticket.getAmount());
     }
 
     /**
