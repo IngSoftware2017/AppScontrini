@@ -2,6 +2,7 @@ package database;
 
 import android.content.Context;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  * Modified by Marco Olivieri on 14/11/2017
  */
 
-public class DataManager {
+public class DataManager implements Serializable{
     private Database database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 

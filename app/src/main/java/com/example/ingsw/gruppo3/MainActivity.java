@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
@@ -47,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         missionsList.setAdapter(adapter);
         newMissionButton.setOnClickListener(this);
         checkInitialization();
+        loadMissions();
     }
 
     /**
@@ -60,8 +60,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void addMission(){
+    public void callAddmission(){
         Intent callAddMission = new Intent(this, AddMission.class);
+        callAddMission.putExtra(IntentCodes.DATAMANAGER_INTENT_CODE,dataManager);
         startActivity(callAddMission);
     }
 
@@ -69,11 +70,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if(view instanceof FloatingActionButton){
-            addMission();
+            callAddmission();
         }
     }
 
     public void loadMissions(){
         missions.addAll(dataManager.getAllMissions());
     }
+    public void addMission(MissionEntity missionEntity) {
+        missions.add(missionEntity);
+    }
+
 }

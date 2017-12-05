@@ -11,6 +11,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import database.DataManager;
 import database.PersonEntity;
 
 /** Created by Marco Olivieri
@@ -25,10 +26,11 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     EditText nameMissionText;
     EditText startDateMissionText;
     EditText endDateMissionText;
+    EditText addPerson;
     ListView personsList;
     ArrayList<PersonEntity> personEntityArrayList;
     AddMissionAdapter adapter;
-
+    DataManager dataManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +40,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         personEntityArrayList.add(new PersonEntity());//fake person
         adapter = new AddMissionAdapter(this, R.layout.person_row_custom, personEntityArrayList);
 
+        addPerson = findViewById(R.id.addPersonEditText);
         saveMissionButton = findViewById(R.id.saveButton);
         cancelMissionButton = findViewById(R.id.deleteButton);
         nameMissionText = findViewById(R.id.nameText);
@@ -45,6 +48,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         endDateMissionText = findViewById(R.id.endMissionText);
         personsList = findViewById(R.id.personsList);
         personsList.setAdapter(adapter);
+        dataManager = (DataManager) getIntent().getSerializableExtra(IntentCodes.DATAMANAGER_INTENT_CODE);
     }
 
     /**
@@ -57,6 +61,15 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
+        if(view.getId() == R.id.addPersonButton){
+            PersonEntity person = new PersonEntity();
+            person.setLastName(addPerson.getText().toString());
+            if(dataManager.addPerson(person)>0){
+                personEntityArrayList.add(person);
+            }
+        }else if(view.getId() == R.id.saveButton){
+
+        }
 
     }
 }
