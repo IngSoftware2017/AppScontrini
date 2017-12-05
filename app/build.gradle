@@ -41,6 +41,7 @@ dependencies {
     compile 'android.arch.persistence.room:rxjava2:1.0.0'
     testCompile 'android.arch.persistence.room:testing:1.0.0'
     implementation 'com.android.support:design:27.0.2'
+    compile project(path: ':database')
 }
 
 task copyDataset(type: Copy) {
@@ -49,8 +50,4 @@ task copyDataset(type: Copy) {
     }
     into "${projectDir}/src/androidTest/assets"
 }
-
-
-
-
 tasks.preBuild.dependsOn('copyDataset')

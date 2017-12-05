@@ -16,20 +16,20 @@ import android.net.Uri;
  */
 
 @Entity(tableName = Constants.MISSION_TABLE_NAME,
-        foreignKeys = @ForeignKey(entity = Person.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
+        foreignKeys = @ForeignKey(entity = PersonEntity.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
 @TypeConverters(Converters.class)
 
-public class Mission {
+public class MissionEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
     private int ID;
-    private String name;
     private Date startMission;
     private Date endMission;
     private String location;
     private boolean isRepay;
     private Uri excel;
+    private String name;
 
     @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
     private int personID;
@@ -38,25 +38,25 @@ public class Mission {
     /**
      * Non parametric constructor
      */
-    public Mission() {
+    public MissionEntity() {
     }
 
     /**
      * Parametric constructor
-     * @param name Description of the mission
+     *
      * @param startMission Date of the beginning of the mission
      * @param endMission Date of the end of the mission
-     * @param location Name of locality where the mission took place
+     * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(String name,Date startMission, Date endMission, String location, int personID) {
-        this.name = name;
+    public MissionEntity(String name, Date startMission, Date endMission, String location, int personID) {
         this.startMission = startMission;
         this.endMission = endMission;
         this.location = location;
         isRepay = false;
         excel = null;
         this.personID = personID;
+        this.name = name;
     }
 
     /**
@@ -74,22 +74,6 @@ public class Mission {
      */
     public void setID(int ID) {
         this.ID = ID;
-    }
-
-    /**
-     * Returns the name description of the mission
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name description of the mission
-     * @param name
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -126,14 +110,14 @@ public class Mission {
 
     /**
      * Returns the location where the mission took place
-     * @return locality
+     * @return location
      */
     public String getLocation() {
         return location;
     }
 
     /**
-     * Sets the locality where the mission took place
+     * Sets the location where the mission took place
      * @param location
      */
     public void setLocation(String location) {
@@ -188,6 +172,13 @@ public class Mission {
         this.personID = personID;
     }
 
-    //TODO override toString
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+//TODO override toString
 }
 

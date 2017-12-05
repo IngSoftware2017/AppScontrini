@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import database.DataManager;
-import database.Mission;
+import database.MissionEntity;
 
 /**
  * Modified by Marco Olivieri on 03/12/2017
@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
         newMissionButton = findViewById(R.id.newMissionButton);
         missionsList = findViewById(R.id.missionsList);
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
-        Mission test = new Mission("name",null,null,"location",1);
-        List<Mission> missions = new ArrayList<Mission>();
+        MissionEntity test = new MissionEntity("name",null,null,"location",1);
+        List<MissionEntity> missions = new ArrayList<MissionEntity>();
         missions.add(test);
         MissionAdapter adapter = new MissionAdapter(this,R.layout.mission_row_custom, missions);
         missionsList.setAdapter(adapter);

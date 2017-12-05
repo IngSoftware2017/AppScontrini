@@ -17,10 +17,10 @@ import java.util.Date;
  */
 
 @Entity(tableName = Constants.TICKET_TABLE_NAME,
-        foreignKeys = @ForeignKey(entity = Mission.class, parentColumns = Constants.MISSION_PRIMARY_KEY_NAME, childColumns = Constants.MISSION_CHILD_COLUMNS))
+        foreignKeys = @ForeignKey(entity = MissionEntity.class, parentColumns = Constants.MISSION_PRIMARY_KEY_NAME, childColumns = Constants.MISSION_CHILD_COLUMNS))
 @TypeConverters(Converters.class)
 
-public class Ticket {
+public class TicketEntity {
 
     @ColumnInfo(name = Constants.TICKET_PRIMARY_KEY_NAME)
     @PrimaryKey(autoGenerate = true)
@@ -39,7 +39,7 @@ public class Ticket {
     /**
      * Non parametric constructor
      */
-    public Ticket() {
+    public TicketEntity() {
     }
 
     /**
@@ -52,7 +52,7 @@ public class Ticket {
      * @param title name given
      * @param missionID code of the mission
      */
-    public Ticket(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
+    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
         this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
@@ -124,28 +124,28 @@ public class Ticket {
     public void setShop (String shop) { this.shop = shop; }
 
     /**
-     * Restituisce il titolo del Ticket
+     * Restituisce il titolo del TicketEntity
      *
      * @return title
      */
     public String getTitle() { return title; }
 
     /**
-     * Imposta il titolo del Ticket
+     * Imposta il titolo del TicketEntity
      *
      * @param title not null
      */
     public void setTitle (String title) { this.title = title; }
 
     /**
-     * Restituisce la categoria del Ticket
+     * Restituisce la categoria del TicketEntity
      *
      * @return title
      */
     public String getCategory() { return category; }
 
     /**
-     * Imposta la categoria del Ticket
+     * Imposta la categoria del TicketEntity
      *
      * @param category not null
      */
@@ -160,7 +160,7 @@ public class Ticket {
     }
 
     /**
-     * Sets mission id of this Ticket
+     * Sets mission id of this TicketEntity
      * @param missionID
      */
     public void setMissionID(int missionID) {
@@ -169,7 +169,7 @@ public class Ticket {
 
 
     /**
-     * Returns a String with Ticket data formatted as follows:
+     * Returns a String with TicketEntity data formatted as follows:
      * "Shop"
      * Totale: "Amount"
      *
