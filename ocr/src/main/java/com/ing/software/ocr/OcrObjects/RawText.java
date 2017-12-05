@@ -61,11 +61,11 @@ public class RawText implements Comparable<RawText> {
      * @return probability that date is present
      */
     int getDateProbability() {
-        log(2,"Value is: ", getDetection());
+        log(6,"Value is: ", getDetection());
         int[] gridBox = getGridBox();
-        log(2,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
+        log(6,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
         int probability = ProbGrid.dateMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
-        log(2,"Date Probability is", " " +probability);
+        log(6,"Date Probability is", " " +probability);
         return probability;
     }
 
@@ -74,11 +74,11 @@ public class RawText implements Comparable<RawText> {
      * @return probability that amount is present
      */
     public int getAmountProbability() {
-        log(2,"Value is: ", getDetection());
+        log(6,"Value is: ", getDetection());
         int[] gridBox = getGridBox();
-        log(2,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
+        log(6,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
         int probability = ProbGrid.amountMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
-        log(2,"Amount Probability is", " " +probability);
+        log(6,"Amount Probability is", " " +probability);
         return probability;
     }
 

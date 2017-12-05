@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 /**
  * Static class containing grids for probability regions (WIP)
- * Note: these grids are note definitive yet, they'll be updated according to the dataset
+ * Note: these grids are note definitive yet
  * More ratios are going to be added for next step
  * @author Michelon
  */
@@ -21,36 +21,36 @@ public class ProbGrid {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {40, 50, 30, 10, 0, 0, 0, 0, 0},
-            {60, 60, 50, 30, 10, 0, 0, 0, 0},
+            {10, 10, 10, 0, 0, 0, 0, 0, 0},
+            {20, 20, 10, 5, 0, 0, 0, 0, 0},
+            {20, 20, 10, 5, 0, 0, 0, 0, 0},
+            {20, 20, 10, 5, 0, 0, 0, 0, 0},
+            {20, 20, 10, 5, 0, 0, 0, 0, 0},
+            {30, 30, 20, 10, 0, 0, 0, 0, 0},
+            {40, 50, 40, 10, 0, 0, 0, 0, 0},
+            {40, 50, 40, 20, 0, 0, 0, 0, 0},
             {60, 70, 60, 40, 20, 0, 0, 0, 0},
-            {40, 50, 30, 20, 0, 0, 0, 0, 0},
-            {30, 40, 20, 10, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0}
+            {60, 70, 60, 40, 10, 0, 0, 0, 0},
+            {30, 40, 30, 10, 0, 0, 0, 0, 0},
+            {10, 20, 20, 10, 0, 0, 0, 0, 0},
+            {10, 5, 5, 0, 0, 0, 0, 0, 0}
     };
     private static final Integer[][] AmountGrid16x7 = {
             {0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0},
-            {5, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0},
             {10, 10, 10, 0, 0, 0, 0},
             {20, 20, 10, 0, 0, 0, 0},
-            {20, 20, 5, 0, 0, 0, 0},
             {20, 20, 10, 0, 0, 0, 0},
-            {40, 40, 10, 0, 0, 0, 0},
-            {50, 50, 10, 0, 0, 0, 0},
+            {20, 20, 10, 0, 0, 0, 0},
             {20, 20, 10, 0, 0, 0, 0},
             {30, 30, 10, 0, 0, 0, 0},
-            {70, 40, 10, 0, 0, 0, 0},
-            {70, 40, 10, 0, 0, 0, 0},
-            {20, 30, 20, 0, 0, 0, 0},
-            {10, 20, 10, 0, 0, 0, 0},
+            {40, 40, 10, 0, 0, 0, 0},
+            {40, 40, 10, 0, 0, 0, 0},
+            {70, 50, 10, 0, 0, 0, 0},
+            {70, 50, 10, 0, 0, 0, 0},
+            {40, 30, 20, 0, 0, 0, 0},
+            {20, 20, 10, 0, 0, 0, 0},
             {10, 10, 0, 0, 0, 0, 0}
     };
     private static final Integer[][] DateGrid16x9 = {
@@ -91,9 +91,8 @@ public class ProbGrid {
     };
 
     static {
-        //Key in gridMap is Math.floor(height/width*100)/100 of corresponding grid
-        gridMap.put(Math.floor(16/9*100)/100, RATIO16x9);
-        gridMap.put(Math.floor(16/7*100)/100, RATIO16x7);
+        gridMap.put((double)16/9, RATIO16x9);
+        gridMap.put((double)16/7, RATIO16x7);
         amountMap.put(RATIO16x9, AmountGrid16x9);
         amountMap.put(RATIO16x7, AmountGrid16x7);
         dateMap.put(RATIO16x9, DateGrid16x9);

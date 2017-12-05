@@ -78,7 +78,7 @@ public class RawBlock implements Comparable<RawBlock> {
         for (RawText rawText : rawTexts) {
             int distanceFromString = rawText.bruteSearch(string);
             if (distanceFromString <= maxDistance)
-                rawTextList.add(new RawStringResult(rawText, distanceFromString));
+                rawTextList.add(new RawStringResult(rawText, distanceFromString, string));
         }
         if (rawTextList.size()>0)
             return rawTextList;

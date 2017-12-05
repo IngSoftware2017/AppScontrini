@@ -1,5 +1,6 @@
 package com.ing.software.ocr;
 
+import java.math.RoundingMode;
 import java.util.List;
 
 import android.content.Context;
@@ -18,6 +19,9 @@ import com.ing.software.common.Ticket;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.Size;
+
+import static com.ing.software.ocr.OcrUtils.levDistance;
+
 
 /*
 USAGE:
@@ -53,7 +57,12 @@ public class DataAnalyzer {
      * @return 0 if everything ok, negative number if an error occurred
      */
     public int initialize(Context context) {
+		OcrUtils.log(1, "DataAnalyzer", "Initializing DataAnalyzer");
         return analyzer.initialize(context);
+    }
+
+    public void release() {
+        analyzer.release();
     }
 
     /**
@@ -83,7 +92,7 @@ public class DataAnalyzer {
                         OcrResult result = analyzer.analyze(req.photo);
                         req.ticketCb.onTicketReady(getTicketFromResult(result));
                         long endTime = System.nanoTime();
-                        long duration = (endTime - startTime)/1000000;
+                		double duration = ((double)(endTime - startTime))/1000000000;
                         OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
                     }
                 }
@@ -99,7 +108,7 @@ public class DataAnalyzer {
      */
     private static Ticket getTicketFromResult(OcrResult result) {
         Ticket ticket = new Ticket();
-        List<RawGridResult> dateMap = result.getDateList();
+        List<RawGridResult> dateList = result.getDateList();
         ticket.amount = getPossibleAmount(result.getAmountResults());
         return ticket;
     }
@@ -114,13 +123,16 @@ public class DataAnalyzer {
      */
     private static BigDecimal getPossibleAmount(@NonNull List<RawStringResult> amountResults) {
         List<RawGridResult> possibleResults = new ArrayList<>();
+        Collections.sort(amountResults);
         for (RawStringResult stringResult : amountResults) {
             //Ignore text with invalid distance (-1) according to findSubstring() documentation
             if (stringResult.getDistanceFromTarget() >= 0) {
                 RawText sourceText = stringResult.getSourceText();
                 int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * 10;
                 if (stringResult.getDetectedTexts() != null) {
-                    for (RawText rawText : stringResult.getDetectedTexts()) {
+                    //Here we order texts according to their distance (position) from source rect
+                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getDetectedTexts(), stringResult.getSourceText().getRect());
+                    for (RawText rawText : orderedDetectedTexts) {
                         if (!rawText.equals(sourceText)) {
                             possibleResults.add(new RawGridResult(rawText, singleCatch));
                             OcrUtils.log(2, "getPossibleAmount", "Analyzing source text: " + sourceText.getDetection() +
@@ -134,6 +146,10 @@ public class DataAnalyzer {
             }
         }
         if (possibleResults.size() > 0) {
+            /* Here we order considering their final probability to contain the amount:
+            If the probability is the same, the fallback is their previous order, so based on when
+            they are inserted.
+            */
             Collections.sort(possibleResults);
             BigDecimal amount;
             for (RawGridResult result : possibleResults) {
@@ -173,13 +189,14 @@ public class DataAnalyzer {
         } catch (Exception e2) {
             amount = null;
         }
+        if (amount != null)
+            amount = amount.setScale(2, RoundingMode.HALF_UP);
         return amount;
     }
 
     /**
      * @author Michelon
      * Tries to find a number in string that may contain also letters (ex. '€' recognized as 'e')
-     * Note: numbers written with exponential expressions (3E+10) are decoded right only if 1 exponential is present
      * @param targetAmount string containing possible amount. Length > 0.
      * @return string containing the amount, null if no number was found
      */
@@ -193,9 +210,18 @@ public class DataAnalyzer {
                 manipulatedAmount.append(singleChar);
                 numberPresent = true;
             } else if (singleChar=='.') {
+                //Should be replaced with a better analysis
+                if (targetAmount.length()-1 != i) { //bad way to check if it's last '.'
+                    String temp = manipulatedAmount.toString().replaceAll("\\.", ""); //Replace previous '.' so only last '.' is saved
+                    manipulatedAmount = new StringBuilder(temp);
+                }
                 manipulatedAmount.append(singleChar);
-            } else if (isExp(targetAmount, i)) {
-                manipulatedAmount.append(getExp(targetAmount, i));
+            //} else if (isExp(targetAmount, i)) { //Removes previous exponents
+            //    String temp = manipulatedAmount.toString().replaceAll("E", "");
+            //    temp = temp.replaceAll("\\+", "");
+            //    temp = temp.replaceAll("-", "");
+            //    manipulatedAmount = new StringBuilder(temp);
+            //    manipulatedAmount.append(getExp(targetAmount, i));
             } else if (singleChar == '-' && manipulatedAmount.length() == 0) { //If negative number
                 manipulatedAmount.append(singleChar);
             }
@@ -248,5 +274,86 @@ public class DataAnalyzer {
             if (Character.isDigit(text.charAt(startingPoint + 2)))
                 return text.substring(startingPoint, startingPoint + 2);
         return "";
+    }
+
+    /**
+     * @author Salvagno
+     * Accept a text and check if there is a combination of date format.
+     * Controllo per tutte le combinazioni simili a
+     * xx/xx/xxxx o xx/xx/xxxx o xxxx/xx/xx
+     * xx-xx-xxxx o xx-xx-xxxx o xxxx-xx-xx
+     * xx.xx.xxxx o xx.xx.xxxx xxxx.xx.xx
+     *
+     * @param text The text to find the date format
+     * @return the absolute value of the minimum distance found between all combinations,
+     * if the distance is >= 10 or the inserted text is empty returns -1
+     */
+    private static int findDate(String text) {
+        if (text.length() == 0)
+            return -1;
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        //Maximum number of characters in the date format
+        int minDistance = 10;
+        //Th eminimum of number combinations of date format without symbols like '/' or '.' or '-'
+        int minCharaterDate = 8;
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                    minDistance = distanceNow;
+            }
+        }
+
+        if(minDistance==10)
+            return -1;
+        else
+            //Returns the absolute value of the distance by subtracting the minimum character
+            return Math.abs(minCharaterDate-minDistance);
+
+    }
+
+
+    /**
+     * @author Salvagno
+     * It takes a text and returns the date if a similarity is found with a date format
+     *
+     * @param text The text to find the date
+     * @return date or null if the date is not there
+     */
+    private static String getDate(String text) {
+        if (text.length() == 0)
+            return null;
+
+        //Splits the string into tokens
+        String[] pack = text.split("\\s");
+
+        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+
+        //Maximum number of characters in the date format
+        int minDistance = 10;
+        String dataSearch = null;
+
+        for (String p : pack) {
+            for (String d : formatDate) {
+                //Convert string to uppercase
+                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
+                if (distanceNow < minDistance)
+                {
+                    minDistance = distanceNow;
+                    dataSearch = p.toUpperCase();
+                }
+
+            }
+        }
+
+
+        return dataSearch;
     }
 }
