@@ -59,7 +59,9 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
      * return boolean - if setting field is ok
      */
     private boolean checkCorrectField(){
-        return false;
+        if(nameMissionText.getText().equals("Nome")||startDateMissionText.getText().equals("Data Inizio")||endDateMissionText.getText().equals("Data Fine") )
+            return false;
+        return true;
     }
 
     @Override
@@ -85,6 +87,9 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 alertDialog.show();
             }
         }else if(view.getId() == R.id.saveButton){
+            if(checkCorrectField()){
+                //campi ok
+            }
 
         }
 
