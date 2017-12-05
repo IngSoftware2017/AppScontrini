@@ -25,13 +25,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton newMissionButton;
     ListView missionsList;
     TextView noticeEmptyText;
+    DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(com.sw.ing.gestionescontrini.R.layout.activity_main);
-        DataManager dbm = new DataManager(this);
+        dataManager = new DataManager(this);
 
         newMissionButton = findViewById(R.id.newMissionButton);
         missionsList = findViewById(R.id.missionsList);
