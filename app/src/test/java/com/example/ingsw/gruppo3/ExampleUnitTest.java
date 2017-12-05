@@ -1,4 +1,4 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.example.ingsw.gruppo3;
 
 import org.junit.Test;
 

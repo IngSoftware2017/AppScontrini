@@ -1,4 +1,4 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.example.ingsw.gruppo3;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;

@@ -1,4 +1,4 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.example.ingsw.gruppo3;
 
 /**
  * Created by nicoladalmaso on 01/12/17.

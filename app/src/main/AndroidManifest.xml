@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    package="com.example.nicoladalmaso.gruppo1">
+    package="com.example.ingsw.gruppo3">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivityGruppo1">
+        <activity android:name="com.example.ingsw.gruppo3.MainActivityGruppo1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,15 +40,15 @@
         </provider>
 
         <activity
-            android:name=".BillViewerGruppo1"
-            android:parentActivityName=".BillActivityGruppo1"
+            android:name="com.example.ingsw.gruppo3.BillViewerGruppo1"
+            android:parentActivityName="com.example.ingsw.gruppo3.BillActivityGruppo1"
             android:theme="@style/AppTheme.ActionBar.Transparent" />
         <activity
-            android:name=".BillActivityGruppo1"
-            android:parentActivityName=".MainActivityGruppo1" />
+            android:name="com.example.ingsw.gruppo3.BillActivityGruppo1"
+            android:parentActivityName="com.example.ingsw.gruppo3.MainActivityGruppo1" />
         <activity
-            android:name=".AddNewMissionGruppo1"
-            android:parentActivityName=".MainActivityGruppo1"/>
+            android:name="com.example.ingsw.gruppo3.AddNewMissionGruppo1"
+            android:parentActivityName="com.example.ingsw.gruppo3.MainActivityGruppo1"/>
     </application>
 
 </manifest>

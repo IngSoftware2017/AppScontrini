@@ -1,23 +1,27 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.example.ingsw.gruppo3;
 
 import android.graphics.Bitmap;
 
 /**
- * Created by nicoladalmaso on 30/11/17.
+ * Created by nicoladalmaso on 28/10/17.
  */
 
-public class MissioneGruppo1 {
+//CLASSE SCONTRINO CHE VIENE UTILIZZATA PER LA RAPPRESENTAZIONE GRAFICA SULLE CARDVIEW
+//Accetta titolo, descrizione e immagine che verranno prelevate dal db
+//Dal Maso
+public class ScontrinoGruppo1 {
 
     private String titolo;
-    private Bitmap img;
     private String descrizione;
+    private Bitmap img;
 
-    public MissioneGruppo1(){
+    public ScontrinoGruppo1(){
     }
 
-    public MissioneGruppo1(String titolo, String desc) {
+    public ScontrinoGruppo1(String titolo, String descrizione, Bitmap img) {
         this.titolo = titolo;
-        this.descrizione = desc;
+        this.descrizione = descrizione;
+        this.img = img;
     }
 
     public String getTitolo() {
