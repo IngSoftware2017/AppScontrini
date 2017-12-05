@@ -11,6 +11,9 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class BillViewer extends AppCompatActivity {
 
     //Dal Maso
@@ -25,9 +28,15 @@ public class BillViewer extends AppCompatActivity {
         Intent intent = getIntent();
         String imgPath = intent.getExtras().getString("imagePath");
         String imgName = intent.getExtras().getString("imageName");
+        String imgLastMod = intent.getExtras().getString("imgLastMod");
         setTitle(imgName);
+
+        TextView billLastMod = (TextView)findViewById(R.id.billLastMod);
+        billLastMod.setText(imgLastMod);
+
         TextView billName = (TextView)findViewById(R.id.billName);
         billName.setText(imgName);
+
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         Bitmap bitmap = BitmapFactory.decodeFile(imgPath,bmOptions);

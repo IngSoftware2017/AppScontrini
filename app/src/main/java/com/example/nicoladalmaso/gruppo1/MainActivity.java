@@ -46,14 +46,6 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Le tue missioni");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-       /* File newDir1 = new File(path + "/Missione 1");
-        File newDir2 = new File(path + "/Missione 2");
-        File newDir3 = new File(path + "/Missione 3");
-        File newDir4 = new File(path + "/Missione 4");
-        newDir1.mkdir();
-        newDir2.mkdir();
-        newDir3.mkdir();
-        newDir4.mkdir();*/
         File f = new File(path);
         File[] files = f.listFiles();
         for (File inFile : files) {

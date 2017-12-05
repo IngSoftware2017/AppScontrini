@@ -28,7 +28,7 @@
             android:layout_gravity="end"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="16dp"
-            app:srcCompat="@drawable/camera" />
+            app:srcCompat="@drawable/ic_done_white" />
     </RelativeLayout>
 
     <LinearLayout
@@ -76,7 +76,42 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="32dp"
             android:layout_marginTop="8dp"
+            android:text="Cena al ristorante" />
+
+        <TextView
+            android:id="@+id/totalTxt"
+            android:layout_marginTop="22dp"
+            android:layout_marginLeft="32dp"
+            android:textSize="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/total" />
+
+        <TextView
+            android:id="@+id/billTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="8dp"
+            android:text="22.50€" />
+
+        <TextView
+            android:id="@+id/lastModTxt"
+            android:layout_marginTop="22dp"
+            android:layout_marginLeft="32dp"
+            android:textSize="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/lastMod" />
+
+        <TextView
+            android:id="@+id/billLastMod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="8dp"
             android:text="..." />
+
     </LinearLayout>
 
 

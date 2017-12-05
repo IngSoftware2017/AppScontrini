@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -115,6 +116,10 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
                 startImageView.putExtra("imagePath", files[pos].getPath());
                 startImageView.putExtra("imageName", files[pos].getName());
+                SimpleDateFormat simpleDateFormat =
+                        new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
+                String date = simpleDateFormat.format(files[pos].lastModified());
+                startImageView.putExtra("imgLastMod", date);
                 context.startActivity(startImageView);
             }//onClick
         });
