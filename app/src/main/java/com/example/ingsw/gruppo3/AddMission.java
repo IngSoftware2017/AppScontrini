@@ -45,10 +45,10 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         addPersonButton.setOnClickListener(this);
         addPerson = findViewById(R.id.addPersonEditText);
         saveMissionButton = findViewById(R.id.saveButton);
-        nameMissionText = findViewById(R.id.nameText);
-        startDateMissionText = findViewById(R.id.starMissionText);
+        nameMissionText = findViewById(R.id.nameMissionEditText);
+        startDateMissionText = findViewById(R.id.startDateEditText);
         namePerson = findViewById(R.id.addPersonEditText);
-        endDateMissionText = findViewById(R.id.endMissionText);
+        endDateMissionText = findViewById(R.id.endMissionEditText);
         personsList = findViewById(R.id.personsList);
         personsList.setAdapter(adapter);
     }
