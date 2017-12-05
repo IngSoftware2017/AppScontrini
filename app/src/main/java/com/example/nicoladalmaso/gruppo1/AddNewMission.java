@@ -1,4 +1,4 @@
-package com.example.nicoladalmaso.gruppo1;
+    package com.example.nicoladalmaso.gruppo1;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class AddNewMission extends AppCompatActivity {
 
@@ -51,6 +53,21 @@ public class AddNewMission extends AppCompatActivity {
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
                 EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
                 String name = editName.getText().toString();
+                Log.d("verify null",name);
+                String voidChar=" ";
+                if((name==null)||name.equals(""))
+                    {
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        name="noName"+timeStamp;
+                    }
+                for(int i=0;i<100;i++)
+                    {   voidChar=voidChar+" ";
+                        if(name.equals(voidChar))
+                            {
+                                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                                name="noName"+timeStamp;
+                            }
+                    }
                 String description = editDescription.getText().toString();
                 //create new directory with input text
                 File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
