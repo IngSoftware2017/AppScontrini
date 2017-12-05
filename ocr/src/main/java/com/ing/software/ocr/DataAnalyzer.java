@@ -3,19 +3,14 @@ package com.ing.software.ocr;
 import java.math.RoundingMode;
 import java.util.List;
 
-import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
 import com.ing.software.ocr.OcrObjects.RawText;
-import com.ing.software.common.Ticket;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.Size;
@@ -23,95 +18,10 @@ import android.support.annotation.Size;
 import static com.ing.software.ocr.OcrUtils.levDistance;
 
 
-/*
-USAGE:
-1) Instantiate DataAnalyzer;
-2) Call initialize() until it returns 0;
-3) Call getTicket ad libitum to extract information (Ticket object) from a photo of a ticket.
-4) Call release() to release internal resources.
- */
-
 /**
  * Class used to extract informations from raw data
  */
 public class DataAnalyzer {
-
-    private final OcrAnalyzer analyzer = new OcrAnalyzer();
-
-    class AnalyzeRequest {
-        Bitmap photo;
-        OnTicketReadyListener ticketCb;
-
-        AnalyzeRequest(Bitmap bm, OnTicketReadyListener cb) {
-            photo = bm;
-            ticketCb = cb;
-        }
-    }
-
-    private Queue<AnalyzeRequest> analyzeQueue = new ConcurrentLinkedQueue<>();
-    private boolean analyzing = false;
-
-    /**
-     * Initialize OcrAnalyzer
-     * @param context Android context
-     * @return 0 if everything ok, negative number if an error occurred
-     */
-    public int initialize(Context context) {
-		OcrUtils.log(1, "DataAnalyzer", "Initializing DataAnalyzer");
-        return analyzer.initialize(context);
-    }
-
-    public void release() {
-        analyzer.release();
-    }
-
-    /**
-     * Get a Ticket from a Bitmap. Some fields of the new ticket can be null.
-     * @param photo Bitmap. Not null.
-     * @param ticketCb callback to get the ticket. Not null.
-     */
-    public void getTicket(@NonNull Bitmap photo, final OnTicketReadyListener ticketCb) {
-        analyzeQueue.add(new AnalyzeRequest(photo, ticketCb));
-        dispatchAnalysis();
-    }
-
-    /**
-     * Handle analysis requests
-     * @author Michelon
-     * @author Zaglia
-     */
-    private void dispatchAnalysis() {
-        if (!analyzing){
-            analyzing = true;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!analyzeQueue.isEmpty()) {
-                        final AnalyzeRequest req = analyzeQueue.remove();
-                        final long startTime = System.nanoTime();
-                        OcrResult result = analyzer.analyze(req.photo);
-                        req.ticketCb.onTicketReady(getTicketFromResult(result));
-                        long endTime = System.nanoTime();
-                		double duration = ((double)(endTime - startTime))/1000000000;
-                        OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
-                    }
-                }
-            }).start();
-            analyzing = false;
-        }
-    }
-
-    /**
-     * Coverts an OcrResult into a Ticket analyzing its data
-     * @param result OcrResult to analyze. Not null.
-     * @return Ticket. Some fields can be null;
-     */
-    private static Ticket getTicketFromResult(OcrResult result) {
-        Ticket ticket = new Ticket();
-        List<RawGridResult> dateList = result.getDateList();
-        ticket.amount = getPossibleAmount(result.getAmountResults());
-        return ticket;
-    }
 
     /**
      * @author Michelon
@@ -121,7 +31,7 @@ public class DataAnalyzer {
      * @param amountResults list of RawStringResult from amount search. Not null.
      * @return BigDecimal containing the amount found. Null if nothing found
      */
-    private static BigDecimal getPossibleAmount(@NonNull List<RawStringResult> amountResults) {
+    static BigDecimal getPossibleAmount(@NonNull List<RawStringResult> amountResults) {
         List<RawGridResult> possibleResults = new ArrayList<>();
         Collections.sort(amountResults);
         for (RawStringResult stringResult : amountResults) {
@@ -176,7 +86,7 @@ public class DataAnalyzer {
      * @param amountString string containing possible amount. Length > 0.
      * @return BigDecimal containing the amount, null if no number was found
      */
-    private static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
+    static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount;
         try {
             amount = new BigDecimal(amountString);
@@ -247,7 +157,7 @@ public class DataAnalyzer {
      * @param startingPoint position of 'E' (from 0 to text.length-1). Int >= 0.
      * @return true if it's a valid exponential form
      */
-    private static boolean isExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
+    static boolean isExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
         if (text.length() <= startingPoint + 2) //There must be at least E'num'
             return false;
         if (text.charAt(startingPoint)!='E')
@@ -268,7 +178,7 @@ public class DataAnalyzer {
      * @param startingPoint position of 'E'. Int >= 0.
      * @return String containing the exponential form (only 'E' and, if present, '+' or '-')
      */
-    private static String getExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
+    static String getExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
         if (Character.isDigit(text.charAt(startingPoint + 1)))
             return String.valueOf(text.charAt(startingPoint));
         else if (text.charAt(startingPoint + 1) == '+' || text.charAt(startingPoint + 1) == '-')
@@ -289,7 +199,7 @@ public class DataAnalyzer {
      * @return the absolute value of the minimum distance found between all combinations,
      * if the distance is >= 10 or the inserted text is empty returns -1
      */
-    private static int findDate(String text) {
+    static int findDate(String text) {
         if (text.length() == 0)
             return -1;
 
@@ -317,7 +227,6 @@ public class DataAnalyzer {
         else
             //Returns the absolute value of the distance by subtracting the minimum character
             return Math.abs(minCharaterDate-minDistance);
-
     }
 
 
@@ -328,7 +237,7 @@ public class DataAnalyzer {
      * @param text The text to find the date
      * @return date or null if the date is not there
      */
-    private static String getDate(String text) {
+    static String getDate(String text) {
         if (text.length() == 0)
             return null;
 
@@ -353,8 +262,6 @@ public class DataAnalyzer {
 
             }
         }
-
-
         return dataSearch;
     }
 }

@@ -36,7 +36,7 @@ public class OcrInstrumentedTests {
         final Semaphore sem = new Semaphore(0);
         int imgsTot = getTotImgs();
 
-        DataAnalyzer analyzer = new DataAnalyzer();
+        OcrManager analyzer = new OcrManager();
 
         int c = 0;
         int TIMEOUT = 60; // 1 min
