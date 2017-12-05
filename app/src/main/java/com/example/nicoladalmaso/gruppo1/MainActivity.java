@@ -37,13 +37,17 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import database.DataManager;
+import database.Mission;
+
 public class MainActivity extends AppCompatActivity {
     public List<Missione> list = new LinkedList<Missione>();
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle("Le tue missioni");
+        //DataManager db= new DataManager(this);
+        setTitle("Your missions");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         File f = new File(path);
@@ -62,6 +66,20 @@ public class MainActivity extends AppCompatActivity {
         });
         printAllMissions();
     }
+
+    /** PICCOLO
+     * Adds to the database the new mission
+     * @param title the title of the mission
+     * @param desc the description of the mission
+     */
+    public void addToList(String title, String desc,DataManager db){
+        Mission mis= new Mission();
+        String query="";
+        list.add(new Missione(title, desc));
+        ListView listView = (ListView)findViewById(R.id.listMission);
+        MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_card, list);
+        listView.setAdapter(adapter);
+    }//addToListDB
 
     /** Dal Maso
      * Aggiunge alla lista la nuova missione
@@ -119,4 +137,13 @@ public class MainActivity extends AppCompatActivity {
                 addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
         }
     }
+
+    /**PICCOLO
+     * printAllMissionsFile adapted for working with a database
+     * Prints the missions
+     * @param db the database containing the missions
+     */
+    public void printAllMissions(DataManager db){
+
+    }//printAllMissions
 }

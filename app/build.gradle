@@ -17,6 +17,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    //for javacv
+    lintOptions {
+        warning 'InvalidPackage'
+    }
+
+    packagingOptions {
+        exclude 'org/bytedeco/javacpp/**'
+        exclude '**/libav*.so'
+    }
 }
 
 dependencies {
@@ -25,6 +34,8 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile project (':database')
+    compile project (':ocr')
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support:design:26.1.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'

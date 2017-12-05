@@ -126,9 +126,9 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         return convertView;
     }
     /**PICCOLO_Edit by Dal Maso
-     * Metodo che cancella permette all'utente di ridimensionare la foto
-     * @param toCrop l'indice della foto di cui fire il resize
-     * @param path percorso della foto
+     * Method that lets the user crop the photo
+     * @param toCrop the index of the photo to resize
+     * @param path the path to the photo
      */
     public void cropFile(int toCrop, String path){
         Log.d("Crop", "Start crop activity");

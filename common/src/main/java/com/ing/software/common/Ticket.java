@@ -40,4 +40,8 @@ public class Ticket {
      * List of errors related to the creation or manipulation of the Ticket
      */
     public List<TicketError> errors = new ArrayList<>();
+
+    public String toString(){
+        return title+" "+date+" "+amount;
+    }//toString
 }
