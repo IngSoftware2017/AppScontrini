@@ -64,9 +64,14 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     public void onClick(View view) {
         if(view.getId() == R.id.addPersonButton){
             PersonEntity person = new PersonEntity();
-            person.setLastName(addPerson.getText().toString());
-            if(dataManager.addPerson(person)>0){
-                personEntityArrayList.add(person);
+            if(isCorrectCognomePerson()) {
+                person.setLastName(addPerson.getText().toString());
+                if (dataManager.addPerson(person) > 0) {
+                    personEntityArrayList.add(person);
+                }
+            }
+            else {
+                //visualizza messaggio errore
             }
         }else if(view.getId() == R.id.saveButton){
 
