@@ -7,14 +7,14 @@
     tools:context="com.example.ingsw.gruppo3.AddMission">
 
     <EditText
-        android:id="@+id/nameText"
+        android:id="@+id/nameMissionEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.034"
+        app:layout_constraintHorizontal_bias="0.111"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView2"
@@ -22,58 +22,32 @@
         tools:ignore="MissingConstraints"
         tools:text="@string/nameMission_string" />
 
-    <EditText
-        android:id="@+id/starMissionText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="104dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nameText"
-        tools:ignore="MissingConstraints"
-        tools:text="@string/startMission_string" />
-
-    <EditText
-        android:id="@+id/endMissionText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="104dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/starMissionText"
-        tools:ignore="MissingConstraints"
-        tools:text="@string/endMission_string" />
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="345dp"
         android:layout_height="25dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
         android:text="Seleziona o inserisci la persona della missione:"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.347"
+        app:layout_constraintHorizontal_bias="0.521"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/endMissionText"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="196dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginTop="8dp"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/personsList"
+        app:layout_constraintVertical_bias="0.937"
         app:srcCompat="@android:drawable/ic_menu_save"
         tools:ignore="MissingConstraints" />
 
@@ -82,9 +56,9 @@
         android:layout_width="355dp"
         android:layout_height="179dp"
         android:layout_margin="10dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.517"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addPersonEditText"
@@ -97,7 +71,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="@string/addPersonTextField"
@@ -118,18 +92,19 @@
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@+id/personsList"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.048"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/addPersonEditText"
         app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.709"
         app:srcCompat="@android:drawable/ic_input_add" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="53dp"
-        android:layout_height="18dp"
+        android:layout_height="23dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:text="@string/nameMission_string"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,11 +114,9 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="44dp"
         android:text="@string/startMission_string"
-        app:layout_constraintEnd_toStartOf="@+id/starMissionText"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -151,12 +124,34 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="21dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="40dp"
         android:text="@string/endMission_string"
-        app:layout_constraintEnd_toStartOf="@+id/endMissionText"
+        app:layout_constraintEnd_toStartOf="@+id/endMissionEditText"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <EditText
+        android:id="@+id/startDateEditText"
+        android:layout_width="208dp"
+        android:layout_height="50dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/startMission_string"
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_editor_absoluteY="66dp" />
+
+    <EditText
+        android:id="@+id/endMissionEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="80dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/endMission_string"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_editor_absoluteY="130dp" />
 
 </android.support.constraint.ConstraintLayout>
