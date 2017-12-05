@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Gruppo1</string>
+    <!--<string name="app_name">Gruppo1</string>-->
 
     <string name="title_activity_collapse">Collapse</string>
     <string name="dummy_button">Dummy Button</string>

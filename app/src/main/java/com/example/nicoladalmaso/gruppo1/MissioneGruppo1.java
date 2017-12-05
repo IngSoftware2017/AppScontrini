@@ -6,16 +6,16 @@ import android.graphics.Bitmap;
  * Created by nicoladalmaso on 30/11/17.
  */
 
-public class Missione {
+public class MissioneGruppo1 {
 
     private String titolo;
     private Bitmap img;
     private String descrizione;
 
-    public Missione(){
+    public MissioneGruppo1(){
     }
 
-    public Missione(String titolo, String desc) {
+    public MissioneGruppo1(String titolo, String desc) {
         this.titolo = titolo;
         this.descrizione = desc;
     }

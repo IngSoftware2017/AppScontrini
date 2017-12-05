@@ -1,23 +1,21 @@
 package com.example.nicoladalmaso.gruppo1;
 
-import android.app.Application;
-
 /**
  * Created by nicoladalmaso on 01/12/17.
  */
 
-public class Variables{
-    private static Variables mInstance = null;
+public class VariablesGruppo1 {
+    private static VariablesGruppo1 mInstance = null;
     private String currentMissionDir;
 
-    private Variables(){
+    private VariablesGruppo1(){
         currentMissionDir = "";
     }
 
-    public static Variables getInstance(){
+    public static VariablesGruppo1 getInstance(){
         if(mInstance == null)
         {
-            mInstance = new Variables();
+            mInstance = new VariablesGruppo1();
         }
         return mInstance;
     }

@@ -3,12 +3,8 @@ package com.example.nicoladalmaso.gruppo1;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -19,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -32,14 +27,14 @@ import java.util.List;
 
 //Classe utilizzata per dupplicare la view cardview all'interno della ListView
 //Dal Maso
-public class CustomAdapter extends ArrayAdapter<Scontrino> {
+public class CustomAdapterGruppo1 extends ArrayAdapter<ScontrinoGruppo1> {
 
     Context context;
     String path = "";
     int pos = 0;
 
-    public CustomAdapter(Context context, int textViewResourceId,
-                         List<Scontrino> objects) {
+    public CustomAdapterGruppo1(Context context, int textViewResourceId,
+                                List<ScontrinoGruppo1> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
     }
@@ -54,7 +49,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         TextView descrizione = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
-        Scontrino c = getItem(position);
+        ScontrinoGruppo1 c = getItem(position);
         titolo.setText(c.getTitolo());
         descrizione.setText(c.getDescrizione());
         img.setImageBitmap(c.getImg());
@@ -66,7 +61,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 pos =  Integer.parseInt(v.getTag().toString());
                 Log.d("TAG", v.getTag().toString());
                 //context.deletePhoto(v);
-                path = Variables.getInstance().getCurrentMissionDir();
+                path = VariablesGruppo1.getInstance().getCurrentMissionDir();
                 Log.d("Dir", path);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -78,8 +73,8 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                         File directory = new File(path);
                         File[] files = directory.listFiles();
                         if(files[pos].delete()){
-                            ((BillActivity)context).clearAllImages();
-                            ((BillActivity)context).printAllImages();
+                            ((BillActivityGruppo1)context).clearAllImages();
+                            ((BillActivityGruppo1)context).printAllImages();
                         }
                     }
                 });
@@ -98,7 +93,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         fabCrop.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path = Variables.getInstance().getCurrentMissionDir();
+                path = VariablesGruppo1.getInstance().getCurrentMissionDir();
                 cropFile(pos,path);
                 /*File directory =new File(path);
                 File[] files =directory.listFiles();
@@ -109,10 +104,10 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path = Variables.getInstance().getCurrentMissionDir();
+                path = VariablesGruppo1.getInstance().getCurrentMissionDir();
                 File directory = new File(path);
                 File[] files = directory.listFiles();
-                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
+                Intent startImageView = new Intent(context, BillViewerGruppo1.class);
                 startImageView.putExtra("imagePath", files[pos].getPath());
                 startImageView.putExtra("imageName", files[pos].getName());
                 context.startActivity(startImageView);
@@ -132,7 +127,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop]))
                 .setOutputUri(Uri.fromFile(files[toCrop]))
-                .start(((BillActivity)context));
+                .start(((BillActivityGruppo1)context));
         //files[toCrop].delete();
     }//cropFile
 

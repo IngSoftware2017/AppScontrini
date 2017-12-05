@@ -36,10 +36,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BillActivity extends AppCompatActivity {
+public class BillActivityGruppo1 extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
     public Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    public List<Scontrino> list = new LinkedList<Scontrino>();
+    public List<ScontrinoGruppo1> list = new LinkedList<ScontrinoGruppo1>();
     public Uri photoURI;
     public boolean isFabOpen = false;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -55,7 +55,7 @@ public class BillActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         Intent intent = getIntent();
-        Log.d("Memes", Variables.getInstance().getCurrentMissionDir());
+        Log.d("Memes", VariablesGruppo1.getInstance().getCurrentMissionDir());
         String missionName = intent.getExtras().getString("missionName");
         pos = intent.getExtras().getInt("missionId");
         context = this.getApplicationContext();
@@ -155,16 +155,16 @@ public class BillActivity extends AppCompatActivity {
      * @param img Bitmap della foto
      */
     public void addToList(String title, String desc, Bitmap img){
-        list.add(new Scontrino(title, desc, img));
+        list.add(new ScontrinoGruppo1(title, desc, img));
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapterGruppo1 adapter = new CustomAdapterGruppo1(this, R.layout.cardview, list);
         listView.setAdapter(adapter);
     }
 
     public void addToMissionGrid(String title, String desc, Bitmap img){
-        list.add(new Scontrino(title, desc, img));
+        list.add(new ScontrinoGruppo1(title, desc, img));
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapterGruppo1 adapter = new CustomAdapterGruppo1(this, R.layout.cardview, list);
         listView.setAdapter(adapter);
     }
 
@@ -174,7 +174,7 @@ public class BillActivity extends AppCompatActivity {
     public void deleteMission(){
         //Lazzarin
         Log.d("tagMission", "" + pos);
-        AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
+        AlertDialog.Builder toast = new AlertDialog.Builder(BillActivityGruppo1.this);
 
         toast.setMessage("Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati")
                 .setTitle("Cancellazione");
@@ -241,7 +241,7 @@ public class BillActivity extends AppCompatActivity {
      */
     private File createImageFile() throws IOException {
         // Create an image file name
-        File storageDir = new File(Variables.getInstance().getCurrentMissionDir());
+        File storageDir = new File(VariablesGruppo1.getInstance().getCurrentMissionDir());
         File image = File.createTempFile(
                 "temp",  /* prefix */
                 ".jpg",         /* suffix */
@@ -339,7 +339,7 @@ public class BillActivity extends AppCompatActivity {
      * @param imageToSave bitmap da salvare come jpeg
      */
     private void savePickedFile(Bitmap imageToSave) {
-        String root = Variables.getInstance().getCurrentMissionDir();
+        String root = VariablesGruppo1.getInstance().getCurrentMissionDir();
         File myDir = new File(root);
         myDir.mkdirs();
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -391,7 +391,7 @@ public class BillActivity extends AppCompatActivity {
      */
     private File temporaryFile()
     {
-        String root = Variables.getInstance().getCurrentMissionDir();
+        String root = VariablesGruppo1.getInstance().getCurrentMissionDir();
         File myDir = new File(root);
         String imageFileName = "photoToCrop.jpg";
         File file = new File(myDir, imageFileName);
@@ -406,7 +406,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapterGruppo1 adapter = new CustomAdapterGruppo1(this, R.layout.cardview, list);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
@@ -418,7 +418,7 @@ public class BillActivity extends AppCompatActivity {
      * @return ritorna tutti i file letti nella cartella
      */
     private File[] readAllImages(){
-        String path = Variables.getInstance().getCurrentMissionDir();
+        String path = VariablesGruppo1.getInstance().getCurrentMissionDir();
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files=null;

@@ -11,7 +11,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class BillViewer extends AppCompatActivity {
+public class BillViewerGruppo1 extends AppCompatActivity {
 
     //Dal Maso
     @Override

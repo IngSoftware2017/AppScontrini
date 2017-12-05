@@ -23,9 +23,8 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
-
+    
     packagingOptions {
-        pickFirst 'protobuf.meta'  //patch
         exclude 'org/bytedeco/javacpp/**'
         exclude '**/libav*.so'
     }

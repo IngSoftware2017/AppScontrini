@@ -25,6 +25,11 @@ android {
             testCoverageEnabled = true
         }
     }
+
+    packagingOptions {
+        exclude 'org/bytedeco/javacpp/**'
+        exclude '**/libav*.so'
+    }
 }
 
 dependencies {

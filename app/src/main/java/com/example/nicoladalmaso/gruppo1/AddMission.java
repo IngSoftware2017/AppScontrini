@@ -1,14 +1,11 @@
-package com.sw.ing.gestionescontrini;
+package com.example.nicoladalmaso.gruppo1;
 
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-
-/**
- * Created by Marco Olivieri on 03/12/2017
- */
 
 public class AddMission extends AppCompatActivity {
 
