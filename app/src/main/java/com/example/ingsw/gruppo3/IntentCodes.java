@@ -6,5 +6,5 @@ package com.example.ingsw.gruppo3;
 
 public class IntentCodes {
 
-    public static final String DATAMANAGER_INTENT_CODE = "DATAMANAGER";
+    public static final String MAINACTIVITY = "DATAMANAGER";
 }

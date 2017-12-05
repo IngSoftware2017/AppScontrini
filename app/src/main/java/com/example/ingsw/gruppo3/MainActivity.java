@@ -9,22 +9,24 @@ import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
 
 /**
  * Modified by Marco Olivieri on 03/12/2017
  * Modified by Step on 03/12/2017.
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Serializable{
 
     FloatingActionButton newMissionButton;
     ListView missionsList;
     TextView noticeEmptyText;
-    DataManager dataManager;
+    static DataManager dataManager;
     List<MissionEntity> missions;
     MissionAdapter adapter;
 
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void callAddmission(){
         Intent callAddMission = new Intent(this, AddMission.class);
-        callAddMission.putExtra(IntentCodes.DATAMANAGER_INTENT_CODE,dataManager);
+        //callAddMission.putExtra(IntentCodes.MAINACTIVITY,this);
         startActivity(callAddMission);
     }
 
@@ -77,8 +79,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void loadMissions(){
         missions.addAll(dataManager.getAllMissions());
     }
-    public void addMission(MissionEntity missionEntity) {
-        missions.add(missionEntity);
+
+    public int addPerson(PersonEntity personEntity){
+        return dataManager.addPerson(personEntity);
     }
 
 }

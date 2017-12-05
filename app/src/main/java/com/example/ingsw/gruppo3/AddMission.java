@@ -32,7 +32,6 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     ListView personsList;
     ArrayList<PersonEntity> personEntityArrayList;
     AddMissionAdapter adapter;
-    DataManager dataManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +42,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         adapter = new AddMissionAdapter(this, R.layout.person_row_custom, personEntityArrayList);
 
         addPersonButton = findViewById(R.id.addPersonButton);
+        addPersonButton.setOnClickListener(this);
         addPerson = findViewById(R.id.addPersonEditText);
         saveMissionButton = findViewById(R.id.saveButton);
         nameMissionText = findViewById(R.id.nameText);
@@ -51,7 +51,6 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         endDateMissionText = findViewById(R.id.endMissionText);
         personsList = findViewById(R.id.personsList);
         personsList.setAdapter(adapter);
-        dataManager = (DataManager) getIntent().getSerializableExtra(IntentCodes.DATAMANAGER_INTENT_CODE);
     }
 
     /**
@@ -70,8 +69,9 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
             PersonEntity person = new PersonEntity();
             if(isCorrectCognomePerson()) {
                 person.setLastName(addPerson.getText().toString());
-                if (dataManager.addPerson(person) > 0) {
+                if (MainActivity.dataManager.addPerson(person) > 0) {
                     personEntityArrayList.add(person);
+                    adapter.notifyDataSetChanged();
                 }
             }
             else {
