@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
         MissionEntity test = new MissionEntity("name",null,null,"location",1);
         List<MissionEntity> missions = new ArrayList<MissionEntity>();
-        missions.add(new MissionEntity()); //fake mission
         missions.add(test);
         MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_row_custom, missions);
         missionsList.setAdapter(adapter);
