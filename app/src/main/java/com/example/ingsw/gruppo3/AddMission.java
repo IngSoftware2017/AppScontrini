@@ -1,6 +1,8 @@
 package com.example.ingsw.gruppo3;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -71,7 +73,16 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 }
             }
             else {
-                //visualizza messaggio errore
+                AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Errore");
+                alertDialog.setMessage("Nome non valido");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
             }
         }else if(view.getId() == R.id.saveButton){
 
