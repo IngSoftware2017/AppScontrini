@@ -37,8 +37,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import database.DataManager;
+
 public class MainActivity extends AppCompatActivity {
     public List<Missione> list = new LinkedList<Missione>();
+    DataManager dataManager;
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
