@@ -16,4 +16,6 @@
     <string name="nameMission_string">Nome Missione</string>
     <string name="startMission_string">Data Inizio Missione</string>
     <string name="endMission_string">Data Fine Missione</string>
+    <string name="addPersonTextViewListItem">Aggiungi una persona</string>
+    <string name="title_activity_test">TestActivity</string>
 </resources>

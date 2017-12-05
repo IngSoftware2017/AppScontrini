@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.example.ingsw.gruppo3.MainActivityGruppo1">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,15 +40,15 @@
         </provider>
 
         <activity
-            android:name="com.example.ingsw.gruppo3.BillViewerGruppo1"
-            android:parentActivityName="com.example.ingsw.gruppo3.BillActivityGruppo1"
+            android:name=".BillViewerGruppo1"
+            android:parentActivityName=".BillActivityGruppo1"
             android:theme="@style/AppTheme.ActionBar.Transparent" />
         <activity
-            android:name="com.example.ingsw.gruppo3.BillActivityGruppo1"
-            android:parentActivityName="com.example.ingsw.gruppo3.MainActivityGruppo1" />
+            android:name=".BillActivityGruppo1"
+            android:parentActivityName=".MainActivityGruppo1" />
         <activity
-            android:name="com.example.ingsw.gruppo3.AddNewMissionGruppo1"
-            android:parentActivityName="com.example.ingsw.gruppo3.MainActivityGruppo1"/>
+            android:name=".AddMission"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

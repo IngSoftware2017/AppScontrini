@@ -8,30 +8,49 @@
 
     <TextView
         android:id="@+id/emptyNoticeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="369dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
         android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.017"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="82dp"
-        tools:layout_editor_absoluteY="62dp"
         tools:text="@string/emptyMission_string" />
-
-    <ListView
-        android:id="@+id/missionsList"
-        android:layout_width="384dp"
-        android:layout_height="515dp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="-3dp"
-        tools:ignore="MissingConstraints" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/newMissionButton"
-        android:layout_width="45dp"
+        android:layout_width="44dp"
         android:layout_height="47dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="324dp"
+        android:layout_marginTop="8dp"
         android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.982"
         app:srcCompat="@android:drawable/ic_input_add"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="323dp"
-        tools:layout_editor_absoluteY="450dp" />
+        tools:ignore="MissingConstraints" />
+
+    <ListView
+        android:id="@+id/missionsList"
+        android:layout_width="395dp"
+        android:layout_height="509dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:defaultFocusHighlightEnabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>

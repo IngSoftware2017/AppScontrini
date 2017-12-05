@@ -10,72 +10,94 @@
         android:id="@+id/nameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp"
-        tools:text="@string/nameMission_string"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.098"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:text="@string/nameMission_string" />
 
     <EditText
         android:id="@+id/starMissionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:inputType="date"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="78dp"
-        tools:text="@string/startMission_string"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.098"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameText"
+        tools:ignore="MissingConstraints"
+        tools:text="@string/startMission_string" />
 
     <EditText
         android:id="@+id/endMissionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:inputType="date"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="147dp"
-        tools:text="@string/endMission_string"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.098"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/starMissionText"
+        tools:ignore="MissingConstraints"
+        tools:text="@string/endMission_string" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="342dp"
         android:layout_height="25dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
         android:text="Seleziona o inserisci la persona della missione:"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="206dp"
-        tools:ignore="MissingConstraints" />
-
-    <ListView
-        android:id="@+id/personsList"
-        android:layout_width="355dp"
-        android:layout_height="170dp"
-        tools:layout_editor_absoluteX="15dp"
-        tools:layout_editor_absoluteY="281dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/endMissionText"
         tools:ignore="MissingConstraints" />
 
     <EditText
         android:id="@+id/editText5"
         android:layout_width="213dp"
         android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Cognome nuova persona"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="235dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.096"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:ignore="MissingConstraints" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addPersonButton"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
+        android:layout_width="38dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="8dp"
         android:clickable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.019"
+        app:layout_constraintStart_toEndOf="@+id/editText5"
         app:srcCompat="@android:drawable/ic_input_add"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="238dp"
-        tools:layout_editor_absoluteY="238dp" />
+        tools:layout_editor_absoluteY="212dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/saveButton"
@@ -83,9 +105,9 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         app:srcCompat="@android:drawable/ic_menu_save"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="328dp"
-        tools:layout_editor_absoluteY="464dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="464dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/deleteButton"
@@ -93,8 +115,17 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         app:srcCompat="@android:drawable/ic_delete"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="464dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="464dp" />
+
+    <ListView
+        android:id="@+id/personsList"
+        android:layout_width="355dp"
+        android:layout_height="170dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="281dp" />
 
 </android.support.constraint.ConstraintLayout>
