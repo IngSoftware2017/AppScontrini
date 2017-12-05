@@ -39,7 +39,7 @@ import java.util.List;
 
 import database.DataManager;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivityGruppo1 extends AppCompatActivity {
     public List<Missione> list = new LinkedList<Missione>();
     DataManager dataManager;
     //Dal Maso

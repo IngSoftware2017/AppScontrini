@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -184,7 +183,7 @@ public class BillActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
                 File[] files = directory.listFiles();
-                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
+                Intent startMissionView = new Intent(context, MainActivityGruppo1.class);
                 File[] bill = files[pos].listFiles();
                 Log.d("number of elements", bill.length+"");
                 int count = bill.length;

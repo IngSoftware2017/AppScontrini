@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivityGruppo1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,10 +45,10 @@
             android:theme="@style/AppTheme.ActionBar.Transparent" />
         <activity
             android:name=".BillActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivityGruppo1" />
         <activity
             android:name=".AddNewMission"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivityGruppo1"/>
     </application>
 
 </manifest>

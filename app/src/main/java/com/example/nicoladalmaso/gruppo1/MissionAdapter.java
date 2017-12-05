@@ -106,8 +106,8 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
                               File directory = new File(path);
                               File[] files = directory.listFiles();
                               if(files[pos].delete()){
-                                  ((MainActivity)context).clearAllMissions();
-                                  ((MainActivity)context).printAllMissions();
+                                  ((MainActivityGruppo1)context).clearAllMissions();
+                                  ((MainActivityGruppo1)context).printAllMissions();
                               }
                           }
                       });
