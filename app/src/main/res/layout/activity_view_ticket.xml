@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sw.ing.gestionescontrini.ViewTicket">
+
+    <TextView
+        android:id="@+id/categoryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tag"
+        tools:layout_editor_absoluteX="45dp"
+        tools:layout_editor_absoluteY="169dp" />
+
+    <TextView
+        android:id="@+id/amountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Prezzo"
+        tools:layout_editor_absoluteX="45dp"
+        tools:layout_editor_absoluteY="229dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/ticketView"
+        android:layout_width="148dp"
+        android:layout_height="162dp"
+        app:srcCompat="@android:drawable/ic_menu_gallery"
+        tools:layout_editor_absoluteX="187dp"
+        tools:layout_editor_absoluteY="86dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/nameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nome Scontrino"
+        tools:layout_editor_absoluteX="45dp"
+        tools:layout_editor_absoluteY="86dp"
+        tools:ignore="MissingConstraints" />
+</android.support.constraint.ConstraintLayout>

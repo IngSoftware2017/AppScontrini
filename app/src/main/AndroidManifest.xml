@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    package="com.example.nicoladalmaso.gruppo1">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -10,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    package="com.example.nicoladalmaso.gruppo1">
 
     <application
         android:allowBackup="true"
@@ -49,6 +49,8 @@
         <activity
             android:name=".AddNewMission"
             android:parentActivityName=".MainActivityGruppo1"/>
+        <activity android:name=".AddMission" />
+        <activity android:name=".ViewTicket"></activity>
     </application>
 
 </manifest>

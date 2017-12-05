@@ -11,4 +11,9 @@
     <string name="description">Descrizione</string>
     <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="app_name">Missions</string>
+    <string name="emptyMission_string">Nessun missione presente.\nAggiungi una missione con il tasto +</string>
+    <string name="nameMission_string">Nome Missione</string>
+    <string name="startMission_string">Data Inizio Missione</string>
+    <string name="endMission_string">Data Fine Missione</string>
 </resources>
