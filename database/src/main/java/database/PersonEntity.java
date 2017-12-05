@@ -13,7 +13,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = Constants.PERSON_TABLE_NAME) @TypeConverters(Converters.class)
 
-public class Person {
+public class PersonEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.PERSON_PRIMARY_KEY_NAME)
@@ -26,7 +26,7 @@ public class Person {
     /**
      * Non parametric constructor
      */
-    public Person() {
+    public PersonEntity() {
     }
 
     /**
@@ -36,14 +36,14 @@ public class Person {
      * @param lastName Last Name of the person
      * @param academicTitle Academic Title of the person
      */
-    public Person(String name, String lastName, String academicTitle) {
+    public PersonEntity(String name, String lastName, String academicTitle) {
         this.name = name;
         this.lastName = lastName;
         this.academicTitle = academicTitle;
     }
 
     /**
-     * Returns the Person ID
+     * Returns the PersonEntity ID
      * @return ID
      */
     public int getID() {
