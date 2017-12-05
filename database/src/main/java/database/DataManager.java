@@ -110,6 +110,11 @@ public class DataManager {
         return database.ticketDao().getAllTickets();
     }
 
+    public List<Mission> getAllMissions(){ return database.ticketDao().getAllMission();}
+
+    public List<Person> getAllPersons(){ return database.ticketDao().getAllPerson();}
+
+
 
 //    /**
 //     Turns a List of TicketEntity into a List of Ticket

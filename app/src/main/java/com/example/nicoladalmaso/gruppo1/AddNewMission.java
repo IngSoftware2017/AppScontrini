@@ -20,7 +20,7 @@ public class AddNewMission extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle("Nuova missione");
+        setTitle("New Mission");
         setContentView(R.layout.activity_add_new_mission);
         context = this.getApplicationContext();
     }

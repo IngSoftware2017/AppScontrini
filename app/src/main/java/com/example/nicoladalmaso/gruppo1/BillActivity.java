@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
@@ -368,10 +369,10 @@ public class BillActivity extends AppCompatActivity {
                  *
                  * @param ticket new Ticket. Never null.
                  */
-                @Override//TODO SISTEMARE GLI OGGETTI
+                @Override
                 public void onTicketReady(com.ing.software.common.Ticket ticket) {
                     //TODO:SAVE THE DATA EXTRACTED FROM THE IMAGE
-                    Toast.makeText(context, ticket.toString(), Toast.LENGTH_SHORT).show();
+                    Log.d("Ticket", "aaa "+ticket.toString());
                 }//onTicketReady
             });//OnTicketReadyListener
             ocr.release();

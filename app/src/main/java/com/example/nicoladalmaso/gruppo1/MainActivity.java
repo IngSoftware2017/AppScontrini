@@ -37,16 +37,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import database.Constants;
 import database.DataManager;
 import database.Mission;
 
 public class MainActivity extends AppCompatActivity {
     public List<Missione> list = new LinkedList<Missione>();
+    public List<Mission> listMission = new LinkedList<Mission>();
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //DataManager db= new DataManager(this);
+        DataManager db= new DataManager(this);
         setTitle("Your missions");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
@@ -64,18 +66,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(addMission);
             }
         });
-        printAllMissions();
+        //printAllMissions();
+        printAllMissionsDB(db);
     }
 
     /** PICCOLO
-     * Adds to the database the new mission
-     * @param title the title of the mission
-     * @param desc the description of the mission
+     * Adds in the database the new mission
+     * @param toAdd mission to be added
+     * @param db DataManager where the mission should be added
      */
-    public void addToList(String title, String desc,DataManager db){
-        Mission mis= new Mission();
-        String query="";
-        list.add(new Missione(title, desc));
+    public void addToList(Mission toAdd,DataManager db){
+        db.addMission(toAdd);
+        //listMission.add(Mission);
         ListView listView = (ListView)findViewById(R.id.listMission);
         MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_card, list);
         listView.setAdapter(adapter);
@@ -117,6 +119,40 @@ public class MainActivity extends AppCompatActivity {
         emptyAdapter.notifyDataSetChanged();
         listView.setAdapter(emptyAdapter);}
 
+    /** PICCOLO
+     * printAllMissionsFile adapted for working with a database
+     * Prints the missions
+     * @param db the database containing the missions
+     */
+    public void printAllMissionsDB(DataManager db){
+        List<Mission> missionsList=db.getAllMissions();
+        TextView noMissions = (TextView)findViewById(R.id.noMissions);
+        if(missionsList.size()==0){
+            noMissions.setVisibility(View.VISIBLE);
+        }//if
+        else{
+            noMissions.setVisibility(View.INVISIBLE);
+        }//else
+        for(int i=0; i<missionsList.size(); i++){
+            addToList(missionsList.get(i));
+            //TODO:COSE
+        }//for
+        /*File[] files = readAllMissions();
+        if(files.length == 0){
+            noMissions.setVisibility(View.VISIBLE);
+        }
+        else{
+            noMissions.setVisibility(View.INVISIBLE);
+        }
+        for (int i = 0; i < files.length; i++)
+        {
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat("HH:mm'\n'dd/MM/yyyy");
+            if(files[i].isDirectory())
+                addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
+        }*/
+    }//printAllMissionsDB
+
     /** Dal Maso
      *  Stampa tutte le immagini
      */
@@ -137,13 +173,4 @@ public class MainActivity extends AppCompatActivity {
                 addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
         }
     }
-
-    /**PICCOLO
-     * printAllMissionsFile adapted for working with a database
-     * Prints the missions
-     * @param db the database containing the missions
-     */
-    public void printAllMissions(DataManager db){
-
-    }//printAllMissions
 }
