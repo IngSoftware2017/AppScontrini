@@ -11,7 +11,6 @@ import static junit.framework.Assert.assertEquals;
 /**
  * Can't test directly with the equivalent BigDecimal cause of approximation
  */
-
 public class DataAnalyzerTest {
 
     @Test
