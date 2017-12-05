@@ -185,6 +185,7 @@ public class BillActivity extends AppCompatActivity {
                 File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
                 File[] files = directory.listFiles();
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
+                startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 File[] bill = files[pos].listFiles();
                 Log.d("number of elements", bill.length+"");
                 int count = bill.length;
