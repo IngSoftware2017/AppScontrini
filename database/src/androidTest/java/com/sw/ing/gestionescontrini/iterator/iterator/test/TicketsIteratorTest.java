@@ -39,7 +39,7 @@ public class TicketsIteratorTest {
         // Generate numIMG of imagine to insert into the Iterator and it save each one of it into an
         // Bitmap array usefull for testing of the get method
         while (i <= numIMG) {
-            // Generation of the fake Ticket Bitmap
+            // Generation of the fake TicketEntity Bitmap
             try {
                 /*
                  * Two different ways to auto-generation fake imagine for testing. Necessary Mock Test!!

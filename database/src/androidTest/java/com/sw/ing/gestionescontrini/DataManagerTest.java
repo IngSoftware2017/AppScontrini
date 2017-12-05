@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import database.DataManager;
-import database.Ticket;
+import database.TicketEntity;
 
 import static org.junit.Assert.*;
 /**
@@ -25,12 +25,12 @@ public class DataManagerTest {
 
     @Test
     public void TicketCreationShouldReturnAFailure(){
-        assertTrue(dbm.addTicket(new Ticket())==-1);
+        assertTrue(dbm.addTicket(new TicketEntity())==-1);
     }
 
     @Test
     public void TicketUpdateShouldReturnFalse(){
-        assertFalse(dbm.updateTicket(new Ticket()));
+        assertFalse(dbm.updateTicket(new TicketEntity()));
     }
 
     @Test
