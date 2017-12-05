@@ -18,4 +18,5 @@
     <string name="endMission_string">Data Fine Missione</string>
     <string name="addPersonTextViewListItem">Aggiungi una persona</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="addPersonTextField">Cognome</string>
 </resources>

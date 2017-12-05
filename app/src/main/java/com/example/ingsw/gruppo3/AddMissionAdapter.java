@@ -36,17 +36,6 @@ public AddMissionAdapter(Context context, int textViewResourceId, List<PersonEnt
 public View getView(int position, View convertView, ViewGroup parent){
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if(position == 0) {
-            AddPersonHolder holder;
-            if (convertView == null) {
-                convertView = inflater.inflate(R.layout.add_person_row_item, null);
-                holder = new AddPersonHolder();
-                convertView.setTag(holder);
-            } else {
-                holder = (AddPersonHolder) convertView.getTag();
-            }
-            PersonEntity personEntity = getItem(position);
-        }else{
             PersonViewerHolder personViewerHolder;
             if(convertView == null){
                 convertView = inflater.inflate(R.layout.person_row_custom,null);
@@ -58,7 +47,6 @@ public View getView(int position, View convertView, ViewGroup parent){
             }
             PersonEntity personEntity = getItem(position);
             personViewerHolder.personSurnameTextView.setText(personEntity.getLastName());
-        }
 
         return convertView;
         }
@@ -75,12 +63,9 @@ public int getItemViewType(int position) {
         return 0;
         }
 
-static class PersonViewerHolder {
-    private TextView personSurnameTextView;
+    static class PersonViewerHolder {
+        private TextView personSurnameTextView;
+    }
 }
-static class AddPersonHolder{
-    private TextView textView;
-    private FloatingActionButton addPersonButton;
-}
-}
+
 
