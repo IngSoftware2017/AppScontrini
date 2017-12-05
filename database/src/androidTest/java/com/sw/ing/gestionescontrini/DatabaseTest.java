@@ -17,9 +17,9 @@ import java.util.Date;
 
 import database.DAO;
 import database.Database;
-import database.Mission;
-import database.Person;
-import database.Ticket;
+import database.MissionEntity;
+import database.PersonEntity;
+import database.TicketEntity;
 
 /**
  * Created by Federico Taschin on 12/11/2017.
@@ -30,10 +30,10 @@ public class DatabaseTest {
 
      static Database database;
      static DAO ticketDAO;
-     static Ticket testTicket1;
-    // static Ticket testTicket2;
-     static Mission mission;
-     static Person person;
+     static TicketEntity testTicketEntity1;
+    // static TicketEntity testTicket2;
+     static MissionEntity missionEntity;
+     static PersonEntity personEntity;
 
     @Before
     public void setDatabaseAndCreateTickets() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -48,82 +48,82 @@ public class DatabaseTest {
 
 
     public void createTicket1AndInsert(){
-        person = new Person();
-        person.setName("Albert");
+        personEntity = new PersonEntity();
+        personEntity.setName("Albert");
 
-        person.setID((int) ticketDAO.addPerson(person));
+        personEntity.setID((int) ticketDAO.addPerson(personEntity));
 
-        mission = new Mission();
-        mission.setPersonID(person.getID());
-        mission.setID((int) ticketDAO.addMission(mission));
+        missionEntity = new MissionEntity();
+        missionEntity.setPersonID(personEntity.getID());
+        missionEntity.setID((int) ticketDAO.addMission(missionEntity));
 
-        testTicket1 = new Ticket();
-        testTicket1.setAmount(new BigDecimal(12));
-        testTicket1.setDate(new Date(1996,10,12));
-        testTicket1.setShop("Decathlon");
-        testTicket1.setTitle("Football shoes");
-        testTicket1.setMissionID(mission.getID());
+        testTicketEntity1 = new TicketEntity();
+        testTicketEntity1.setAmount(new BigDecimal(12));
+        testTicketEntity1.setDate(new Date(1996,10,12));
+        testTicketEntity1.setShop("Decathlon");
+        testTicketEntity1.setTitle("Football shoes");
+        testTicketEntity1.setMissionID(missionEntity.getID());
 
-        /*testTicket2 = new Ticket();
+        /*testTicket2 = new TicketEntity();
         testTicket2.setAmount(new BigDecimal(12));
         testTicket2.setDate(new Date(1966,11,12));
         testTicket2.setShop("wwww");
         testTicket2.setTitle("wwwwwwwww shoes");
-        testTicket2.setMissionID(mission.getID());*/
+        testTicket2.setMissionID(missionEntity.getID());*/
 
-        testTicket1.setID((int) ticketDAO.addTicket(testTicket1));
+        testTicketEntity1.setID((int) ticketDAO.addTicket(testTicketEntity1));
         //ticketDAO.addTicket(testTicket2);
     }
 
     @Test
     public void insertTicketDateTest(){
-        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getDate().equals(testTicket1.getDate()));
+        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getDate().equals(testTicketEntity1.getDate()));
     }
     @Test
     public void insertTicketTitleTest(){
-        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getTitle().equals(testTicket1.getTitle()));
+        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getTitle().equals(testTicketEntity1.getTitle()));
     }
     @Test
     public void insertTicketAmountTest(){
-        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getAmount().equals(testTicket1.getAmount()));
+        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getAmount().equals(testTicketEntity1.getAmount()));
     }
     @Test
     public void insertTicketShopTest(){
-        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getShop().equals(testTicket1.getShop()));
+        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getShop().equals(testTicketEntity1.getShop()));
     }
     @Test
     public void updateNotEmptyTicketTest(){
-        testTicket1.setAmount(new BigDecimal(12));
-        ticketDAO.updateTicket(testTicket1);
-        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getAmount().equals(testTicket1.getAmount()));
+        testTicketEntity1.setAmount(new BigDecimal(12));
+        ticketDAO.updateTicket(testTicketEntity1);
+        Assert.assertTrue(ticketDAO.getAllTickets().get(0).getAmount().equals(testTicketEntity1.getAmount()));
     }
 
     @Test
     public void updateTicketShouldNullEmptyFields(){
-        Ticket emptyTicket = new Ticket();
-        emptyTicket.setID(testTicket1.getID());
-        emptyTicket.setMissionID(testTicket1.getMissionID());
-        emptyTicket.setTitle("modified value");
-        ticketDAO.updateTicket(emptyTicket);
-        Assert.assertNull(emptyTicket.getAmount());
+        TicketEntity emptyTicketEntity = new TicketEntity();
+        emptyTicketEntity.setID(testTicketEntity1.getID());
+        emptyTicketEntity.setMissionID(testTicketEntity1.getMissionID());
+        emptyTicketEntity.setTitle("modified value");
+        ticketDAO.updateTicket(emptyTicketEntity);
+        Assert.assertNull(emptyTicketEntity.getAmount());
     }
 
     @Test
     public void updateNullTicketIDShouldReturnZero(){
-        Ticket ticket = new Ticket();
-        Assert.assertTrue(0 == ticketDAO.updateTicket(ticket));
+        TicketEntity ticketEntity = new TicketEntity();
+        Assert.assertTrue(0 == ticketDAO.updateTicket(ticketEntity));
     }
 
     @Test
     public void updateInvalidTicketIDShouldReturnZero(){
-        Ticket ticket = new Ticket();
-        ticket.setID(123);
-        Assert.assertTrue(0 == ticketDAO.updateTicket(ticket));
+        TicketEntity ticketEntity = new TicketEntity();
+        ticketEntity.setID(123);
+        Assert.assertTrue(0 == ticketDAO.updateTicket(ticketEntity));
     }
 
     @Test
     public void deleteExistingTicketTest(){
-        Assert.assertTrue(ticketDAO.deleteTicket(testTicket1.getID())==1);
+        Assert.assertTrue(ticketDAO.deleteTicket(testTicketEntity1.getID())==1);
     }
     //TODO test with invalid ID, test with null ID (deleteTicket pre-conditions accept null)
 

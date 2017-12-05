@@ -25,7 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 
 public class XMLParser {
-    private static final String TICKET_TAG = "Ticket";
+    private static final String TICKET_TAG = "TicketEntity";
     private static final String ID_TAG = "ID";
     private static final String DATE_TAG = "Date";
     private static final String POSITION_DATE_TAG = "PositionDate";
@@ -73,8 +73,8 @@ public class XMLParser {
     /**
      *Created by Federico Taschin
      * @param node the node to be parsed
-     * @return TicketInfo with the information about the xml Ticket element
-     * @throws ParseException if a field of the <Ticket> element is in the wrong format
+     * @return TicketInfo with the information about the xml TicketEntity element
+     * @throws ParseException if a field of the <TicketEntity> element is in the wrong format
      */
     private TicketInfo readTicket(Node node) throws ParseException {
         TicketInfo ticket = new TicketInfo();

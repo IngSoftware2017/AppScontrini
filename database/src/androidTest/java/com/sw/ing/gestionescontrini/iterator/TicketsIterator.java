@@ -31,7 +31,7 @@ public class TicketsIterator<Type> implements Iterable<Type> {
 
     }
     /**
-     * Add a new Ticket at the LinkedList
+     * Add a new TicketEntity at the LinkedList
      *
      * @param element the bitmap image we want to insert in the LinkedList
      */

@@ -16,10 +16,10 @@ import android.net.Uri;
  */
 
 @Entity(tableName = Constants.MISSION_TABLE_NAME,
-        foreignKeys = @ForeignKey(entity = Person.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
+        foreignKeys = @ForeignKey(entity = PersonEntity.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
 @TypeConverters(Converters.class)
 
-public class Mission {
+public class MissionEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
@@ -37,7 +37,7 @@ public class Mission {
     /**
      * Non parametric constructor
      */
-    public Mission() {
+    public MissionEntity() {
     }
 
     /**
@@ -48,7 +48,7 @@ public class Mission {
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(Date startMission, Date endMission, String location, int personID) {
+    public MissionEntity(Date startMission, Date endMission, String location, int personID) {
         this.startMission = startMission;
         this.endMission = endMission;
         this.location = location;
