@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ListView missionsList;
     TextView noticeEmptyText;
     DataManager dataManager;
+    List<MissionEntity> missions;
+    MissionAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +39,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newMissionButton = findViewById(R.id.newMissionButton);
         missionsList = findViewById(R.id.missionsList);
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
+
         MissionEntity test = new MissionEntity("name",null,null,"location",1);
-        List<MissionEntity> missions = new ArrayList<MissionEntity>();
+        missions = new ArrayList<MissionEntity>();
         missions.add(test);
-        MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_row_custom, missions);
+        adapter = new MissionAdapter(this, R.layout.mission_row_custom, missions);
         missionsList.setAdapter(adapter);
         newMissionButton.setOnClickListener(this);
         checkInitialization();
@@ -68,5 +71,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(view instanceof FloatingActionButton){
             addMission();
         }
+    }
+
+    public void loadMissions(){
+        missions.addAll(dataManager.getAllMissions());
     }
 }
