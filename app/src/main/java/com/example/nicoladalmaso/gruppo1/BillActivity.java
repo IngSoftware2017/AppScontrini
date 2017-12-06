@@ -36,10 +36,13 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import database.DataManager;
 import database.Ticket;
 public class BillActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
@@ -52,7 +55,7 @@ public class BillActivity extends AppCompatActivity {
     String tempPhotoPath;
     Integer pos;
     Context context;
-
+    public DataManager DB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -342,14 +345,17 @@ public class BillActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";
-        File file = new File(myDir, fname);
+        final File file = new File(myDir, fname);
         if (file.exists())
             file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
             //PICCOLO
             //using the ocr, extract the information from che picture and then add them to the database
+            context = getApplicationContext();
+            DB = new DataManager(context);
             DataAnalyzer ocr = new DataAnalyzer();
+            final Uri uri=Uri.fromFile(file);
             while (ocr.initialize(getApplicationContext())==1){
                 //resource occupied
             }//while
@@ -361,8 +367,13 @@ public class BillActivity extends AppCompatActivity {
                  */
                 @Override
                 public void onTicketReady(com.ing.software.common.Ticket ticket) {
-                    //TODO:SAVE THE DATA EXTRACTED FROM THE IMAGE
+                    //TODO:CHECK THE DATA EXTRACTED FROM THE IMAGE
                     Log.d("Ticket", ticket.toString());
+                    DB.addTicket(new Ticket(uri,ticket.amount,null,ticket.date,ticket.title,1));
+                    List<Ticket> ticketList=DB.getAllTickets();
+                    for(int i=0; i<ticketList.size()-1; i++){
+                        Log.d("DBTicket",ticketList.get(i).getTitle()+", "+ticketList.get(i).getDate()+", "+ticketList.get(i).getAmount()+".");
+                    }//for
                 }//onTicketReady
             });//OnTicketReadyListener
             ocr.release();

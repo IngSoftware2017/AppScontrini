@@ -56,6 +56,21 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Your missions");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+        /*/PICCOLO Aggiungo delle missioni di prova
+        Date data1= new Date();
+        data1.setTime(2041920531);
+        Person p1=new Person("aaaa","AAAAAAA","Dottore");
+        Person p2=new Person("bbbb","BBBBBBB","Laureando");
+        DB.addPerson(p1);
+        DB.addPerson(p2);
+        DB.addMission(new Mission(new Date(2000,03,02),new Date(2001,03,15),"New York",p1.getID()));
+        DB.addMission(new Mission(new Date(2010,07,02),new Date(2011,01,15),"Berlino",p2.getID()));
+        DB.addMission(new Mission(new Date(2005,03,02),new Date(2005,03,25),"Londra",p1.getID()));
+        List<Mission> missionList = db.getAllMissions();
+        for(int i=0; i<=missionList.size()-1; i++) {
+            Log.d("mission", "mission " + i + ": " + missionList.get(i).getStartMission() + "," + missionList.get(i).getEndMission() + ","
+                    + missionList.get(i).getLocation() + "," + missionList.get(i).getPersonID());
+        }*/
         File f = new File(path);
         File[] files = f.listFiles();
         for (File inFile : files) {
