@@ -1,6 +1,7 @@
 package database;
 
 import java.util.Date;
+import java.util.List;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -179,6 +180,7 @@ public class MissionEntity {
     public void setName(String name) {
         this.name = name;
     }
+
 //TODO override toString
 }
 

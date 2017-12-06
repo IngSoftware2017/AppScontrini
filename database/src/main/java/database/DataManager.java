@@ -110,6 +110,14 @@ public class DataManager {
     }
 
 
+    public List<TicketEntity> getTicketsForMission(int id){
+        return database.ticketDao().getTicketsForMission(id);
+    }
+
+
+    public TicketEntity getTicket(int id){
+        return database.ticketDao().getTicket(id);
+    }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null
