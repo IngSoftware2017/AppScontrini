@@ -11,10 +11,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import java.io.File;
+import java.util.Date;
+
+import database.DataManager;
+import database.Mission;
 
 public class AddNewMission extends AppCompatActivity {
 
     Context context;
+    DataManager DB = new DataManager(context);
+    Mission newMission;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,9 +45,12 @@ public class AddNewMission extends AppCompatActivity {
     /** Dal Maso
      * Edit by Lazzarin
      * Cattura degli eventi nella toolbar
+     *
+     * Modify: Improve database interaction
+     * @author Matteo Mascotto
+     *
      * @param item oggetto nella toolbar catturato
      * @return flag di successo
-     *
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -54,7 +64,21 @@ public class AddNewMission extends AppCompatActivity {
                 String description = editDescription.getText().toString();
                 //create new directory with input text
                 File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
-                newMissionPath.mkdir();
+
+                Boolean ret;
+                ret = newMissionPath.mkdir();
+
+                // If the ret value is true insert the Mission Info in the DB
+                if (ret) {
+
+                    Date start, end;
+                    start = new Date(10-12-2017);
+                    end = new Date(12-12-2017);
+
+                    newMission = new Mission(name, description, start, end, "", 1);
+                    DB.addMission(newMission);
+                }
+
                 //Start billActivity
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

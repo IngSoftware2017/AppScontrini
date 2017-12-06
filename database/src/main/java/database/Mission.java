@@ -13,6 +13,9 @@ import android.net.Uri;
 /**
  * Represents one mission and its associated information
  * @author Marco Olivieri on 26/11/2017 (Team 3)
+ *
+ * Modify: Insert the Title and Description attribute at the Mission entity
+ * @author Matteo Mascotto on 06-12-2017
  */
 
 @Entity(tableName = Constants.MISSION_TABLE_NAME,
@@ -24,6 +27,8 @@ public class Mission {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
     private int ID;
+    private String Title;
+    private String Description;
     private Date startMission;
     private Date endMission;
     private String location;
@@ -43,12 +48,17 @@ public class Mission {
     /**
      * Parametric constructor
      *
+     * @param Title Name of the mission
+     * @param Description Name of the mission
      * @param startMission Date of the beginning of the mission
      * @param endMission Date of the end of the mission
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(Date startMission, Date endMission, String location, int personID) {
+    public Mission(String Title, String Description, Date startMission, Date endMission, String location, int personID) {
+
+        this.Title = Title;
+        this.Description = Description;
         this.startMission = startMission;
         this.endMission = endMission;
         this.location = location;
@@ -168,6 +178,42 @@ public class Mission {
      */
     public void setPersonID(int personID) {
         this.personID = personID;
+    }
+
+
+    /**
+     * Return the Title of the Mission
+     * @return Title
+     */
+    public String getTitle() {
+        return Title;
+    }
+
+
+    /**
+     * Sets the Title of the Mission
+     * @param title
+     */
+    public void setTitle(String title) {
+        this.Title = title;
+    }
+
+
+    /**
+     * Return a generic description of the Mission
+     * @return Description
+     */
+    public String getDescription() {
+        return Description;
+    }
+
+
+    /**
+     * Sets a generic description of the Mission
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.Description = description;
     }
 
     //TODO override toString
