@@ -40,6 +40,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import database.DataManager;
 import database.Ticket;
 public class BillActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
@@ -52,6 +54,7 @@ public class BillActivity extends AppCompatActivity {
     String tempPhotoPath;
     Integer pos;
     Context context;
+    public DataManager DB;
 
 
     @Override
@@ -60,6 +63,7 @@ public class BillActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         Intent intent = getIntent();
+        DB = new DataManager(this.getApplicationContext());
         Log.d("Memes", Variables.getInstance().getCurrentMissionDir());
         String missionName = intent.getExtras().getString("missionName");
         pos = intent.getExtras().getInt("missionId");
@@ -98,7 +102,7 @@ public class BillActivity extends AppCompatActivity {
      *  Gestione delle animazioni e visualizzazione delle foto salvate precedentemente
      */
     public void initializeComponents(){
-        printAllImages();
+        printAllImagesDB();
         fab = (FloatingActionButton)findViewById(R.id.fab);
         fab1 = (FloatingActionButton)findViewById(R.id.fab1);
         fab2 = (FloatingActionButton)findViewById(R.id.fab2);
@@ -379,6 +383,12 @@ public class BillActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Ticket ticket = new Ticket();
+        ticket.setMissionID(pos);
+        ticket.setAmount(null);
+        ticket.setFileUri(android.net.Uri.parse(file.toURI().toString()));
+        ticket.setTitle(fname);
+        DB.addTicket(ticket);
     }
 
     /** NOT USED
@@ -467,6 +477,34 @@ public class BillActivity extends AppCompatActivity {
                     new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
             Bitmap myBitmap = BitmapFactory.decodeFile(files[i].getAbsolutePath());
             addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()), myBitmap);
+        }
+    }
+
+    /** Dal Maso
+     *  Stampa tutte le immagini
+     */
+    public void printAllImagesDB(){
+        List<Ticket> Tickets = DB.getAllTickets();
+        TextView noBills = (TextView)findViewById(R.id.noBills);
+        if(Tickets.size() == 0){
+            noBills.setVisibility(View.VISIBLE);
+        }
+        else{
+            noBills.setVisibility(View.INVISIBLE);
+        }
+        Ticket t;
+        for (int i = 0; i < Tickets.size(); i++)
+        {
+            /*t = Tickets.get(i);
+            Log.d("Test ticket", t.getFileUri().toString());
+            Log.d("Test ticket", ""+t.getMissionID());
+            Log.d("Test ticket", ""+pos);
+            if(t.getMissionID() == pos){
+                String path = t.getFileUri().getPath();
+                Bitmap myBitmap = BitmapFactory.decodeFile(path);
+                addToList(t.getTitle(), t.getCategory(), myBitmap);
+            }
+            */
         }
     }
 
