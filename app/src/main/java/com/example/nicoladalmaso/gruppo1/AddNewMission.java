@@ -94,16 +94,18 @@ public class AddNewMission extends AppCompatActivity {
 
                     newMission = new Mission(name, description, start, end, "Padova", ID_Person);
                     dataManager.addMission(newMission);
-                /*}
+
 
                 //Start billActivity
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                /*
                 Variables.getInstance().setCurrentMissionDir(newMissionPath.getAbsolutePath());
                 Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
+                */
                 startImageView.putExtra("missionName", name);
                 startImageView.putExtra("missionDescription",description);
-                context.startActivity(startImageView);*/
+                context.startActivity(startImageView);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
