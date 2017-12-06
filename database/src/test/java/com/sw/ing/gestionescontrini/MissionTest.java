@@ -10,19 +10,36 @@ import database.Mission;
 
 /**
  * Created by Step on 28/11/2017.
+ *
+ * Modify: Improve the testing for Title and Description
+ * @author Matteo Mascotto on 06-12-2017
  */
 
 public class MissionTest {
     Mission mission1;
     Mission mission2;
     Date dateI,dateF;
+    String Title;
+    String Desc;
 
     @Before
     public void beforeTest(){
         dateI = new Date(2017,11,20);
         dateF = new Date(2017,11,30);
-        mission1 = new Mission(dateI,dateF,"Venice",1);
+        Title = "TitleT";
+        Desc = "Description Test";
+        mission1 = new Mission(Title, Desc, dateI,dateF,"Venice",1);
         mission2 = new Mission();
+    }
+
+    @Test
+    public void getTitleReturnTheTitleOfTheMission(){
+        assertTrue(mission1.getTitle().equals(Title));
+    }
+
+    @Test
+    public void getDescReturnTheDescriptionOfTheMission(){
+        assertTrue(mission1.getDescription().equals(Desc));
     }
 
     @Test

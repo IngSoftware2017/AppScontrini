@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         Log.d("Files", "Size: "+ files.length);
         return files;
+
+
     }
 
     /**Lazzarin
