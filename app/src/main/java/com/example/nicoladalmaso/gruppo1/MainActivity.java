@@ -38,17 +38,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 import database.Constants;
+import database.DAO;
 import database.DataManager;
 import database.Mission;
+import database.Person;
+
 
 public class MainActivity extends AppCompatActivity {
     public List<Missione> list = new LinkedList<Missione>();
+    public DataManager DB;
     public List<Mission> listMission = new LinkedList<Mission>();
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DataManager db= new DataManager(this);
+        DB = new DataManager(this.getApplicationContext());
         setTitle("Your missions");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
@@ -67,21 +71,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //printAllMissions();
-        printAllMissionsDB(db);
+        printAllMissionsDB();
     }
 
     /** PICCOLO
      * Adds in the database the new mission
      * @param toAdd mission to be added
-     * @param db DataManager where the mission should be added
      */
-    public void addToList(Mission toAdd,DataManager db){
-        db.addMission(toAdd);
-        //listMission.add(Mission);
+    public void addToListDB(Mission toAdd){
+        listMission.add(toAdd);
         ListView listView = (ListView)findViewById(R.id.listMission);
-        MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_card, list);
+        MissionAdapterDB adapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
-    }//addToListDB
+    }
 
     /** Dal Maso
      * Aggiunge alla lista la nuova missione
@@ -119,40 +121,6 @@ public class MainActivity extends AppCompatActivity {
         emptyAdapter.notifyDataSetChanged();
         listView.setAdapter(emptyAdapter);}
 
-    /** PICCOLO
-     * printAllMissionsFile adapted for working with a database
-     * Prints the missions
-     * @param db the database containing the missions
-     */
-    public void printAllMissionsDB(DataManager db){
-        List<Mission> missionsList=db.getAllMissions();
-        TextView noMissions = (TextView)findViewById(R.id.noMissions);
-        if(missionsList.size()==0){
-            noMissions.setVisibility(View.VISIBLE);
-        }//if
-        else{
-            noMissions.setVisibility(View.INVISIBLE);
-        }//else
-        for(int i=0; i<missionsList.size(); i++){
-            addToList(missionsList.get(i));
-            //TODO:COSE
-        }//for
-        /*File[] files = readAllMissions();
-        if(files.length == 0){
-            noMissions.setVisibility(View.VISIBLE);
-        }
-        else{
-            noMissions.setVisibility(View.INVISIBLE);
-        }
-        for (int i = 0; i < files.length; i++)
-        {
-            SimpleDateFormat simpleDateFormat =
-                    new SimpleDateFormat("HH:mm'\n'dd/MM/yyyy");
-            if(files[i].isDirectory())
-                addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
-        }*/
-    }//printAllMissionsDB
-
     /** Dal Maso
      *  Stampa tutte le immagini
      */
@@ -171,6 +139,37 @@ public class MainActivity extends AppCompatActivity {
                     new SimpleDateFormat("HH:mm'\n'dd/MM/yyyy");
             if(files[i].isDirectory())
                 addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
+        }
+    }
+
+    //Dal Maso
+    public void printAllMissionsDB(){
+        List<Mission> missions = DB.getAllMissions();
+        List<Person> persons = DB.getAllPersons();
+        //Crea una persona fake per non creare problemi di FOREING KEY
+        if(persons.size()==0){
+            Person person = new Person();
+            person.setName("Nicola");
+            person.setAcademicTitle("Studente");
+            person.setLastName("Dal Maso");
+            DB.addPerson(person);
+            persons = DB.getAllPersons();
+        }
+
+        Log.d("Lista Persone", ""+persons.get(0).getID());
+        Log.d("Persons", ""+persons.size());
+        Log.d("Missions", ""+missions.size());
+
+        TextView noMissions = (TextView)findViewById(R.id.noMissions);
+        if(missions.size() == 0){
+            noMissions.setVisibility(View.VISIBLE);
+        }
+        else{
+            noMissions.setVisibility(View.INVISIBLE);
+        }
+        for (int i = 0; i < missions.size(); i++)
+        {
+            addToListDB(missions.get(i));
         }
     }
 }

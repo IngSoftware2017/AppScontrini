@@ -120,6 +120,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                         new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
                 String date = simpleDateFormat.format(files[pos].lastModified());
                 startImageView.putExtra("imgLastMod", date);
+                startImageView.putExtra("imgPrice", "25.40€");
                 context.startActivity(startImageView);
             }//onClick
         });

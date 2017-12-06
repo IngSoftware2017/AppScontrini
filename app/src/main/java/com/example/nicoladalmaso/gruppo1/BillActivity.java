@@ -166,13 +166,6 @@ public class BillActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
-    public void addToMissionGrid(String title, String desc, Bitmap img){
-        list.add(new Scontrino(title, desc, img));
-        ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
-        listView.setAdapter(adapter);
-    }
-
     /** Dal Maso (Using Lazzarin code)
      * Delete the mission from the bills viewer (inside the mission)
      */
@@ -337,8 +330,6 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-    //
-    //
 
     /** Dal Maso
      * Salva il bitmap passato nell'apposita cartella
@@ -366,17 +357,15 @@ public class BillActivity extends AppCompatActivity {
                 /**
                  * Get a Ticket. In the argument "ticket", fields corresponding to unextracted information are null.
                  * ID and fileURI fields are uninitialized.
-                 *
                  * @param ticket new Ticket. Never null.
                  */
                 @Override
                 public void onTicketReady(com.ing.software.common.Ticket ticket) {
                     //TODO:SAVE THE DATA EXTRACTED FROM THE IMAGE
-                    Log.d("Ticket", "aaa "+ticket.toString());
+                    Log.d("Ticket", ticket.toString());
                 }//onTicketReady
             });//OnTicketReadyListener
             ocr.release();
-            //
 
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             //PICCOLO_OLD

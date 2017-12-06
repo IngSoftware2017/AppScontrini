@@ -29,14 +29,18 @@ public class BillViewer extends AppCompatActivity {
         String imgPath = intent.getExtras().getString("imagePath");
         String imgName = intent.getExtras().getString("imageName");
         String imgLastMod = intent.getExtras().getString("imgLastMod");
+        String imgPrice = intent.getExtras().getString("imgPrice");
         setTitle(imgName);
-
+        //Title
         TextView billLastMod = (TextView)findViewById(R.id.billLastMod);
         billLastMod.setText(imgLastMod);
-
+        //ImageName
         TextView billName = (TextView)findViewById(R.id.billName);
         billName.setText(imgName);
-
+        //Total price
+        TextView billPrice = (TextView)findViewById(R.id.billTotal);
+        billPrice.setText(imgPrice);
+        //Full image view
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         Bitmap bitmap = BitmapFactory.decodeFile(imgPath,bmOptions);

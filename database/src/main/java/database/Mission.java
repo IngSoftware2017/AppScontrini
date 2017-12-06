@@ -24,6 +24,8 @@ public class Mission {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
     private int ID;
+    private String name;
+    private String description;
     private Date startMission;
     private Date endMission;
     private String location;
@@ -48,12 +50,14 @@ public class Mission {
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(Date startMission, Date endMission, String location, int personID) {
+    public Mission(Date startMission, Date endMission, String location, int personID, String name, String description) {
         this.startMission = startMission;
         this.endMission = endMission;
         this.location = location;
         isRepay = false;
         excel = null;
+        this.name = name;
+        this.description = description;
         this.personID = personID;
     }
 
@@ -120,6 +124,38 @@ public class Mission {
      */
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    /**
+     * Returns the name of the mission
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name of the mission
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Returns the description of the mission
+     * @return description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of the mission
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
