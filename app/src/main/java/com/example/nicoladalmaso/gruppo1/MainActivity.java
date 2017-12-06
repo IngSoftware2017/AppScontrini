@@ -1,6 +1,7 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -38,10 +39,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import database.DataManager;
+import database.Mission;
+import database.Ticket;
 
 public class MainActivity extends AppCompatActivity {
-    public List<Missione> list = new LinkedList<Missione>();
+
+    public List<Missione> list = new LinkedList<>();
+
+    Context context;
     DataManager dataManager;
+
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Le tue missioni");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+
+        context = this.getApplicationContext();
+        dataManager = new DataManager(context);
+
        /* File newDir1 = new File(path + "/Missione 1");
         File newDir2 = new File(path + "/Missione 2");
         File newDir3 = new File(path + "/Missione 3");
@@ -97,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         Log.d("Files", "Size: "+ files.length);
         return files;
-
-
     }
 
     /**Lazzarin
@@ -114,22 +123,30 @@ public class MainActivity extends AppCompatActivity {
 
     /** Dal Maso
      *  Stampa tutte le immagini
+     *
+     *  Modified: Show all the mission in the DB
+     *  @author Matteo Mascotto
      */
-    public void printAllMissions(){
-        File[] files = readAllMissions();
-        TextView noMissions = (TextView)findViewById(R.id.noMissions);
-        if(files.length == 0){
+    public void printAllMissions() {
+
+        Mission mission;
+        List<Mission> Missions = dataManager.getAllMissions();
+
+        TextView noMissions = findViewById(R.id.noMissions);
+        if(Missions.isEmpty()){
             noMissions.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             noMissions.setVisibility(View.INVISIBLE);
         }
-        for (int i = 0; i < files.length; i++)
+
+        for (int i = 0; i < Missions.size(); i++)
         {
-            SimpleDateFormat simpleDateFormat =
-                    new SimpleDateFormat("HH:mm'\n'dd/MM/yyyy");
-            if(files[i].isDirectory())
-                addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm'\n'dd/MM/yyyy");
+
+            if(Missions.get(i) != null) {
+                mission = Missions.get(i);
+                addToList(mission.getTitle(), simpleDateFormat.format(mission.getStartMission()));
+            }
         }
     }
 }

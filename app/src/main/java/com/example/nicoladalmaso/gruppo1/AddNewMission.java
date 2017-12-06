@@ -63,18 +63,19 @@ public class AddNewMission extends AppCompatActivity {
                 EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
                 String name = editName.getText().toString();
                 String description = editDescription.getText().toString();
+                /*
                 //create new directory with input text
                 File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
 
                 // If the insert of the Mission Info in the path it's ok, it will add it in the DB
-                if (newMissionPath.mkdir()) {
+                if (newMissionPath.mkdir()) {*/
                     Date start, end;
                     start = new Date(2017, 10, 10);
                     end = new Date(2017, 12, 12);
 
-                    newMission = new Mission(name, description, start, end, "", 1);
+                    newMission = new Mission(name, description, start, end, "Padova", 1);
                     DB.addMission(newMission);
-                }
+                /*}
 
                 //Start billActivity
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
@@ -83,7 +84,7 @@ public class AddNewMission extends AppCompatActivity {
                 Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
                 startImageView.putExtra("missionName", name);
                 startImageView.putExtra("missionDescription",description);
-                context.startActivity(startImageView);
+                context.startActivity(startImageView);*/
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

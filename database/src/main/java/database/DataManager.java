@@ -8,6 +8,9 @@ import java.util.List;
 /**
  * Created by Federico Taschin on 07/11/2017.
  * Modified by Marco Olivieri on 14/11/2017
+ *
+ * Modified: improve getAllMissions method
+ * @author Matteo Mascotto on 06-12-2017
  */
 
 public class DataManager {
@@ -110,6 +113,12 @@ public class DataManager {
         return database.ticketDao().getAllTickets();
     }
 
+    /**
+     * @return List<Mission> not null, which contains all the missions in the database
+     */
+    public List<Mission> getAllMissions(){
+        return database.ticketDao().getAllMission();
+    }
 
 //    /**
 //     Turns a List of TicketEntity into a List of Ticket
