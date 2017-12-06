@@ -25,12 +25,6 @@ import org.junit.runner.RunWith;
 public class OcrInstrumentedTests {
 
     @Test
-    public void findCornersTest() throws Exception {
-        //ImagePreprocessor.findCorners(getBitmap(0));
-        assertEquals(4, 2 + 2);
-    }
-
-    @Test
     public void ocrMainTest() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
         final Semaphore sem = new Semaphore(0);

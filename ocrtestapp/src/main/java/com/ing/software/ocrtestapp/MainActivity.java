@@ -10,17 +10,15 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ing.software.common.Ref;
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.DataAnalyzer;
 import com.ing.software.ocr.OcrManager;
@@ -36,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.ing.software.ocrtestapp.StatusVars.*;
 
@@ -50,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
 
     final OcrResultReceiver mReceiver = new OcrResultReceiver(new Handler());
     private static OcrManager ocrAnalyzer;
-    private final String testFolder = "/TestOCR";
+    static private final String testFolder = "/TestOCR";
     private int counter = 0;
     private final PermissionsHandler permissionsHandler = new PermissionsHandler(this);
     private static final Semaphore sem = new Semaphore(0);
@@ -79,8 +76,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         for (File aFile : listFile)
             listNames.add(aFile.getAbsolutePath());
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.run_all).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (counter == listNames.size()) {
@@ -92,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     Intent intent = new Intent(MainActivity.this, TestService.class);
                     intent.putExtra("receiver", mReceiver);
                     OcrUtils.log(1, "OcrHandler", "ANALYZING: " + listNames.get(counter));
-                    intent.putExtra("imagePath", listNames.get(counter));
                     ++counter;
                     startService(intent);
                     Snackbar.make(view, "Service started", Snackbar.LENGTH_LONG)
@@ -103,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 }
             }
         });
-
     }
 
     @Override
@@ -126,28 +120,6 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 Toast.makeText(this, text, Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -178,6 +150,9 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 //Toast.makeText(this, "Error: " + error, Toast.LENGTH_LONG).show();
                 s = "\nError: " + error;
                 break;
+            case STATUS_AVERAGE:
+                s = "\n\nAVERAGE TIME: " + resultData.getString(DURATION_RECEIVED) + " seconds\n";
+
         }
         tv.append(s);
         //scrollView.addView(tv);
@@ -197,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
      * @param dir directory containing files. Must be a non empty directory with only files
      * @return list of files in current dir
      */
-    private List<File> loadImage(String dir) {
+    static private List<File> loadImage(String dir) {
         File appDir = new File(Environment.getExternalStorageDirectory().toString() + dir);
         if (appDir.isDirectory())
             Log.e("listFileInfolder", "File is directory. Path is: " + appDir.getPath());
@@ -206,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         return listFilesInFolder(appDir);
     }
 
-    public List<File> listFilesInFolder(File folder) {
+    static public List<File> listFilesInFolder(File folder) {
         List<File> fileInFolder = new ArrayList<>();
         for (File fileEntry : folder.listFiles()) {
             fileInFolder.add(fileEntry);
@@ -234,43 +209,54 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         protected void onHandleIntent(final Intent workIntent) {
             OcrUtils.log(1, "TestService", "Entering service");
             final ResultReceiver receiver = workIntent.getParcelableExtra("receiver");
-            final String testPic = workIntent.getExtras().getString("imagePath");
-            Bitmap testBmp = getBitmapFromFile(getFileFromPath(testPic));
-            //test = OcrAnalyzer.getCroppedPhoto(test, this);
-            final long startTime = System.nanoTime();
-            final Bundle bundle = new Bundle();
-            if (testBmp != null) {
-                bundle.putString(IMAGE_RECEIVED, testPic);
-                receiver.send(STATUS_RUNNING, bundle);
-                ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
-                    @Override
-                    public void onTicketReady(Ticket result) {
-                        OcrUtils.log(1, "OcrHandler", "Detection complete");
-                        long endTime = System.nanoTime();
-                        double duration = ((double) (endTime - startTime)) / 1000000000;
-                        if (result.amount != null) {
-                            OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
-                            bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
-                            bundle.putString(DURATION_RECEIVED, duration + "");
-                            receiver.send(STATUS_FINISHED, bundle);
-                        } else {
-                            OcrUtils.log(1, "OcrHandler", "No amount found");
-                            bundle.putString(AMOUNT_RECEIVED, "Not found.");
-                            bundle.putString(DURATION_RECEIVED, duration + "");
-                            receiver.send(STATUS_FINISHED, bundle);
+            final Semaphore sem = new Semaphore(0);
+            final Ref<Double> durationSum = new Ref<>(0.0);
+            int validBitmaps = 0;
+            List<File> listFile = loadImage(MainActivity.testFolder);
+            for (File aFile : listFile) {
+                Bitmap testBmp = getBitmapFromFile(aFile);
+                //test = OcrAnalyzer.getCroppedPhoto(test, this);
+                final long startTime = System.nanoTime();
+                final Bundle bundle = new Bundle();
+                if (testBmp != null) {
+                    validBitmaps++;
+                    bundle.putString(IMAGE_RECEIVED, aFile.getName());
+                    receiver.send(STATUS_RUNNING, bundle);
+                    ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
+                        @Override
+                        public void onTicketReady(Ticket result) {
+                            OcrUtils.log(1, "OcrHandler", "Detection complete");
+                            long endTime = System.nanoTime();
+                            double duration = ((double) (endTime - startTime)) / 1000000000;
+                            durationSum.value += duration;
+                            if (result.amount != null) {
+                                OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
+                                bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
+                                bundle.putString(DURATION_RECEIVED, duration + "");
+                                receiver.send(STATUS_FINISHED, bundle);
+                            } else {
+                                OcrUtils.log(1, "OcrHandler", "No amount found");
+                                bundle.putString(AMOUNT_RECEIVED, "Not found.");
+                                bundle.putString(DURATION_RECEIVED, duration + "");
+                                receiver.send(STATUS_FINISHED, bundle);
+                            }
+                            sem.release();
                         }
-                        sem.release();
+                    });
+                    try {
+                        sem.acquire();
                     }
-                });
-            } else {
-                bundle.putString("ErrorMessage", "Error null image");
-                receiver.send(STATUS_ERROR, bundle);
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    bundle.putString("ErrorMessage", "Error null image");
+                    receiver.send(STATUS_ERROR, bundle);
+                }
             }
-            try {
-                sem.acquire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            final Bundle bundle = new Bundle();
+            bundle.putString(DURATION_RECEIVED, String.valueOf(durationSum.value / validBitmaps));
+            receiver.send(STATUS_AVERAGE, bundle);
             this.stopSelf();
         }
 

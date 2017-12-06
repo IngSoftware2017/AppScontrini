@@ -18,6 +18,7 @@ import android.support.annotation.Size;
 import static com.ing.software.ocr.OcrUtils.levDistance;
 
 
+
 /**
  * Class used to extract informations from raw data
  */
