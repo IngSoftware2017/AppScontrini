@@ -345,6 +345,7 @@ public class BillActivity extends AppCompatActivity {
         String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";
         File file = new File(myDir, fname);
+        final Uri uri=Uri.fromFile(file);
         if (file.exists())
             file.delete();
         try {
@@ -352,6 +353,7 @@ public class BillActivity extends AppCompatActivity {
             //PICCOLO
             //using the ocr, extract the information from che picture and then add them to the database
             DataAnalyzer ocr = new DataAnalyzer();
+            DB = new DataManager(this.getApplicationContext());
             while (ocr.initialize(getApplicationContext())==1){
                 //resource occupied
             }//while
@@ -363,8 +365,15 @@ public class BillActivity extends AppCompatActivity {
                  */
                 @Override
                 public void onTicketReady(com.ing.software.common.Ticket ticket) {
-                    //TODO:SAVE THE DATA EXTRACTED FROM THE IMAGE
-                    Log.d("Ticket", ticket.toString());
+                    //TODO:CHECK THE DATA EXTRACTED FROM THE IMAGE
+                    Log.d("OCRTicket", ticket.toString());
+                    DB.addTicket(new Ticket(uri,ticket.amount,null,ticket.date,ticket.title,1));//TODO: sistemare il mission id
+                    //DB.addTicket(new Ticket(uri,ticket.amount,null,ticket.date,ticket.title,pos));//Così muore tutto
+                    List<Ticket> ticketList = DB.getAllTickets();
+                    for(int i=0; i<ticketList.size()-1; i++) {
+                        Log.d("DBTicket " + i, ticketList.get(i).getID()+" "+ticketList.get(i).getFileUri()+" "
+                                +ticketList.get(i).getTitle()+" "+ticketList.get(i).getDate()+" "+ticketList.get(i).getAmount()+" "+ticketList.get(i).getMissionID());
+                    }//for
                 }//onTicketReady
             });//OnTicketReadyListener
             ocr.release();
