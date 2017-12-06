@@ -15,11 +15,19 @@ import java.util.Date;
 
 import database.DataManager;
 import database.Mission;
+import database.Person;
 
+/**
+ * It manage the insert and the view of the Missions from Files
+ * @author Dal Maso
+ *
+ * Modify: Improve the Database management
+ * @author Matteo Mascotto
+ */
 public class AddNewMission extends AppCompatActivity {
 
     Context context;
-    DataManager DB;
+    DataManager dataManager;
     Mission newMission;
 
     @Override
@@ -28,7 +36,7 @@ public class AddNewMission extends AppCompatActivity {
         setTitle("Nuova missione");
         setContentView(R.layout.activity_add_new_mission);
         context = this.getApplicationContext();
-         DB = new DataManager(context);
+        dataManager= new DataManager(context);
     }
 
     /** Dal Maso
@@ -69,12 +77,23 @@ public class AddNewMission extends AppCompatActivity {
 
                 // If the insert of the Mission Info in the path it's ok, it will add it in the DB
                 if (newMissionPath.mkdir()) {*/
+
                     Date start, end;
                     start = new Date(2017, 10, 10);
                     end = new Date(2017, 12, 12);
 
-                    newMission = new Mission(name, description, start, end, "Padova", 1);
-                    DB.addMission(newMission);
+
+                    Person person = dataManager.getPerson(1);
+                    int ID_Person;
+
+                    if (person == null) {
+                        ID_Person = dataManager.addPerson(new Person("Luca", "Rossi", "Rettore"));
+                    } else {
+                        ID_Person = person.getID();
+                    }
+
+                    newMission = new Mission(name, description, start, end, "Padova", ID_Person);
+                    dataManager.addMission(newMission);
                 /*}
 
                 //Start billActivity

@@ -12,6 +12,9 @@ import java.util.List;
 /**
  * Created by Federico Taschin on 08/11/2017.
  * Modified by Marco Olivieri on 28/11/2017
+ *
+ * Modified: improve get Person from ID
+ * @author Matteo Mascotto on 06-12-2017
  */
 
 //Data Access Objects Interface. Defines the queries using Room libraries
@@ -20,7 +23,7 @@ import java.util.List;
 public interface DAO {
 
     //INSERT
-
+    //------
     /** Executes the insert query.
      * @param ticket Ticket not null, the entity to be inserted
      *               ticket.fileUri not null, must be a valid file path
@@ -49,7 +52,7 @@ public interface DAO {
     long addPerson(Person person);
 
     //DELETE
-
+    //------
     /**Deletes a Mission from the database
      * @param id int the ID of the Mission to be deleted
      * @return the number of deleted entities.
@@ -72,7 +75,7 @@ public interface DAO {
     int deleteTicket(int id);
 
     //UPDATE
-
+    //------
     /**Updates the given Ticket matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param ticket Ticket not null, the entity to be updated.
      *               ticket.fileUri not null
@@ -100,7 +103,7 @@ public interface DAO {
     int updatePerson(Person person);
 
     //SELECT ALL
-
+    //----------
     /**
      * Executes a SELECT of all the entities in the database
      * @return List<Ticket>
@@ -122,4 +125,13 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<Person> getAllPerson();
 
+    // Select from ID
+    //---------------
+    /**
+     * Gets the Person with a specific ID
+     * @param ID
+     * @return Person
+     */
+    @Query("SELECT * FROM " + Constants.PERSON_TABLE_NAME + " WHERE " + Constants.TICKET_PRIMARY_KEY_NAME + " = :ID")
+    Person getPerson(int ID);
 }

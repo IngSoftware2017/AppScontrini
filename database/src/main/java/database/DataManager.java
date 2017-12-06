@@ -120,6 +120,12 @@ public class DataManager {
         return database.ticketDao().getAllMission();
     }
 
+    /**
+     * Return the Person form ID
+     * @param ID Identifiner of the person you want ti find
+     * @return
+     */
+    public Person getPerson(int ID) { return database.ticketDao().getPerson(ID); }
 //    /**
 //     Turns a List of TicketEntity into a List of Ticket
 //     * @param ticketEntities not null
