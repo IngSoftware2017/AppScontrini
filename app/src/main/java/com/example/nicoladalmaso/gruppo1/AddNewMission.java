@@ -85,6 +85,7 @@ public class AddNewMission extends AppCompatActivity {
                 Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
                 startImageView.putExtra("missionName", name);
                 startImageView.putExtra("missionDescription",description);
+                startImageView.putExtra("missionID", miss.getID());
                 context.startActivity(startImageView);
                 return true;
 
