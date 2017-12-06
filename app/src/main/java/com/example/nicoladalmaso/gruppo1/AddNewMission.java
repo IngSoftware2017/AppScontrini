@@ -70,7 +70,6 @@ public class AddNewMission extends AppCompatActivity {
 
                 // If the ret value is true insert the Mission Info in the DB
                 if (ret) {
-
                     Date start, end;
                     start = new Date(10-12-2017);
                     end = new Date(12-12-2017);

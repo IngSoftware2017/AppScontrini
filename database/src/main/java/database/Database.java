@@ -29,12 +29,12 @@ public abstract class Database extends RoomDatabase {
     public static Database getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), Database.class, Constants.DATABASE_NAME)
-                            .allowMainThreadQueries().addMigrations(MIGRATION_1_2, MIGRATION_2_3).build();
+                        .allowMainThreadQueries().addMigrations(MIGRATION_1_2, MIGRATION_2_3).build();
         }
         return INSTANCE;
     }
 
-    //
+    // It insert the column Title to the Ticket table
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
@@ -42,6 +42,7 @@ public abstract class Database extends RoomDatabase {
         }
     };
 
+    // It insert the column Description to the Ticket table
     static final Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
