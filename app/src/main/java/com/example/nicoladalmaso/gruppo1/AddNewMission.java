@@ -19,7 +19,7 @@ import database.Mission;
 public class AddNewMission extends AppCompatActivity {
 
     Context context;
-    DataManager DB = new DataManager(context);
+    DataManager DB;
     Mission newMission;
 
     @Override
@@ -28,6 +28,7 @@ public class AddNewMission extends AppCompatActivity {
         setTitle("Nuova missione");
         setContentView(R.layout.activity_add_new_mission);
         context = this.getApplicationContext();
+         DB = new DataManager(context);
     }
 
     /** Dal Maso
@@ -65,14 +66,11 @@ public class AddNewMission extends AppCompatActivity {
                 //create new directory with input text
                 File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
 
-                Boolean ret;
-                ret = newMissionPath.mkdir();
-
-                // If the ret value is true insert the Mission Info in the DB
-                if (ret) {
+                // If the insert of the Mission Info in the path it's ok, it will add it in the DB
+                if (newMissionPath.mkdir()) {
                     Date start, end;
-                    start = new Date(10-12-2017);
-                    end = new Date(12-12-2017);
+                    start = new Date(2017, 10, 10);
+                    end = new Date(2017, 12, 12);
 
                     newMission = new Mission(name, description, start, end, "", 1);
                     DB.addMission(newMission);
