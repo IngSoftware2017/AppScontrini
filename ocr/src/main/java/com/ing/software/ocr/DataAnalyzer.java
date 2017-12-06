@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
 import com.ing.software.ocr.OcrObjects.RawText;
@@ -16,7 +17,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
-
+import static com.ing.software.ocr.OcrVars.IS_DEBUG_ENABLED;
 
 
 /**

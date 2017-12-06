@@ -74,7 +74,7 @@ class OcrAnalyzer {
         }
         valuedTexts = searchContinuousStringExtended(rawBlocks, valuedTexts, targetPrecision);
         List<RawGridResult> dateList = getDateList(rawBlocks);
-        return new OcrResult(valuedTexts, dateList);
+        return new OcrResult(valuedTexts, dateList, getProducts(rawBlocks));
     }
 
     /**
@@ -218,6 +218,15 @@ class OcrAnalyzer {
         log(2,"FINAL_LIST_SIZE_IS", " " + fullList.size());
         Collections.sort(fullList);
         return fullList;
+    }
+
+    private static List<RawBlock> getProducts(List<RawBlock> blocks) {
+        blocks = OcrSchemer.findBlocksOnLeft(blocks);
+        if (IS_DEBUG_ENABLED)
+            for (RawBlock block : blocks)
+                for (RawText text : block.getTexts())
+                    OcrUtils.log(3,"getProducts", "Product found: " + text.getDetection());
+        return blocks;
     }
 
     /**

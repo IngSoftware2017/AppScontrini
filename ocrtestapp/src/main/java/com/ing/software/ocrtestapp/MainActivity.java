@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.ing.software.common.Ref;
 import com.ing.software.common.Ticket;
-import com.ing.software.ocr.DataAnalyzer;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
 import com.ing.software.ocr.OnTicketReadyListener;

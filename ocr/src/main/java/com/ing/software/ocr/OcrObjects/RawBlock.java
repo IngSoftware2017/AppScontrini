@@ -41,8 +41,22 @@ public class RawBlock implements Comparable<RawBlock> {
     /**
      * @return rect containing this block
      */
-    private RectF getRectF() {
+    public RectF getRectF() {
         return rectF;
+    }
+
+    /**
+     * @return image containing this block
+     */
+    public RawImage getRawImage() {
+        return rawImage;
+    }
+
+    /**
+     * @return list of rawTexts contained
+     */
+    public List<RawText> getTexts() {
+        return rawTexts;
     }
 
     /**
