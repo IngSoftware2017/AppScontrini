@@ -11,6 +11,9 @@ import android.content.Context;
 
 /**
  * Created by Taschin Federico on 08/11/2017.
+ *
+ * Modify: Allow DB migration adding Title and Description columns to the Ticket class
+ * @author Matteo Mascotto on 06-12-2017
  */
 
 @android.arch.persistence.room.Database(entities = {Ticket.class, Mission.class, Person.class}, version = 3)
@@ -31,6 +34,7 @@ public abstract class Database extends RoomDatabase {
         return INSTANCE;
     }
 
+    //
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
@@ -61,6 +65,4 @@ public abstract class Database extends RoomDatabase {
     protected InvalidationTracker createInvalidationTracker() {
         return null;
     }
-
-
 }
