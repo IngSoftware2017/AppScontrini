@@ -122,4 +122,10 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
+    @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
+    List<TicketEntity> getTicketsForMission(int id);
+
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_PRIMARY_KEY_NAME+" = :id")
+    MissionEntity getMission(int id);
+
 }

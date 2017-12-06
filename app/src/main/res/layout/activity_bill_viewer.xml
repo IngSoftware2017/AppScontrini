@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.ingsw.gruppo3.BillViewerGruppo1">
+    tools:context="com.unipd.ingsw.gruppo3.BillViewerGruppo1">
 
     <RelativeLayout
         android:layout_width="match_parent"

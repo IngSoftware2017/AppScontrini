@@ -3,6 +3,7 @@ package com.ing.software.ocr;
 import java.math.RoundingMode;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
@@ -19,6 +20,8 @@ import com.ing.software.common.Ticket;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.Size;
+
+import database.TicketEntity;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
 
@@ -37,14 +40,17 @@ USAGE:
 public class DataAnalyzer {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
+    Activity requested;
 
     class AnalyzeRequest {
         Bitmap photo;
         OnTicketReadyListener ticketCb;
+        Ticket ticket;
 
-        AnalyzeRequest(Bitmap bm, OnTicketReadyListener cb) {
+        AnalyzeRequest(Bitmap bm, OnTicketReadyListener cb, Ticket t) {
             photo = bm;
             ticketCb = cb;
+            ticket = t;
         }
     }
 
@@ -70,8 +76,9 @@ public class DataAnalyzer {
      * @param photo Bitmap. Not null.
      * @param ticketCb callback to get the ticket. Not null.
      */
-    public void getTicket(@NonNull Bitmap photo, final OnTicketReadyListener ticketCb) {
-        analyzeQueue.add(new AnalyzeRequest(photo, ticketCb));
+    public void getTicket(@NonNull Bitmap photo, Ticket ticket,final OnTicketReadyListener ticketCb, Activity requested) {
+        this.requested = requested;
+        analyzeQueue.add(new AnalyzeRequest(photo, ticketCb, ticket));
         dispatchAnalysis();
     }
 
@@ -83,20 +90,28 @@ public class DataAnalyzer {
     private void dispatchAnalysis() {
         if (!analyzing){
             analyzing = true;
-            new Thread(new Runnable() {
+
+            requested.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     while (!analyzeQueue.isEmpty()) {
                         final AnalyzeRequest req = analyzeQueue.remove();
                         final long startTime = System.nanoTime();
                         OcrResult result = analyzer.analyze(req.photo);
-                        req.ticketCb.onTicketReady(getTicketFromResult(result));
+                        Ticket ticket = getTicketFromResult(result);
+                        ticket.ID = req.ticket.ID;
+                        ticket.date = req.ticket.date;
+                        ticket.title = req.ticket.title;
+                        ticket.missionId = req.ticket.missionId;
+                        ticket.fileURI = req.ticket.fileURI;
+                        req.ticketCb.onTicketReady(ticket);
                         long endTime = System.nanoTime();
                 		double duration = ((double)(endTime - startTime))/1000000000;
                         OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
                     }
                 }
-            }).start();
+            });
+
             analyzing = false;
         }
     }

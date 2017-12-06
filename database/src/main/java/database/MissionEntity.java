@@ -1,5 +1,6 @@
 package database;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import android.arch.persistence.room.ColumnInfo;

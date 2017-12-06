@@ -117,6 +117,14 @@ public class DataManager implements Serializable{
     public List<PersonEntity> getAllpersons(){
         return database.ticketDao().getAllPerson();
     }
+
+    public List<TicketEntity> getTicketsForMission(int id){
+        return database.ticketDao().getTicketsForMission(id);
+    }
+
+    public MissionEntity getMission(int id){
+     return database.ticketDao().getMission(id);
+    }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null

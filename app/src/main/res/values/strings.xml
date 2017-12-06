@@ -14,8 +14,8 @@
     <string name="app_name">Missions</string>
     <string name="emptyMission_string">Nessuna missione presente.\nAggiungi una missione con il tasto +</string>
     <string name="nameMission_string">Nome </string>
-    <string name="startMission_string">Data Inizio</string>
-    <string name="endMission_string">Data Fine</string>
+    <string name="startMission_string">2012-01-01</string>
+    <string name="endMission_string">2012-01-01</string>
     <string name="addPersonTextViewListItem">Aggiungi una persona</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="addPersonTextField">Cognome</string>
