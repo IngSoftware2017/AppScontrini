@@ -1,7 +1,6 @@
-package com.example.ingsw.gruppo3;
+package com.unipd.ingsw.gruppo3;
 
 import android.content.Context;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +9,19 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import database.MissionEntity;
 import database.PersonEntity;
 
 /**
  * Created by Federico Taschin on 05/12/2017.
  */
 
-public class AddMissionAdapter extends ArrayAdapter<PersonEntity> {
+public class PeopleListAdapter extends ArrayAdapter<PersonEntity> {
 
 
 
-public AddMissionAdapter(Context context, int textViewResourceId, List<PersonEntity> persons){
+public PeopleListAdapter(Context context, int textViewResourceId, List<PersonEntity> persons){
         super(context,textViewResourceId,persons);
-        }
+}
 
 /**
  * Method that convert the usual view with one modified to show Mission objects
@@ -51,17 +49,6 @@ public View getView(int position, View convertView, ViewGroup parent){
         return convertView;
         }
 
-@Override
-public int getViewTypeCount() {
-        return 2;
-        }
-
-@Override
-public int getItemViewType(int position) {
-        if(position == 0)
-        return 1;
-        return 0;
-        }
 
     static class PersonViewerHolder {
         private TextView personSurnameTextView;
