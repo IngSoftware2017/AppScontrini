@@ -98,7 +98,7 @@ public class OcrManager {
      */
     private static Ticket getTicketFromResult(OcrResult result) {
         Ticket ticket = new Ticket();
-        OcrUtils.log(2, "OCR RESULT", result.toString());
+        OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
         ticket.amount = getPossibleAmount(result.getAmountResults());
         return ticket;

@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 } else if (counter < listNames.size()) {
                     Intent intent = new Intent(MainActivity.this, TestService.class);
                     intent.putExtra("receiver", mReceiver);
-                    OcrUtils.log(1, "OcrHandler", "ANALYZING: " + listNames.get(counter));
                     ++counter;
                     startService(intent);
                     Snackbar.make(view, "Service started", Snackbar.LENGTH_LONG)
@@ -219,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 final Bundle bundle = new Bundle();
                 if (testBmp != null) {
                     validBitmaps++;
+                    OcrUtils.log(1, "OcrHandler", "ANALYZING: " + aFile.getName());
                     bundle.putString(IMAGE_RECEIVED, aFile.getName());
                     receiver.send(STATUS_RUNNING, bundle);
                     ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {

@@ -179,4 +179,74 @@ public class DataAnalyzerTest {
         String result = (String)method.invoke(null,amount, start);
         assertEquals("E", result);
     }
+
+    @Test
+    public void test2Char() throws Exception {
+        String amount = "21";
+        String expected = "21.0";
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test3Char() throws Exception {
+        String amount = "211";
+        String expected = "21.1";
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test3CharDPD() throws Exception {
+        String amount = "2.1";
+        String expected = "02.1";
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test3CharPDD() throws Exception {
+        String amount = ".11";
+        String expected = "00.11";
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test3CharDDP() throws Exception {
+        String amount = "21.";
+        String expected = "21.0";
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test2CharDP() throws Exception {
+        String amount = "2.";
+        String expected = "02.0";
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test2CharPD() throws Exception {
+        String amount = ".2";
+        String expected = "00.2";
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
 }

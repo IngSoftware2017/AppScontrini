@@ -22,14 +22,17 @@ class OcrSchemer {
     - Tieni tutti i blocchi con corrispondenze a destra
      */
     static List<RawBlock> findBlocksOnLeft(List<RawBlock> blocks) {
-        RawImage rawImage = blocks.get(0).getRawImage();
         List<RawBlock> candidates = new ArrayList<>();
-        for(RawBlock block : blocks) {
-            RectF extendedRect = OcrUtils.getExtendedRect(block.getRectF(), rawImage);
-            for (RawBlock block1 : blocks) {
-                if (block1 != block && extendedRect.contains(block1.getRectF())) {
-                    candidates.add(block);
-                    break;
+        if (blocks.size() > 0) {
+            RawImage rawImage = blocks.get(0).getRawImage();
+            for (RawBlock block : blocks) {
+                RectF extendedRect = OcrUtils.getExtendedRect(block.getRectF(), rawImage);
+                for (RawBlock block1 : blocks) {
+                    if (block1 != block && extendedRect.contains(block1.getRectF())) {
+                        candidates.add(block);
+                        candidates.add(block1);
+                        break;
+                    }
                 }
             }
         }

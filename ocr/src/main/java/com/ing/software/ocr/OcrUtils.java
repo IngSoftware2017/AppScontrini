@@ -36,7 +36,7 @@ public class OcrUtils {
      * @return cropped image, null if invalid coordinates
      */
     static Bitmap cropImage(@NonNull Bitmap photo, @IntRange(from = 0) int startX, @IntRange(from = 0) int startY, @IntRange(from = 0) int endX, @IntRange(from = 0) int endY) {
-        log(2,"OcrUtils.cropImage","Received crop: left " + startX + " top: " + startY + " right: " + endX + " bottom: " + endY);
+        log(4,"OcrUtils.cropImage","Received crop: left " + startX + " top: " + startY + " right: " + endX + " bottom: " + endY);
         if (endX < startX || endY < startY)
             return null;
         int width = Math.abs(endX - startX);
@@ -70,14 +70,14 @@ public class OcrUtils {
                 bottom = Math.round(rectF.bottom);
             if (rectF.top<top)
                 top = Math.round(rectF.top);
-            log(4,"OcrUtils.getRectBorder","Value: " + textBlock.getValue());
-            log(4,"OcrUtils.getRectBorder","Temp rect: (left, top, right, bottom): " + rectF.left + "; " + rectF.top + "; " + rectF.right + "; " + rectF.bottom);
+            log(6,"OcrUtils.getRectBorder","Value: " + textBlock.getValue());
+            log(6,"OcrUtils.getRectBorder","Temp rect: (left, top, right, bottom): " + rectF.left + "; " + rectF.top + "; " + rectF.right + "; " + rectF.bottom);
         }
         borders[0] = left;
         borders[1] = top;
         borders[2] = right;
         borders[3] = bottom;
-        log(2,"OcrUtils.getRectBorder","New rect: (left, top, right, bottom): " + left + "; " + top + "; " + right + "; " + bottom);
+        log(4,"OcrUtils.getRectBorder","New rect: (left, top, right, bottom): " + left + "; " + top + "; " + right + "; " + bottom);
         return borders;
     }
 
@@ -176,7 +176,7 @@ public class OcrUtils {
         float left = 0;
         float right = photo.getWidth();
         RectF rectF = new RectF(left, top, right, bottom);
-        log(2,"OcrUtils.getExtendRect","Extended rect: left " + rectF.left + " top: "
+        log(6,"OcrUtils.getExtendRect","Extended rect: left " + rectF.left + " top: "
                 + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
         return rectF;
     }
