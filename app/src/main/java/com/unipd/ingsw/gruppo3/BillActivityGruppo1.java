@@ -1,6 +1,7 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.unipd.ingsw.gruppo3;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,12 +10,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.TimeKeyListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,21 +28,31 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.ing.software.common.Ticket;
+import com.ing.software.ocr.OnTicketReadyListener;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BillActivity extends AppCompatActivity {
+import database.DataManager;
+import database.MissionEntity;
+import database.TicketEntity;
+
+public class BillActivityGruppo1 extends AppCompatActivity implements OnTicketReadyListener{
+    private final String DEBUG_TAG = "BAG1_DEBUG";
+
     public FloatingActionButton fab, fab1, fab2;
     public Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    public List<Scontrino> list = new LinkedList<Scontrino>();
+    public List<TicketEntity> list = new LinkedList<TicketEntity>();
     public Uri photoURI;
     public boolean isFabOpen = false;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -47,19 +60,20 @@ public class BillActivity extends AppCompatActivity {
     String tempPhotoPath;
     Integer pos;
     Context context;
-
+    MissionEntity missionEntity;
+    ArrayList<Ticket> requestedTickets = new ArrayList<Ticket>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        MainActivityGruppo1.mainActivity.subscribe(this);
         setContentView(R.layout.activity_bill);
         Intent intent = getIntent();
-        Log.d("Memes", Variables.getInstance().getCurrentMissionDir());
-        String missionName = intent.getExtras().getString("missionName");
-        pos = intent.getExtras().getInt("missionId");
+         missionEntity = (MissionEntity) intent.getSerializableExtra(IntentCodes.MISSION_OBJECT);
+        //pos = intent.getExtras().getInt("missionId");
         context = this.getApplicationContext();
-        setTitle(missionName);
+        setTitle(missionEntity.getName());
+        list = DataManager.getInstance(this).getTicketsForMission(missionEntity.getID());
         initializeComponents();
         Log.d("fin qui","corretto");
     }
@@ -148,25 +162,22 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-    /**Dal Maso
-     * Aggiunge una card alla lista
-     * @param title Titolo della card (Nome del file)
-     * @param desc Descrizione del file
-     * @param img Bitmap della foto
+    /**
+     *
+     * @param ticketEntity
      */
-    public void addToList(String title, String desc, Bitmap img){
-        list.add(new Scontrino(title, desc, img));
+    public void addToList(TicketEntity ticketEntity){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapterGruppo1 adapter = new CustomAdapterGruppo1(this, R.layout.cardview, list);
         listView.setAdapter(adapter);
     }
 
-    public void addToMissionGrid(String title, String desc, Bitmap img){
+    /*public void addToMissionGrid(String title, String desc, Bitmap img){
         list.add(new Scontrino(title, desc, img));
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapterGruppo1 adapter = new CustomAdapterGruppo1(this, R.layout.cardview, list);
         listView.setAdapter(adapter);
-    }
+    }*/
 
     /** Dal Maso (Using Lazzarin code)
      * Delete the mission from the bills viewer (inside the mission)
@@ -174,7 +185,7 @@ public class BillActivity extends AppCompatActivity {
     public void deleteMission(){
         //Lazzarin
         Log.d("tagMission", "" + pos);
-        AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
+        AlertDialog.Builder toast = new AlertDialog.Builder(BillActivityGruppo1.this);
 
         toast.setMessage("Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati")
                 .setTitle("Cancellazione");
@@ -221,14 +232,26 @@ public class BillActivity extends AppCompatActivity {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(DEBUG_TAG,e.getMessage());
+            }
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
+                try {
+                    photoURI = FileProvider.getUriForFile(this, "com.unipd.ingsw.gruppo3.fileprovider", photoFile);
+                    Log.d(DEBUG_TAG,"CREATO A "+photoURI.getPath());
+                }catch(Exception e){
+                    Log.d(DEBUG_TAG,"ECCEZIONE URI");
+                    Log.d(DEBUG_TAG,e.getMessage());
+                }
                 takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
+            }else{
+                Toast.makeText(this, "null", Toast.LENGTH_SHORT);
             }
+
+        }else{
+            Log.d(DEBUG_TAG,"AAAAAAAAAAAAAA");
         }
     }
 
@@ -240,13 +263,19 @@ public class BillActivity extends AppCompatActivity {
      *
      */
     private File createImageFile() throws IOException {
-        // Create an image file name
-        File storageDir = new File(Variables.getInstance().getCurrentMissionDir());
+        /// Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
-                "temp",  /* prefix */
+                imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
+
+        if(image.exists()){
+            Log.d("AAAAAAAAAA","ESISTE!!!!");
+        }
         // Save a file: path for use with ACTION_VIEW intents
         tempPhotoPath = image.getAbsolutePath();
         return image;
@@ -290,7 +319,6 @@ public class BillActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-
             switch (requestCode) {
                 /**lazzarin
                  * Saves definitely the photo without losing quality, deletes the temporary file and shows
@@ -301,7 +329,6 @@ public class BillActivity extends AppCompatActivity {
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
-                    deleteTempFiles();
                     clearAllImages();
                     printAllImages();
                     break;
@@ -339,13 +366,18 @@ public class BillActivity extends AppCompatActivity {
      * @param imageToSave bitmap da salvare come jpeg
      */
     private void savePickedFile(Bitmap imageToSave) {
-        String root = Variables.getInstance().getCurrentMissionDir();
-        File myDir = new File(root);
-        myDir.mkdirs();
+        File myDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File dir = new File(myDir, "photos");
+        boolean made;
+        if(made = dir.mkdirs()){
+            Log.d(DEBUG_TAG,"MKDIRS "+made);
+        }else{
+            Log.d(DEBUG_TAG,"NOT MADE");
+        }
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "JPEG_" + timeStamp;
         String fname = imageFileName+".jpg";
-        File file = new File(myDir, fname);
+        File file = new File(dir, fname);
         if (file.exists())
             file.delete();
         try {
@@ -360,8 +392,23 @@ public class BillActivity extends AppCompatActivity {
             out.flush();
             out.close();
         } catch (Exception e) {
+            Log.d(DEBUG_TAG,"FINAL WRITE EXCEPTION");
+            Log.d(DEBUG_TAG,e.getMessage());
             e.printStackTrace();
         }
+        Uri uriFile = Uri.fromFile(file);
+        Log.d(DEBUG_TAG,"Uri created at "+uriFile.getPath());
+        TicketEntity ticketToSave = new TicketEntity();
+        ticketToSave.setMissionID(missionEntity.getID());
+        ticketToSave.setFileUri(uriFile);
+        DataManager.getInstance(this).addTicket(ticketToSave);
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        Bitmap bitmapPhoto = BitmapFactory.decodeFile(ticketToSave.getFileUri().getPath(),bmOptions);
+        Ticket ticket = Wrapper.toTicket(ticketToSave);
+        ticket.bitmap = bitmapPhoto;
+        requestedTickets.add(ticket);
+        MainActivityGruppo1.mainActivity.requestTicket(ticket);
+        list.add(ticketToSave);
     }
 
     /** NOT USED
@@ -406,7 +453,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapterGruppo1 adapter = new CustomAdapterGruppo1(this, R.layout.cardview, list);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
@@ -436,43 +483,19 @@ public class BillActivity extends AppCompatActivity {
      *  Stampa tutte le immagini
      */
     public void printAllImages(){
-        File[] files = readAllImages();
+        list = DataManager.getInstance(this).getTicketsForMission(missionEntity.getID());
+        for(TicketEntity ticketEntity : list){
+            Log.d(DEBUG_TAG, "Adding to list ticket number "+ticketEntity.getID()+"with amount = "+ticketEntity.getAmount());
+            addToList(ticketEntity);
+        }
         TextView noBills = (TextView)findViewById(R.id.noBills);
-        if(files.length == 0){
+        if(list.size() == 0){
             noBills.setVisibility(View.VISIBLE);
         }
         else{
             noBills.setVisibility(View.INVISIBLE);
         }
-        for (int i = 0; i < files.length; i++)
-        {
-            SimpleDateFormat simpleDateFormat =
-                    new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
-            Bitmap myBitmap = BitmapFactory.decodeFile(files[i].getAbsolutePath());
-            addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()), myBitmap);
-        }
     }
-
-
-    /** Dal Maso
-     *  Stampa l'ultima foto
-     */
-    private void printLastImage(){
-        File[] files = readAllImages();
-        Bitmap myBitmap = BitmapFactory.decodeFile(files[files.length-1].getAbsolutePath());
-        addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
-    }
-
-
-    /** NOT USED
-     * Dal Maso
-     * Stampa il bitmap passato (Solo per testing)
-     * @param myBitmap bitmap da stampare
-     */
-    private void printThisBitmap(Bitmap myBitmap){
-        addToList("Print this bitmap", "Descrizione della foto", myBitmap);
-    }
-
 
     /** NOT USED
      * PICCOLO_Edit by Dal Maso
@@ -501,10 +524,37 @@ public class BillActivity extends AppCompatActivity {
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
 
+    @Override
+    public void onTicketReady(Ticket ticket) {
+        for(TicketEntity ticketEntity : list){
+            if(ticketEntity.getID() == ticket.ID)
+                if(ticket.amount!=null) {
+                ticketEntity.setAmount(ticket.amount);
+                DataManager.getInstance(this).updateTicket(ticketEntity);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        clearAllImages();
+                        printAllImages();
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public boolean isRequested(Ticket ticket) {
+        boolean isRequested = requestedTickets.contains(ticket);
+        if(isRequested){
+            requestedTickets.remove(ticket);
+        }
+        return isRequested;
+    }
+
     /** NOT USED
      * VERSIONE DATABASE
      *PICCOLO
-     * @param filename il id del file da cancellare a
+     *   il id del file da cancellare a
      */
     /*
     private void deleteFileAndRow(String filename){
@@ -515,4 +565,6 @@ public class BillActivity extends AppCompatActivity {
             boolean deleted = file.delete();
         }//if
     }//deletePickedFile */
+
+
 }

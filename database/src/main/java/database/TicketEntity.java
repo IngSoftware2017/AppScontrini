@@ -7,6 +7,8 @@ import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.ColumnInfo;
 import android.net.Uri;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -20,7 +22,7 @@ import java.util.Date;
         foreignKeys = @ForeignKey(entity = MissionEntity.class, parentColumns = Constants.MISSION_PRIMARY_KEY_NAME, childColumns = Constants.MISSION_CHILD_COLUMNS))
 @TypeConverters(Converters.class)
 
-public class TicketEntity {
+public class TicketEntity implements Serializable{
 
     @ColumnInfo(name = Constants.TICKET_PRIMARY_KEY_NAME)
     @PrimaryKey(autoGenerate = true)

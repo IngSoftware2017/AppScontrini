@@ -10,12 +10,22 @@ import java.util.List;
  */
 
 public class DataManager {
+    private static DataManager dataManager;
     private Database database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 
-    public DataManager(Context context){
+    private DataManager(Context context){
         //receives the instance of the database
         database = Database.getAppDatabase(context);
+    }
+
+    public static DataManager getInstance(Context context){
+        if(dataManager ==null){
+            dataManager = new DataManager(context);
+            return dataManager;
+        }else{
+            return dataManager;
+        }
     }
 
     /** Adds a ticketEntity into the database
@@ -109,7 +119,18 @@ public class DataManager {
         return database.ticketDao().getAllTickets();
     }
 
+    public List<MissionEntity> getAllMission(){return database.ticketDao().getAllMission(); }
 
+    public List<PersonEntity> getAllPerson(){return database.ticketDao().getAllPerson(); }
+
+    public List<TicketEntity> getTicketsForMission(int id){
+        return database.ticketDao().getTicketsForMission(id);
+    }
+
+
+    public TicketEntity getTicket(int id){
+        return database.ticketDao().getTicket(id);
+    }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null

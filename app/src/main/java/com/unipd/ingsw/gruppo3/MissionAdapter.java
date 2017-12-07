@@ -1,4 +1,4 @@
-package com.sw.ing.gestionescontrini;
+package com.unipd.ingsw.gruppo3;
 
 import android.content.Context;
 import android.view.LayoutInflater;

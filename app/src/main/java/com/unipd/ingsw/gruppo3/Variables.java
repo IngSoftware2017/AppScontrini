@@ -1,6 +1,4 @@
-package com.example.nicoladalmaso.gruppo1;
-
-import android.app.Application;
+package com.unipd.ingsw.gruppo3;
 
 /**
  * Created by nicoladalmaso on 01/12/17.

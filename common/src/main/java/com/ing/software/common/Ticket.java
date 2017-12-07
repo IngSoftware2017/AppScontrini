@@ -1,5 +1,8 @@
 package com.ing.software.common;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.ArrayList;
@@ -19,7 +22,7 @@ public class Ticket {
     /**
      * URI pointing to the ticket photo (local or remote).
      */
-    public URI fileURI;
+    public Uri fileURI;
 
     /**
      * Ticket title
@@ -40,4 +43,8 @@ public class Ticket {
      * List of errors related to the creation or manipulation of the Ticket
      */
     public List<TicketError> errors = new ArrayList<>();
+
+    public int missionId;
+
+    public Bitmap bitmap;
 }

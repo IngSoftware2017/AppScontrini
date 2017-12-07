@@ -39,11 +39,11 @@ public class DataAnalyzer {
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
 
     class AnalyzeRequest {
-        Bitmap photo;
+        Ticket ticket;
         OnTicketReadyListener ticketCb;
 
-        AnalyzeRequest(Bitmap bm, OnTicketReadyListener cb) {
-            photo = bm;
+        AnalyzeRequest(Ticket t, OnTicketReadyListener cb) {
+            ticket = t;
             ticketCb = cb;
         }
     }
@@ -67,11 +67,10 @@ public class DataAnalyzer {
 
     /**
      * Get a Ticket from a Bitmap. Some fields of the new ticket can be null.
-     * @param photo Bitmap. Not null.
      * @param ticketCb callback to get the ticket. Not null.
      */
-    public void getTicket(@NonNull Bitmap photo, final OnTicketReadyListener ticketCb) {
-        analyzeQueue.add(new AnalyzeRequest(photo, ticketCb));
+    public void getTicket(@NonNull Ticket ticket, final OnTicketReadyListener ticketCb) {
+        analyzeQueue.add(new AnalyzeRequest(ticket, ticketCb));
         dispatchAnalysis();
     }
 
@@ -89,8 +88,8 @@ public class DataAnalyzer {
                     while (!analyzeQueue.isEmpty()) {
                         final AnalyzeRequest req = analyzeQueue.remove();
                         final long startTime = System.nanoTime();
-                        OcrResult result = analyzer.analyze(req.photo);
-                        req.ticketCb.onTicketReady(getTicketFromResult(result));
+                        OcrResult result = analyzer.analyze(req.ticket.bitmap);
+                        req.ticketCb.onTicketReady(getTicketFromResult(req.ticket,result));
                         long endTime = System.nanoTime();
                 		double duration = ((double)(endTime - startTime))/1000000000;
                         OcrUtils.log(1,"EXECUTION TIME: ", duration + " seconds");
@@ -106,8 +105,7 @@ public class DataAnalyzer {
      * @param result OcrResult to analyze. Not null.
      * @return Ticket. Some fields can be null;
      */
-    private static Ticket getTicketFromResult(OcrResult result) {
-        Ticket ticket = new Ticket();
+    private static Ticket getTicketFromResult(Ticket ticket, OcrResult result) {
         List<RawGridResult> dateList = result.getDateList();
         ticket.amount = getPossibleAmount(result.getAmountResults());
         return ticket;

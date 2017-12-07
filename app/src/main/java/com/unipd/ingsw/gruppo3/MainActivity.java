@@ -1,4 +1,4 @@
-package com.sw.ing.gestionescontrini;
+package com.unipd.ingsw.gruppo3;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        DataManager dbm = new DataManager(this);
+        setContentView(com.sw.ing.gestionescontrini.R.layout.activity_main);
+        //DataManager dbm = new DataManager(this);
 
         newMissionButton = findViewById(R.id.newMissionButton);
         missionsList = findViewById(R.id.missionsList);
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         MissionEntity test = new MissionEntity("name",null,null,"location",1);
         List<MissionEntity> missions = new ArrayList<MissionEntity>();
         missions.add(test);
-        MissionAdapter adapter = new MissionAdapter(this,R.layout.mission_row_custom, missions);
+        MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_row_custom, missions);
         missionsList.setAdapter(adapter);
         checkInitialization();
     }

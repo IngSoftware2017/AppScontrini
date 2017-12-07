@@ -4,97 +4,123 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.sw.ing.gestionescontrini.AddMission">
+    tools:context=".AddMission">
 
     <EditText
         android:id="@+id/nameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp"
-        tools:text="@string/nameMission_string"
+        android:inputType="text"
+        android:hint="@string/nameMission_string"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:focusable="true"
         tools:ignore="MissingConstraints" />
 
     <EditText
         android:id="@+id/starMissionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="date"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="78dp"
-        tools:text="@string/startMission_string"
+        android:inputType="text"
+        android:hint="@string/startMission_string"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameText"
+        android:focusable="true"
         tools:ignore="MissingConstraints" />
 
     <EditText
         android:id="@+id/endMissionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="date"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="147dp"
-        tools:text="@string/endMission_string"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.052"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/starMissionText"
+        android:focusable="true"
         tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="342dp"
         android:layout_height="25dp"
-        android:text="Seleziona o inserisci la persona della missione:"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="206dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/add_person_surname_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.307"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/endMissionText"
         tools:ignore="MissingConstraints" />
 
     <ListView
         android:id="@+id/personsList"
         android:layout_width="355dp"
-        android:layout_height="170dp"
-        tools:layout_editor_absoluteX="15dp"
-        tools:layout_editor_absoluteY="281dp"
-        tools:ignore="MissingConstraints" />
+        android:layout_height="203dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="250dp" />
 
-    <EditText
-        android:id="@+id/editText5"
+    <com.unipd.ingsw.gruppo3.AddPersonEditText
+        android:id="@+id/addPersonaEditText"
         android:layout_width="213dp"
         android:layout_height="40dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Cognome nuova persona"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="235dp"
+        android:inputType="text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:ignore="MissingConstraints" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addPersonButton"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:clickable="true"
-        app:srcCompat="@android:drawable/ic_input_add"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="238dp"
-        tools:layout_editor_absoluteY="238dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.982"
         app:srcCompat="@android:drawable/ic_menu_save"
-        tools:layout_editor_absoluteX="328dp"
-        tools:layout_editor_absoluteY="464dp"
-        tools:ignore="MissingConstraints" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:srcCompat="@android:drawable/ic_delete"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="464dp"
         tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>

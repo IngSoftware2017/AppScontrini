@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    package="com.unipd.ingsw.gruppo3">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -9,7 +10,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
-    package="com.example.nicoladalmaso.gruppo1">
 
     <application
         android:allowBackup="true"
@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivityGruppo1">
+        <activity android:name="com.unipd.ingsw.gruppo3.MainActivityGruppo1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,26 +31,26 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.example.android.fileprovider"
+            android:authorities="com.unipd.ingsw.gruppo3.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/file_paths"></meta-data>
         </provider>
 
         <activity
-            android:name=".BillViewer"
-            android:parentActivityName=".BillActivity"
+            android:name="com.unipd.ingsw.gruppo3.BillViewerGruppo1"
+            android:parentActivityName="com.unipd.ingsw.gruppo3.BillActivityGruppo1"
             android:theme="@style/AppTheme.ActionBar.Transparent" />
         <activity
-            android:name=".BillActivity"
-            android:parentActivityName=".MainActivityGruppo1" />
-        <activity
-            android:name=".AddNewMission"
-            android:parentActivityName=".MainActivityGruppo1"/>
-        <activity android:name=".AddMission" />
-        <activity android:name=".ViewTicket"></activity>
+            android:name="com.unipd.ingsw.gruppo3.BillActivityGruppo1"
+            android:parentActivityName="com.unipd.ingsw.gruppo3.MainActivityGruppo1" />
+        <activity android:name="com.unipd.ingsw.gruppo3.AddNewMissionGruppo1"
+            android:parentActivityName="com.unipd.ingsw.gruppo3.MainActivity">
+        </activity>
+        <activity android:name="com.unipd.ingsw.gruppo3.AddMission"
+            android:parentActivityName=".MainActivityGruppo1"></activity>
     </application>
 
 </manifest>

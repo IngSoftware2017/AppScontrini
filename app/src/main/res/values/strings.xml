@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Gruppo1</string>
-
     <string name="title_activity_collapse">Collapse</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -11,9 +10,10 @@
     <string name="description">Descrizione</string>
     <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
-    <string name="app_name">Missions</string>
     <string name="emptyMission_string">Nessun missione presente.\nAggiungi una missione con il tasto +</string>
     <string name="nameMission_string">Nome Missione</string>
     <string name="startMission_string">Data Inizio Missione</string>
     <string name="endMission_string">Data Fine Missione</string>
+    <string name="select_person_label">Seleziona o inserisci la persona della missione:</string>
+    <string name="add_person_surname_label">Cognome nuova persona</string>
 </resources>

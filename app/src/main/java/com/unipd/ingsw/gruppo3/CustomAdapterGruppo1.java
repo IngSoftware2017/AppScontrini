@@ -1,4 +1,4 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.unipd.ingsw.gruppo3;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,8 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -19,12 +18,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.ing.software.common.Ticket;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import Iterator.TicketsIterator;
+import database.TicketEntity;
 
 /**
  * Created by nicoladalmaso on 28/10/17.
@@ -32,20 +36,22 @@ import java.util.List;
 
 //Classe utilizzata per dupplicare la view cardview all'interno della ListView
 //Dal Maso
-public class CustomAdapter extends ArrayAdapter<Scontrino> {
+public class CustomAdapterGruppo1 extends ArrayAdapter<TicketEntity> {
+    private static final String DEBUG_TAG ="CAG1_DEBUG";
 
     Context context;
     String path = "";
     int pos = 0;
 
-    public CustomAdapter(Context context, int textViewResourceId,
-                         List<Scontrino> objects) {
+    public CustomAdapterGruppo1(Context context, int textViewResourceId,
+                                List<TicketEntity> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.d(DEBUG_TAG, "getView() called at position "+position);
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.cardview, null);
@@ -54,10 +60,16 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         TextView descrizione = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
-        Scontrino c = getItem(position);
-        titolo.setText(c.getTitolo());
-        descrizione.setText(c.getDescrizione());
-        img.setImageBitmap(c.getImg());
+        final TicketEntity ticketEntity = getItem(position);
+        titolo.setText(ticketEntity.getTitle());
+        try {
+            descrizione.setText("Importo totale: "+ticketEntity.getAmount().toString()+"€");
+        }catch(Exception e){
+            descrizione.setText("Importo non disponibile");
+        }
+        Bitmap myBitmap = BitmapFactory.decodeFile(ticketEntity.getFileUri().getPath());
+        Log.d(DEBUG_TAG,"Bitmap created: "+myBitmap);
+        img.setImageBitmap(myBitmap);
         fabDelete.setTag(position);
         convertView.setTag(position);
         //Dal Maso
@@ -78,8 +90,8 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                         File directory = new File(path);
                         File[] files = directory.listFiles();
                         if(files[pos].delete()){
-                            ((BillActivity)context).clearAllImages();
-                            ((BillActivity)context).printAllImages();
+                            ((BillActivityGruppo1)context).clearAllImages();
+                            ((BillActivityGruppo1)context).printAllImages();
                         }
                     }
                 });
@@ -108,13 +120,14 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         //Dal Maso
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                pos = Integer.parseInt(v.getTag().toString());
-                path = Variables.getInstance().getCurrentMissionDir();
-                File directory = new File(path);
-                File[] files = directory.listFiles();
-                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
-                startImageView.putExtra("imagePath", files[pos].getPath());
-                startImageView.putExtra("imageName", files[pos].getName());
+                int index = Integer.parseInt(v.getTag().toString());
+                TicketEntity ticketEntity = getItem(index);
+
+                Intent startImageView = new Intent(context, BillViewerGruppo1.class);
+                IntentWrapperTicketEntity i = Wrapper.toIntentWrapper(ticketEntity);
+                startImageView.putExtra(IntentCodes.INTENT_WRAPPER_OBJECT,i);
+
+                startImageView.putExtra(IntentCodes.URI_OBJECT, ticketEntity.getFileUri().toString());
                 context.startActivity(startImageView);
             }//onClick
         });
@@ -132,7 +145,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop]))
                 .setOutputUri(Uri.fromFile(files[toCrop]))
-                .start(((BillActivity)context));
+                .start(((BillActivityGruppo1)context));
         //files[toCrop].delete();
     }//cropFile
 

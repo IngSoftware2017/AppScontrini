@@ -1,6 +1,8 @@
 package database;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -19,7 +21,7 @@ import android.net.Uri;
         foreignKeys = @ForeignKey(entity = PersonEntity.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
 @TypeConverters(Converters.class)
 
-public class MissionEntity {
+public class MissionEntity implements Serializable{
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
@@ -179,6 +181,7 @@ public class MissionEntity {
     public void setName(String name) {
         this.name = name;
     }
+
 //TODO override toString
 }
 

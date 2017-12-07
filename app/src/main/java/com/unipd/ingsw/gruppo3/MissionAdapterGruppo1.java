@@ -1,37 +1,32 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.unipd.ingsw.gruppo3;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
 
+import database.MissionEntity;
+
 /**
  * Created by nicoladalmaso on 30/11/17.
  */
 
-public class MissionAdapter extends ArrayAdapter<Missione> {
+public class MissionAdapterGruppo1 extends ArrayAdapter<MissionEntity> {
 
     Context context;
-    String path = "";
-    int pos = 0;
 
-    public MissionAdapter(Context context, int textViewResourceId,
-                         List<Missione> objects) {
+    public MissionAdapterGruppo1(Context context, int textViewResourceId,
+                                 List<MissionEntity> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
     }
@@ -46,9 +41,9 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
         TextView description = (TextView)convertView.findViewById(R.id.missionDescription);
         //FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
         //missionDelete.setTag(position);
-        Missione c = getItem(position);
-        title.setText(c.getTitolo());
-        description.setText(c.getDescrizione());
+        final MissionEntity missionEntity= getItem(position);
+        title.setText(missionEntity.getName());
+        description.setText("");
         convertView.setTag(position);
 
         //Dal Maso
@@ -70,16 +65,11 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
 
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                pos = Integer.parseInt(v.getTag().toString());
-                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-                Log.d("Directory Mission",path);
-                File directory = new File(path);
-                File[] files = directory.listFiles();
-                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
-                Variables.getInstance().setCurrentMissionDir(files[pos].getPath());
-                Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
-                startMissionView.putExtra("missionName", files[pos].getName());
-                startMissionView.putExtra("missionId", pos);
+                int index = Integer.parseInt(v.getTag().toString());
+                MissionEntity mission = getItem(index);
+
+                Intent startMissionView = new Intent(context, BillActivityGruppo1.class);
+                startMissionView.putExtra(IntentCodes.MISSION_OBJECT,mission);
                 context.startActivity(startMissionView);
             }//onClick
         });

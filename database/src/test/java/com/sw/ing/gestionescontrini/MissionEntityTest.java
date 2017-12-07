@@ -21,7 +21,7 @@ public class MissionEntityTest {
     public void beforeTest(){
         dateI = new Date(2017,11,20);
         dateF = new Date(2017,11,30);
-        missionEntity1 = new MissionEntity(dateI,dateF,"Venice",1);
+        missionEntity1 = new MissionEntity("Name",dateI,dateF,"Venice",1);
         missionEntity2 = new MissionEntity();
     }
 

@@ -1,4 +1,4 @@
-package com.example.nicoladalmaso.gruppo1;
+package com.unipd.ingsw.gruppo3;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import java.io.File;
 
-public class AddNewMission extends AppCompatActivity {
+public class AddNewMissionGruppo1 extends AppCompatActivity {
 
     Context context;
     @Override
@@ -56,7 +56,7 @@ public class AddNewMission extends AppCompatActivity {
                 File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
                 newMissionPath.mkdir();
                 //Start billActivity
-                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
+                Intent startImageView = new Intent(context, BillActivityGruppo1.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 Variables.getInstance().setCurrentMissionDir(newMissionPath.getAbsolutePath());
                 Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());

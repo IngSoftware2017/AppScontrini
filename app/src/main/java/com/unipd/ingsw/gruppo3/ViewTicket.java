@@ -1,4 +1,4 @@
-package com.sw.ing.gestionescontrini;
+package com.unipd.ingsw.gruppo3;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

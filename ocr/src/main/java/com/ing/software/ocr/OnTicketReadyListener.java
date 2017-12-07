@@ -13,4 +13,6 @@ public interface OnTicketReadyListener {
      * @param ticket new Ticket. Never null.
      */
     void onTicketReady(Ticket ticket);
+
+    boolean isRequested(Ticket ticket);
 }
