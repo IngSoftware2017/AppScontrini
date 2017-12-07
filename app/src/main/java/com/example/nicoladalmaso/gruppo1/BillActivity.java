@@ -355,35 +355,7 @@ public class BillActivity extends AppCompatActivity {
             file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
-            //PICCOLO
-            //using the ocr, extract the information from che picture and then add them to the database
-            DataAnalyzer ocr = new DataAnalyzer();
-            while (ocr.initialize(getApplicationContext())==1){
-                //resource occupied
-            }//while
-            ocr.getTicket(imageToSave,new OnTicketReadyListener(){
-                /**
-                 * Get a Ticket. In the argument "ticket", fields corresponding to unextracted information are null.
-                 * ID and fileURI fields are uninitialized.
-                 *
-                 * @param ticket new Ticket. Never null.
-                 */
-                @Override//TODO SISTEMARE GLI OGGETTI
-                public void onTicketReady(com.ing.software.common.Ticket ticket) {
-                    //TODO:SAVE THE DATA EXTRACTED FROM THE IMAGE
-                    Toast.makeText(context, ticket.toString(), Toast.LENGTH_SHORT).show();
-                }//onTicketReady
-            });//OnTicketReadyListener
-            ocr.release();
-            //
-
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            //PICCOLO_OLD
-            // aggiungo il file al db
-            //DatabaseManager helper = DatabaseManager.getInstance(getApplicationContext());
-            //helper.addPhoto(root+fname); DB ALTERNATIVO
-            //DbManager db = new DbManager(getApplicationContext());
-            //db.addRecord(root+fname,"","","");
             out.flush();
             out.close();
         } catch (Exception e) {

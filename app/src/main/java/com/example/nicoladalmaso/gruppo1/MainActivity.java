@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //DataManager db= new DataManager(this);
-        setTitle("Your missions");
+        setTitle("Le tue missioni");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         File f = new File(path);
