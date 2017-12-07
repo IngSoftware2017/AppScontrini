@@ -14,24 +14,33 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.util.List;
 
+import database.Constants;
 import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 
 /**
  * Created by Marco Olivieri on 03/12/2017
+ *
+ * Modify: Implement the method checkCorrectField()
+ * @author Matteo Mascotto on 07-12-2017
  */
 
 public class AddMission extends AppCompatActivity implements View.OnClickListener{
+
     private final String DEBUG_TAG = "ADM_DEBUG";
+
     //Components
     FloatingActionButton saveMissionButton;
+
     EditText nameMissionText;
     EditText startDateMissionText;
     EditText endDateMissionText;
     AddPersonEditText addPersonaEditText;
+
     ListView personsList;
     List<PersonEntity> personEntities;
 
@@ -80,20 +89,65 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     }
 
-
-
     /**
+     * It control if the Mission data are corrects
+     * (not empty for text fields, correct date format for date fields)
+     *
      * @author Marco Olivieri on 03/12/2017 (Team 3)
-     * return boolean - if setting field is ok
+     * @return the Object where there is an error, null otherwise
      */
-    private boolean checkCorrectField(){
-        return false;
+    private Object checkCorrectField(){
+
+        String dateInput;
+
+        if (nameMissionText.getText().toString().equals("")) return nameMissionText;
+        if (startDateMissionText.getText().toString().equals("")) return startDateMissionText;
+        if (endDateMissionText.getText().toString().equals("")) return endDateMissionText;
+        if (addPersonaEditText.getText().toString().equals("")) return addPersonaEditText;
+
+        dateInput = startDateMissionText.getText().toString();
+        if (dateInput.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}") || dateInput.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
+            return startDateMissionText;
+        }
+
+        dateInput = endDateMissionText.getText().toString();
+        if (dateInput.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}") || dateInput.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
+            return endDateMissionText;
+        }
+
+        return null;
     }
 
     @Override
     public void onClick(View view) {
+
+        // Action after activate the request to Save the Mission
         if(view.getId()==saveMissionButton.getId()){
             Log.d(DEBUG_TAG,"EDIT TEXT:"+addPersonaEditText.getText()+".");
+            if (checkCorrectField() == nameMissionText) {
+                showErrorDialog("Inserire un valore corretto di Missione");
+            } else if (checkCorrectField() == startDateMissionText) {
+                showErrorDialog("Inserire un valore corretto di data di inizio Missione");
+            } else if (checkCorrectField() == endDateMissionText) {
+                showErrorDialog("Inserire un valore corretto di data di fine Missione");
+            } else if (checkCorrectField() == addPersonaEditText) {
+                showErrorDialog("Inserire o selezionare una persona");
+            } else {
+
+                MissionEntity missionEntity = new MissionEntity();
+
+                if (addPersonaEditText.getPersonEntity() != null) {
+                    missionEntity.setPersonID(addPersonaEditText.getPersonEntity().getID());
+                }
+
+                missionEntity.setName(nameMissionText.getText().toString());
+                DataManager.getInstance(this).addMission(missionEntity);
+                Intent callBillActivity = new Intent(this, BillActivityGruppo1.class);
+                callBillActivity.putExtra(IntentCodes.MISSION_OBJECT,missionEntity);
+                startActivity(callBillActivity);
+
+            }
+/*
             if(addPersonaEditText.getText().toString().equals("")){
                 showErrorDialog("Inserire o selezionare una persona");
             }else{
@@ -111,6 +165,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 callBillActivity.putExtra(IntentCodes.MISSION_OBJECT,missionEntity);
                 startActivity(callBillActivity);
             }
+            */
         }
     }
 
