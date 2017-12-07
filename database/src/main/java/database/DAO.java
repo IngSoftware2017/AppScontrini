@@ -12,6 +12,9 @@ import java.util.List;
 /**
  * Created by Federico Taschin on 08/11/2017.
  * Modified by Marco Olivieri on 28/11/2017
+ *
+ * Modify: improve getPerson from id and complete methods documentation
+ * @author Matteo Mascotto
  */
 
 //Data Access Objects Interface. Defines the queries using Room libraries
@@ -49,7 +52,7 @@ public interface DAO {
     long addPerson(PersonEntity personEntity);
 
     //DELETE
-
+    //------
     /**Deletes a MissionEntity from the database
      * @param id int the ID of the MissionEntity to be deleted
      * @return the number of deleted entities.
@@ -72,7 +75,7 @@ public interface DAO {
     int deleteTicket(int id);
 
     //UPDATE
-
+    //------
     /**Updates the given TicketEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param ticketEntity TicketEntity not null, the entity to be updated.
      *               ticketEntity.fileUri not null
@@ -100,7 +103,7 @@ public interface DAO {
     int updatePerson(PersonEntity personEntity);
 
     //SELECT ALL
-
+    //----------
     /**
      * Executes a SELECT of all the entities in the database
      * @return List<TicketEntity>
@@ -122,9 +125,32 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
+    //SELECT FROM ID
+    //--------------
+    /**
+     * Executes a SELECT of the all tickets of the mission
+     *
+     * @param id identifier of the Mission
+     * @return List<TicketEntity>
+     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
-    public List<TicketEntity> getTicketsForMission(int id);
+    List<TicketEntity> getTicketsForMission(int id);
 
+    /**
+     * Executes a SELECT of a specific ticket from id
+     *
+     * @param id identifier of the ticket
+     * @return TicketEntity
+     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY_NAME+" =:id")
-    public TicketEntity getTicket(int id);
+    TicketEntity getTicket(int id);
+
+    /**
+     * Executes a SELECT of a specific person from id
+     *
+     * @param id identifier of the person
+     * @return PersonEntity
+     */
+    @Query("SELECT * FROM " + Constants.PERSON_TABLE_NAME + " WHERE " + Constants.PERSON_PRIMARY_KEY_NAME + " =:id")
+    PersonEntity getPerson(int id);
 }
