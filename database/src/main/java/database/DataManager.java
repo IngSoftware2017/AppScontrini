@@ -7,6 +7,9 @@ import java.util.List;
 /**
  * Created by Federico Taschin on 07/11/2017.
  * Modified by Marco Olivieri on 14/11/2017
+ *
+ * Modify: improve methods and complete documentation
+ * @author Matteo Mascotto
  */
 
 public class DataManager {
@@ -119,17 +122,48 @@ public class DataManager {
         return database.ticketDao().getAllTickets();
     }
 
+    /**
+     * Return a list of the all Persons
+     *
+     * @return List<MissionEntity>
+     */
     public List<MissionEntity> getAllMission(){return database.ticketDao().getAllMission(); }
 
+    /**
+     * Return a list of the all Persons
+     *
+     * @return List<PersonEntity>
+     */
     public List<PersonEntity> getAllPerson(){return database.ticketDao().getAllPerson(); }
 
+    /**
+     * Return a list of the tickets associate to a specific Mission
+     *
+     * @param id identifier of the Mission
+     * @return List<TicketEntity>
+     */
     public List<TicketEntity> getTicketsForMission(int id){
         return database.ticketDao().getTicketsForMission(id);
     }
 
-
+    /**
+     * Return a specific Ticket from a given ID
+     *
+     * @param id identifier of the Ticket
+     * @return TicketEntity
+     */
     public TicketEntity getTicket(int id){
         return database.ticketDao().getTicket(id);
+    }
+
+    /**
+     * Return a specific Person from a given ID
+     *
+     * @param id identifier of the Person
+     * @return PersonEntity
+     */
+    public PersonEntity getPerson(int id){
+        return database.ticketDao().getPerson(id);
     }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
