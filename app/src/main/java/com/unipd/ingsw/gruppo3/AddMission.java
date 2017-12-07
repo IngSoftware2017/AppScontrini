@@ -169,6 +169,11 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    /**
+     * Lunch the error message by Toast
+     *
+     * @param errorMessage it contains the error message to write in the Toast
+     */
     public void showErrorDialog(String errorMessage){
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
         Log.d(DEBUG_TAG,"Toast displayed");
