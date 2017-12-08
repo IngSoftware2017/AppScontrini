@@ -1,5 +1,6 @@
 package com.unipd.ingsw.gruppo3;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.provider.ContactsContract;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -47,6 +49,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         setContentView(R.layout.activity_add_mission);
 
@@ -64,6 +67,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 startDateMissionText.setText("");
             }
         });
+
         endDateMissionText = findViewById(R.id.endMissionText);
         endDateMissionText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +75,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 endDateMissionText.setText("");
             }
         });
+
         addPersonaEditText =findViewById(R.id.addPersonaEditText);
         addPersonaEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,15 +83,18 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 addPersonaEditText.setText("");
             }
         });
+
         personsList = findViewById(R.id.personsList);
 
         saveMissionButton = findViewById(R.id.saveButton);
         saveMissionButton.setOnClickListener(this);
 
+        /* Matteo Mascotto - TO-DO: Improve different code for the autocomplete of the Person
+            this code cause problem with the layout addMissionPage
         personEntities = DataManager.getInstance(this).getAllPerson();
         PersonAdapter adapter = new PersonAdapter(this, R.layout.persona_row_item, personEntities);
         personsList.setAdapter(adapter);
-
+        */
     }
 
     /**
@@ -94,6 +102,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
      * (not empty for text fields, correct date format for date fields)
      *
      * @author Marco Olivieri on 03/12/2017 (Team 3)
+     * @author Matteo Mascotto on 07-12-2017
+     *
      * @return the Object where there is an error, null otherwise
      */
     private Object checkCorrectField(){
@@ -115,15 +125,20 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
             return endDateMissionText;
         }
 
+        // Compare the beginDate and endDate of the Mission to check if it contain a correct interval
+        if (dateInput.compareTo(startDateMissionText.getText().toString()) > 0) {
+            return endDateMissionText;
+        }
+
         return null;
     }
 
     @Override
     public void onClick(View view) {
-
         // Action after activate the request to Save the Mission
-        if(view.getId()==saveMissionButton.getId()){
-            Log.d(DEBUG_TAG,"EDIT TEXT:"+addPersonaEditText.getText()+".");
+        if (view.getId() == saveMissionButton.getId()) {
+            Log.d(DEBUG_TAG, "EDIT TEXT:" + addPersonaEditText.getText() + ".");
+
             if (checkCorrectField() == nameMissionText) {
                 showErrorDialog("Inserire un valore corretto di Missione");
             } else if (checkCorrectField() == startDateMissionText) {
@@ -143,16 +158,15 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 missionEntity.setName(nameMissionText.getText().toString());
                 DataManager.getInstance(this).addMission(missionEntity);
                 Intent callBillActivity = new Intent(this, BillActivityGruppo1.class);
-                callBillActivity.putExtra(IntentCodes.MISSION_OBJECT,missionEntity);
+                callBillActivity.putExtra(IntentCodes.MISSION_OBJECT, missionEntity);
                 startActivity(callBillActivity);
-
             }
-/*
-            if(addPersonaEditText.getText().toString().equals("")){
-                showErrorDialog("Inserire o selezionare una persona");
-            }else{
-                MissionEntity missionEntity = new MissionEntity();
-                if(addPersonaEditText.getPersonEntity()==null){
+    /*
+                if(addPersonaEditText.getText().toString().equals("")){
+                    showErrorDialog("Inserire o selezionare una persona");
+                }else{
+                    MissionEntity missionEntity = new MissionEntity();
+                    if(addPersonaEditText.getPersonEntity()==null){
                     PersonEntity personEntity = new PersonEntity();
                     DataManager.getInstance(this).addPerson(personEntity);
                     missionEntity.setPersonID(personEntity.getID());
