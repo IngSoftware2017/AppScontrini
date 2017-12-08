@@ -71,10 +71,10 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 Log.d("Dir", path);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Sei sicuro di voler eliminare lo scontrino?")
+                builder.setMessage(text.deleteTicketToast)
                         .setTitle("Cancellazione");
                 // Add the buttons
-                builder.setPositiveButton("Cancella", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         File directory = new File(path);
                         File[] files = directory.listFiles();
@@ -84,7 +84,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                         }
                     }
                 });
-                builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
                     }

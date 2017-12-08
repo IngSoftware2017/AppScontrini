@@ -98,10 +98,10 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
                       Log.d("Dir", path);
 
                       AlertDialog.Builder toast = new AlertDialog.Builder(context);
-                      toast.setMessage("Sei sicuro di voler eliminare la missione?Tutti gli scontrini verranno eliminati")
+                      toast.setMessage(text.deleteMissionToast)
                               .setTitle("Cancellazione");
 
-                      toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
+                      toast.setPositiveButton(text.deleteButton, new DialogInterface.OnClickListener() {
                           public void onClick(DialogInterface dialog, int id) {
                               File directory = new File(path);
                               File[] files = directory.listFiles();
@@ -111,7 +111,7 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
                               }
                           }
                       });
-                      toast.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+                      toast.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
                           public void onClick(DialogInterface dialog, int id) {
                               //Nothing to do
                           }

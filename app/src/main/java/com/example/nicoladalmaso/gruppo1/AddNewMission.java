@@ -20,7 +20,7 @@ public class AddNewMission extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle("Nuova missione");
+        setTitle(text.newMission);
         setContentView(R.layout.activity_add_new_mission);
         context = this.getApplicationContext();
     }
@@ -39,9 +39,9 @@ public class AddNewMission extends AppCompatActivity {
 
     /** Dal Maso
      * Edit by Lazzarin
-     * Cattura degli eventi nella toolbar
-     * @param item oggetto nella toolbar catturato
-     * @return flag di successo
+     * Catch of events on toolbar
+     * @param item object on toolbar
+     * @return flag of success
      *
      */
     @Override
