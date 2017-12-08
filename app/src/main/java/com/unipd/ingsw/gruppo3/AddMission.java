@@ -27,7 +27,7 @@ import database.PersonEntity;
 /**
  * Created by Marco Olivieri on 03/12/2017
  *
- * Modify: Implement the method checkCorrectField()
+ * Modify: Implement the method checkCorrectField(), remove the auto setting of empty text to the Items
  * @author Matteo Mascotto on 07-12-2017
  */
 
@@ -54,36 +54,46 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.activity_add_mission);
 
         nameMissionText = findViewById(R.id.nameText);
+        /*
+        nameMissionText.setOnClickListener(this);
         nameMissionText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 nameMissionText.setText("");
+                nameMissionText.setEnabled(true);
             }
         });
+        */
+
         startDateMissionText = findViewById(R.id.starMissionText);
+        /*
         startDateMissionText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startDateMissionText.setText("");
             }
         });
+        */
 
         endDateMissionText = findViewById(R.id.endMissionText);
+        /*
         endDateMissionText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 endDateMissionText.setText("");
             }
         });
+        */
 
         addPersonaEditText =findViewById(R.id.addPersonaEditText);
+        /*
         addPersonaEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addPersonaEditText.setText("");
             }
         });
-
+        */
         personsList = findViewById(R.id.personsList);
 
         saveMissionButton = findViewById(R.id.saveButton);
