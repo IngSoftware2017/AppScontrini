@@ -186,8 +186,8 @@ public class DataAnalyzerTest {
         String expected = "21.0";
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
         method.setAccessible(true);
-        String result = (String)method.invoke(null,amount);
-        assertEquals(expected, result);
+        StringBuilder result = (StringBuilder)method.invoke(null,amount);
+        assertEquals(expected, result.toString());
     }
 
     @Test
@@ -196,8 +196,8 @@ public class DataAnalyzerTest {
         String expected = "21.1";
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
         method.setAccessible(true);
-        String result = (String)method.invoke(null,amount);
-        assertEquals(expected, result);
+        StringBuilder result = (StringBuilder)method.invoke(null,amount);
+        assertEquals(expected, result.toString());
     }
 
     @Test
@@ -206,8 +206,8 @@ public class DataAnalyzerTest {
         String expected = "02.1";
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
         method.setAccessible(true);
-        String result = (String)method.invoke(null,amount);
-        assertEquals(expected, result);
+        StringBuilder result = (StringBuilder)method.invoke(null,amount);
+        assertEquals(expected, result.toString());
     }
 
     @Test
@@ -216,8 +216,8 @@ public class DataAnalyzerTest {
         String expected = "00.11";
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
         method.setAccessible(true);
-        String result = (String)method.invoke(null,amount);
-        assertEquals(expected, result);
+        StringBuilder result = (StringBuilder)method.invoke(null,amount);
+        assertEquals(expected, result.toString());
     }
 
     @Test
@@ -226,8 +226,8 @@ public class DataAnalyzerTest {
         String expected = "21.0";
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
         method.setAccessible(true);
-        String result = (String)method.invoke(null,amount);
-        assertEquals(expected, result);
+        StringBuilder result = (StringBuilder)method.invoke(null,amount);
+        assertEquals(expected, result.toString());
     }
 
     @Test
@@ -236,8 +236,8 @@ public class DataAnalyzerTest {
         String expected = "02.0";
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
         method.setAccessible(true);
-        String result = (String)method.invoke(null,amount);
-        assertEquals(expected, result);
+        StringBuilder result = (StringBuilder)method.invoke(null,amount);
+        assertEquals(expected, result.toString());
     }
 
     @Test
@@ -245,6 +245,66 @@ public class DataAnalyzerTest {
         String amount = ".2";
         String expected = "00.2";
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeChars", String.class);
+        method.setAccessible(true);
+        StringBuilder result = (StringBuilder)method.invoke(null,amount);
+        assertEquals(expected, result.toString());
+    }
+
+    @Test
+    public void deepAmount2SingleLetter() throws Exception {
+        String amount = "5S";
+        String expected = "0.55";
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void deepAmount2Comma() throws Exception {
+        String amount = "111,5";
+        String expected = "111.50";
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void deepAmount2DoublePoint() throws Exception {
+        String amount = "7.87.5";
+        String expected = "787.50";
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void deepAmount2SingleDigit() throws Exception {
+        String amount = "1";
+        String expected = "1.00";
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void deepAmount2NoPoint() throws Exception {
+        String amount = "250";
+        String expected = "2.50";
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void deepAmount2ThreeDecimals() throws Exception {
+        String amount = "2.500";
+        String expected = "2.50";
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
         method.setAccessible(true);
         String result = (String)method.invoke(null,amount);
         assertEquals(expected, result);

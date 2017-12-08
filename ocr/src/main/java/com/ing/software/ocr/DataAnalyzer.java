@@ -110,6 +110,7 @@ public class DataAnalyzer {
      * @param targetAmount string containing possible amount. Length > 0.
      * @return string containing the amount, null if no number was found
      */
+    @Deprecated
     private static String deepAnalyzeAmount(@Size(min = 1) String targetAmount){
         targetAmount = targetAmount.replaceAll(",", ".").replaceAll("S", "5");
         StringBuilder manipulatedAmount = new StringBuilder();
@@ -146,105 +147,165 @@ public class DataAnalyzer {
     }
 
     //Seems that the price under the correct one is usually correct, the manager
-    // will have to find it (tip = search under amount rect) and compare with this one and
+    // will have to find it and compare with this one and
     // with the result of products search...
-    private static String deepAnalyzeAmountV2(@Size(min = 1) String targetAmount){
-        targetAmount = targetAmount.replaceAll(",", ".").replaceAll(" ", "")
-                .replaceAll("S", "5");
-        StringBuilder manipulatedAmount = new StringBuilder();
-        StringBuilder reversedAmount = new StringBuilder(targetAmount).reverse();
-        OcrUtils.log(3,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
-        //Check if there are at least 2 dec + '.' + 1 num
-        if (reversedAmount.length() >= 4) {
-            char char0 = reversedAmount.charAt(0);
-            char char1 = reversedAmount.charAt(1);
-            char char2 = reversedAmount.charAt(2);
-            char char3 = reversedAmount.charAt(3);
-        } else {
-            manipulatedAmount = new StringBuilder(analyzeChars(reversedAmount.toString()));
-        }
-        return manipulatedAmount.toString();
-    }
-    /*
-    Metti la stringa sottosopra.
-    Prendi i primi tre char, se sono 2 number e un '.' allora sono i decimali
-        Se il '.' è in posiz 0, verifica di avere almeno un numero dopo, se si allora aggiungi
-            due 0 all'inizio. Se non hai numeri dopo, riparti dall'inizio scartando il punto.
-        Se il '.' è in posiz 1, verifica che in 0 ci sia un numero, se si controlla che ci almeno un
-            num dopo il '.' se no scarta la parte prima
-        Se sono 3 num e fino alla fine non c'è alcun punto, supponi che non sia stato individuato
-            e aggiungilo dopo i primi due decimali.
-        Se sono 3 num e c'è un punto in posiz 3, scarta il primo numero.
 
-
-        //if not suppose one is missing
-            char char0 = '\u0000';
-            char char1 = '\u0000';
-            char char2 = '\u0000';
-            String result = "";
-            if (reversedAmount.length() == 1)
-                char0 = reversedAmount.charAt(0);
-            if (reversedAmount.length() == 2)
-                char1 = reversedAmount.charAt(1);
-            if (reversedAmount.length() == 3)
-                char2 = reversedAmount.charAt(2);
-            if (Character.isDigit(char0) && Character.isDigit(char1) && Character.isDigit(char2)) {
-                //point is missing = add after char0 and char1
-                result = String.valueOf(char0) + String.valueOf(char1) + "." + String.valueOf(char2);
-            } else if (Character.isDigit(char0) && char1 == '.' && Character.isDigit(char2)) {
-                //one decimal is missing, suppose it's the last one
-                result =  "0" + String.valueOf(char0) + String.valueOf(char1) + String.valueOf(char2);
-            } else if (char0 == '.' && Character.isDigit(char1) && Character.isDigit(char2)) {
-                //Missing both decimals (or maybe found a point that shouldn't be there)
-                result = "00" + String.valueOf(char0) + String.valueOf(char1) + String.valueOf(char2);
-            } else if (Character.isDigit(char0) && Character.isDigit(char1) && char2 == '.') {
-                //Missing first integer, use 0
-                result = String.valueOf(char0) + String.valueOf(char1) + String.valueOf(char2) + "0";
-            }
+    /**
+     * @author Michelon
+     * Analyze a string looking for a number (with two decimals)
+     * @param targetAmount string containing possible amount. Length > 0.
+     * @return string containing the amount, empty string if nothing found
      */
+    private static String deepAnalyzeAmountChars(@Size(min = 1) String targetAmount){
+        StringBuilder manipulatedAmount;
+        StringBuilder reversedAmount = new StringBuilder(targetAmount.replaceAll(",", ".")
+                .replaceAll(" ", "").replaceAll("S", "5")).reverse();
+        OcrUtils.log(3,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
+        OcrUtils.log(3,"deepAnalyzeAmount", "Reversed amount is: " + reversedAmount.toString());
+        manipulatedAmount = analyzeCharsLong(reversedAmount.toString());
+        return manipulatedAmount.reverse().toString();
+    }
 
-    private static String analyzeChars(@Size (max = 3) String source) {
+    /**
+     * @author Michelon
+     * Analyze a string looking for a number (with two decimals)
+     * @param source string containing possible amount. Length > 0.
+     * @return stringBuilder containing the amount, empty string if nothing found
+     */
+    private static StringBuilder analyzeCharsLong(@Size (min = 1) String source) {
+        source = removeLetters(source);
+        StringBuilder manipulatedAmount = new StringBuilder();
+        //Check if there are at least 2 dec + '.' + 1 num
+        if (source.length() >= 4) {
+            char char0 = source.charAt(0);
+            char char1 = source.charAt(1);
+            char char2 = source.charAt(2);
+            char char3 = source.charAt(3);
+            if (char0 == '.' && Character.isDigit(char1))
+                manipulatedAmount.append("00").append(char0).append(char1).append(removeRedundantPoints(source.substring(2)));
+            else if (char0 == '.')
+                return analyzeCharsLong(source.substring(1));
+            else if (char1 == '.' && Character.isDigit(char2)) //now char0 must be digit
+                manipulatedAmount.append("0").append(char0).append(char1).append(removeRedundantPoints(source.substring(2)));
+            else if (char1 == '.') //char0 must be digit and char2 must be '.' = remove char1
+                return analyzeCharsLong(String.valueOf(char0) + source.substring(2));
+            else if (char2 == '.') //char0 and char1 must be digit = if char2 is '.' everything is ok
+                manipulatedAmount.append(char0).append(char1).append(char2).append(removeRedundantPoints(source.substring(3)));
+            else if (char3 == '.') //char0, 1, 2 must be digit = if char3 is '.' char0 was added by detector = remove it
+                return analyzeCharsLong(source.substring(1));
+            else //we have 4 digits, suppose we did not find the '.' = add it after char0 and char1
+                manipulatedAmount.append(char0).append(char1).append('.').append(removeRedundantPoints(source.substring(2)));
+            return manipulatedAmount;
+        } else
+            return analyzeChars(source);
+    }
+
+    /**
+     * @author Michelon
+     * Keep only digits and points in a string
+     * @param string source string
+     * @return string with only digits and '.'
+     */
+    private static String removeLetters(String string) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < string.length(); ++i)
+            if (Character.isDigit(string.charAt(i)) || string.charAt(i) == '.')
+                result.append(string.charAt(i));
+        return result.toString();
+    }
+
+    /**
+     * @author Michelon
+     * Removes '.' from a string
+     * @param string source string
+     * @return string with no '.'
+     */
+    private static String removeRedundantPoints(String string) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < string.length(); ++i)
+            if (string.charAt(i) != '.')
+                result.append(string.charAt(i));
+        return result.toString();
+    }
+
+    /**
+     * @author Michelon
+     * Analyze a string looking for a number with two decimals
+     * @param source source string @Size(min = 1, max = 3)
+     * @return StringBuilder with decoded number
+     */
+    private static StringBuilder analyzeChars(String source) {
         if (source.length()==3)
             return analyzeChars(source.charAt(0), source.charAt(1), source.charAt(2));
         else if (source.length() == 2)
             return analyzeChars(source.charAt(0), source.charAt(1));
         else
-            return source;
+            return analyzeChars(source.charAt(0));
     }
 
-    private static String analyzeChars(char char0, char char1, char char2) {
+    /**
+     * @author Michelon
+     * Analyze three chars
+     * @param char0 first char
+     * @param char1 second char
+     * @param char2 third char
+     * @return analysis
+     */
+    private static StringBuilder analyzeChars(char char0, char char1, char char2) {
+        StringBuilder result = new StringBuilder();
         if (Character.isDigit(char0) && Character.isDigit(char1) && Character.isDigit(char2)) {
             //point is missing = add after char0 and char1
-            return String.valueOf(char0) + String.valueOf(char1) + "." + String.valueOf(char2);
+            return result.append(char0).append(char1).append(".").append(char2);
         } else if (Character.isDigit(char0) && char1 == '.' && Character.isDigit(char2)) {
             //one decimal is missing, suppose it's the last one
-            return  "0" + String.valueOf(char0) + String.valueOf(char1) + String.valueOf(char2);
+            return  result.append("0").append(char0).append(char1).append(char2);
         } else if (char0 == '.' && Character.isDigit(char1) && Character.isDigit(char2)) {
             //Missing both decimals (or maybe found a point that shouldn't be there)
-            return "00" + String.valueOf(char0) + String.valueOf(char1) + String.valueOf(char2);
+            return result.append("00").append(char0).append(char1).append(char2);
         } else if (Character.isDigit(char0) && Character.isDigit(char1) && char2 == '.') {
             //Missing first integer, use 0
-            return String.valueOf(char0) + String.valueOf(char1) + String.valueOf(char2) + "0";
-        } else
-            return String.valueOf(char0) + String.valueOf(char1) + String.valueOf(char2);
+            return result.append(char0).append(char1).append(char2).append("0");
+        } else if (Character.isDigit(char0)) //char1 and char2 must be points
+            return analyzeChars(char0, char1);
+        else //char0 is point, can be removed as char1 or char2 is also a point
+            return analyzeChars(char1, char2);
     }
 
-    private static String analyzeChars(char char0, char char1) {
+    /**
+     * @author Michelon
+     * Analyze two chars
+     * @param char0 first char
+     * @param char1 second char
+     * @return analysis
+     */
+    private static StringBuilder analyzeChars(char char0, char char1) {
+        StringBuilder result = new StringBuilder();
         if (Character.isDigit(char0) && Character.isDigit(char1)) {
             //point is missing = add after char0 and char1 and add '0' (actually this may be anything)
-            return String.valueOf(char0) + String.valueOf(char1) + ".0";
+            return result.append(char0).append(char1).append(".0");
         } else if (Character.isDigit(char0) && char1 == '.') {
             //one decimal is missing, suppose it's the last one
-            return  "0" + String.valueOf(char0) + String.valueOf(char1) + "0";
+            return  result.append("0").append(char0).append(char1).append("0");
         } else if (char0 == '.' && Character.isDigit(char1)) {
             //Missing both decimals (or maybe found a point that shouldn't be there)
-            return "00" + String.valueOf(char0) + String.valueOf(char1);
-        } else
-            return String.valueOf(char0) + String.valueOf(char1);
+            return result.append("00").append(char0).append(char1);
+        } else //Both are points
+            return result;
     }
 
-
-
+    /**
+     * @author Michelon
+     * Analyze single char
+     * @param char0 first char
+     * @return analysis
+     */
+    private static StringBuilder analyzeChars(char char0) {
+        StringBuilder result = new StringBuilder();
+        if (Character.isDigit(char0))
+            return result.append("00.").append(char0);
+        else
+            return result;
+    }
 
     /**
      * @author Michelon
