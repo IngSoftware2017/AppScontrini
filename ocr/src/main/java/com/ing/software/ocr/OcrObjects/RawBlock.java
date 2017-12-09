@@ -22,7 +22,6 @@ import static com.ing.software.ocr.OcrUtils.log;
 public class RawBlock implements Comparable<RawBlock> {
 
     private List<RawText> rawTexts = new ArrayList<>();
-    private List<? extends Text> textComponents;
     private RectF rectF;
     private RawImage rawImage;
 
@@ -33,9 +32,8 @@ public class RawBlock implements Comparable<RawBlock> {
      */
     public RawBlock(@NonNull TextBlock textBlock, @NonNull RawImage imageMod) {
         rectF = new RectF(textBlock.getBoundingBox());
-        textComponents = textBlock.getComponents();
         this.rawImage = imageMod;
-        initialize();
+        initialize(textBlock);
     }
 
     /**
@@ -62,8 +60,8 @@ public class RawBlock implements Comparable<RawBlock> {
     /**
      * Populates this block with its RawTexts
      */
-    private void initialize() {
-        for (Text currentText : textComponents) {
+    private void initialize(TextBlock textBlock) {
+        for (Text currentText : textBlock.getComponents()) {
             rawTexts.add(new RawText(currentText, rawImage));
         }
     }

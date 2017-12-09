@@ -31,7 +31,7 @@ public class DataAnalyzer {
      * @param amountResults list of RawStringResult from amount search. Not null.
      * @return BigDecimal containing the amount found. Null if nothing found
      */
-    static BigDecimal getPossibleAmount(@NonNull List<RawStringResult> amountResults) {
+    static List<RawGridResult> getPossibleAmounts(@NonNull List<RawStringResult> amountResults) {
         List<RawGridResult> possibleResults = new ArrayList<>();
         Collections.sort(amountResults);
         for (RawStringResult stringResult : amountResults) {
@@ -61,23 +61,16 @@ public class DataAnalyzer {
             they are inserted.
             */
             Collections.sort(possibleResults);
-            BigDecimal amount;
-            for (RawGridResult result : possibleResults) {
-                String amountString = result.getText().getDetection();
-                OcrUtils.log(2,"getPossibleAmount", "Possible amount is: " + amountString);
-                amount = analyzeAmount(amountString);
-                if (amount != null) {
-                    OcrUtils.log(2, "getPossibleAmount", "Decoded value: " + amount);
-                    return amount;
-                }
-            }
         }
+        /*
         else {
             OcrUtils.log(2,"getPossibleAmount", "No parsable result ");
             return null;
         }
         OcrUtils.log(2,"getPossibleAmount", "No parsable amount ");
         return null;
+        */
+        return possibleResults;
     }
 
     /**
@@ -87,12 +80,14 @@ public class DataAnalyzer {
      * @return BigDecimal containing the amount, null if no number was found
      */
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
-        BigDecimal amount;
+        BigDecimal amount = null;
         try {
             amount = new BigDecimal(amountString);
         } catch (NumberFormatException e) {
             try {
-                amount = new BigDecimal(deepAnalyzeAmount(amountString));
+                String decoded = deepAnalyzeAmountChars(amountString);
+                if (!decoded.equals(""))
+                    amount = new BigDecimal(decoded);
             } catch (Exception e1) {
                 amount = null;
             }
@@ -152,6 +147,7 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 8-12-17
      * Analyze a string looking for a number (with two decimals)
      * @param targetAmount string containing possible amount. Length > 0.
      * @return string containing the amount, empty string if nothing found
@@ -168,11 +164,13 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 9-12-17
      * Analyze a string looking for a number (with two decimals)
      * @param source string containing possible amount. Length > 0.
      * @return stringBuilder containing the amount, empty string if nothing found
      */
     private static StringBuilder analyzeCharsLong(@Size (min = 1) String source) {
+        boolean isNegative = (source.charAt(source.length()-1) == '-');
         source = removeLetters(source);
         StringBuilder manipulatedAmount = new StringBuilder();
         //Check if there are at least 2 dec + '.' + 1 num
@@ -195,13 +193,20 @@ public class DataAnalyzer {
                 return analyzeCharsLong(source.substring(1));
             else //we have 4 digits, suppose we did not find the '.' = add it after char0 and char1
                 manipulatedAmount.append(char0).append(char1).append('.').append(removeRedundantPoints(source.substring(2)));
+            if (isNegative)
+                manipulatedAmount.append("-");
             return manipulatedAmount;
-        } else
+        } else if (source.length() > 0 && isNegative)
+            return analyzeChars(source).append("-");
+        else if (source.length() > 0)
             return analyzeChars(source);
+        else
+            return manipulatedAmount;
     }
 
     /**
      * @author Michelon
+     * @date 8-12-17
      * Keep only digits and points in a string
      * @param string source string
      * @return string with only digits and '.'
@@ -216,6 +221,7 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 8-12-17
      * Removes '.' from a string
      * @param string source string
      * @return string with no '.'
@@ -230,6 +236,7 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 8-12-17
      * Analyze a string looking for a number with two decimals
      * @param source source string @Size(min = 1, max = 3)
      * @return StringBuilder with decoded number
@@ -245,6 +252,7 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 8-12-17
      * Analyze three chars
      * @param char0 first char
      * @param char1 second char
@@ -273,6 +281,7 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 8-12-17
      * Analyze two chars
      * @param char0 first char
      * @param char1 second char
@@ -295,6 +304,7 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 8-12-17
      * Analyze single char
      * @param char0 first char
      * @return analysis

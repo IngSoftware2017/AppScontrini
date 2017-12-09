@@ -69,8 +69,10 @@ class OcrResult {
         if (dateList != null) {
             for (RawGridResult result : dateList) {
                 int probability = result.getPercentage();
-                list.append("POSSIBLE DATE: " + result.getText().getDetection() + " with probability: " + probability);
-                log(2,"POSSIBLE DATE: ", result.getText().getDetection() + " with probability: " + probability);
+                list.append("POSSIBLE DATE: ").append(result.getText().getDetection()).append(" with probability: ")
+                        .append(probability);
+                log(2,"POSSIBLE DATE: ", result.getText().getDetection() + " with probability: "
+                        + probability + " and distance: " + DataAnalyzer.findDate(result.getText().getDetection()));
                 list.append("\n");
             }
         }

@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         ocrAnalyzer = new OcrManager();
         while (ocrAnalyzer.initialize(this) != 0) {
             try {
-                Thread.sleep(5000);
+                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
