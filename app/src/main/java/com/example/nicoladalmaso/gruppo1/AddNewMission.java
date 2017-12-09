@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -18,7 +20,7 @@ import java.util.List;
 import database.DataManager;
 import database.Mission;
 
-public class AddNewMission extends AppCompatActivity {
+public class AddNewMission extends AppCompatActivity{
 
     Context context;
     public DataManager DB;
@@ -58,6 +60,7 @@ public class AddNewMission extends AppCompatActivity {
                 //read input text
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
                 EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
+
                 String name = editName.getText().toString();
                 String description = editDescription.getText().toString();
                 Log.d("verify null",name);

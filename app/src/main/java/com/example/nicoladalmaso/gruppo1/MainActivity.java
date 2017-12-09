@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         DB = new DataManager(this.getApplicationContext());
         setTitle("Missioni");
+        Variables.getInstance().setCurrentMissionDir(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         /*/PICCOLO Aggiungo delle missioni di prova
@@ -71,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d("mission", "mission " + i + ": " + missionList.get(i).getStartMission() + "," + missionList.get(i).getEndMission() + ","
                     + missionList.get(i).getLocation() + "," + missionList.get(i).getPersonID());
         }*/
-        File f = new File(path);
+        /*File f = new File(path);
         File[] files = f.listFiles();
         for (File inFile : files) {
             if (inFile.isDirectory()) {
                 Log.d("Dir", inFile.toString());
             }
-        }
+        }*/
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
-    /** Dal Maso
+    /** Dal Maso (NOT USED)
      * Legge tutte le missioni disponibili
      * @return ritorna array di missioni
      */
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         emptyAdapter.notifyDataSetChanged();
         listView.setAdapter(emptyAdapter);}
 
-    /** Dal Maso
+    /** Dal Maso (NOT USED)
      *  Stampa tutte le immagini
      */
     public void printAllMissions(){

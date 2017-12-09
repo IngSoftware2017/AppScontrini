@@ -13,4 +13,6 @@
     <string name="lastMod">Ultima modifica</string>
     <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="dateStart">Data inizio</string>
+    <string name="dateFinish">Data fine</string>
 </resources>

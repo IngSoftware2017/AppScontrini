@@ -31,11 +31,13 @@ public class MissionAdapterDB extends ArrayAdapter<Mission> {
     Context context;
     String path = "";
     int pos = 0;
+    List<Mission> missions;
 
     public MissionAdapterDB(Context context, int textViewResourceId,
                           List<Mission> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
+        missions = objects;
     }
 
     @Override
@@ -51,7 +53,8 @@ public class MissionAdapterDB extends ArrayAdapter<Mission> {
         Mission c = getItem(position);
         title.setText(c.getName());
         description.setText(c.getDescription());
-        convertView.setTag(position);
+        convertView.setTag(c.getID());
+        Log.d("MID", ""+c.getID());
 
         //Dal Maso
         //Sets a default background color for the mission's card
@@ -73,12 +76,19 @@ public class MissionAdapterDB extends ArrayAdapter<Mission> {
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-                File directory = new File(path);
-                File[] files = directory.listFiles();
+                //path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+                //File directory = new File(path);
+                //File[] files = directory.listFiles();
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
-                Variables.getInstance().setCurrentMissionDir(files[pos].getPath());
-                startMissionView.putExtra("missionName", files[pos].getName());
+                //Variables.getInstance().setCurrentMissionDir(files[pos].getPath());
+                String name = "";
+                for(int i = 0; i < missions.size(); i++){
+                    if(missions.get(i).getID() == pos){
+                        name = missions.get(i).getName();
+                    }
+                }
+                Log.d("MissionName", name);
+                startMissionView.putExtra("missionName", name);
                 startMissionView.putExtra("missionID", pos);
                 context.startActivity(startMissionView);
             }//onClick

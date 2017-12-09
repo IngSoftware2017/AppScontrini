@@ -36,6 +36,7 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -46,7 +47,7 @@ import database.Ticket;
 public class BillActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
     public Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    public List<Scontrino> list = new LinkedList<Scontrino>();
+    public List<Ticket> list = new LinkedList<Ticket>();
     public Uri photoURI;
     public boolean isFabOpen = false;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -54,6 +55,7 @@ public class BillActivity extends AppCompatActivity {
     String tempPhotoPath;
     Integer pos;
     Context context;
+    String root;
     public DataManager DB;
 
     @Override
@@ -61,11 +63,11 @@ public class BillActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
+        root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         Intent intent = getIntent();
-        //Log.d("Global DIR", Variables.getInstance().getCurrentMissionDir());
         String missionName = intent.getExtras().getString("missionName");
         pos = intent.getExtras().getInt("missionID");
-        Log.d("MissionID2", ""+pos);
+        Log.d("MissionID", ""+pos);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
         setTitle(missionName);
@@ -156,16 +158,19 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-    /**Dal Maso
+    /** Dal Maso
      * Aggiunge una card alla lista
-     * @param title Titolo della card (Nome del file)
-     * @param amount Totale dello scontrino
-     * @param img Bitmap della foto
+     * @param fileUri
+     * @param amount
+     * @param shop
+     * @param date
+     * @param title
+     * @param missionID
      */
-    public void addToList(String title, String amount, Bitmap img){
-        list.add(new Scontrino(title, amount, img));
+    public void addToList(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID){
+        list.add(new Ticket(fileUri, amount, shop, date, title, missionID));
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, DB);
         listView.setAdapter(adapter);
     }
 
@@ -182,22 +187,14 @@ public class BillActivity extends AppCompatActivity {
 
         toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
-                File[] files = directory.listFiles();
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                File[] bill = files[pos].listFiles();
-                Log.d("number of elements", bill.length+"");
-                int count = bill.length;
-                while(count > 0){
-                    //remove internal file
-                    if(bill[count-1].delete()){
-                        Log.d("eliminated file number",count + "");
-                        count--;
+                for(int i = 0; i < list.size(); i++){
+                    if(list.get(i).getMissionID() == pos){
+                        DB.deleteTicket(list.get(i).getID());
                     }
                 }
-                Log.d("flag",count+"qui ci arrivo");
-                files[pos].delete();
+                DB.deleteMission(pos);
                 context.startActivity(startMissionView);
             }
         });
@@ -243,7 +240,7 @@ public class BillActivity extends AppCompatActivity {
      */
     private File createImageFile() throws IOException {
         // Create an image file name
-        File storageDir = new File(Variables.getInstance().getCurrentMissionDir());
+        File storageDir = new File(root);
         File image = File.createTempFile(
                 "temp",  /* prefix */
                 ".jpg",         /* suffix */
@@ -339,13 +336,10 @@ public class BillActivity extends AppCompatActivity {
      * @param imageToSave bitmap da salvare come jpeg
      */
     private void savePickedFile(Bitmap imageToSave) {
-        String root = Variables.getInstance().getCurrentMissionDir();
-        File myDir = new File(root);
-        myDir.mkdirs();
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";
-        File file = new File(myDir, fname);
+        File file = new File(root, fname);
         final Uri uri=Uri.fromFile(file);
         if (file.exists())
             file.delete();
@@ -367,7 +361,7 @@ public class BillActivity extends AppCompatActivity {
                 public void onTicketReady(com.ing.software.common.Ticket ticket) {
                     //TODO:CHECK THE DATA EXTRACTED FROM THE IMAGE
                     Log.d("OCRTicket", ticket.toString());
-                    DB.addTicket(new Ticket(uri, ticket.amount, null, ticket.date, ticket.title, pos+1));//TODO: sistemare il mission id
+                    DB.addTicket(new Ticket(uri, ticket.amount, null, ticket.date, ticket.title, pos));//TODO: sistemare il mission id
                     //DB.addTicket(new Ticket(uri,ticket.amount,null,ticket.date,ticket.title,pos));//Così muore tutto
                     /*List<Ticket> ticketList = DB.getAllTickets();
                     for(int i = 0; i < (ticketList.size() - 1); i++) {
@@ -419,7 +413,6 @@ public class BillActivity extends AppCompatActivity {
      */
     private File temporaryFile()
     {
-        String root = Variables.getInstance().getCurrentMissionDir();
         File myDir = new File(root);
         String imageFileName = "photoToCrop.jpg";
         File file = new File(myDir, imageFileName);
@@ -434,7 +427,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, DB);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
@@ -446,7 +439,7 @@ public class BillActivity extends AppCompatActivity {
      * @return ritorna tutti i file letti nella cartella
      */
     private File[] readAllImages(){
-        String path = Variables.getInstance().getCurrentMissionDir();
+        String path = root;
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files=null;
@@ -466,40 +459,31 @@ public class BillActivity extends AppCompatActivity {
     public void printAllImages(){
         List<Ticket> ticketList = DB.getAllTickets();
         Ticket t;
-        File[] files = readAllImages();
+        int count = 0;
+        for(int i = 0; i < ticketList.size(); i++){
+            t = ticketList.get(i);
+            if(t.getMissionID() == (pos)){
+                count++;
+                addToList(t.getFileUri(), t.getAmount(), t.getShop(), t.getDate(), t.getTitle(), t.getID());
+            }
+        }
         TextView noBills = (TextView)findViewById(R.id.noBills);
-        if(files.length == 0){
+        if(count == 0){
             noBills.setVisibility(View.VISIBLE);
         }
         else{
             noBills.setVisibility(View.INVISIBLE);
         }
-        for(int i = 0; i < ticketList.size(); i++){
-            t = ticketList.get(i);
-            if(t.getMissionID() == (pos + 1)){
-                Log.d("UriFromDB", t.getFileUri().toString().substring(7));
-                String uri = t.getFileUri().toString().substring(7);
-                Bitmap myBitmap = BitmapFactory.decodeFile(uri);
-                String amount = "";
-                if(t.getAmount() == null){
-                    amount = "Nessun prezzo rilevato";
-                }
-                else{
-                    amount = t.getAmount().toString();
-                }
-                addToList(t.getTitle(), amount, myBitmap);
-            }
-        }
     }
 
 
-    /** Dal Maso
+    /** Dal Maso (NOT USED)
      *  Stampa l'ultima foto
      */
     private void printLastImage(){
         File[] files = readAllImages();
         Bitmap myBitmap = BitmapFactory.decodeFile(files[files.length-1].getAbsolutePath());
-        addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
+        //addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
     }
 
 
@@ -509,7 +493,7 @@ public class BillActivity extends AppCompatActivity {
      * @param myBitmap bitmap da stampare
      */
     private void printThisBitmap(Bitmap myBitmap){
-        addToList("Print this bitmap", "Descrizione della foto", myBitmap);
+        //addToList("Print this bitmap", "Descrizione della foto", myBitmap);
     }
 
 

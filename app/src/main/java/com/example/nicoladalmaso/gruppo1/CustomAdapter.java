@@ -24,10 +24,13 @@ import android.widget.Toast;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import database.DataManager;
+import database.Ticket;
 
 /**
  * Created by nicoladalmaso on 28/10/17.
@@ -35,18 +38,23 @@ import database.DataManager;
 
 //Classe utilizzata per dupplicare la view cardview all'interno della ListView
 //Dal Maso
-public class CustomAdapter extends ArrayAdapter<Scontrino> {
+public class CustomAdapter extends ArrayAdapter<Ticket> {
 
     Context context;
     String path = "";
     int pos = 0;
+    int missionID;
     DataManager DB;
+    List<Ticket> t = new ArrayList<Ticket>();
 
     public CustomAdapter(Context context, int textViewResourceId,
-                         List<Scontrino> objects) {
+                         List<Ticket> objects, int missionID, DataManager DB) {
         super(context, textViewResourceId, objects);
         this.context = context;
-        DB = new DataManager(context);
+        this.missionID = missionID;
+        this.DB = new DataManager(context);
+        this.t = objects;
+        Log.d("MISSION", ""+missionID);
     }
 
     @Override
@@ -55,34 +63,50 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.cardview, null);
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
-        TextView titolo = (TextView)convertView.findViewById(R.id.title);
-        TextView descrizione = (TextView)convertView.findViewById(R.id.description);
+        TextView title = (TextView)convertView.findViewById(R.id.title);
+        TextView tot = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
-        Scontrino c = getItem(position);
-        titolo.setText(c.getTitolo());
-        descrizione.setText(c.getDescrizione());
-        img.setImageBitmap(c.getImg());
-        fabDelete.setTag(position);
-        convertView.setTag(position);
+        Ticket c = getItem(position);
+        File photo = new File(c.getFileUri().toString().substring(7));
+        title.setText(photo.getName());
+        String amount = "";
+        if(c.getAmount() == null){
+            amount = "Prezzo non rilevato";
+        }
+        else {
+            amount = c.getAmount().toString();
+        }
+        tot.setText("Totale: "+amount+"€");
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
+        img.setImageBitmap(bitmap);
+        Log.d("LocalID", ""+c.toString());
+        fabDelete.setTag(c.getID());
+        convertView.setTag(c.getID());
         //Dal Maso
         fabDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 pos =  Integer.parseInt(v.getTag().toString());
-                Log.d("TAG", v.getTag().toString());
-                //context.deletePhoto(v);
-                path = Variables.getInstance().getCurrentMissionDir();
-                Log.d("Dir", path);
-
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Sei sicuro di voler eliminare lo scontrino?")
                         .setTitle("Cancellazione");
+                String toDelete = "";
+                for(int i = 0; i < t.size(); i++){
+                    if(t.get(i).getID() == pos){
+                        toDelete = t.get(i).getFileUri().toString().substring(7);
+                    }
+                }
+                final File ticketDelete = new File(toDelete);
                 // Add the buttons
                 builder.setPositiveButton("Cancella", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        File directory = new File(path);
-                        File[] files = directory.listFiles();
-                        if(files[pos].delete() && DB.deleteTicket(pos+1)){
+                        Log.d("LocalID", ""+pos);
+                        if(DB.deleteTicket(pos)){
+                            ticketDelete.delete();
+                            Log.d("MEME", "s");
                             ((BillActivity)context).clearAllImages();
                             ((BillActivity)context).printAllImages();
                         }
@@ -103,47 +127,51 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
         fabCrop.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path = Variables.getInstance().getCurrentMissionDir();
-                cropFile(pos,path);
-                /*File directory =new File(path);
-                File[] files =directory.listFiles();
-                CropImage.activity(Uri.fromFile(files[pos])).start(MainActivity.this);*/
-            }//onClick
+                cropFile(pos);
+            }
         });
+
         //Dal Maso
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
-                path = Variables.getInstance().getCurrentMissionDir();
-                File directory = new File(path);
-                File[] files = directory.listFiles();
-                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
-                startImageView.putExtra("imagePath", files[pos].getPath());
-                startImageView.putExtra("imageName", files[pos].getName());
-                SimpleDateFormat simpleDateFormat =
-                        new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
-                String date = simpleDateFormat.format(files[pos].lastModified());
-                startImageView.putExtra("imgLastMod", date);
-                startImageView.putExtra("imgPrice", "25.40€");
-                context.startActivity(startImageView);
+                for(int i = 0; i < t.size(); i++){
+                    if(t.get(i).getID() == pos){
+                        Ticket thisPhoto = t.get(i);
+                        Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
+                        File photo = new File(thisPhoto.getFileUri().toString().substring(7));
+                        startImageView.putExtra("imagePath", thisPhoto.getFileUri().toString().substring(7));
+                        startImageView.putExtra("imageName", photo.getName());
+                        SimpleDateFormat simpleDateFormat =
+                                new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
+                        String date = simpleDateFormat.format(photo.lastModified());
+                        startImageView.putExtra("imgLastMod", date);
+                        startImageView.putExtra("imgPrice", thisPhoto.getAmount().toString()+"€");
+                        context.startActivity(startImageView);
+                        return;
+                    }
+                }
             }//onClick
         });
         return convertView;
     }
+
     /**PICCOLO_Edit by Dal Maso
      * Method that lets the user crop the photo
      * @param toCrop the index of the photo to resize
-     * @param path the path to the photo
      */
-    public void cropFile(int toCrop, String path){
+    public void cropFile(int toCrop){
         Log.d("Crop", "Start crop activity");
         boolean result = false;
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        CropImage.activity(Uri.fromFile(files[toCrop]))
-                .setOutputUri(Uri.fromFile(files[toCrop]))
-                .start(((BillActivity)context));
-        //files[toCrop].delete();
-    }//cropFile
+        for(int i = 0; i < t.size(); i++){
+            if(t.get(i).getID() == pos){
+                Uri toCropUri = t.get(i).getFileUri();
+                CropImage.activity(toCropUri)
+                        .setOutputUri(toCropUri)
+                        .start(((BillActivity)context));
+                return;
+            }
+        }
+    }
 
 }

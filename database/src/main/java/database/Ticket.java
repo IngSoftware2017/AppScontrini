@@ -177,6 +177,6 @@ public class Ticket {
      */
     @Override
     public String toString(){
-        return getShop()+"\nTotale: "+getAmount();
+        return getShop()+" Totale: "+getAmount()+" MissionID: "+getMissionID()+"ID: "+getID();
     }
 }
