@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DB = new DataManager(this.getApplicationContext());
-        setTitle("Your missions");
+        setTitle("Missioni");
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         /*/PICCOLO Aggiungo delle missioni di prova

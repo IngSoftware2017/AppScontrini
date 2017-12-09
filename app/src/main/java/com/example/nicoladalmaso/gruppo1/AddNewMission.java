@@ -13,6 +13,7 @@ import android.widget.EditText;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import database.DataManager;
 import database.Mission;
@@ -71,12 +72,18 @@ public class AddNewMission extends AppCompatActivity {
                 File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
                 newMissionPath.mkdir();
                 Mission miss = new Mission();
+                int missionID = 0;
                 miss.setPersonID(1);
                 miss.setName(name);
                 miss.setDescription(description);
                 miss.setLocation(newMissionPath.getPath());
                 DB.addMission(miss);
-
+                List<Mission> missions = DB.getAllMissions();
+                for(int i = 0; i < missions.size(); i++){
+                    if(missions.get(i).getID() > missionID)
+                        missionID = missions.get(i).getID();
+                }
+                Log.d("New mission id", ""+missionID);
                 //create new directory with input text
                 //Start billActivity
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
@@ -85,7 +92,7 @@ public class AddNewMission extends AppCompatActivity {
                 Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
                 startImageView.putExtra("missionName", name);
                 startImageView.putExtra("missionDescription",description);
-                startImageView.putExtra("missionID", miss.getID());
+                startImageView.putExtra("missionID", missionID);
                 context.startActivity(startImageView);
                 return true;
 

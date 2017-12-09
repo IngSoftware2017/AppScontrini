@@ -27,6 +27,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import database.DataManager;
+
 /**
  * Created by nicoladalmaso on 28/10/17.
  */
@@ -38,11 +40,13 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
     Context context;
     String path = "";
     int pos = 0;
+    DataManager DB;
 
     public CustomAdapter(Context context, int textViewResourceId,
                          List<Scontrino> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
+        DB = new DataManager(context);
     }
 
     @Override
@@ -78,7 +82,7 @@ public class CustomAdapter extends ArrayAdapter<Scontrino> {
                     public void onClick(DialogInterface dialog, int id) {
                         File directory = new File(path);
                         File[] files = directory.listFiles();
-                        if(files[pos].delete()){
+                        if(files[pos].delete() && DB.deleteTicket(pos+1)){
                             ((BillActivity)context).clearAllImages();
                             ((BillActivity)context).printAllImages();
                         }

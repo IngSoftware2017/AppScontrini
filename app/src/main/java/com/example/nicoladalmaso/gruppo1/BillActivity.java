@@ -62,13 +62,14 @@ public class BillActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         Intent intent = getIntent();
-        Log.d("Memes", Variables.getInstance().getCurrentMissionDir());
+        //Log.d("Global DIR", Variables.getInstance().getCurrentMissionDir());
         String missionName = intent.getExtras().getString("missionName");
-        pos = intent.getExtras().getInt("missionId");
+        pos = intent.getExtras().getInt("missionID");
+        Log.d("MissionID2", ""+pos);
+        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
         setTitle(missionName);
         initializeComponents();
-        Log.d("fin qui","corretto");
     }
 
     //Dal Maso (adding menu delete option)
@@ -158,11 +159,11 @@ public class BillActivity extends AppCompatActivity {
     /**Dal Maso
      * Aggiunge una card alla lista
      * @param title Titolo della card (Nome del file)
-     * @param desc Descrizione del file
+     * @param amount Totale dello scontrino
      * @param img Bitmap della foto
      */
-    public void addToList(String title, String desc, Bitmap img){
-        list.add(new Scontrino(title, desc, img));
+    public void addToList(String title, String amount, Bitmap img){
+        list.add(new Scontrino(title, amount, img));
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list);
         listView.setAdapter(adapter);
@@ -353,10 +354,9 @@ public class BillActivity extends AppCompatActivity {
             //PICCOLO
             //using the ocr, extract the information from che picture and then add them to the database
             DataAnalyzer ocr = new DataAnalyzer();
-            DB = new DataManager(this.getApplicationContext());
             while (ocr.initialize(getApplicationContext())==1){
                 //resource occupied
-            }//while
+            }
             ocr.getTicket(imageToSave,new OnTicketReadyListener(){
                 /**
                  * Get a Ticket. In the argument "ticket", fields corresponding to unextracted information are null.
@@ -367,15 +367,15 @@ public class BillActivity extends AppCompatActivity {
                 public void onTicketReady(com.ing.software.common.Ticket ticket) {
                     //TODO:CHECK THE DATA EXTRACTED FROM THE IMAGE
                     Log.d("OCRTicket", ticket.toString());
-                    DB.addTicket(new Ticket(uri,ticket.amount,null,ticket.date,ticket.title,1));//TODO: sistemare il mission id
+                    DB.addTicket(new Ticket(uri, ticket.amount, null, ticket.date, ticket.title, pos+1));//TODO: sistemare il mission id
                     //DB.addTicket(new Ticket(uri,ticket.amount,null,ticket.date,ticket.title,pos));//Così muore tutto
-                    List<Ticket> ticketList = DB.getAllTickets();
-                    for(int i=0; i<ticketList.size()-1; i++) {
+                    /*List<Ticket> ticketList = DB.getAllTickets();
+                    for(int i = 0; i < (ticketList.size() - 1); i++) {
                         Log.d("DBTicket " + i, ticketList.get(i).getID()+" "+ticketList.get(i).getFileUri()+" "
                                 +ticketList.get(i).getTitle()+" "+ticketList.get(i).getDate()+" "+ticketList.get(i).getAmount()+" "+ticketList.get(i).getMissionID());
-                    }//for
-                }//onTicketReady
-            });//OnTicketReadyListener
+                    }*/
+                }
+            });
             ocr.release();
 
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -464,6 +464,8 @@ public class BillActivity extends AppCompatActivity {
      *  Stampa tutte le immagini
      */
     public void printAllImages(){
+        List<Ticket> ticketList = DB.getAllTickets();
+        Ticket t;
         File[] files = readAllImages();
         TextView noBills = (TextView)findViewById(R.id.noBills);
         if(files.length == 0){
@@ -472,12 +474,21 @@ public class BillActivity extends AppCompatActivity {
         else{
             noBills.setVisibility(View.INVISIBLE);
         }
-        for (int i = 0; i < files.length; i++)
-        {
-            SimpleDateFormat simpleDateFormat =
-                    new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
-            Bitmap myBitmap = BitmapFactory.decodeFile(files[i].getAbsolutePath());
-            addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()), myBitmap);
+        for(int i = 0; i < ticketList.size(); i++){
+            t = ticketList.get(i);
+            if(t.getMissionID() == (pos + 1)){
+                Log.d("UriFromDB", t.getFileUri().toString().substring(7));
+                String uri = t.getFileUri().toString().substring(7);
+                Bitmap myBitmap = BitmapFactory.decodeFile(uri);
+                String amount = "";
+                if(t.getAmount() == null){
+                    amount = "Nessun prezzo rilevato";
+                }
+                else{
+                    amount = t.getAmount().toString();
+                }
+                addToList(t.getTitle(), amount, myBitmap);
+            }
         }
     }
 
