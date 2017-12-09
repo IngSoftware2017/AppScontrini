@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.ing.software.common.Ticket;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,15 +21,19 @@ import org.opencv.core.Mat;
 @RunWith(AndroidJUnit4.class)
 public class ImagePreprocessorTests {
 
-    @Test
-    public void findContoursTest() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        //invoke(ImagePreprocessor.class, "findBiggestContour", bitmapToMatBGR(getBitmap(0)));
+    // alias
+    private final static Class<ImagePreprocessor> IP_CLASS = ImagePreprocessor.class;
+
+    @Before
+    public void initOpenCV() {
+        OpenCVLoader.initDebug();
     }
 
     @Test
-    public void testOpencv4Android() throws Exception {
-        org.opencv.core.Mat a = new Mat(2, 3, CV_32SC2);
-        Mat b = a.clone();
+    public void findBiggestContourTest() throws Exception {
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        ImagePreprocessor ip = new ImagePreprocessor(getBitmap(0));
+        Mat img = fieldVal(ip, "srcImg");
+        invoke(IP_CLASS, "findBiggestContour", img);
     }
 }

@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int greenInt = 0xFF00FF00;
 
     // alias
-    final Class<ImagePreprocessor> IP_CLASS = ImagePreprocessor.class;
+    private final static Class<ImagePreprocessor> IP_CLASS = ImagePreprocessor.class;
 
     final Handler h = new Handler(Looper.getMainLooper()) {
         @Override
