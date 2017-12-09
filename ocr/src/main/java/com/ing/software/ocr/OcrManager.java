@@ -109,11 +109,12 @@ public class OcrManager {
         Ticket ticket = new Ticket();
         OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
-        ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), result.getProducts());
+        List<RawText> prices = OcrSchemer.getPricesTexts(result.getProducts());
+        ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
         return ticket;
     }
 
-    private static BigDecimal extendedAmountAnalysis(List<RawGridResult> possibleResults, List<RawBlock> products) {
+    private static BigDecimal extendedAmountAnalysis(List<RawGridResult> possibleResults, List<RawText> products) {
         BigDecimal amount = null;
         RawText amountText = null;
         for (RawGridResult result : possibleResults) {
@@ -127,7 +128,7 @@ public class OcrManager {
             }
         }
         if (amount != null) {
-            AmountAnalyzer amountAnalyzer = new AmountAnalyzer(amount);
+            AmountAnalyzer amountAnalyzer = new AmountAnalyzer(amountText, amount);
             //check against list of products and cash + change
             List<RawGridResult> possiblePrices = getPricesList(amountText, products);
             amountAnalyzer.analyzePrices(possiblePrices);
@@ -155,17 +156,35 @@ public class OcrManager {
             if (hasChange)
                 distanceFromCash = OcrUtils.findSubstring(amountAnalyzer.getCash().subtract(amountAnalyzer.getChange()).toString(), amountAnalyzer.getAmount().toString());
             //analyze all possible cases
+            BigDecimal subtotal = null;
+            BigDecimal cash = null;
+            BigDecimal prices = null;
+            BigDecimal amount = amountAnalyzer.getAmount();
+            if (distanceFromCash > -1 && !hasChange)
+                cash = amountAnalyzer.getCash();
+            else if (distanceFromCash > -1)
+                cash = amountAnalyzer.getCash().subtract(amountAnalyzer.getChange());
+            if (distanceFromPriceList > -1)
+                prices = amountAnalyzer.getPriceList();
+            if (distanceFromSubtotal > -1)
+                subtotal = amountAnalyzer.getSubTotal();
             if (distanceFromSubtotal > -1 && distanceFromPriceList > -1 && distanceFromCash > -1) {
-                //i have all three values, they should all be equals to amount
-                if (amountAnalyzer.getSubTotal().compareTo(amountAnalyzer.getAmount()) == 0) {
+                boolean cashSubtotal = cash.compareTo(subtotal)==0;
+                boolean cashPrices = cash.compareTo(prices)==0;
+                boolean cashAmount = cash.compareTo(amount)==0;
+                boolean subtotalPrices = subtotal.compareTo(prices)==0;
+                boolean subtotalAmount = subtotal.compareTo(amount)==0;
+                //i have all three values + amount, if three of them are equals use that value
+                if ((cashSubtotal && cashAmount) || (cashPrices && cashSubtotal) || (cashPrices && cashAmount))
+                    return cash;
+                else if (subtotalPrices && subtotalAmount)
+                    return subtotal;
+                //Here i don't have three equal values
 
-                }
             }
-            return null;
+            return amountAnalyzer.getAmount();
         } else
             return amountAnalyzer.getAmount();
     }
-
-
 
 }

@@ -1,8 +1,6 @@
 package com.ing.software.ocr;
 
 import android.graphics.RectF;
-
-import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
@@ -22,6 +20,7 @@ import static com.ing.software.ocr.DataAnalyzer.analyzeAmount;
 class AmountAnalyzer {
 
     private BigDecimal amount;
+    private RawText amountText;
     private int precision = 0;
     private boolean hasSubtotal = false;
     private boolean hasPriceList = false;
@@ -32,12 +31,17 @@ class AmountAnalyzer {
     private BigDecimal cash = null;
     private BigDecimal change = null;
 
-    AmountAnalyzer(BigDecimal amount) {
+    AmountAnalyzer(RawText amountText, BigDecimal amount) {
+        this.amountText = amountText;
         this.amount = amount;
     }
 
     BigDecimal getAmount() {
         return amount;
+    }
+
+    RawText getAmountText() {
+        return amountText;
     }
 
     private void addPrecision() {
@@ -101,7 +105,7 @@ class AmountAnalyzer {
         BigDecimal decodedAmount = getAmount();
         int maxDistance = 1; //only 1 miss in amount detection
         //above amount we can have all prices and a subtotal, so first sum all products with distance > 0
-        if (possiblePrices.size() == 0 && possiblePrices.get(0).getPercentage() > 0)
+        if (possiblePrices.size() == 0 || possiblePrices.get(0).getPercentage() < 0)
             return;
         BigDecimal productsSum = null;
         BigDecimal possibleSubTotal = null;
@@ -126,7 +130,7 @@ class AmountAnalyzer {
         }
         if (productsSum != null) {
             //Check if my subtotal is the same as total
-            if (decodedAmount.compareTo(possibleSubTotal) == 0) {
+            if (possibleSubTotal != null && decodedAmount.compareTo(possibleSubTotal) == 0) {
                 //Accept the value
                 flagHasSubtotal(possibleSubTotal);
             }
@@ -161,20 +165,26 @@ class AmountAnalyzer {
         //under amount we accept only 'contante' and 'resto' (if present)
         BigDecimal cash = null;
         BigDecimal change = null;
+        RawText cashText = null;
         int index = 0;
         //Search for first parsable product price
         while (cash == null && index < possiblePrices.size()) {
             if (possiblePrices.get(index).getPercentage() < 0)
-                cash = analyzeAmount(possiblePrices.get(index).getText().getDetection());
+                if (OcrSchemer.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
+                    cash = analyzeAmount(possiblePrices.get(index).getText().getDetection());
+                    cashText = possiblePrices.get(index).getText();
+                }
             ++index;
         }
         if (cash != null) {
             OcrUtils.log(3, "analyzeTotals", "Cash is: " + cash.toString());
             while (index < possiblePrices.size() && change == null) {
-                change = analyzeAmount(possiblePrices.get(index).getText().getDetection());
-                OcrUtils.log(3, "analyzeTotals", "Change is: " + change.toString());
+                if (OcrSchemer.isPossibleCash(cashText, possiblePrices.get(index).getText()))
+                    change = analyzeAmount(possiblePrices.get(index).getText().getDetection());
                 ++index;
             }
+            if (change != null)
+                OcrUtils.log(3, "analyzeTotals", "Change is: " + change.toString());
             //Check if cash is the same as total
             if (decodedAmount.compareTo(cash) == 0) {
                 //Accept the value
@@ -207,14 +217,12 @@ class AmountAnalyzer {
      * @param products   List of RawTexts containing products (both name and price)
      * @return List of texts above or under amount with distance from amount (positive = above)
      */
-    static List<RawGridResult> getPricesList(RawText amountText, List<RawBlock> products) {
+    static List<RawGridResult> getPricesList(RawText amountText, List<RawText> products) {
         List<RawGridResult> possiblePrices = new ArrayList<>();
-        for (RawBlock product : products) {
-            for (RawText productText : product.getTexts()) {
-                if (isProductPrice(amountText, productText)) {
-                    int distanceFromSource = getProductPosition(amountText, productText);
-                    possiblePrices.add(new RawGridResult(productText, distanceFromSource));
-                }
+        for (RawText productText : products) {
+            if (isProductPrice(amountText, productText)) {
+                int distanceFromSource = getProductPosition(amountText, productText);
+                possiblePrices.add(new RawGridResult(productText, distanceFromSource));
             }
         }
         if (possiblePrices.size() > 0)
@@ -231,7 +239,7 @@ class AmountAnalyzer {
      */
     private static boolean isProductPrice(RawText amount, RawText product) {
         int percentage = 50;
-        RectF extendedRect = partialExtendWidthRect(amount.getRect(), percentage);
+        RectF extendedRect = OcrUtils.partialExtendWidthRect(amount.getRect(), percentage);
         RectF productRect = product.getRect();
         return extendedRect.left < productRect.left && extendedRect.right > productRect.right;
     }
@@ -247,17 +255,5 @@ class AmountAnalyzer {
         return Math.round(amount.getRect().top - product.getRect().top);
     }
 
-    /**
-     * Extends width of rect according to percentage
-     *
-     * @param originalRect rect containing amount
-     * @param percentage   percentage of the width of the rect to extend
-     * @return extended rect
-     */
-    private static RectF partialExtendWidthRect(RectF originalRect, int percentage) {
-        float width = originalRect.width();
-        float left = originalRect.left - (width * percentage / 2);
-        float right = originalRect.right + (width * percentage / 2);
-        return new RectF(left, originalRect.top, right, originalRect.bottom);
-    }
+
 }

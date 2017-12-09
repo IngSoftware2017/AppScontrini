@@ -271,10 +271,8 @@ public class OcrUtils {
     {
         if(text == null || substring == null || text.length() == 0)
             return -1;
-
         int minDistance = substring.length();
         int subLength = minDistance;
-
         /*
         //Splits the string into tokens
         String[] pack = text.split("\\s");
@@ -287,10 +285,8 @@ public class OcrUtils {
 
         }
         */
-
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
-
         //If the text is smaller than the searched string, invert the strings
         if(text_w_o_space.length() < minDistance)
         {
@@ -298,7 +294,6 @@ public class OcrUtils {
             text_w_o_space = substring;
             substring = temp_text;
         }
-
         //Search a piece of string as long as the length of the searched string in the text
         int start=0;
         for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
@@ -308,8 +303,38 @@ public class OcrUtils {
                 minDistance = distanceNow;
             start++;
             }
-
         return minDistance;
+    }
 
+    /**
+     * Extends width of rect according to percentage
+     *
+     * @param originalRect rect containing amount
+     * @param percentage   percentage of the width of the rect to extend
+     * @return extended rect
+     */
+    static RectF partialExtendWidthRect(RectF originalRect, int percentage) {
+        float width = originalRect.width();
+        float left = originalRect.left - (width * percentage / 200);
+        if (left <0)
+            left = 0;
+        float right = originalRect.right + (width * percentage / 200);
+        return new RectF(left, originalRect.top, right, originalRect.bottom);
+    }
+
+    /**
+     * Extends height of rect according to percentage
+     *
+     * @param originalRect rect containing amount
+     * @param percentage   percentage of the height of the rect to extend. Int >0
+     * @return extended rect
+     */
+    static RectF partialExtendHeightRect(RectF originalRect, int percentage) {
+        float height = originalRect.height();
+        float top = originalRect.top - (height * percentage / 200);
+        if (top < 0)
+            top = 0;
+        float bottom = originalRect.bottom + (height * percentage / 200);
+        return new RectF(originalRect.left, top, originalRect.right, bottom);
     }
 }

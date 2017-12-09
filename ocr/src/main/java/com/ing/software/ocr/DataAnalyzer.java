@@ -183,9 +183,9 @@ public class DataAnalyzer {
                 manipulatedAmount.append("00").append(char0).append(char1).append(removeRedundantPoints(source.substring(2)));
             else if (char0 == '.')
                 return analyzeCharsLong(source.substring(1));
-            else if (char1 == '.' && Character.isDigit(char2)) //now char0 must be digit
+            else if (char1 == '.' && Character.isDigit(char2) && Character.isDigit(char3)) //now char0 must be digit
                 manipulatedAmount.append("0").append(char0).append(char1).append(removeRedundantPoints(source.substring(2)));
-            else if (char1 == '.') //char0 must be digit and char2 must be '.' = remove char1
+            else if (char1 == '.') //char0 must be digit and char2 or char3 must be '.' = remove char1
                 return analyzeCharsLong(String.valueOf(char0) + source.substring(2));
             else if (char2 == '.') //char0 and char1 must be digit = if char2 is '.' everything is ok
                 manipulatedAmount.append(char0).append(char1).append(char2).append(removeRedundantPoints(source.substring(3)));
@@ -253,7 +253,7 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * @date 8-12-17
-     * Analyze three chars
+     * Analyze three chars, uses arbitrary decisions
      * @param char0 first char
      * @param char1 second char
      * @param char2 third char
