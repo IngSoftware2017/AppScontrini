@@ -2,7 +2,6 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.ing.software.common.Ticket;
@@ -11,13 +10,12 @@ import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static com.ing.software.ocr.AmountAnalyzer.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
 
 /*
@@ -111,174 +109,63 @@ public class OcrManager {
         Ticket ticket = new Ticket();
         OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
-        AmountAnalyzer amountAnalyzer = new AmountAnalyzer();
-        ticket.amount = extendedAmountAnalysis(amountAnalyzer, getPossibleAmounts(result.getAmountResults()), result.getProducts());
+        ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), result.getProducts());
         return ticket;
     }
 
-    private static BigDecimal extendedAmountAnalysis(AmountAnalyzer amountAnalyzer, List<RawGridResult> possibleResults, List<RawBlock> products) {
+    private static BigDecimal extendedAmountAnalysis(List<RawGridResult> possibleResults, List<RawBlock> products) {
         BigDecimal amount = null;
+        RawText amountText = null;
         for (RawGridResult result : possibleResults) {
             String amountString = result.getText().getDetection();
             OcrUtils.log(2, "getPossibleAmount", "Possible amount is: " + amountString);
             amount = analyzeAmount(amountString);
             if (amount != null) {
                 OcrUtils.log(2, "getPossibleAmount", "Decoded value: " + amount);
-                return amount;
+                amountText = result.getText();
+                break;
             }
         }
         if (amount != null) {
-            //confronta con lista product
+            AmountAnalyzer amountAnalyzer = new AmountAnalyzer(amount);
+            //check against list of products and cash + change
+            List<RawGridResult> possiblePrices = getPricesList(amountText, products);
+            amountAnalyzer.analyzePrices(possiblePrices);
+            amountAnalyzer.analyzeTotals(possiblePrices);
         }
         return amount;
     }
 
-    private static void analyzePrices(AmountAnalyzer amountAnalyzer, List<RawGridResult> possiblePrices, BigDecimal decodedAmount) {
-        int maxDistance = 1; //only 1 miss in amount detection
-        //above amount we can have all prices and a subtotal, so first sum all products with distance > 0
-        Collections.sort(possiblePrices);
-        if (possiblePrices.size() == 0 && possiblePrices.get(0).getPercentage() > 0)
-            return;
-        BigDecimal productsSum = null;
-        BigDecimal possibleSubTotal = null;
-        int index = 0;
-        //Search for first parsable product price
-        while (productsSum == null && index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
-            productsSum = analyzeAmount(possiblePrices.get(index).getText().getDetection());
-            ++index;
-        }
-        if (productsSum != null)
-            OcrUtils.log(3, "analyzePrices", "List of prices, first value is: " + productsSum.toString());
-        while (index < possiblePrices.size()) {
-            if (possiblePrices.get(index).getPercentage() <= 0)
-                break;
-            BigDecimal adder = analyzeAmount(possiblePrices.get(index).getText().getDetection());
-            if (adder != null) {
-                productsSum = productsSum.add(adder);
-                possibleSubTotal = adder;
-            }
-            OcrUtils.log(3, "analyzePrices", "List of prices, new total value is: " + productsSum.toString());
-            ++index;
-        }
-        if (productsSum != null) {
-            //Check if my subtotal is the same as total
-            if (decodedAmount.compareTo(possibleSubTotal) == 0) {
-                //Accept the value
-                amountAnalyzer.flagHasSubtotal(possibleSubTotal);
-            }
-            //now we may have the same value of decodedAmount, or its double (=*2)
-            if (decodedAmount.compareTo(productsSum) == 0) {
-                OcrUtils.log(3, "analyzePrices", "List of prices equals decoded amount");
-                amountAnalyzer.flagHasPriceList(productsSum);
-            } else if (decodedAmount.compareTo(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP))) == 0) {
-                OcrUtils.log(3, "analyzePrices", "List of prices/2 equals decoded amount");
-                amountAnalyzer.flagHasPriceList(productsSum);
-                //decodedAmount = productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP));
-            } else if (OcrUtils.findSubstring(productsSum.toString(), decodedAmount.toString()) <= maxDistance) {
-                //It's acceptable a distance of 1 from target
-                amountAnalyzer.flagHasPriceList(productsSum);
-                OcrUtils.log(3, "analyzePrices", "List of prices diffs from decoded amount by 1");
-            } else if (OcrUtils.findSubstring(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP)).toString(), decodedAmount.toString()) <= maxDistance) {
-                OcrUtils.log(3, "analyzePrices", "List of prices/2 diffs from decoded amount by 1");
-                amountAnalyzer.flagHasPriceList(productsSum);
-                //decodedAmount = productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP));
-            } else {
-                OcrUtils.log(3, "analyzePrices", "List of prices id not a valid input");
-            }
-        }
+    private static BigDecimal getBestAmount(AmountAnalyzer amountAnalyzer) {
+        HashMap<String, Boolean> flags = amountAnalyzer.getFlags();
+        boolean hasSubtotal = flags.get("hasSubtotal");
+        boolean hasPriceList = flags.get("hasPriceList");
+        boolean hasCash = flags.get("hasCash");
+        boolean hasChange = flags.get("hasChange");
+        if (amountAnalyzer.getPrecision() > 0) {
+            int distanceFromSubtotal = -1;
+            int distanceFromPriceList = -1;
+            int distanceFromCash = -1;
+            if (hasSubtotal)
+                distanceFromSubtotal = OcrUtils.findSubstring(amountAnalyzer.getSubTotal().toString(), amountAnalyzer.getAmount().toString());
+            if (hasPriceList)
+                distanceFromPriceList = OcrUtils.findSubstring(amountAnalyzer.getPriceList().toString(), amountAnalyzer.getAmount().toString());
+            if (hasCash)
+                distanceFromCash = OcrUtils.findSubstring(amountAnalyzer.getCash().toString(), amountAnalyzer.getAmount().toString());
+            if (hasChange)
+                distanceFromCash = OcrUtils.findSubstring(amountAnalyzer.getCash().subtract(amountAnalyzer.getChange()).toString(), amountAnalyzer.getAmount().toString());
+            //analyze all possible cases
+            if (distanceFromSubtotal > -1 && distanceFromPriceList > -1 && distanceFromCash > -1) {
+                //i have all three values, they should all be equals to amount
+                if (amountAnalyzer.getSubTotal().compareTo(amountAnalyzer.getAmount()) == 0) {
 
-    }
-
-    //under total we have "contante" or "contante" + "resto"
-    private static void analyzeTotals() {
-
-    }
-
-    /**
-     * Retrieves all texts from products on the same 'column' as amount
-     *
-     * @param amountText RawText containing possible amount
-     * @param products   List of RawTexts containing products (both name and price)
-     * @return List of texts above or under amount with distance from amount (positive = above)
-     */
-    private static List<RawGridResult> getPricesList(RawText amountText, List<RawBlock> products) {
-        List<RawGridResult> possibleAmounts = new ArrayList<>();
-        for (RawBlock product : products) {
-            for (RawText productText : product.getTexts()) {
-                if (isProductPrice(amountText, productText)) {
-                    int distanceFromSource = getProductPosition(amountText, productText);
-                    possibleAmounts.add(new RawGridResult(productText, distanceFromSource));
                 }
             }
-        }
-        return possibleAmounts;
+            return null;
+        } else
+            return amountAnalyzer.getAmount();
     }
 
-    /**
-     * Return true if product is in the same column as amount
-     *
-     * @param amount  RawText containing possible amount
-     * @param product RawText containing possible product price
-     * @return true if product is in the same column (extended by 50%) as amount
-     */
-    private static boolean isProductPrice(RawText amount, RawText product) {
-        int percentage = 50;
-        RectF extendedRect = partialExtendWidthRect(amount.getRect(), percentage);
-        RectF productRect = product.getRect();
-        return extendedRect.left < productRect.left && extendedRect.right > productRect.right;
-    }
 
-    /**
-     * Return distance from amount: positive if product is above amount
-     *
-     * @param amount  RawText containing possible amount
-     * @param product RawText containing possible product price
-     * @return distance
-     */
-    private static int getProductPosition(RawText amount, RawText product) {
-        return Math.round(amount.getRect().top - product.getRect().top);
-    }
 
-    /**
-     * Extends width of rect according to percentage
-     *
-     * @param originalRect rect containing amount
-     * @param percentage   percentage of the width of the rect to extend
-     * @return extended rect
-     */
-    private static RectF partialExtendWidthRect(RectF originalRect, int percentage) {
-        float width = originalRect.width();
-        float left = originalRect.left - (width * percentage / 2);
-        float right = originalRect.right + (width * percentage / 2);
-        return new RectF(left, originalRect.top, right, originalRect.bottom);
-    }
-
-}
-class AmountAnalyzer {
-
-    private int precision = 0;
-    private boolean hasSubtotal = false;
-    private boolean hasPriceList = false;
-    private BigDecimal subTotal = null;
-    private BigDecimal priceList = null;
-
-    private void addPrecision() {
-        ++precision;
-    }
-
-    void flagHasSubtotal(BigDecimal subTotal) {
-        hasSubtotal = true;
-        this.subTotal = subTotal;
-        addPrecision();
-    }
-
-    void flagHasPriceList(BigDecimal priceList) {
-        hasPriceList = true;
-        this.priceList = priceList;
-        addPrecision();
-    }
-
-    int getPrecision() {
-        return precision;
-    }
 }

@@ -179,7 +179,7 @@ public class DataAnalyzer {
             char char1 = source.charAt(1);
             char char2 = source.charAt(2);
             char char3 = source.charAt(3);
-            if (char0 == '.' && Character.isDigit(char1))
+            if (char0 == '.' && char1 != '.' && char2 != '.' && char3 != '.')
                 manipulatedAmount.append("00").append(char0).append(char1).append(removeRedundantPoints(source.substring(2)));
             else if (char0 == '.')
                 return analyzeCharsLong(source.substring(1));
