@@ -133,6 +133,7 @@ public class OcrManager {
             List<RawGridResult> possiblePrices = getPricesList(amountText, products);
             amountAnalyzer.analyzePrices(possiblePrices);
             amountAnalyzer.analyzeTotals(possiblePrices);
+            amount = getBestAmount(amountAnalyzer);
         }
         return amount;
     }
@@ -175,16 +176,82 @@ public class OcrManager {
                 boolean subtotalPrices = subtotal.compareTo(prices)==0;
                 boolean subtotalAmount = subtotal.compareTo(amount)==0;
                 //i have all three values + amount, if three of them are equals use that value
-                if ((cashSubtotal && cashAmount) || (cashPrices && cashSubtotal) || (cashPrices && cashAmount))
+                if ((cashSubtotal && cashAmount) || (cashPrices && cashSubtotal) || (cashPrices && cashAmount)) {
+                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
                     return cash;
-                else if (subtotalPrices && subtotalAmount)
+                } else if (subtotalPrices && subtotalAmount) {
+                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
                     return subtotal;
+                }
                 //Here i don't have three equal values.
                 if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
+                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
                     return subtotal;
-                } else if (cashPrices) //same as above
+                } else if (cashPrices) {//same as above
+                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
                     return cash;
+                }
                 //TO BE CONTINUED
+            } else if (distanceFromPriceList > -1 && distanceFromCash > -1) {
+                boolean cashPrices = cash.compareTo(prices)==0;
+                boolean cashAmount = cash.compareTo(amount)==0;
+                //i have all three values + amount, if three of them are equals use that value
+                if (cashPrices && cashAmount) {
+                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
+                    return cash;
+                }
+                //Here i don't have three equal values.
+                if (cashPrices) {//same as above
+                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
+                    return cash;
+                }
+                //TO BE CONTINUED
+            } else if (distanceFromSubtotal > -1 && distanceFromPriceList > -1) {
+                boolean subtotalPrices = subtotal.compareTo(prices)==0;
+                boolean subtotalAmount = subtotal.compareTo(amount)==0;
+                //i have all three values + amount, if three of them are equals use that value
+                if (subtotalPrices && subtotalAmount) {
+                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
+                    return subtotal;
+                }
+                //Here i don't have three equal values.
+                if (subtotalPrices) { //Probably if both subtotal and cash are the same amount is wrong
+                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
+                    return subtotal;
+                }
+            } else if (distanceFromSubtotal > -1 && distanceFromCash > -1) {
+                boolean cashSubtotal = cash.compareTo(subtotal)==0;
+                boolean cashAmount = cash.compareTo(amount)==0;
+                //i have all three values + amount, if three of them are equals use that value
+                if (cashSubtotal && cashAmount) {
+                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
+                    return cash;
+                }
+                //Here i don't have two equal values.
+                if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
+                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
+                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
+                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
+                    return subtotal;
+                } 
             }
             return amountAnalyzer.getAmount();
         } else

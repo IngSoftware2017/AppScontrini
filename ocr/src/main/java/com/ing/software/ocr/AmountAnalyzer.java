@@ -103,7 +103,7 @@ class AmountAnalyzer {
 
     void analyzePrices(List<RawGridResult> possiblePrices) {
         BigDecimal decodedAmount = getAmount();
-        int maxDistance = 1; //only 1 miss in amount detection
+        int maxDistance = 2; //only 2 miss in amount detection
         //above amount we can have all prices and a subtotal, so first sum all products with distance > 0
         if (possiblePrices.size() == 0 || possiblePrices.get(0).getPercentage() < 0)
             return;
@@ -156,7 +156,7 @@ class AmountAnalyzer {
                 flagHasPriceList(productsSum);
                 //decodedAmount = productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP));
             } else {
-                OcrUtils.log(3, "analyzePrices", "List of prices id not a valid input");
+                OcrUtils.log(3, "analyzePrices", "List of prices is not a valid input");
             }
         }
 
@@ -166,7 +166,7 @@ class AmountAnalyzer {
     //ignore for now tips
     void analyzeTotals(List<RawGridResult> possiblePrices) {
         BigDecimal decodedAmount = getAmount();
-        int maxDistance = 1; //only 1 miss in amount detection
+        int maxDistance = 2; //only 2 miss in amount detection
         //under amount we accept only 'contante' and 'resto' (if present)
         BigDecimal cash = null;
         BigDecimal change = null;
