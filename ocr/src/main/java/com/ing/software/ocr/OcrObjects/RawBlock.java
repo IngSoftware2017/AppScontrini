@@ -18,7 +18,7 @@ import static com.ing.software.ocr.OcrUtils.log;
  * Contains useful methods and variables that TextBlock does not provide.
  * @author Michelon
  */
-
+@Deprecated
 public class RawBlock implements Comparable<RawBlock> {
 
     private List<RawText> rawTexts = new ArrayList<>();

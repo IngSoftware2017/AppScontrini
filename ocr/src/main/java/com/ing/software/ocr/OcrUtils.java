@@ -310,7 +310,7 @@ public class OcrUtils {
      * Extends width of rect according to percentage
      *
      * @param originalRect rect containing amount
-     * @param percentage   percentage of the width of the rect to extend
+     * @param percentage   percentage of the width of the rect to extend. Int >0
      * @return extended rect
      */
     static RectF partialExtendWidthRect(RectF originalRect, int percentage) {
@@ -336,5 +336,27 @@ public class OcrUtils {
             top = 0;
         float bottom = originalRect.bottom + (height * percentage / 200);
         return new RectF(originalRect.left, top, originalRect.right, bottom);
+    }
+
+    /**
+     * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
+     * Note: Min value for top and left is 0
+     * @param rect source rect. Not null
+     * @param percent chosen percentage. Int >= 0
+     * @return new extended rectangle
+     */
+    public static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
+        float extendedHeight = rect.height()*percent/100;
+        float extendedWidth = rect.width()*percent/100;
+        float left = rect.left - extendedWidth/2;
+        if (left<0)
+            left = 0;
+        float top = rect.top - extendedHeight/2;
+        if (top < 0)
+            top = 0;
+        //Doesn't matter if bottom and right are outside the photo
+        float right = rect.right + extendedWidth/2;
+        float bottom = rect.bottom + extendedHeight/2;
+        return new RectF(left, top, right, bottom);
     }
 }

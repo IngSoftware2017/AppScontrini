@@ -179,8 +179,12 @@ public class OcrManager {
                     return cash;
                 else if (subtotalPrices && subtotalAmount)
                     return subtotal;
-                //Here i don't have three equal values
-
+                //Here i don't have three equal values.
+                if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
+                    return subtotal;
+                } else if (cashPrices) //same as above
+                    return cash;
+                //TO BE CONTINUED
             }
             return amountAnalyzer.getAmount();
         } else

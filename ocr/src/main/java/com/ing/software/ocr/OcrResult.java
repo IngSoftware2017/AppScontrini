@@ -17,14 +17,14 @@ class OcrResult {
 
     private List<RawStringResult> amountResults;
     private List<RawGridResult> dateList;
-    private List<RawBlock> products;
+    private List<RawText> products;
 
     /**
      * Constructor
      * @param amountResults list of possible amounts. Not null.
      * @param dateList list of possible dates. Not null.
      */
-    OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList, List<RawBlock> products) {
+    OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList, List<RawText> products) {
         this.amountResults = amountResults;
         this.dateList = dateList;
         this.products = products;
@@ -44,7 +44,7 @@ class OcrResult {
         return dateList;
     }
 
-    List<RawBlock> getProducts() {
+    List<RawText> getProducts() {
         return products;
     }
 

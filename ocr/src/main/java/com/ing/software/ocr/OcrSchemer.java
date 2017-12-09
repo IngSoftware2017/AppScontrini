@@ -10,13 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Associa a uno scotrino uno schema contenente le disposizioni teoriche dei suoi elementi
+ * Manages a receipt trying to find its elements (products, blocks etc)
  */
 
 class OcrSchemer {
-
-    private List<RawBlock> blocks = new ArrayList<>();
-    private RawImage rawImage;
 
     /*
     Un prodotto deve stare a sinistra e avere un corrispondente blocco con i prezzi a destra:
@@ -42,16 +39,28 @@ class OcrSchemer {
 
     /**
      * Get texts that are on the right part of the receipt
+     * @param blocks list of texts
+     * @return list of texts on right side
+     */
+    static List<RawText> getPricesTexts(List<RawText> blocks) {
+        List<RawText> texts = new ArrayList<>();
+        for (RawText text : blocks) {
+            if (text.getRect().centerX() > text.getRawImage().getWidth()*0.75)
+                texts.add(text);
+        }
+        return texts;
+    }
+
+    /**
+     * Get texts that are on the right part of the receipt
      * @param blocks list of blocks containing texts
      * @return list of texts on right side
      */
-    static List<RawText> getPricesTexts(List<RawBlock> blocks) {
+    static List<RawText> findTextsOnRight(List<RawText> blocks) {
         List<RawText> texts = new ArrayList<>();
-        for (RawBlock block : blocks) {
-            for (RawText text : block.getTexts()) {
-                if (text.getRect().centerX() > text.getRawImage().getWidth()/2)
-                    texts.add(text);
-            }
+        for (RawText text : blocks) {
+            if (text.getRect().centerX() > text.getRawImage().getWidth()/2)
+                texts.add(text);
         }
         return texts;
     }

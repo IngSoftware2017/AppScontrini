@@ -4,6 +4,7 @@ package com.ing.software.ocr.OcrObjects;
 import android.support.annotation.NonNull;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +39,16 @@ public class RawStringResult implements Comparable<RawStringResult>{
             this.detectedTexts = detectedTexts;
         else
             this.detectedTexts.addAll(detectedTexts);
+    }
+
+    /**
+     * Adds rawTexts found in extended rect
+     * @param detectedText rawText detected. Not null.
+     */
+    public void addDetectedTexts(@NonNull RawText detectedText) {
+        if (this.detectedTexts == null)
+            this.detectedTexts = new ArrayList<>();
+        this.detectedTexts.add(detectedText);
     }
 
     public RawText getSourceText() {

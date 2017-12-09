@@ -2,12 +2,15 @@ package com.ing.software.ocr.OcrObjects;
 
 
 import android.graphics.RectF;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.ocr.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static com.ing.software.ocr.OcrUtils.log;
@@ -29,7 +32,7 @@ public class RawText implements Comparable<RawText> {
      * @param text current Text inside TextBlock. Not null.
      * @param rawImage source image. Not null.
      */
-    RawText(@NonNull Text text, @NonNull RawImage rawImage) {
+    public RawText(@NonNull Text text, @NonNull RawImage rawImage) {
         rectText = new RectF(text.getBoundingBox());
         this.text = text;
         this.rawImage = rawImage;
@@ -60,7 +63,7 @@ public class RawText implements Comparable<RawText> {
      * Retrieves probability that date is present in current text
      * @return probability that date is present
      */
-    int getDateProbability() {
+    public int getDateProbability() {
         log(6,"Value is: ", getDetection());
         int[] gridBox = getGridBox();
         log(6,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
@@ -100,6 +103,20 @@ public class RawText implements Comparable<RawText> {
     }
 
     /**
+     * Search string in block, all occurrences are returned ordered(top -> bottom, left -> right)
+     * @param string string to search. Length > 0.
+     * @param maxDistance max distance (included) allowed for the target string. Int >= 0
+     * @return list of RawStringResult containing the string with corresponding distance from target, null if nothing found
+     */
+    public RawStringResult findContinuous(@Size(min = 1) String string, @IntRange(from = 0) int maxDistance) {
+        int distanceFromString = bruteSearch(string);
+        if (distanceFromString <= maxDistance)
+            return new RawStringResult(this, distanceFromString, string);
+        else
+            return null;
+    }
+
+    /**
      * Search string in text
      * @param string string to search. Length > 0.
      * @return int according to OcrUtils.findSubstring()
@@ -113,7 +130,7 @@ public class RawText implements Comparable<RawText> {
      * @param rect target rect that could contain this text. Not null.
      * @return true if is inside
      */
-    boolean isInside(@NonNull RectF rect) {
+    public boolean isInside(@NonNull RectF rect) {
         return rect.contains(rectText);
     }
 

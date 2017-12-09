@@ -40,7 +40,7 @@ class AmountAnalyzer {
         return amount;
     }
 
-    RawText getAmountText() {
+    private RawText getAmountText() {
         return amountText;
     }
 
@@ -112,7 +112,9 @@ class AmountAnalyzer {
         int index = 0;
         //Search for first parsable product price
         while (productsSum == null && index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
-            productsSum = analyzeAmount(possiblePrices.get(index).getText().getDetection());
+            String s = possiblePrices.get(index).getText().getDetection();
+            if (isPossibleNumber(s))
+                productsSum = analyzeAmount(s);
             ++index;
         }
         if (productsSum != null)
@@ -120,10 +122,13 @@ class AmountAnalyzer {
         while (index < possiblePrices.size()) {
             if (possiblePrices.get(index).getPercentage() <= 0)
                 break;
-            BigDecimal adder = analyzeAmount(possiblePrices.get(index).getText().getDetection());
-            if (adder != null) {
-                productsSum = productsSum.add(adder);
-                possibleSubTotal = adder;
+            String s = possiblePrices.get(index).getText().getDetection();
+            if (isPossibleNumber(s)) {
+                BigDecimal adder = analyzeAmount(s);
+                if (adder != null) {
+                    productsSum = productsSum.add(adder);
+                    possibleSubTotal = adder;
+                }
             }
             OcrUtils.log(3, "analyzePrices", "List of prices, new total value is: " + productsSum.toString());
             ++index;
@@ -171,16 +176,22 @@ class AmountAnalyzer {
         while (cash == null && index < possiblePrices.size()) {
             if (possiblePrices.get(index).getPercentage() < 0)
                 if (OcrSchemer.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
-                    cash = analyzeAmount(possiblePrices.get(index).getText().getDetection());
-                    cashText = possiblePrices.get(index).getText();
+                    String s = possiblePrices.get(index).getText().getDetection();
+                    if (isPossibleNumber(s)) {
+                        cash = analyzeAmount(s);
+                        cashText = possiblePrices.get(index).getText();
+                    }
                 }
             ++index;
         }
         if (cash != null) {
             OcrUtils.log(3, "analyzeTotals", "Cash is: " + cash.toString());
             while (index < possiblePrices.size() && change == null) {
-                if (OcrSchemer.isPossibleCash(cashText, possiblePrices.get(index).getText()))
-                    change = analyzeAmount(possiblePrices.get(index).getText().getDetection());
+                if (OcrSchemer.isPossibleCash(cashText, possiblePrices.get(index).getText())) {
+                    String s = possiblePrices.get(index).getText().getDetection();
+                    if (isPossibleNumber(s))
+                        change = analyzeAmount(s);
+                }
                 ++index;
             }
             if (change != null)
@@ -255,5 +266,12 @@ class AmountAnalyzer {
         return Math.round(amount.getRect().top - product.getRect().top);
     }
 
-
+    private static boolean isPossibleNumber(String s) {
+        int counter = 0;
+        for (int i = 0; i < s.length(); ++i) {
+            if (Character.isDigit(s.charAt(i)))
+                ++counter;
+        }
+        return counter > s.length()/2;
+    }
 }
