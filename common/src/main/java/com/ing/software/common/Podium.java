@@ -1,0 +1,49 @@
+package com.ing.software.common;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Size;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+
+/**
+ * Sorted data structure (descending order) used to select best k elements.
+ * @author Riccardo Zaglia
+ */
+public class Podium<T extends Comparable> {
+    private int k = 0;
+    private PriorityQueue<T> pq = null;
+    // NB: the first element is the lowest/worst one
+
+    /**
+     * New podium
+     * @param k > 0. Size of podium (ex: 2, 3).
+     */
+    Podium(@Size(min = 1) int k) {
+        this.k = k;
+        pq = new PriorityQueue<>(k + 1);
+    }
+
+    /**
+     * Try add element to podium.
+     * Complexity: O(log(k))
+     * @param obj element to add. Not null.
+     * @return true if obj is added to podium, false otherwise
+     */
+    boolean tryAdd(@NonNull T obj) {
+        pq.offer(obj); // insert
+        return pq.size() <= k || pq.poll() != obj; // if first is obj -> add failed
+    }
+
+    /**
+     * Get all elements in podium.
+     * @return array of all elements
+     */
+    @SuppressWarnings("unchecked")
+    T[] getAll() {
+        return (T[])pq.toArray();
+    }
+}

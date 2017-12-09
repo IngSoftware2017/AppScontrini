@@ -15,18 +15,17 @@ import com.ing.software.common.Ref;
 import com.ing.software.common.TicketError;
 import com.ing.software.ocr.ImagePreprocessor;
 
-import org.bytedeco.javacpp.opencv_core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
 
-import static com.ing.software.ocr.ImagePreprocessor.*;
+import static com.ing.software.common.Reflect.fieldVal;
 import static com.ing.software.common.Reflect.invoke;
+import static org.opencv.imgproc.Imgproc.drawContours;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-
-import static org.bytedeco.javacpp.opencv_core.*;
-import static org.bytedeco.javacpp.opencv_imgproc.INTER_MAX;
-import static org.bytedeco.javacpp.opencv_imgproc.drawContours;
 
 public class MainActivity extends AppCompatActivity {
     public static final String folder = "photos";
@@ -36,10 +35,9 @@ public class MainActivity extends AppCompatActivity {
 
     final Semaphore sem = new Semaphore(0);
 
-    private static final Scalar blue = new Scalar(255,0,0, 255);
-    private static final Scalar red = new Scalar(0,0,255, 255);
+    private static final Scalar blue = new Scalar(0,0,255, 255);
     private static final int redInt = 0xFFFF0000;
-    private static final int blueInt = 0xFF0000FF;
+    private static final int greenInt = 0xFF00FF00;
 
     // alias
     final Class<ImagePreprocessor> IP_CLASS = ImagePreprocessor.class;
@@ -51,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void drawBitmap(Bitmap bm) {
+    private void showBitmap(Bitmap bm) {
         h.obtainMessage(0, bm).sendToTarget();
         try {
             sem.acquire();
@@ -61,14 +59,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void drawMat(Mat img) {
-        drawBitmap(matToBitmap(img));
+    private void showMat(Mat img) throws Exception {
+        Bitmap bm = invoke(IP_CLASS, "matToBitmap", img);
+        showBitmap(bm);
     }
 
-    void drawContour(Mat dst, Mat contour, Scalar color) {
-        MatVector contourVec = new MatVector(1);
-        contourVec.put(0, contour);
-        drawContours(dst, contourVec, 0, color, 3, 8, new Mat(), INTER_MAX, new opencv_core.Point());
+    void drawContour(Mat dst, MatOfPoint contour, Scalar color) {
+        //MatVector contourVec = new MatVector(1);
+        //contourVec.put(0, contour);
+        List<MatOfPoint> ctrList = Collections.singletonList(contour);
+        //drawContours();
+        drawContours(dst, ctrList, 0, color, 3);
     }
 
     Bitmap drawPoly(Bitmap src, List<Point> corns, int color) {
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         Paint p = new Paint();
         p.setColor(color);
-        p.setStrokeWidth(10);
+        p.setStrokeWidth(20);
         int cornsTot = corns.size();
         for (int i = 0; i < cornsTot; i++) {
             Point start = corns.get(i), end = corns.get((i + 1) % cornsTot);
@@ -111,36 +112,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void backgroundWork() {
+        int len = 0;
         try {
-            for (int i = 0; i < mgr.list(folder).length; i++) {
-                Bitmap bm = BitmapFactory.decodeStream(mgr.open(folder + "/" + String.valueOf(i) + ".jpg"));
-                Mat origImg = bitmapToMatBGR(bm);
-                Mat imgResized = invoke(IP_CLASS, "downScaleBGR", origImg);
-                Ref<Mat> imgRef = new Ref<>(imgResized);
-                drawMat(imgRef.value);
-
-                invoke(IP_CLASS, "BGR2Gray", imgRef);
-                invoke(IP_CLASS, "bilatFilter", imgRef);
-                drawMat(imgRef.value);
-
-                invoke(IP_CLASS, "threshold", imgRef);
-                drawMat(imgRef.value);
-
-                invoke(IP_CLASS, "erodeDilate", imgRef);
-                invoke(IP_CLASS, "enclose", imgRef);
-                drawMat(imgRef.value);
-
-                Mat contour = invoke(IP_CLASS, "findBiggestContour", imgResized);
-                drawContour(imgResized, contour, blue);
-                drawMat(imgResized);
-
-                List<Point> pts = new ArrayList<>();
-                TicketError err = findRectangle(bm, pts);
-                drawBitmap(drawPoly(bm, pts, err == TicketError.RECT_NOT_FOUND ? redInt : blueInt));
-            }
+            len = mgr.list(folder).length;
         }
         catch (Exception e) {
-            System.out.println();
+            System.out.println(e.getMessage());
+        }
+
+        for (int i = 0; i < len; i++) {
+            ImagePreprocessor ip = new ImagePreprocessor();
+            Bitmap bm = null;
+            try {
+                bm = BitmapFactory.decodeStream(mgr.open(folder + "/" + String.valueOf(i) + ".jpg"));
+                ip.setImage(bm);
+
+                Mat srcImg = fieldVal(ip, "srcImg");
+                Mat imgResized = invoke(IP_CLASS, "downScaleRGBA", srcImg);
+                Ref<Mat> imgRef = new Ref<>(imgResized);
+                showMat(imgRef.value);
+
+                invoke(IP_CLASS, "RGBA2Gray", imgRef);
+                invoke(IP_CLASS, "bilateralFilter", imgRef);
+                showMat(imgRef.value);
+
+                invoke(IP_CLASS, "threshold", imgRef);
+                invoke(IP_CLASS, "erodeDilate", imgRef);
+                invoke(IP_CLASS, "enclose", imgRef);
+                showMat(imgRef.value);
+
+                MatOfPoint contour = invoke(IP_CLASS, "findBiggestContour", imgResized);
+                drawContour(imgResized, contour, blue);
+                showMat(imgResized);
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+
+            TicketError err = ip.findRectangle();
+            List<Point> pts = ip.getCorners();
+            showBitmap(drawPoly(bm, pts, err == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
+
+            showBitmap(ip.undistort(0));
         }
     }
 

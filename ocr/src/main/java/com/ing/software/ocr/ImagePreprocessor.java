@@ -1,28 +1,33 @@
 package com.ing.software.ocr;
 
-import static org.bytedeco.javacpp.opencv_core.*;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
-//import static org.bytedeco.javacpp.opencv_imgcodecs.*;
-
-import org.bytedeco.javacpp.annotation.ByVal;
-import org.bytedeco.javacpp.indexer.IntRawIndexer;
-import org.bytedeco.javacv.*;
-import org.bytedeco.javacpp.*;
-
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 
 import com.ing.software.common.Ref;
 import com.ing.software.common.TicketError;
 
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.*;
+import org.opencv.core.Size; // resolve conflict
+import org.opencv.core.Point; // resolve conflict
+import org.opencv.imgproc.Imgproc;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import static org.opencv.core.Core.*;
+import static org.opencv.core.CvType.*;
+import static org.opencv.imgproc.Imgproc.*;
+
 /**
+ * Process an image to be suitable to be used by DataAnalyzer.
  * @author Riccardo Zaglia
+ */
+/*
+ * I used only pivate-static and public methods to avoid side effects that increase complexity.
+ * I'm sticking to the one-purpose-method rule.
  */
 public class ImagePreprocessor {
 
@@ -32,46 +37,30 @@ public class ImagePreprocessor {
 
     //Bilateral filter:
     private static final int bfKerSz = 9; // kernel size, must be odd
-    private static final int bfSigma = 20; // color variance
+    private static final int bfSigma = 20; // space/color variance
 
     //Erode/Dilate iterations
-    private static final int edIters = 3;
+    private static final int edIters = 4;
 
     //Median kernel size
     private static final int medSz = 7; // must be odd
 
     //Adaptive threshold:
-    private static final int thrWinSz = 201; // window size. must be odd
-    private static final int thrOffset = 3;
+    private static final int thrWinSz = 75; // window size. must be odd
+    private static final int thrOffset = 2; //
 
     // factor that determines maximum distance of detected contour from rectangle
     //private static final double polyMaxErrMul = 0.02;
-    private static final int polyMaxErr = 30;
+    private static final int polyMaxErr = 50;
+
+    static {
+        if (!OpenCVLoader.initDebug()) {
+            OcrUtils.log(0, "OpenCV", "OpenCV failed to initialize");
+        }
+    }
 
     class MatPool {
         //todo
-    }
-
-
-    private Size size;
-    private List<Mat> contours = new ArrayList<>(2);
-
-    /**
-     * Convert a bitmap to a BGR Mat
-     * @param bm bitmap
-     * @return Mat BGR
-     */
-    public static Mat bitmapToMatBGR(@ByVal Bitmap bm) {
-        return new OpenCVFrameConverter.ToMat().convert(new AndroidFrameConverter().convert(bm));
-    }
-
-    /**
-     * Convert a bitmap to a BGR Mat
-     * @param img Mat any color
-     * @return Bitmap
-     */
-    public static Bitmap matToBitmap(@ByVal Mat img) {
-        return new AndroidFrameConverter().convert(new OpenCVFrameConverter.ToIplImage().convert(img));
     }
 
     /**
@@ -92,26 +81,42 @@ public class ImagePreprocessor {
         }
     }
 
+
+    //private Size size;
+    //private List<Mat> contours = new ArrayList<>(2);
+
+    /**
+     * Convert a Mat to a Bitmap
+     * @param img Mat of any color
+     * @return Bitmap
+     */
+    private static Bitmap matToBitmap(Mat img) {
+        Bitmap bm = Bitmap.createBitmap(img.width(), img.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(img, bm);
+        return bm;
+    }
+
     /**
      * Downscale image.
      * This method ensures that any image at any resolution or orientation is processed at the same level of detail.
      * @param img in-out ref to BGR Mat
      */
-    private static Mat downScaleBGR(@ByVal Mat img) {
+    private static Mat downScaleRGBA(Mat img) {
         float aspectRatio = (float)img.rows() / img.cols();
         Size size = aspectRatio > 1 ? new Size(shortSide, (int)(shortSide * aspectRatio))
                 : new Size((int)(shortSide / aspectRatio), shortSide);
-        Mat bgrResized = new Mat(size, CV_8UC3);
+        Mat bgrResized = new Mat(size, CV_8UC4);
         resize(img, bgrResized, size);
         return bgrResized;
     }
+
     /**
-     * Convert Mat from BGR to gray
+     * Convert Mat from RGBA to gray
      * @param img in-out ref to Mat (in: BGR, out: gray)
      */
-    private static void BGR2Gray(Ref<Mat> img) {
+    private static void RGBA2Gray(Ref<Mat> img) {
         Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        cvtColor(img.value, img2, CV_BGR2GRAY);
+        cvtColor(img.value, img2, COLOR_RGBA2GRAY);
         img.value = img2;
     }
 
@@ -119,9 +124,10 @@ public class ImagePreprocessor {
      * Bilateral filter
      * @param img in-out ref to gray Mat
      */
-    private static void bilatFilter(Ref<Mat> img) {
+    private static void bilateralFilter(Ref<Mat> img) {
         Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        bilateralFilter(img.value, img2, bfKerSz, bfSigma, bfSigma);
+        //Imgproc.bil
+        Imgproc.bilateralFilter(img.value, img2, bfKerSz, bfSigma, bfSigma);
         img.value = img2;
     }
 
@@ -135,16 +141,15 @@ public class ImagePreprocessor {
         img.value = img2;
     }
 
-
     /**
      * Grow + shrink mask.
      * @param img in-out ref to B&W Mat
      */
     private static void erodeDilate(Ref<Mat> img) {
         Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        opencv_core.Point pt = new opencv_core.Point(-1, -1);
-        erode(img.value, img2, new Mat(), pt, edIters, BORDER_CONSTANT, morphologyDefaultBorderValue());
-        dilate(img2, img.value, new Mat(), pt, edIters, BORDER_CONSTANT, morphologyDefaultBorderValue());
+        org.opencv.core.Point pt = new Point(-1, -1);
+        erode(img.value, img2, new Mat(), pt, edIters);
+        dilate(img2, img.value, new Mat(), pt, edIters);
     }
 
     /**
@@ -165,35 +170,38 @@ public class ImagePreprocessor {
         copyMakeBorder(img.value, img.value, 1, 1, 1, 1, BORDER_CONSTANT);
     }
 
+
     /**
      * Find all outer contours in a BGR image, sorted by area (descending).
      * @param img BGR Mat
      * @return Contour with biggest area
      */
-    private static Mat findBiggestContour(@ByVal Mat img) {
+    private static MatOfPoint findBiggestContour(Mat img) {
         Ref<Mat> imgRef = new Ref<>(img);
 
         //I used Ref parameters to enable me to easily reorder the methods
         // and experiment with the image processing pipeline
-        BGR2Gray(imgRef);
-        bilatFilter(imgRef);
+        RGBA2Gray(imgRef);
+        bilateralFilter(imgRef);
         threshold(imgRef);
         erodeDilate(imgRef);
         //median(imgRef);
         enclose(imgRef);
 
-        MatVector contours = new MatVector();
-        Mat hierachy = new Mat();
-        findContours(imgRef.value, contours, hierachy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
-        IntRawIndexer idxr = hierachy.createIndexer();
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+        findContours(imgRef.value, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
         double maxArea = 0;
-        Mat maxContour = new Mat(1,1, CV_32SC2);
-        for (int i = 0; i < hierachy.cols(); i++) {
-            // select outer contours, ie contours that have no parent (hierachy-1)
+        MatOfPoint maxContour = new MatOfPoint();
+        //List<Pair<Mat, Double>> contourSelection = new ArrayList<>();
+
+        for (int i = 0; i < hierarchy.cols(); i++) {
+            // select outer contours, ie contours that have no parent (hierarchy-1)
             // to know more, go to the link below, look for "RETR_CCOMP":
             // https://docs.opencv.org/3.1.0/d9/d8b/tutorial_py_contours_hierarchy.html
-            if (idxr.get(0, i, 3) == -1) {
-                Mat contour = contours.get(i);
+            double[] asdf= hierarchy.get(0, i);
+            if (asdf[3] == -1) {
+                MatOfPoint contour = contours.get(i);
                 double curArea = contourArea(contour);
                 if (curArea > maxArea) {
                     maxArea = curArea;
@@ -201,7 +209,6 @@ public class ImagePreprocessor {
                 }
             }
         }
-
         return maxContour;
     }
 
@@ -212,66 +219,126 @@ public class ImagePreprocessor {
      * @param perspRect ordered corners of a rectangle in perspective
      * @return Size in pixels proportional to the real ticket
      */
-    private static Size getRectSizeSimple(Mat perspRect) {
+    @NonNull
+    private static Size getRectSizeSimple(MatOfPoint2f perspRect) {
         Mat[] v = new Mat[4];
-        for (int i = 0; i < 4; i++)
-            v[i] = perspRect.rowRange(new Range(i,i + 1));
-        double w = (norm(v[0], v[1]) + norm(v[2], v[3])) / 2;
-        double h = (norm(v[1], v[2]) + norm(v[3], v[0])) / 2;
-        return new Size((int)w, (int)h);
+        double w = 1, h = 1;
+        if (perspRect.rows() == 4) {
+            for (int i = 0; i < 4; i++)
+                v[i] = perspRect.row(i);
+            w = (norm(v[1], v[2]) + norm(v[3], v[0])) / 2;
+            h = (norm(v[0], v[1]) + norm(v[2], v[3])) / 2;
+        }
+        return new Size(w, h);
     }
     //todo: use a better approach:
     // http://andrewkay.name/blog/post/aspect-ratio-of-a-rectangle-in-perspective/
 
 
+    //INSTANCE FIELDS:
+
+    private Mat srcImg;
+    private List<MatOfPoint> contours;
+    private MatOfPoint2f corners;
 
     //PUBLIC:
 
     /**
-     * Find the four corners of a ticket, ordered clockwise from the top-left corner
-     * @param bm input image. Not null.
-     * @param corners List of points in bitmap space (range from (0,0) to (width, height) ).
+     * You need to call setBitmap()
+     */
+    public ImagePreprocessor() {}
+
+    /**
+     * No need to call setBitmap()
+     * @param bm ticket bitmap
+     */
+    public ImagePreprocessor(Bitmap bm) {
+        setImage(bm);
+    }
+
+    /**
+     * Set content of internal image buffers.
+     * Always call this method before any other image manipulation method.
+     * @param bm ticket bitmap
+     */
+    public void setImage(Bitmap bm) {
+        srcImg = new Mat();
+        Utils.bitmapToMat(bm, srcImg);
+    }
+
+    /**
+     * Find the four corners of a ticket, ordered clockwise from the top-left corner.
+     * To obtain the corners, call getCorners().
+     * param corners List of points in bitmap space (range from (0,0) to (width, height) ).
      *                null if corners cannot be found or more than four sides are found.
      * @return TicketError NONE or RECT_NOT_FOUND
      */
-    public static TicketError findRectangle(Bitmap bm, @NonNull List<Point> corners) {
-        Mat orig = bitmapToMatBGR(bm);
-        Mat resized = downScaleBGR(orig);
-        Mat contour = findBiggestContour(resized);
-        double scaleMul = (double)orig.cols() / resized.cols();
+    // I used another method to retrieve the corners to make it optional
+    // and to allow me to return the TicketError instead.
+    public TicketError findRectangle() {
+        contours = new ArrayList<>();
+        Mat resized = downScaleRGBA(srcImg);
+        contours.add(findBiggestContour(resized));
+        MatOfPoint2f contour = new MatOfPoint2f(contours.get(0).toArray());
+        double scaleMul = (double)srcImg.cols() / resized.cols();
 
-        Mat polyApprox = new Mat();
+        corners = new MatOfPoint2f();
         //double perimeter = arcLength(contour, true);
-        approxPolyDP(contour, polyApprox, polyMaxErr/*polyMaxErrMul * perimeter*/, true);
-        polyApprox = multiply(polyApprox, scaleMul).asMat();
-        corners.clear();
-//        if (polyApprox.rows() != 4) {
-//            // polyApprox has not 4 sides. Return bounding box.
-//            Rect box = boundingRect(polyApprox);
-//            return TicketError.RECT_NOT_FOUND;
-//        }
-        //else it's a quadrilateral
+        approxPolyDP(contour, corners, polyMaxErr/*polyMaxErrMul * perimeter*/, true);
 
-        //List<Point> pts = new ArrayList<>(4);
         //scale up the the corners to match the scale of the original image
-        IntRawIndexer idxr = polyApprox.createIndexer();
-        for (int i = 0; i < 4; i++)
-            corners.add(new Point(idxr.get(0, i, 0), idxr.get(0, i, 1)));
-        return TicketError.NONE;
+        multiply(corners.clone(), new Scalar(scaleMul, scaleMul), corners);
+
+        return corners.rows() == 4 ? TicketError.NONE : TicketError.RECT_NOT_FOUND;
     }
     //tests: is corners input non empty? does corners output have 4 elements?
 
     /**
+     *
+     * @return List of points in bitmap space (range from (0,0) to (width, height) ).
+     *         The corners might be more or less than 4. Never null.
+     */
+    public List<android.graphics.Point> getCorners() {
+        List<android.graphics.Point> androidPts = new ArrayList<>(corners.rows());
+        for (Point p : corners.toArray())
+            androidPts.add(new android.graphics.Point((int)p.x, (int)p.y));
+        return androidPts;
+    }
+
+
+    /**
      * Get a Bitmap with a perspective correction applied, with a margin.
-     * @param bm Original photo
-     * @param corners corners of the ticket found with findRectangle().
+     * param bm Original photo
+     * param corners corners of the ticket found with findRectangle().
      * @param marginMul fraction/percentage of length of smallest side to be used as margin
      * @return Bitmap with perspective distortion removed
      */
-    public static Bitmap undistort(Bitmap bm, List<Point> corners, double marginMul) {
-        Mat orig = bitmapToMatBGR(bm);
-        return null;
+    public Bitmap undistort(double marginMul) {
+        Size sz = getRectSizeSimple(corners);
+        MatOfPoint2f dstRect;
+        Mat dstImg = srcImg.clone();
+        if (corners.rows() > 4) {
+            //todo select
+            return matToBitmap(dstImg); // todo remove
+        }
+        else if (corners.rows() < 4) { // very unlikely case where the biggest contour is a triangle
+            return matToBitmap(dstImg);
+        }
+
+        dstRect = new MatOfPoint2f( // counter-clockwise
+                new Point(0, 0),
+                new Point(0, sz.height),
+                new Point(sz.width, sz.height),
+                new Point(sz.width, 0));
+
+        Mat mtx = getPerspectiveTransform(corners, dstRect);
+        warpPerspective(srcImg, dstImg, mtx, sz);
+
+        return matToBitmap(dstImg);
     }
+
+
+    //UTILITY FUNCTIONS:
 
     /**
      * Rotate a bitmap

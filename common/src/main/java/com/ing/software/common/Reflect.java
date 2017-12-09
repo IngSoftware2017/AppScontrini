@@ -1,5 +1,6 @@
 package com.ing.software.common;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +21,17 @@ public class Reflect {
      * @param params List of arguments of the method. They can be null.
      * @param <T> return type of the method.
      * @return return of the method or void.
-     * @throws NoSuchMethodException: The method name, the number or type of parameters is wrong
-     * @throws NullPointerException: Calling an instance method with a class type.
-     * @throws ClassCastException: Return type mismatch.
-     * @throws UnknownException: Something went wrong. The causes might be:
-     *                           * parameters incompatible with method annotations;
-     *                           * exception raised inside method.
+     *
+     * @throws Exception:
+     *  NoSuchMethodException: The method name, the number or type of parameters is wrong
+     *  NullPointerException: Calling an instance method with a class type.
+     *  ClassCastException: Return type mismatch.
+     *  Other exception: Something went wrong. The causes might be:
+     *                    * parameters incompatible with method annotations;
+     *                    * exception raised inside method.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T invoke(Object clazz, String methodName, Object... params)
-            throws NoSuchMethodException, NullPointerException, ClassCastException, UnknownException {
+    public static <T> T invoke(Object clazz, String methodName, Object... params) throws Exception {
         List<Class<?>> paramsTypes = new ArrayList<>(params.length);
         for (Object p : params) {
             if (p != null)
@@ -65,20 +67,28 @@ public class Reflect {
                     m.setAccessible(true);
 
                     //Exception if there is a return type mismatch (cannot handle it in unit tests)
-                    try {
-                        return (T)m.invoke(isType ? null : clazz, params);
-                    }
-                    catch (NullPointerException | ClassCastException e) {
-                        throw e;
-                    }
-                    catch (Exception e) {
-                        System.out.println();
-                        throw new UnknownException();
-                    }
-
+                    return (T)m.invoke(isType ? null : clazz, params);
                 }
             }
         }
         throw new NoSuchMethodException();
     }
+
+    /**
+     * Get value of a static or non static field (with any access level).
+     * @param clazz A class instance or class type. Not null
+     * @param fieldName Field name. Not null
+     * @param <T> type of the field.
+     * @return value of the field.
+     *
+     * @throws Exception exception
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T fieldVal(Object clazz, String fieldName) throws Exception {
+        boolean isType = clazz instanceof Class<?>;
+        Field f = (isType ? (Class<?>)clazz : clazz.getClass()).getDeclaredField(fieldName);
+        f.setAccessible(true);
+        return (T)f.get(isType ? null : clazz);
+    }
+
 }

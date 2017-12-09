@@ -17,29 +17,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    //for javacv
-    lintOptions {
-        warning 'InvalidPackage'
-    }
-
-    packagingOptions {
-        exclude 'org/bytedeco/javacpp/**'
-        exclude '**/libav*.so'
-    }
-
-    flavorDimensions "isEmulator"
-    productFlavors {
-        realPhone {
-            dimension "isEmulator"
-            packagingOptions {
-                exclude 'lib/x86/*'
-            }
-        }
-        emululator {
-            dimension "isEmulator"
-        }
-    }
 }
 
 dependencies {
