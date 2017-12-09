@@ -84,9 +84,9 @@ public class BillActivity extends AppCompatActivity {
 
     /** Dal Maso
      * Edit by Lazzarin
-     * Cattura degli eventi nella toolbar
-     * @param item oggetto nella toolbar catturato
-     * @return flag di successo
+     * Catch events on toolbar
+     * @param item object on the toolbar
+     * @return flag of success
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -182,10 +182,10 @@ public class BillActivity extends AppCompatActivity {
         Log.d("tagMission", "" + pos);
         AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
 
-        toast.setMessage("Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati")
+        toast.setMessage(text.deleteMissionToast)
                 .setTitle("Cancellazione");
 
-        toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
+        toast.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -199,7 +199,7 @@ public class BillActivity extends AppCompatActivity {
             }
         });
 
-        toast.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+        toast.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //Nothing to do
             }

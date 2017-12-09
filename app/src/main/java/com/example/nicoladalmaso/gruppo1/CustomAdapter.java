@@ -91,7 +91,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
             public void onClick(View v) {
                 pos =  Integer.parseInt(v.getTag().toString());
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Sei sicuro di voler eliminare lo scontrino?")
+                builder.setMessage(text.deleteTicketToast)
                         .setTitle("Cancellazione");
                 String toDelete = "";
                 for(int i = 0; i < t.size(); i++){
@@ -101,7 +101,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                 }
                 final File ticketDelete = new File(toDelete);
                 // Add the buttons
-                builder.setPositiveButton("Cancella", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("LocalID", ""+pos);
                         if(DB.deleteTicket(pos)){
@@ -112,7 +112,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                         }
                     }
                 });
-                builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
                     }

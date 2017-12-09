@@ -47,9 +47,9 @@ public class AddNewMission extends AppCompatActivity{
 
     /** Dal Maso
      * Edit by Lazzarin
-     * Cattura degli eventi nella toolbar
-     * @param item oggetto nella toolbar catturato
-     * @return flag di successo
+     * Catch events on toolbar
+     * @param item object on the toolbar
+     * @return flag of success
      *
      */
     @Override
@@ -69,8 +69,16 @@ public class AddNewMission extends AppCompatActivity{
                     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                     name = timeStamp;
                 }
+                for(int i=0;i<50;i++)
+                {
+                    voidChar=voidChar+" ";
+                    if(name.equals(voidChar))
+                    { String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    name = timeStamp;}
+
+                }
                 if((description==null)||description.equals("")){
-                    description = "Nessuna descrizione";
+                    description = text.defaultDescription;
                 }
                 File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
                 newMissionPath.mkdir();
