@@ -11,14 +11,17 @@ import java.util.List;
 
 /**
  * Manages a receipt trying to find its elements (products, blocks etc)
+ * WIP
  */
 
 class OcrSchemer {
 
-    /*
-    Un prodotto deve stare a sinistra e avere un corrispondente blocco con i prezzi a destra:
-    - Tieni tutti i blocchi con corrispondenze in un lato
+    /**
+     * Find all blocks with a corresponding block on its left or right.
+     * @param blocks list of blocks
+     * @return list of blocks with a block on its left or right
      */
+    @Deprecated
     static List<RawBlock> findBlocksOnLeft(List<RawBlock> blocks) {
         List<RawBlock> candidates = new ArrayList<>();
         if (blocks.size() > 0) {
@@ -38,7 +41,7 @@ class OcrSchemer {
     }
 
     /**
-     * Get texts that are on the right part of the receipt
+     * Get texts that are on the right part (3/4) of the receipt
      * @param blocks list of texts
      * @return list of texts on right side
      */
@@ -52,8 +55,8 @@ class OcrSchemer {
     }
 
     /**
-     * Get texts that are on the right part of the receipt
-     * @param blocks list of blocks containing texts
+     * Get texts that are on the right part (1/2) of the receipt
+     * @param blocks list of texts
      * @return list of texts on right side
      */
     static List<RawText> findTextsOnRight(List<RawText> blocks) {
@@ -66,14 +69,16 @@ class OcrSchemer {
     }
 
     /**
-     * Return true if cash rect is inside extended amount rect
+     * Return true if cash rect is inside extended (on height) amount rect
      * @param amount source rect of amount
      * @param cash amount of possible cash
      * @return true if inside
      */
     static boolean isPossibleCash(RawText amount, RawText cash) {
-        RectF extendedRect = OcrUtils.partialExtendWidthRect(amount.getRect(), 50);
-        extendedRect = OcrUtils.partialExtendHeightRect(extendedRect, 400);
+        int extendHeight = 400;
+        int extendWidth = 50;
+        RectF extendedRect = OcrUtils.partialExtendWidthRect(amount.getRect(), extendWidth);
+        extendedRect = OcrUtils.partialExtendHeightRect(extendedRect, extendHeight);
         extendedRect = new RectF(extendedRect.left, amount.getRect().top, extendedRect.right, extendedRect.bottom);
         return extendedRect.contains(cash.getRect());
     }

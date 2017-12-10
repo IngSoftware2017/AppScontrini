@@ -3,8 +3,9 @@ package com.ing.software.ocr.OcrObjects;
 import android.support.annotation.NonNull;
 
 /**
- * Class to store results from grid search
- * This object is used only for comparing purposes
+ * Class to store results from grid search or for other searches
+ * where you need only a RawText and an int.
+ * This object is used only for comparing purposes.
  * @author Michelon
  */
 

@@ -5,17 +5,15 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.ing.software.common.Ticket;
-import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.ing.software.ocr.AmountAnalyzer.*;
+import static com.ing.software.ocr.AmountComparator.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
 
 /*
@@ -33,6 +31,9 @@ public class OcrManager {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
 
+    /**
+     * @author Zaglia
+     */
     class AnalyzeRequest {
         Bitmap photo;
         OnTicketReadyListener ticketCb;
@@ -100,8 +101,8 @@ public class OcrManager {
     }
 
     /**
+     * @author Michelon
      * Coverts an OcrResult into a Ticket analyzing its data
-     *
      * @param result OcrResult to analyze. Not null.
      * @return Ticket. Some fields can be null;
      */
@@ -114,13 +115,22 @@ public class OcrManager {
         return ticket;
     }
 
-    private static BigDecimal extendedAmountAnalysis(List<RawGridResult> possibleResults, List<RawText> products) {
+    /**
+     * @author Michelon
+     * @date 9-12-17
+     * Analyze possible RawTexts containing amount. When one is found check if it consistent with list of products,
+     * subtotal, cash and change.
+     * @param possibleResults List of RawGridResults containing possible amount. Not null.
+     * @param products List of RawTexts containing possible prices for products. Not null.
+     * @return BigDecimal containing detected amount. null if nothing found.
+     */
+    private static BigDecimal extendedAmountAnalysis(@NonNull List<RawGridResult> possibleResults, @NonNull List<RawText> products) {
         BigDecimal amount = null;
         RawText amountText = null;
         for (RawGridResult result : possibleResults) {
             String amountString = result.getText().getDetection();
             OcrUtils.log(2, "getPossibleAmount", "Possible amount is: " + amountString);
-            amount = analyzeAmount(amountString);
+            amount = DataAnalyzer.analyzeAmount(amountString);
             if (amount != null) {
                 OcrUtils.log(2, "getPossibleAmount", "Decoded value: " + amount);
                 amountText = result.getText();
@@ -128,134 +138,13 @@ public class OcrManager {
             }
         }
         if (amount != null) {
-            AmountAnalyzer amountAnalyzer = new AmountAnalyzer(amountText, amount);
+            AmountComparator amountComparator = new AmountComparator(amountText, amount);
             //check against list of products and cash + change
             List<RawGridResult> possiblePrices = getPricesList(amountText, products);
-            amountAnalyzer.analyzePrices(possiblePrices);
-            amountAnalyzer.analyzeTotals(possiblePrices);
-            amount = getBestAmount(amountAnalyzer);
+            amountComparator.analyzePrices(possiblePrices);
+            amountComparator.analyzeTotals(possiblePrices);
+            amount = amountComparator.getBestAmount();
         }
         return amount;
     }
-
-    private static BigDecimal getBestAmount(AmountAnalyzer amountAnalyzer) {
-        HashMap<String, Boolean> flags = amountAnalyzer.getFlags();
-        boolean hasSubtotal = flags.get("hasSubtotal");
-        boolean hasPriceList = flags.get("hasPriceList");
-        boolean hasCash = flags.get("hasCash");
-        boolean hasChange = flags.get("hasChange");
-        if (amountAnalyzer.getPrecision() > 0) {
-            int distanceFromSubtotal = -1;
-            int distanceFromPriceList = -1;
-            int distanceFromCash = -1;
-            if (hasSubtotal)
-                distanceFromSubtotal = OcrUtils.findSubstring(amountAnalyzer.getSubTotal().toString(), amountAnalyzer.getAmount().toString());
-            if (hasPriceList)
-                distanceFromPriceList = OcrUtils.findSubstring(amountAnalyzer.getPriceList().toString(), amountAnalyzer.getAmount().toString());
-            if (hasCash)
-                distanceFromCash = OcrUtils.findSubstring(amountAnalyzer.getCash().toString(), amountAnalyzer.getAmount().toString());
-            if (hasChange)
-                distanceFromCash = OcrUtils.findSubstring(amountAnalyzer.getCash().subtract(amountAnalyzer.getChange()).toString(), amountAnalyzer.getAmount().toString());
-            //analyze all possible cases
-            BigDecimal subtotal = null;
-            BigDecimal cash = null;
-            BigDecimal prices = null;
-            BigDecimal amount = amountAnalyzer.getAmount();
-            if (distanceFromCash > -1 && !hasChange)
-                cash = amountAnalyzer.getCash();
-            else if (distanceFromCash > -1)
-                cash = amountAnalyzer.getCash().subtract(amountAnalyzer.getChange());
-            if (distanceFromPriceList > -1)
-                prices = amountAnalyzer.getPriceList();
-            if (distanceFromSubtotal > -1)
-                subtotal = amountAnalyzer.getSubTotal();
-            if (distanceFromSubtotal > -1 && distanceFromPriceList > -1 && distanceFromCash > -1) {
-                boolean cashSubtotal = cash.compareTo(subtotal)==0;
-                boolean cashPrices = cash.compareTo(prices)==0;
-                boolean cashAmount = cash.compareTo(amount)==0;
-                boolean subtotalPrices = subtotal.compareTo(prices)==0;
-                boolean subtotalAmount = subtotal.compareTo(amount)==0;
-                //i have all three values + amount, if three of them are equals use that value
-                if ((cashSubtotal && cashAmount) || (cashPrices && cashSubtotal) || (cashPrices && cashAmount)) {
-                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                    return cash;
-                } else if (subtotalPrices && subtotalAmount) {
-                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                    return subtotal;
-                }
-                //Here i don't have three equal values.
-                if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
-                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                    return subtotal;
-                } else if (cashPrices) {//same as above
-                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                    return cash;
-                }
-                //TO BE CONTINUED
-            } else if (distanceFromPriceList > -1 && distanceFromCash > -1) {
-                boolean cashPrices = cash.compareTo(prices)==0;
-                boolean cashAmount = cash.compareTo(amount)==0;
-                //i have all three values + amount, if three of them are equals use that value
-                if (cashPrices && cashAmount) {
-                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                    return cash;
-                }
-                //Here i don't have three equal values.
-                if (cashPrices) {//same as above
-                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                    return cash;
-                }
-                //TO BE CONTINUED
-            } else if (distanceFromSubtotal > -1 && distanceFromPriceList > -1) {
-                boolean subtotalPrices = subtotal.compareTo(prices)==0;
-                boolean subtotalAmount = subtotal.compareTo(amount)==0;
-                //i have all three values + amount, if three of them are equals use that value
-                if (subtotalPrices && subtotalAmount) {
-                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                    return subtotal;
-                }
-                //Here i don't have three equal values.
-                if (subtotalPrices) { //Probably if both subtotal and cash are the same amount is wrong
-                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                    return subtotal;
-                }
-            } else if (distanceFromSubtotal > -1 && distanceFromCash > -1) {
-                boolean cashSubtotal = cash.compareTo(subtotal)==0;
-                boolean cashAmount = cash.compareTo(amount)==0;
-                //i have all three values + amount, if three of them are equals use that value
-                if (cashSubtotal && cashAmount) {
-                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                    return cash;
-                }
-                //Here i don't have two equal values.
-                if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
-                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                    return subtotal;
-                } 
-            }
-            return amountAnalyzer.getAmount();
-        } else
-            return amountAnalyzer.getAmount();
-    }
-
 }

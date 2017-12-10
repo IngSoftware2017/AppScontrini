@@ -307,8 +307,8 @@ public class OcrUtils {
     }
 
     /**
+     * @author Michelon
      * Extends width of rect according to percentage
-     *
      * @param originalRect rect containing amount
      * @param percentage   percentage of the width of the rect to extend. Int >0
      * @return extended rect
@@ -323,8 +323,8 @@ public class OcrUtils {
     }
 
     /**
+     * @author Michelon
      * Extends height of rect according to percentage
-     *
      * @param originalRect rect containing amount
      * @param percentage   percentage of the height of the rect to extend. Int >0
      * @return extended rect
@@ -339,13 +339,15 @@ public class OcrUtils {
     }
 
     /**
+     * @author Michelon
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
      * Note: Min value for top and left is 0
+     * todo: revise method to include both height and width extension (with different values to replace also the two above
      * @param rect source rect. Not null
      * @param percent chosen percentage. Int >= 0
      * @return new extended rectangle
      */
-    public static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
+    static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
         float extendedHeight = rect.height()*percent/100;
         float extendedWidth = rect.width()*percent/100;
         float left = rect.left - extendedWidth/2;
@@ -358,5 +360,22 @@ public class OcrUtils {
         float right = rect.right + extendedWidth/2;
         float bottom = rect.bottom + extendedHeight/2;
         return new RectF(left, top, right, bottom);
+    }
+
+    /**
+     * @author Michelon
+     * @date 9-12-17
+     * Check if a string may be a number. Removes spaces before analysis.
+     * @param s string to analyze
+     * @return true if more than half of the chars in the string are numbers
+     */
+    static boolean isPossibleNumber(String s) {
+        int counter = 0;
+        s = s.replaceAll(" ", "");
+        for (int i = 0; i < s.length(); ++i) {
+            if (Character.isDigit(s.charAt(i)))
+                ++counter;
+        }
+        return counter > s.length()/2;
     }
 }

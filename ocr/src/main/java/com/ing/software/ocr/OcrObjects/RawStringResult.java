@@ -23,6 +23,7 @@ public class RawStringResult implements Comparable<RawStringResult>{
      * Constructor. Set source rawText and its distance from target string
      * @param rawText source RawText
      * @param distanceFromTarget distance from target String
+     * @param sourceString source string
      */
     RawStringResult(RawText rawText, int distanceFromTarget, String sourceString) {
         this.sourceString = sourceString;
@@ -42,7 +43,7 @@ public class RawStringResult implements Comparable<RawStringResult>{
     }
 
     /**
-     * Adds rawTexts found in extended rect
+     * Adds rawText found in extended rect
      * @param detectedText rawText detected. Not null.
      */
     public void addDetectedTexts(@NonNull RawText detectedText) {

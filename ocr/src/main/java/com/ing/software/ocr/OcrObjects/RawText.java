@@ -9,8 +9,6 @@ import android.support.annotation.Size;
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.ocr.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import static com.ing.software.ocr.OcrUtils.log;
@@ -24,7 +22,7 @@ import static com.ing.software.ocr.OcrUtils.log;
 public class RawText implements Comparable<RawText> {
 
     private RectF rectText;
-    private Text text;
+    private String detection;
     private RawImage rawImage;
 
     /**
@@ -34,7 +32,7 @@ public class RawText implements Comparable<RawText> {
      */
     public RawText(@NonNull Text text, @NonNull RawImage rawImage) {
         rectText = new RectF(text.getBoundingBox());
-        this.text = text;
+        this.detection = text.getValue();
         this.rawImage = rawImage;
     }
 
@@ -42,7 +40,7 @@ public class RawText implements Comparable<RawText> {
      * @return string contained in this Text
      */
     public String getDetection() {
-        return text.getValue();
+        return detection;
     }
 
     /**
@@ -64,11 +62,11 @@ public class RawText implements Comparable<RawText> {
      * @return probability that date is present
      */
     public int getDateProbability() {
-        log(6,"Value is: ", getDetection());
+        log(8,"Value is: ", getDetection());
         int[] gridBox = getGridBox();
-        log(6,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
+        log(8,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
         int probability = ProbGrid.dateMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
-        log(6,"Date Probability is", " " +probability);
+        log(8,"Date Probability is", " " +probability);
         return probability;
     }
 
@@ -77,19 +75,20 @@ public class RawText implements Comparable<RawText> {
      * @return probability that amount is present
      */
     public int getAmountProbability() {
-        log(6,"Value is: ", getDetection());
+        log(8,"Value is: ", getDetection());
         int[] gridBox = getGridBox();
-        log(6,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
+        log(8,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
         int probability = ProbGrid.amountMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
-        log(6,"Amount Probability is", " " +probability);
+        log(8,"Amount Probability is", " " +probability);
         return probability;
     }
 
     /**
      * Find box of the grid containing the center of the text rect
+     * todo: replace with point
      * @return coordinates of the grid, where int[0] = column, int[1] = row
      */
-    private int[] getGridBox() {
+    public int[] getGridBox() {
         Scanner gridder = new Scanner(rawImage.getGrid());
         gridder.useDelimiter("x");
         int rows = Integer.parseInt(gridder.next());
@@ -103,10 +102,10 @@ public class RawText implements Comparable<RawText> {
     }
 
     /**
-     * Search string in block, all occurrences are returned ordered(top -> bottom, left -> right)
+     * Search string in text
      * @param string string to search. Length > 0.
      * @param maxDistance max distance (included) allowed for the target string. Int >= 0
-     * @return list of RawStringResult containing the string with corresponding distance from target, null if nothing found
+     * @return RawStringResult containing the string with corresponding distance from target, null if nothing found
      */
     public RawStringResult findContinuous(@Size(min = 1) String string, @IntRange(from = 0) int maxDistance) {
         int distanceFromString = bruteSearch(string);
@@ -134,6 +133,11 @@ public class RawText implements Comparable<RawText> {
         return rect.contains(rectText);
     }
 
+    /**
+     * Order: top to bottom, left to right
+     * @param rawText target RawText
+     * @return int > 0 if target comes before source (i.e. is above/on the left)
+     */
     @Override
     public int compareTo(@NonNull RawText rawText) {
         RectF text2Rect = rawText.getRect();

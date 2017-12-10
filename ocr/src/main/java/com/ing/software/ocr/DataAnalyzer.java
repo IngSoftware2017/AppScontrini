@@ -26,19 +26,20 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * Search through results from the research of amount string and retrieves the text with highest
-     * probability to contain the amount calculated with (probability from grid - distanceFromTarget*10).
+     * probability to contain the amount calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
      * If no amount was found in first result iterate through all results following previous ordering.
      * @param amountResults list of RawStringResult from amount search. Not null.
      * @return BigDecimal containing the amount found. Null if nothing found
      */
     static List<RawGridResult> getPossibleAmounts(@NonNull List<RawStringResult> amountResults) {
+        int distanceMultiplier = 15;
         List<RawGridResult> possibleResults = new ArrayList<>();
         Collections.sort(amountResults);
         for (RawStringResult stringResult : amountResults) {
             //Ignore text with invalid distance (-1) according to findSubstring() documentation
             if (stringResult.getDistanceFromTarget() >= 0) {
                 RawText sourceText = stringResult.getSourceText();
-                int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * 10;
+                int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
                 if (stringResult.getDetectedTexts() != null) {
                     //Here we order texts according to their distance (position) from source rect
                     List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getDetectedTexts(), stringResult.getSourceText().getRect());
@@ -81,21 +82,23 @@ public class DataAnalyzer {
      */
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
-        try {
-            amount = new BigDecimal(amountString);
-        } catch (NumberFormatException e) {
+        if (OcrUtils.isPossibleNumber(amountString)) {
             try {
-                String decoded = deepAnalyzeAmountChars(amountString);
-                if (!decoded.equals(""))
-                    amount = new BigDecimal(decoded);
-            } catch (Exception e1) {
+                amount = new BigDecimal(amountString);
+            } catch (NumberFormatException e) {
+                try {
+                    String decoded = deepAnalyzeAmountChars(amountString);
+                    if (!decoded.equals(""))
+                        amount = new BigDecimal(decoded);
+                } catch (Exception e1) {
+                    amount = null;
+                }
+            } catch (Exception e2) {
                 amount = null;
             }
-        } catch (Exception e2) {
-            amount = null;
+            if (amount != null)
+                amount = amount.setScale(2, RoundingMode.HALF_UP);
         }
-        if (amount != null)
-            amount = amount.setScale(2, RoundingMode.HALF_UP);
         return amount;
     }
 
@@ -141,10 +144,6 @@ public class DataAnalyzer {
         return manipulatedAmount.toString();
     }
 
-    //Seems that the price under the correct one is usually correct, the manager
-    // will have to find it and compare with this one and
-    // with the result of products search...
-
     /**
      * @author Michelon
      * @date 8-12-17
@@ -173,7 +172,7 @@ public class DataAnalyzer {
         boolean isNegative = (source.charAt(source.length()-1) == '-');
         source = removeLetters(source);
         StringBuilder manipulatedAmount = new StringBuilder();
-        //Check if there are at least 2 dec + '.' + 1 num
+        //Check if there are at least 2 dec + '.' + 1 num = 4 chars
         if (source.length() >= 4) {
             char char0 = source.charAt(0);
             char char1 = source.charAt(1);
@@ -208,10 +207,10 @@ public class DataAnalyzer {
      * @author Michelon
      * @date 8-12-17
      * Keep only digits and points in a string
-     * @param string source string
+     * @param string source string. Length > 0.
      * @return string with only digits and '.'
      */
-    private static String removeLetters(String string) {
+    private static String removeLetters(@Size(min = 1) String string) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < string.length(); ++i)
             if (Character.isDigit(string.charAt(i)) || string.charAt(i) == '.')
@@ -223,10 +222,10 @@ public class DataAnalyzer {
      * @author Michelon
      * @date 8-12-17
      * Removes '.' from a string
-     * @param string source string
+     * @param string source string. Length > 0
      * @return string with no '.'
      */
-    private static String removeRedundantPoints(String string) {
+    private static String removeRedundantPoints(@Size(min = 1) String string) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < string.length(); ++i)
             if (string.charAt(i) != '.')
@@ -241,7 +240,7 @@ public class DataAnalyzer {
      * @param source source string @Size(min = 1, max = 3)
      * @return StringBuilder with decoded number
      */
-    private static StringBuilder analyzeChars(String source) {
+    private static StringBuilder analyzeChars(@Size(min = 1) String source) {
         if (source.length()==3)
             return analyzeChars(source.charAt(0), source.charAt(1), source.charAt(2));
         else if (source.length() == 2)
@@ -253,16 +252,16 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * @date 8-12-17
-     * Analyze three chars, uses arbitrary decisions
-     * @param char0 first char
-     * @param char1 second char
-     * @param char2 third char
+     * Analyze three chars, uses arbitrary decisions to extract a number with two decimals.
+     * @param char0 first char. Not null.
+     * @param char1 second char. Not null.
+     * @param char2 third char. Not null.
      * @return analysis
      */
     private static StringBuilder analyzeChars(char char0, char char1, char char2) {
         StringBuilder result = new StringBuilder();
         if (Character.isDigit(char0) && Character.isDigit(char1) && Character.isDigit(char2)) {
-            //point is missing = add after char0 and char1
+            //point is missing = add it after char0 and char1
             return result.append(char0).append(char1).append(".").append(char2);
         } else if (Character.isDigit(char0) && char1 == '.' && Character.isDigit(char2)) {
             //one decimal is missing, suppose it's the last one
@@ -282,9 +281,9 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * @date 8-12-17
-     * Analyze two chars
-     * @param char0 first char
-     * @param char1 second char
+     * Analyze two chars, uses arbitrary decisions to extract a number with two decimals.
+     * @param char0 first char. Not null.
+     * @param char1 second char. Not null.
      * @return analysis
      */
     private static StringBuilder analyzeChars(char char0, char char1) {
@@ -305,8 +304,8 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * @date 8-12-17
-     * Analyze single char
-     * @param char0 first char
+     * Analyze single char, uses arbitrary decisions to extract a number with two decimals.
+     * @param char0 first char. Not null.
      * @return analysis
      */
     private static StringBuilder analyzeChars(char char0) {

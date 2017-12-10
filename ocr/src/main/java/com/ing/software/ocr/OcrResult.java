@@ -23,8 +23,9 @@ class OcrResult {
      * Constructor
      * @param amountResults list of possible amounts. Not null.
      * @param dateList list of possible dates. Not null.
+     * @param products list of possible products prices. Not null.
      */
-    OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList, List<RawText> products) {
+    OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList, @NonNull List<RawText> products) {
         this.amountResults = amountResults;
         this.dateList = dateList;
         this.products = products;
@@ -44,6 +45,9 @@ class OcrResult {
         return dateList;
     }
 
+    /**
+     * @return possible RawTexts where a product price is present
+     */
     List<RawText> getProducts() {
         return products;
     }
@@ -52,6 +56,7 @@ class OcrResult {
      * @return String containing all results before processing by DataAnalyzer.
      * Only for debugging purposes.
      */
+    @Override
     public String toString() {
         StringBuilder list = new StringBuilder();
         list.append("AMOUNT FOUND IN:");
