@@ -22,7 +22,7 @@ import org.opencv.core.Mat;
 public class ImagePreprocessorTests {
 
     // alias
-    private final static Class<ImagePreprocessor> IP_CLASS = ImagePreprocessor.class;
+    private final static Class<?> IP_CLASS = ImagePreprocessor.class;
 
     @Before
     public void initOpenCV() {

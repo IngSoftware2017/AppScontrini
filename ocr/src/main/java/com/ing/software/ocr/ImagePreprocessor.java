@@ -15,6 +15,10 @@ import org.opencv.core.Point; // resolve conflict
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.opencv.core.Core.*;
@@ -234,12 +238,29 @@ public class ImagePreprocessor {
     //todo: use a better approach:
     // http://andrewkay.name/blog/post/aspect-ratio-of-a-rectangle-in-perspective/
 
+    /**
+     * Find the polygon from a contour.
+     * @param contour A MatOfPoint containing a contour.
+     * @return Polygon corners.
+     */
+    // I used another method to retrieve the corners to make it optional
+    // and to allow me to return the TicketError instead.
+    private static MatOfPoint2f findRectangle(MatOfPoint contour) {
+        MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
+        MatOfPoint2f corns = new MatOfPoint2f();
+        //double perimeter = arcLength(contour, true);
+        approxPolyDP(contour2f, corns, polyMaxErr/*polyMaxErrMul * perimeter*/, true);
+        return corns;
+    }
+    //tests: is corners input non empty? does corners output have 4 elements?
 
     //INSTANCE FIELDS:
 
     private Mat srcImg;
     private List<MatOfPoint> contours;
     private MatOfPoint2f corners;
+
+
 
     //PUBLIC:
 
@@ -266,35 +287,52 @@ public class ImagePreprocessor {
         Utils.bitmapToMat(bm, srcImg);
     }
 
+
     /**
-     * Find the four corners of a ticket, ordered clockwise from the top-left corner.
+     * Find the four corners of a ticket, ordered counter-clockwise from the top-left corner of the ticket.
+     * The corners are ordered to get a straight ticket (but could be upside down).
      * To obtain the corners, call getCorners().
-     * param corners List of points in bitmap space (range from (0,0) to (width, height) ).
-     *                null if corners cannot be found or more than four sides are found.
+     * @param quick true: faster but more errors: good for real time visual feedback. No orientation detection.
+     *              false: slower but more accurate: good for recalculating the rectangle after the shot.
+     *                                               or for analyzing an imported image.
      * @return TicketError NONE or RECT_NOT_FOUND
      */
-    // I used another method to retrieve the corners to make it optional
-    // and to allow me to return the TicketError instead.
-    public TicketError findRectangle() {
+    public TicketError findTicket(boolean quick) {
         contours = new ArrayList<>();
         Mat resized = downScaleRGBA(srcImg);
         contours.add(findBiggestContour(resized));
-        MatOfPoint2f contour = new MatOfPoint2f(contours.get(0).toArray());
-        double scaleMul = (double)srcImg.cols() / resized.cols();
-
-        corners = new MatOfPoint2f();
-        //double perimeter = arcLength(contour, true);
-        approxPolyDP(contour, corners, polyMaxErr/*polyMaxErrMul * perimeter*/, true);
+        corners = findRectangle(contours.get(0));
 
         //scale up the the corners to match the scale of the original image
+        double scaleMul = (double)srcImg.cols() / resized.cols();
         multiply(corners.clone(), new Scalar(scaleMul, scaleMul), corners);
 
-        return corners.rows() == 4 ? TicketError.NONE : TicketError.RECT_NOT_FOUND;
+        if (corners.rows() != 4)
+            return TicketError.RECT_NOT_FOUND;
+
+        if (!quick) {
+            //shift corners in order to make top-left corner the first of list.
+            final List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
+            int tlIdx = Collections.min(Arrays.asList(0, 1, 2, 3), new Comparator<Integer>() {
+                @Override
+                public int compare(Integer o1, Integer o2) {
+                    return Integer.valueOf((int)(corns.get(o1).x + corns.get(o1).y))
+                            .compareTo((int)(corns.get(o2).x + corns.get(o2).y));
+                }
+            });
+            //shift corns by tlIdx
+            //NB: sublist creates a view, not a copy.
+            corns.addAll(corns.subList(0, tlIdx));
+            corns.subList(0, tlIdx).clear();
+            corners = new MatOfPoint2f(corns.toArray(new Point[4]));
+        }
+
+
+        return TicketError.NONE;
     }
-    //tests: is corners input non empty? does corners output have 4 elements?
 
     /**
-     *
+     * Get rectangle (or polygon) corners.
      * @return List of points in bitmap space (range from (0,0) to (width, height) ).
      *         The corners might be more or less than 4. Never null.
      */
@@ -305,16 +343,12 @@ public class ImagePreprocessor {
         return androidPts;
     }
 
-
     /**
-     * Get a Bitmap with a perspective correction applied, with a margin.
-     * param bm Original photo
-     * param corners corners of the ticket found with findRectangle().
-     * @param marginMul fraction/percentage of length of smallest side to be used as margin
-     * @return Bitmap with perspective distortion removed
+     * Get a Bitmap of a ticket with a perspective correction applied, with a margin.
+     * @param marginMul fraction/percentage of length of shortest side to be used as margin. Ex 0.1
+     * @return Bitmap of ticket with perspective distortion removed
      */
     public Bitmap undistort(double marginMul) {
-        Size sz = getRectSizeSimple(corners);
         MatOfPoint2f dstRect;
         Mat dstImg = srcImg.clone();
         if (corners.rows() > 4) {
@@ -325,17 +359,25 @@ public class ImagePreprocessor {
             return matToBitmap(dstImg);
         }
 
-        dstRect = new MatOfPoint2f( // counter-clockwise
-                new Point(0, 0),
-                new Point(0, sz.height),
-                new Point(sz.width, sz.height),
-                new Point(sz.width, 0));
+        Size sz = getRectSizeSimple(corners);
+        double m = marginMul * Math.min(sz.width, sz.height);
 
+        dstRect = new MatOfPoint2f( // counter-clockwise
+                new Point(m, m),
+                new Point(m, sz.height + m),
+                new Point(sz.width + m, sz.height + m),
+                new Point(sz.width + m, m));
         Mat mtx = getPerspectiveTransform(corners, dstRect);
-        warpPerspective(srcImg, dstImg, mtx, sz);
+        warpPerspective(srcImg, dstImg, mtx, new Size(sz.width + 2 * m,sz.height + 2 * m));
 
         return matToBitmap(dstImg);
     }
+
+
+    //public Bitmap rotate180(int ) {
+
+    //}
+
 
 
     //UTILITY FUNCTIONS:

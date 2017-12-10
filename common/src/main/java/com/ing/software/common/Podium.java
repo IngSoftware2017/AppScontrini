@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,14 +14,14 @@ import java.util.PriorityQueue;
  * Sorted data structure (descending order) used to select best k elements.
  * @author Riccardo Zaglia
  */
-public class Podium<T extends Comparable> {
+public class Podium<T extends Comparable<T>> {
     private int k = 0;
     private PriorityQueue<T> pq = null;
     // NB: the first element is the lowest/worst one
 
     /**
      * New podium
-     * @param k > 0. Size of podium (ex: 2, 3).
+     * @param k > 0. Size of podium.
      */
     Podium(@Size(min = 1) int k) {
         this.k = k;
@@ -43,7 +44,10 @@ public class Podium<T extends Comparable> {
      * @return array of all elements
      */
     @SuppressWarnings("unchecked")
-    T[] getAll() {
-        return (T[])pq.toArray();
+    List<T> getAll() { //with generics I cannot instantiate arrays.
+        List<T> l = new ArrayList<>();
+        while (!pq.isEmpty())
+            l.add(pq.poll());
+        return l;
     }
 }

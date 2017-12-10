@@ -65,8 +65,6 @@ public class Reflect {
                 }
                 if (paramsMatch) {
                     m.setAccessible(true);
-
-                    //Exception if there is a return type mismatch (cannot handle it in unit tests)
                     return (T)m.invoke(isType ? null : clazz, params);
                 }
             }

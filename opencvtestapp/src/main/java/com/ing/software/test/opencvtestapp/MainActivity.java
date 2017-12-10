@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int greenInt = 0xFF00FF00;
 
     // alias
-    private final static Class<ImagePreprocessor> IP_CLASS = ImagePreprocessor.class;
+    private final static Class<?> IP_CLASS = ImagePreprocessor.class;
 
     final Handler h = new Handler(Looper.getMainLooper()) {
         @Override
@@ -149,11 +149,11 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(e.getMessage());
             }
 
-            TicketError err = ip.findRectangle();
+            TicketError err = ip.findTicket(false);
             List<Point> pts = ip.getCorners();
             showBitmap(drawPoly(bm, pts, err == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
 
-            showBitmap(ip.undistort(0));
+            showBitmap(ip.undistort(0.02));
         }
     }
 
