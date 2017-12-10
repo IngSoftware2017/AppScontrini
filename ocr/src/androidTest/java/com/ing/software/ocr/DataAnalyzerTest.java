@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -16,23 +17,21 @@ public class DataAnalyzerTest {
     @Test
     public void analyzeAmountSingleDigit() throws Exception {
         String amount = "5";
-        double expected = 5;
+        BigDecimal expected = new BigDecimal(5).setScale(2, RoundingMode.HALF_UP);
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
         method.setAccessible(true);
         BigDecimal result = (BigDecimal)method.invoke(null,amount);
-        double resulD = result.doubleValue();
-        assertEquals(expected, resulD);
+        assertEquals(0, expected.compareTo(result));
     }
 
     @Test
     public void analyzeAmountDecimal() throws Exception {
         String amount = "5.33";
-        double expected = 5.33;
+        BigDecimal expected = new BigDecimal(5.33).setScale(2, RoundingMode.HALF_UP);
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
         method.setAccessible(true);
         BigDecimal result = (BigDecimal)method.invoke(null,amount);
-        double resulD = result.doubleValue();
-        assertEquals(expected, resulD);
+        assertEquals(0, expected.compareTo(result));
     }
 
     @Test
@@ -47,34 +46,31 @@ public class DataAnalyzerTest {
     @Test
     public void analyzeAmountSingleCharLett() throws Exception {
         String amount = "5c";
-        double expected = 5;
+        BigDecimal expected = new BigDecimal(5).setScale(2, RoundingMode.HALF_UP);
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
         method.setAccessible(true);
         BigDecimal result = (BigDecimal)method.invoke(null,amount);
-        double resulD = result.doubleValue();
-        assertEquals(expected, resulD);
+        assertEquals(0, expected.compareTo(result));
     }
 
     @Test
     public void analyzeAmountComma() throws Exception {
         String amount = "5,33";
-        double expected = 5.33;
+        BigDecimal expected = new BigDecimal(5.33).setScale(2, RoundingMode.HALF_UP);
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
         method.setAccessible(true);
         BigDecimal result = (BigDecimal)method.invoke(null,amount);
-        double resulD = result.doubleValue();
-        assertEquals(expected, resulD);
+        assertEquals(0, expected.compareTo(result));
     }
 
     @Test
     public void analyzeAmountLastCharIsPoint() throws Exception {
         String amount = "5.33.";
-        double expected = 5.33;
+        BigDecimal expected = new BigDecimal(5.33).setScale(2, RoundingMode.HALF_UP);
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
         method.setAccessible(true);
         BigDecimal result = (BigDecimal)method.invoke(null,amount);
-        double resulD = result.doubleValue();
-        assertEquals(expected, resulD);
+        assertEquals(0, expected.compareTo(result));
     }
 
 	/*

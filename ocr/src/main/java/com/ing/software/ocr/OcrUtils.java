@@ -365,17 +365,18 @@ public class OcrUtils {
     /**
      * @author Michelon
      * @date 9-12-17
-     * Check if a string may be a number. Removes spaces before analysis.
+     * Check if a string may be a number. Removes spaces, 's', 'S', '.' before analysis.
      * @param s string to analyze
-     * @return true if more than half of the chars in the string are numbers
+     * @return true if more than half (included) of the chars in the string are numbers
      */
     static boolean isPossibleNumber(String s) {
         int counter = 0;
-        s = s.replaceAll(" ", "");
+        s = s.replaceAll(" ", "").replaceAll("\\.", "")
+                .replaceAll("s", "").replaceAll("S", ""); //sometimes '5' are recognized as 's'
         for (int i = 0; i < s.length(); ++i) {
             if (Character.isDigit(s.charAt(i)))
                 ++counter;
         }
-        return counter > s.length()/2;
+        return counter >= s.length()/2;
     }
 }
