@@ -233,14 +233,14 @@ class AmountComparator {
                 flagHasPriceList(productsSum);
             } else if (decodedAmount.compareTo(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP)) == 0) {
                 OcrUtils.log(3, "analyzePrices", "List of prices/2 equals decoded amount");
-                flagHasPriceList(productsSum);
+                flagHasPriceList(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP));
             } else if (OcrUtils.findSubstring(productsSum.toString(), decodedAmount.toString()) <= maxDistance) {
                 //It's acceptable a distance of maxDistance from target
                 flagHasPriceList(productsSum);
                 OcrUtils.log(3, "analyzePrices", "List of prices diffs from decoded amount by at most " + maxDistance);
             } else if (OcrUtils.findSubstring(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP).toString(), decodedAmount.toString()) <= maxDistance) {
                 OcrUtils.log(3, "analyzePrices", "List of prices/2 diffs from decoded amount by at most " + maxDistance);
-                flagHasPriceList(productsSum);
+                flagHasPriceList(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP));
             } else {
                 OcrUtils.log(3, "analyzePrices", "List of prices is not a valid input");
             }
