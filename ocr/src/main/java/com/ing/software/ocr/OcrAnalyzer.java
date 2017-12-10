@@ -29,7 +29,7 @@ class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
-    private final int targetPrecision = 75; //Should be passed with image. todo
+    private final int targetPrecision = 130; //Should be passed with image. todo
 
 
     /**
