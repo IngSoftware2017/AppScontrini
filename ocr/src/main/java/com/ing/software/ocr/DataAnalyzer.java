@@ -28,7 +28,7 @@ public class DataAnalyzer {
      * @author Michelon
      * Search through results from the research of amount string and retrieves the text with highest
      * probability to contain the amount calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
-     * If no amount was found in first result iterate through all results following previous ordering.
+     * If no amount was found in first result iterate through all results following previous order.
      * @param amountResults list of RawStringResult from amount search. Not null.
      * @return BigDecimal containing the amount found. Null if nothing found
      */
@@ -148,7 +148,8 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * @date 8-12-17
-     * Analyze a string looking for a number (with two decimals)
+     * Analyze a string (reversed) looking for a number (with two decimals).
+     * Uses arbitrary decisions.
      * @param targetAmount string containing possible amount. Length > 0.
      * @return string containing the amount, empty string if nothing found
      */

@@ -187,6 +187,7 @@ class AmountComparator {
      * Analyze a list of possible prices and sum them. Then try to find subtotal, if present.
      * If found update this object accordingly
      * todo: handle tips and explicit taxes
+     * todo: rather than divide, use *2 on total and if equals use total as new value for subtotal\pricelist
      * @param possiblePrices list of ordered (top to bottom) possible prices. Not null.
      */
     void analyzePrices(@NonNull List<RawGridResult> possiblePrices) {
@@ -278,7 +279,7 @@ class AmountComparator {
         if (cash != null) {
             OcrUtils.log(3, "analyzeTotals", "Cash is: " + cash.toString());
             while (index < possiblePrices.size() && change == null) {
-                //change must be below cash, here i use the same method above, bust parsing cash as rawtext
+                //change must be below cash, here i use the same method above, but parsing cash as rawtext
                 if (OcrSchemer.isPossibleCash(cashText, possiblePrices.get(index).getText())) {
                     String s = possiblePrices.get(index).getText().getDetection();
                     if (OcrUtils.isPossibleNumber(s))
@@ -423,7 +424,6 @@ class AmountComparator {
      * @param amountText RawText containing possible amount. Not null.
      * @param products   List of RawTexts containing products (both name and price). Not null.
      * @return List of texts above or under amount with distance from amount (positive = above)
-     * todo: rather than divide, use *2 on total and if equals use total as new value for subtotal\pricelist
      */
     static List<RawGridResult> getPricesList(@NonNull RawText amountText, @NonNull List<RawText> products) {
         List<RawGridResult> possiblePrices = new ArrayList<>();
