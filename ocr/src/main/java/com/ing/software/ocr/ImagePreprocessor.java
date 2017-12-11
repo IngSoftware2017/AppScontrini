@@ -4,7 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 
+import com.ing.software.common.Podium;
 import com.ing.software.common.Ref;
+import com.ing.software.common.Scored;
 import com.ing.software.common.TicketError;
 
 import org.opencv.android.OpenCVLoader;
@@ -15,10 +17,7 @@ import org.opencv.core.Point; // resolve conflict
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.opencv.core.Core.*;
@@ -36,26 +35,32 @@ import static org.opencv.imgproc.Imgproc.*;
 public class ImagePreprocessor {
 
     // length of smallest side of downscaled image
-    // shortSide must be chosen to limit side effects of resampling, on both 16:9 and 4:3 aspect ratio images
-    private static final int shortSide = 720;
+    // SHORT_SIDE must be chosen to limit side effects of resampling, on both 16:9 and 4:3 aspect ratio images
+    private static final int SHORT_SIDE = 720;
 
     //Bilateral filter:
-    private static final int bfKerSz = 9; // kernel size, must be odd
-    private static final int bfSigma = 20; // space/color variance
+    private static final int BF_KER_SZ = 9; // kernel size, must be odd
+    private static final int BF_SIGMA = 20; // space/color variance
 
     //Erode/Dilate iterations
-    private static final int edIters = 4;
+    private static final int E_D_ITERS = 4;
+
+    //Erode for hugh lines
+    private static final int ERODE_ITERS = 2;
 
     //Median kernel size
-    private static final int medSz = 7; // must be odd
+    private static final int MED_SZ = 7; // must be odd
+
+    //Enclose border thickness
+    private static final int BORD_THICK = 2;
 
     //Adaptive threshold:
-    private static final int thrWinSz = 75; // window size. must be odd
-    private static final int thrOffset = 2; //
+    private static final int THR_WIN_SZ = 75; // window size. must be odd
+    private static final int THR_OFFSET = 2; //
 
     // factor that determines maximum distance of detected contour from rectangle
     //private static final double polyMaxErrMul = 0.02;
-    private static final int polyMaxErr = 50;
+    private static final int POLY_MAX_ERR = 50;
 
     static {
         if (!OpenCVLoader.initDebug()) {
@@ -68,30 +73,8 @@ public class ImagePreprocessor {
     }
 
     /**
-     * This class is created to avoid to recalculate contour area at every comparison during sort
-     */
-    class Contour implements Comparable<Contour> {
-        int area;
-        Mat contour;
-
-        Contour(Mat contour) {
-            this.contour = contour;
-            area = (int)contourArea(contour);
-        }
-
-        @Override
-        public int compareTo(@NonNull Contour o) {
-            return area < o.area ? 1 : -1;
-        }
-    }
-
-
-    //private Size size;
-    //private List<Mat> contours = new ArrayList<>(2);
-
-    /**
      * Convert a Mat to a Bitmap
-     * @param img Mat of any color
+     * @param img Mat of any color. Not null.
      * @return Bitmap
      */
     private static Bitmap matToBitmap(Mat img) {
@@ -103,12 +86,13 @@ public class ImagePreprocessor {
     /**
      * Downscale image.
      * This method ensures that any image at any resolution or orientation is processed at the same level of detail.
-     * @param img in-out ref to BGR Mat
+     * @param img Mat RGBA. Not null.
+     * @return Mat RGBA
      */
     private static Mat downScaleRGBA(Mat img) {
         float aspectRatio = (float)img.rows() / img.cols();
-        Size size = aspectRatio > 1 ? new Size(shortSide, (int)(shortSide * aspectRatio))
-                : new Size((int)(shortSide / aspectRatio), shortSide);
+        Size size = aspectRatio > 1 ? new Size(SHORT_SIDE, (int)(SHORT_SIDE * aspectRatio))
+                : new Size((int)(SHORT_SIDE / aspectRatio), SHORT_SIDE);
         Mat bgrResized = new Mat(size, CV_8UC4);
         resize(img, bgrResized, size);
         return bgrResized;
@@ -116,7 +100,7 @@ public class ImagePreprocessor {
 
     /**
      * Convert Mat from RGBA to gray
-     * @param img in-out ref to Mat (in: BGR, out: gray)
+     * @param img in-out ref to Mat (in: BGR, out: gray). Original mat is not modified. Not null.
      */
     private static void RGBA2Gray(Ref<Mat> img) {
         Mat img2 = new Mat(img.value.size(), CV_8UC1);
@@ -126,95 +110,124 @@ public class ImagePreprocessor {
 
     /**
      * Bilateral filter
-     * @param img in-out ref to gray Mat
+     * @param img in-out ref to gray Mat. Original mat is not modified. Not null.
      */
     private static void bilateralFilter(Ref<Mat> img) {
         Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        //Imgproc.bil
-        Imgproc.bilateralFilter(img.value, img2, bfKerSz, bfSigma, bfSigma);
+        Imgproc.bilateralFilter(img.value, img2, BF_KER_SZ, BF_SIGMA, BF_SIGMA);
         img.value = img2;
     }
 
     /**
      * Transform a gray image into a mask using an adaptive threshold
-     * @param img in-out ref to Mat (in: gray, out: black & white)
+     * @param img in-out ref to Mat (in: gray, out: black & white). Original mat is not modified. Not null.
      */
     private static void threshold(Ref<Mat> img) {
         Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        adaptiveThreshold(img.value, img2, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, thrWinSz, thrOffset);
+        adaptiveThreshold(img.value, img2, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, THR_WIN_SZ, THR_OFFSET);
+        img.value = img2;
+    }
+
+    private static void erode(Ref<Mat> img, int iters) {
+        Mat img2 = new Mat(img.value.size(), CV_8UC1);
+        Imgproc.erode(img.value, img2, new Mat(), new Point(-1, -1), iters);
+        img.value = img2;
+    }
+
+    private static void dilate(Ref<Mat> img, int iters) {
+        Mat img2 = new Mat(img.value.size(), CV_8UC1);
+        Imgproc.dilate(img.value, img2, new Mat(), new Point(-1, -1), iters);
         img.value = img2;
     }
 
     /**
      * Grow + shrink mask.
-     * @param img in-out ref to B&W Mat
+     * @param img in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
     private static void erodeDilate(Ref<Mat> img) {
-        Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        org.opencv.core.Point pt = new Point(-1, -1);
-        erode(img.value, img2, new Mat(), pt, edIters);
-        dilate(img2, img.value, new Mat(), pt, edIters);
+        erode(img, E_D_ITERS);
+        dilate(img, E_D_ITERS);
     }
 
     /**
      * Smooth mask contours
-     * @param img in-out ref to B&W Mat
+     * @param img in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
     private static void median(Ref<Mat> img) {
         Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        medianBlur(img.value, img2, medSz);
+        medianBlur(img.value, img2, MED_SZ);
         img.value = img2;
     }
 
     /**
      * Make sure that no white area is touching image edges
-     * @param img in-out ref to B&W Mat
+     * @param img in-out ref to B&W Mat. Original mat IS modified. Not null.
      */
     private static void enclose(Ref<Mat> img) {
-        copyMakeBorder(img.value, img.value, 1, 1, 1, 1, BORDER_CONSTANT);
+        copyMakeBorder(img.value, img.value, BORD_THICK, BORD_THICK, BORD_THICK, BORD_THICK, BORDER_CONSTANT);
     }
 
 
-    /**
-     * Find all outer contours in a BGR image, sorted by area (descending).
-     * @param img BGR Mat
-     * @return Contour with biggest area
-     */
-    private static MatOfPoint findBiggestContour(Mat img) {
+    private static Mat prepareBinaryImg(Mat img) {
         Ref<Mat> imgRef = new Ref<>(img);
-
         //I used Ref parameters to enable me to easily reorder the methods
         // and experiment with the image processing pipeline
         RGBA2Gray(imgRef);
         bilateralFilter(imgRef);
         threshold(imgRef);
+        enclose(imgRef);
+        return imgRef.value;
+    }
+
+    /**
+     * Find k biggest outer contours in a RGBA image, sorted by area (descending).
+     * @param img RGBA Mat. Not null.
+     * @param k number of contours to return.
+     * @return Contour with biggest area. Never null.
+     */
+    private static List<MatOfPoint> findBiggestContours(Mat img, int k) {
+        Ref<Mat> imgRef = new Ref<>(img);
         erodeDilate(imgRef);
         //median(imgRef);
-        enclose(imgRef);
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         findContours(imgRef.value, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
-        double maxArea = 0;
-        MatOfPoint maxContour = new MatOfPoint();
-        //List<Pair<Mat, Double>> contourSelection = new ArrayList<>();
 
+        Podium<Scored<MatOfPoint>> podium = new Podium<>(k);
         for (int i = 0; i < hierarchy.cols(); i++) {
-            // select outer contours, ie contours that have no parent (hierarchy-1)
+            // select outer contours, i.e. contours that have no parent (hierarchy-1)
             // to know more, go to the link below, look for "RETR_CCOMP":
             // https://docs.opencv.org/3.1.0/d9/d8b/tutorial_py_contours_hierarchy.html
-            double[] asdf= hierarchy.get(0, i);
-            if (asdf[3] == -1) {
-                MatOfPoint contour = contours.get(i);
-                double curArea = contourArea(contour);
-                if (curArea > maxArea) {
-                    maxArea = curArea;
-                    maxContour = contour;
-                }
+            double[] h = hierarchy.get(0, i);
+            if (h[3] == -1) {
+                MatOfPoint ctr = contours.get(i);
+                podium.tryAdd(new Scored<>(ctr, contourArea(ctr)));
             }
         }
-        return maxContour;
+        List<Scored<MatOfPoint>> ctrList = podium.getAll();
+        List<MatOfPoint> mopList = new ArrayList<>();
+        for (Scored<MatOfPoint> c : ctrList)
+            mopList.add(c.obj);
+        return mopList;
     }
+
+
+    private static Mat removeBackground(Mat img, MatOfPoint contour) {
+        List<MatOfPoint> ctrList = new ArrayList<>(1);
+        ctrList.add(contour);
+        Mat mask = new Mat(img.rows(), img.cols(), CV_8UC1, new Scalar(255));
+        fillPoly(mask, ctrList, new Scalar(0));
+        Ref<Mat> maskRef = new Ref<>(mask);
+        dilate(maskRef, ERODE_ITERS + 1);
+        bitwise_or(img, img, maskRef.value);
+        return img;
+    }
+
+    private static void findHoughLines() {
+
+    }
+
 
 
 
@@ -249,10 +262,10 @@ public class ImagePreprocessor {
         MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
         MatOfPoint2f corns = new MatOfPoint2f();
         //double perimeter = arcLength(contour, true);
-        approxPolyDP(contour2f, corns, polyMaxErr/*polyMaxErrMul * perimeter*/, true);
+        approxPolyDP(contour2f, corns, POLY_MAX_ERR/*polyMaxErrMul * perimeter*/, true);
         return corns;
     }
-    //tests: is corners input non empty? does corners output have 4 elements?
+    //todo tests: is corners input non empty?
 
     //INSTANCE FIELDS:
 
@@ -300,8 +313,24 @@ public class ImagePreprocessor {
     public TicketError findTicket(boolean quick) {
         contours = new ArrayList<>();
         Mat resized = downScaleRGBA(srcImg);
-        contours.add(findBiggestContour(resized));
-        corners = findRectangle(contours.get(0));
+        Mat binary = prepareBinaryImg(resized);
+        contours = findBiggestContours(binary, quick ? 1 : 3);
+
+        List<Scored<MatOfPoint2f>> candidates = new ArrayList<>();
+        for (MatOfPoint ctr : contours) {
+            if (!quick) {
+                // find Hough lines of ticket text
+                Ref<Mat> binRef = new Ref<>(binary);
+                //NB: original "binary" is not modified
+                erode(binRef, ERODE_ITERS);
+                Mat houghReady = removeBackground(binRef.value, ctr);
+                //todo find Hough lines + RANSAC to find undistort transform matrix
+            }
+            MatOfPoint2f rect = findRectangle(ctr);
+            candidates.add(new Scored<>(rect, 0));
+        }
+        //todo assign score and use Collections.max
+        corners = candidates.get(0).obj;
 
         //scale up the the corners to match the scale of the original image
         double scaleMul = (double)srcImg.cols() / resized.cols();
@@ -312,18 +341,16 @@ public class ImagePreprocessor {
 
         if (!quick) {
             //shift corners in order to make top-left corner the first of list.
-            final List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
-            int tlIdx = Collections.min(Arrays.asList(0, 1, 2, 3), new Comparator<Integer>() {
-                @Override
-                public int compare(Integer o1, Integer o2) {
-                    return Integer.valueOf((int)(corns.get(o1).x + corns.get(o1).y))
-                            .compareTo((int)(corns.get(o2).x + corns.get(o2).y));
-                }
-            });
-            //shift corns by tlIdx
+            List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
+            List<Scored<Integer>> scoredIdxs = new ArrayList<>(4);
+            for (int i = 0; i < 4; i++)
+                scoredIdxs.add(new Scored<>(i, corns.get(i).x + corns.get(i).y));
+            int topLeftIdx = Collections.min(scoredIdxs).obj;
+
+            //shift corns by topLeftIdx
             //NB: sublist creates a view, not a copy.
-            corns.addAll(corns.subList(0, tlIdx));
-            corns.subList(0, tlIdx).clear();
+            corns.addAll(corns.subList(0, topLeftIdx));
+            corns.subList(0, topLeftIdx).clear();
             corners = new MatOfPoint2f(corns.toArray(new Point[4]));
         }
 

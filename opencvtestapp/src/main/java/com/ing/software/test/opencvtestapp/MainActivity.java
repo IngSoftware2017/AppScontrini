@@ -112,18 +112,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void backgroundWork() {
-        int len = 0;
         try {
-            len = mgr.list(folder).length;
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-        for (int i = 0; i < len; i++) {
-            ImagePreprocessor ip = new ImagePreprocessor();
-            Bitmap bm = null;
-            try {
+            for (int i = 0; i < mgr.list(folder).length; i++) {
+                ImagePreprocessor ip = new ImagePreprocessor();
+                Bitmap bm = null;
                 bm = BitmapFactory.decodeStream(mgr.open(folder + "/" + String.valueOf(i) + ".jpg"));
                 ip.setImage(bm);
 
@@ -137,23 +129,24 @@ public class MainActivity extends AppCompatActivity {
                 showMat(imgRef.value);
 
                 invoke(IP_CLASS, "threshold", imgRef);
-                invoke(IP_CLASS, "erodeDilate", imgRef);
                 invoke(IP_CLASS, "enclose", imgRef);
+                invoke(IP_CLASS, "erodeDilate", imgRef);
                 showMat(imgRef.value);
 
-                MatOfPoint contour = invoke(IP_CLASS, "findBiggestContour", imgResized);
-                drawContour(imgResized, contour, blue);
+                Mat contourReady = invoke(IP_CLASS, "prepareBinaryImg", imgResized);
+                List<MatOfPoint> contours = invoke(IP_CLASS, "findBiggestContours", contourReady, 1);
+                drawContour(imgResized, contours.get(0), blue);
                 showMat(imgResized);
-            }
-            catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
 
-            TicketError err = ip.findTicket(false);
-            List<Point> pts = ip.getCorners();
-            showBitmap(drawPoly(bm, pts, err == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
+                TicketError err = ip.findTicket(false);
+                List<Point> pts = ip.getCorners();
+                showBitmap(drawPoly(bm, pts, err == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
 
-            showBitmap(ip.undistort(0.02));
+                showBitmap(ip.undistort(0.02));
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 

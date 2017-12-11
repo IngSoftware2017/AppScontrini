@@ -6,6 +6,7 @@ package com.ing.software.common;
  */
 public class Ref<T> {
     public T value;
+
     public Ref(T obj) {
         value = obj;
     }

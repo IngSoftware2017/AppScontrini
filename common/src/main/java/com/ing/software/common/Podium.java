@@ -23,7 +23,7 @@ public class Podium<T extends Comparable<T>> {
      * New podium
      * @param k > 0. Size of podium.
      */
-    Podium(@Size(min = 1) int k) {
+    public Podium(@Size(min = 1) int k) {
         this.k = k;
         pq = new PriorityQueue<>(k + 1);
     }
@@ -34,20 +34,20 @@ public class Podium<T extends Comparable<T>> {
      * @param obj element to add. Not null.
      * @return true if obj is added to podium, false otherwise
      */
-    boolean tryAdd(@NonNull T obj) {
+    public boolean tryAdd(@NonNull T obj) {
         pq.offer(obj); // insert
         return pq.size() <= k || pq.poll() != obj; // if first is obj -> add failed
     }
 
     /**
-     * Get all elements in podium.
+     * Get all elements in podium (descending order).
      * @return array of all elements
      */
     @SuppressWarnings("unchecked")
-    List<T> getAll() { //with generics I cannot instantiate arrays.
+    public List<T> getAll() { //with generics I cannot instantiate arrays.
         List<T> l = new ArrayList<>();
         while (!pq.isEmpty())
-            l.add(pq.poll());
+            l.add(0, pq.poll());
         return l;
     }
 }
