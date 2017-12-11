@@ -42,3 +42,8 @@ task copyDataset(type: Copy){
 }
 
 tasks.preBuild.dependsOn('copyDataset')
+
+task testAll(dependsOn: ['test', 'connectedAndroidTest']) {
+    group = 'custom_tasks'
+    description = "Run all tests"
+}
