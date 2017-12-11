@@ -27,6 +27,7 @@ public class RawText implements Comparable<RawText> {
 
     /**
      * Constructor
+     * todo: use getCornerPoints() to ease process
      * @param text current Text inside TextBlock. Not null.
      * @param rawImage source image. Not null.
      */
