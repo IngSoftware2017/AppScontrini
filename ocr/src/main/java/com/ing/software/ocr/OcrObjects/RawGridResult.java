@@ -3,8 +3,9 @@ package com.ing.software.ocr.OcrObjects;
 import android.support.annotation.NonNull;
 
 /**
- * Class to store results from grid search
- * This object is used only for comparing purposes
+ * Class to store results from grid search or for other searches
+ * where you need only a RawText and an int.
+ * This object is used only for comparing purposes.
  * @author Michelon
  */
 
@@ -39,11 +40,7 @@ public class RawGridResult implements Comparable<RawGridResult>{
 
     @Override
     public int compareTo(@NonNull RawGridResult rawGridResult) {
-        //if (getPercentage() == rawGridResult.getPercentage())
-            //return getText().compareTo(rawGridResult.getText());
-        //    return -1;
-       // else
-            return  rawGridResult.getPercentage() - getPercentage();
+        return  rawGridResult.getPercentage() - getPercentage();
     }
 
     @Override

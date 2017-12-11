@@ -4,6 +4,7 @@ package com.ing.software.ocr.OcrObjects;
 import android.support.annotation.NonNull;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ public class RawStringResult implements Comparable<RawStringResult>{
      * Constructor. Set source rawText and its distance from target string
      * @param rawText source RawText
      * @param distanceFromTarget distance from target String
+     * @param sourceString source string
      */
     RawStringResult(RawText rawText, int distanceFromTarget, String sourceString) {
         this.sourceString = sourceString;
@@ -38,6 +40,16 @@ public class RawStringResult implements Comparable<RawStringResult>{
             this.detectedTexts = detectedTexts;
         else
             this.detectedTexts.addAll(detectedTexts);
+    }
+
+    /**
+     * Adds rawText found in extended rect
+     * @param detectedText rawText detected. Not null.
+     */
+    public void addDetectedTexts(@NonNull RawText detectedText) {
+        if (this.detectedTexts == null)
+            this.detectedTexts = new ArrayList<>();
+        this.detectedTexts.add(detectedText);
     }
 
     public RawText getSourceText() {
@@ -58,9 +70,6 @@ public class RawStringResult implements Comparable<RawStringResult>{
 
     @Override
     public int compareTo(@NonNull RawStringResult rawStringResult) {
-        if (distanceFromTarget != rawStringResult.getDistanceFromTarget())
-            return distanceFromTarget - rawStringResult.getDistanceFromTarget();
-        else
-            return -1; //Follow order from AMOUNT_STRINGS array
+        return distanceFromTarget - rawStringResult.getDistanceFromTarget();
     }
 }

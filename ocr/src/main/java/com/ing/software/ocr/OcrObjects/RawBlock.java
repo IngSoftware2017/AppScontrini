@@ -18,11 +18,10 @@ import static com.ing.software.ocr.OcrUtils.log;
  * Contains useful methods and variables that TextBlock does not provide.
  * @author Michelon
  */
-
+@Deprecated
 public class RawBlock implements Comparable<RawBlock> {
 
     private List<RawText> rawTexts = new ArrayList<>();
-    private List<? extends Text> textComponents;
     private RectF rectF;
     private RawImage rawImage;
 
@@ -33,23 +32,36 @@ public class RawBlock implements Comparable<RawBlock> {
      */
     public RawBlock(@NonNull TextBlock textBlock, @NonNull RawImage imageMod) {
         rectF = new RectF(textBlock.getBoundingBox());
-        textComponents = textBlock.getComponents();
         this.rawImage = imageMod;
-        initialize();
+        initialize(textBlock);
     }
 
     /**
      * @return rect containing this block
      */
-    private RectF getRectF() {
+    public RectF getRectF() {
         return rectF;
+    }
+
+    /**
+     * @return image containing this block
+     */
+    public RawImage getRawImage() {
+        return rawImage;
+    }
+
+    /**
+     * @return list of rawTexts contained
+     */
+    public List<RawText> getTexts() {
+        return rawTexts;
     }
 
     /**
      * Populates this block with its RawTexts
      */
-    private void initialize() {
-        for (Text currentText : textComponents) {
+    private void initialize(TextBlock textBlock) {
+        for (Text currentText : textBlock.getComponents()) {
             rawTexts.add(new RawText(currentText, rawImage));
         }
     }
