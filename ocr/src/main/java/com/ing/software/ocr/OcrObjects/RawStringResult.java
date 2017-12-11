@@ -70,9 +70,6 @@ public class RawStringResult implements Comparable<RawStringResult>{
 
     @Override
     public int compareTo(@NonNull RawStringResult rawStringResult) {
-        if (distanceFromTarget != rawStringResult.getDistanceFromTarget())
-            return distanceFromTarget - rawStringResult.getDistanceFromTarget();
-        else
-            return -1; //Follow order from AMOUNT_STRINGS array
+        return distanceFromTarget - rawStringResult.getDistanceFromTarget();
     }
 }

@@ -219,7 +219,10 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 final Bundle bundle = new Bundle();
                 if (testBmp != null) {
                     validBitmaps++;
+                    OcrUtils.log(1, "OcrHandler", "____________________________________________________");
+                    OcrUtils.log(1, "OcrHandler", "");
                     OcrUtils.log(1, "OcrHandler", "ANALYZING: " + aFile.getName());
+                    OcrUtils.log(1, "OcrHandler", "_____________________________________________________");
                     bundle.putString(IMAGE_RECEIVED, aFile.getName());
                     receiver.send(STATUS_RUNNING, bundle);
                     ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
