@@ -4,10 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 
-import com.ing.software.common.Podium;
-import com.ing.software.common.Ref;
-import com.ing.software.common.Scored;
-import com.ing.software.common.TicketError;
+import com.ing.software.common.*;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -170,7 +167,7 @@ public class ImagePreprocessor {
 
     private static Mat prepareBinaryImg(Mat img) {
         Ref<Mat> imgRef = new Ref<>(img);
-        //I used Ref parameters to enable me to easily reorder the methods
+        // I used Ref parameters to enable me to easily reorder the methods
         // and experiment with the image processing pipeline
         RGBA2Gray(imgRef);
         bilateralFilter(imgRef);
@@ -227,9 +224,6 @@ public class ImagePreprocessor {
     private static void findHoughLines() {
 
     }
-
-
-
 
     /**
      * Get Size in pixels of a rectangle in perspective
@@ -406,7 +400,6 @@ public class ImagePreprocessor {
     //}
 
 
-
     //UTILITY FUNCTIONS:
 
     /**
@@ -420,6 +413,4 @@ public class ImagePreprocessor {
         matrix.postRotate(angle);
         return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
     }
-
-
 }

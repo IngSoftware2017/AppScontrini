@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.ing.software.common.Ref;
 import com.ing.software.common.Ticket;
-import com.ing.software.ocr.DataAnalyzer;
+import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
 import com.ing.software.ocr.OnTicketReadyListener;
 
@@ -45,10 +45,11 @@ import static com.ing.software.ocrtestapp.StatusVars.*;
 public class MainActivity extends AppCompatActivity implements OcrResultReceiver.Receiver {
 
     final OcrResultReceiver mReceiver = new OcrResultReceiver(new Handler());
-    private static DataAnalyzer dataAnalyzer;
+    private static OcrManager ocrAnalyzer;
     static private final String testFolder = "/TestOCR";
     private int counter = 0;
     private final PermissionsHandler permissionsHandler = new PermissionsHandler(this);
+    private static final Semaphore sem = new Semaphore(0);
 
 
     @Override
@@ -59,10 +60,11 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             permissionsHandler.requestStoragePermission();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        dataAnalyzer = new DataAnalyzer();
-        while (dataAnalyzer.initialize(this) != 0) {
+        ocrAnalyzer = new OcrManager();
+        while (ocrAnalyzer.initialize(this) != 0) {
             try {
-                Thread.sleep(5000);
+                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -78,13 +80,13 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             @Override
             public void onClick(View view) {
                 if (counter == listNames.size()) {
-                    dataAnalyzer.release();
+                    ocrAnalyzer.release();
+                    ++counter;
                     Snackbar.make(view, "DataAnalyzer released", Snackbar.LENGTH_LONG)
                             .setAction("Service", null).show();
                 } else if (counter < listNames.size()) {
                     Intent intent = new Intent(MainActivity.this, TestService.class);
                     intent.putExtra("receiver", mReceiver);
-                    OcrUtils.log(1, "OcrHandler", "ANALYZING: " + listNames.get(counter));
                     ++counter;
                     startService(intent);
                     Snackbar.make(view, "Service started", Snackbar.LENGTH_LONG)
@@ -206,12 +208,9 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
         protected void onHandleIntent(final Intent workIntent) {
             OcrUtils.log(1, "TestService", "Entering service");
             final ResultReceiver receiver = workIntent.getParcelableExtra("receiver");
-
             final Semaphore sem = new Semaphore(0);
-
             final Ref<Double> durationSum = new Ref<>(0.0);
             int validBitmaps = 0;
-
             List<File> listFile = loadImage(MainActivity.testFolder);
             for (File aFile : listFile) {
                 Bitmap testBmp = getBitmapFromFile(aFile);
@@ -220,9 +219,13 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 final Bundle bundle = new Bundle();
                 if (testBmp != null) {
                     validBitmaps++;
+                    OcrUtils.log(1, "OcrHandler", "____________________________________________________");
+                    OcrUtils.log(1, "OcrHandler", "");
+                    OcrUtils.log(1, "OcrHandler", "ANALYZING: " + aFile.getName());
+                    OcrUtils.log(1, "OcrHandler", "_____________________________________________________");
                     bundle.putString(IMAGE_RECEIVED, aFile.getName());
                     receiver.send(STATUS_RUNNING, bundle);
-                    dataAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
+                    ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
                         @Override
                         public void onTicketReady(Ticket result) {
                             OcrUtils.log(1, "OcrHandler", "Detection complete");
@@ -240,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                                 bundle.putString(DURATION_RECEIVED, duration + "");
                                 receiver.send(STATUS_FINISHED, bundle);
                             }
-
                             sem.release();
                         }
                     });
@@ -248,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                         sem.acquire();
                     }
                     catch (Exception e) {
-                        System.out.println();
+                        e.printStackTrace();
                     }
                 } else {
                     bundle.putString("ErrorMessage", "Error null image");
@@ -258,7 +260,6 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             final Bundle bundle = new Bundle();
             bundle.putString(DURATION_RECEIVED, String.valueOf(durationSum.value / validBitmaps));
             receiver.send(STATUS_AVERAGE, bundle);
-
             this.stopSelf();
         }
 
