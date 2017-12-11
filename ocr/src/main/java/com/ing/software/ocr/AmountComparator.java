@@ -187,7 +187,7 @@ class AmountComparator {
      * Analyze a list of possible prices and sum them. Then try to find subtotal, if present.
      * If found update this object accordingly
      * todo: handle tips and explicit taxes
-     * @param possiblePrices list of possible prices. Not null.
+     * @param possiblePrices list of ordered (top to bottom) possible prices. Not null.
      */
     void analyzePrices(@NonNull List<RawGridResult> possiblePrices) {
         BigDecimal decodedAmount = getAmount();
@@ -423,6 +423,7 @@ class AmountComparator {
      * @param amountText RawText containing possible amount. Not null.
      * @param products   List of RawTexts containing products (both name and price). Not null.
      * @return List of texts above or under amount with distance from amount (positive = above)
+     * todo: rather than divide, use *2 on total and if equals use total as new value for subtotal\pricelist
      */
     static List<RawGridResult> getPricesList(@NonNull RawText amountText, @NonNull List<RawText> products) {
         List<RawGridResult> possiblePrices = new ArrayList<>();
