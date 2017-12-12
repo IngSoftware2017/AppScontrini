@@ -86,6 +86,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
         Log.d("LocalID", ""+c.toString());
         fabDelete.setTag(c.getID());
         convertView.setTag(c.getID());
+
         //Dal Maso
         fabDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -103,10 +104,10 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                 // Add the buttons
                 builder.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Log.d("LocalID", ""+pos);
-                        if(DB.deleteTicket(pos)){
+                        Log.d("TicketID", ""+pos);
+                        if(DB.deleteTicket(pos) && ticketDelete.delete()){
                             ticketDelete.delete();
-                            Log.d("MEME", "s");
+                            Log.d("ELIMINATO", "OK");
                             ((BillActivity)context).clearAllImages();
                             ((BillActivity)context).printAllImages();
                         }
@@ -122,6 +123,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                 nbutton.setTextColor(Color.parseColor("#2196F3"));
             }
         });
+
         //PICCOLO
         fabCrop.setTag(position);
         fabCrop.setOnClickListener(new View.OnClickListener(){

@@ -80,14 +80,11 @@ public class AddNewMission extends AppCompatActivity{
                 if((description==null)||description.equals("")){
                     description = text.defaultDescription;
                 }
-                File newMissionPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + name);
-                newMissionPath.mkdir();
                 Mission miss = new Mission();
                 int missionID = 0;
                 miss.setPersonID(1);
                 miss.setName(name);
                 miss.setDescription(description);
-                miss.setLocation(newMissionPath.getPath());
                 DB.addMission(miss);
                 List<Mission> missions = DB.getAllMissions();
                 for(int i = 0; i < missions.size(); i++){
@@ -99,8 +96,6 @@ public class AddNewMission extends AppCompatActivity{
                 //Start billActivity
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                Variables.getInstance().setCurrentMissionDir(newMissionPath.getAbsolutePath());
-                Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
                 startImageView.putExtra("missionName", name);
                 startImageView.putExtra("missionDescription",description);
                 startImageView.putExtra("missionID", missionID);

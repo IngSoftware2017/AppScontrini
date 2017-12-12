@@ -301,6 +301,7 @@ public class BillActivity extends AppCompatActivity {
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
                     deleteTempFiles();
+                    waitDB();
                     clearAllImages();
                     printAllImages();
                     break;
@@ -312,6 +313,7 @@ public class BillActivity extends AppCompatActivity {
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                         savePickedFile(btm);
+                        waitDB();
                         clearAllImages();
                         printAllImages();
                         Log.d("Foto da galleria", "OK");
@@ -323,6 +325,7 @@ public class BillActivity extends AppCompatActivity {
                 //Gestisco il risultato del Resize
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     Log.d("Crop", "OK");
+                    waitDB();
                     clearAllImages();
                     printAllImages();
                     break;
@@ -331,6 +334,14 @@ public class BillActivity extends AppCompatActivity {
     }
 
 
+    public void waitDB(){
+        try {
+            Log.i("Waiting db", "Going to sleep");
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     /** Dal Maso
      * Salva il bitmap passato nell'apposita cartella
      * @param imageToSave bitmap da salvare come jpeg
@@ -361,13 +372,7 @@ public class BillActivity extends AppCompatActivity {
                 public void onTicketReady(com.ing.software.common.Ticket ticket) {
                     //TODO:CHECK THE DATA EXTRACTED FROM THE IMAGE
                     Log.d("OCRTicket", ticket.toString());
-                    DB.addTicket(new Ticket(uri, ticket.amount, null, ticket.date, ticket.title, pos));//TODO: sistemare il mission id
-                    //DB.addTicket(new Ticket(uri,ticket.amount,null,ticket.date,ticket.title,pos));//Così muore tutto
-                    /*List<Ticket> ticketList = DB.getAllTickets();
-                    for(int i = 0; i < (ticketList.size() - 1); i++) {
-                        Log.d("DBTicket " + i, ticketList.get(i).getID()+" "+ticketList.get(i).getFileUri()+" "
-                                +ticketList.get(i).getTitle()+" "+ticketList.get(i).getDate()+" "+ticketList.get(i).getAmount()+" "+ticketList.get(i).getMissionID());
-                    }*/
+                    DB.addTicket(new Ticket(uri, ticket.amount, null, ticket.date, ticket.title, pos));
                 }
             });
             ocr.release();
@@ -458,6 +463,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void printAllImages(){
         List<Ticket> ticketList = DB.getAllTickets();
+        Log.d("Tickets", ticketList.toString());
         Ticket t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
