@@ -432,7 +432,6 @@ public class DataAnalyzer {
                     minDistance = distanceNow;
                     dataSearch = p.toUpperCase();
                 }
-
             }
         }
         return dataSearch;
