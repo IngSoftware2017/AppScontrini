@@ -18,7 +18,7 @@ import java.util.Date;
 
 @Entity(tableName = Constants.TICKET_TABLE_NAME,
         foreignKeys = @ForeignKey(entity = MissionEntity.class, parentColumns = Constants.MISSION_PRIMARY_KEY_NAME, childColumns = Constants.MISSION_CHILD_COLUMNS))
-@TypeConverters(Converters.class)
+@TypeConverters(Converters.class) // automatic converters for database correct type
 
 public class TicketEntity {
 

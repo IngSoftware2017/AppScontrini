@@ -11,7 +11,8 @@ import android.arch.persistence.room.PrimaryKey;
  * @author Marco Olivieri on 26/11/2017 (Team 3)
  */
 
-@Entity(tableName = Constants.PERSON_TABLE_NAME) @TypeConverters(Converters.class)
+@Entity(tableName = Constants.PERSON_TABLE_NAME)
+@TypeConverters(Converters.class) // automatic converters for database correct type
 
 public class PersonEntity {
 
@@ -107,5 +108,4 @@ public class PersonEntity {
         this.academicTitle = academicTitle;
     }
 
-    //TODO override toString
 }
