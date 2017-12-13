@@ -8,7 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -41,4 +43,10 @@ public class ExampleInstrumentedTest {
 //            }
 //        });
 //    }
+
+    @Test
+    public void java8test() {
+        //List<Integer> list = new ArrayList<>(Arrays.asList(1,2,3));
+        //boolean fds = list.stream().allMatch(integer -> integer < 4);
+    }
 }

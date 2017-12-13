@@ -16,6 +16,7 @@ public class CommonUtils {
      * @param <T> Object
      * @return List of CompPair
      */
+    @Deprecated //use Stream.zip().toList()
     public static <C extends Comparable<C>, T>
     List<CompPair<C, T>> zipComp(List<C> compList, List<T> objList) {
         List<CompPair<C, T>> zipped = new ArrayList<>();
@@ -30,6 +31,7 @@ public class CommonUtils {
      * @param <T> Object
      * @return List of T objects
      */
+    @Deprecated //use Stream.of().map(()->{}).toList()
     public static <C extends Comparable<C>, T>
     List<T> unzipComp(List<CompPair<C, T>> compPairList) {
         List<T> unzipped = new ArrayList<>();

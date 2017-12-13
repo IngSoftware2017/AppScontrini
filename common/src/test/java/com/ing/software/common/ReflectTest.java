@@ -53,7 +53,7 @@ public class ReflectTest {
 
     @Test
     public void testFieldValPrimitive() throws Exception {
-        assertEquals(1, fieldVal(new TestClass(), "intField"));
+        assertEquals(1, (int)fieldVal(new TestClass(), "intField"));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ReflectTest {
 
     @Test
     public void testFieldValNull() throws Exception {
-        assertEquals(null, fieldVal(new TestClass(), "nullObj"));
+        assertEquals(null, (Object)fieldVal(new TestClass(), "nullObj"));
     }
 
 

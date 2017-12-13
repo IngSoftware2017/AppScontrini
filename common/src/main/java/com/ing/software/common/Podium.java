@@ -3,10 +3,7 @@ package com.ing.software.common;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -35,8 +32,8 @@ public class Podium<T extends Comparable<T>> {
      * @return true if obj is added to podium, false otherwise
      */
     public boolean tryAdd(@NonNull T obj) {
-        pq.offer(obj); // insert
-        return pq.size() <= k || pq.poll() != obj; // if first is obj -> add failed
+        pq.offer(obj);
+        return pq.size() <= k || pq.poll() != obj; // if lowest is obj -> add failed
     }
 
     /**

@@ -4,8 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.Stream;
 import com.ing.software.common.*;
-import static com.ing.software.common.CommonUtils.*;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -21,6 +21,35 @@ import java.util.List;
 import static org.opencv.core.Core.*;
 import static org.opencv.core.CvType.*;
 import static org.opencv.imgproc.Imgproc.*;
+import static com.annimon.stream.Stream.*;
+
+
+/*
+USAGE CASES:
+
+Real time visual feedback when framing a ticket:
+ 1) Create new ImagePreprocessor passing a the bitmap of the preview frame.
+ 2) Call findTicket(true);
+ 3) If findTicket returns NONE, call getCorners to get the rectangle corners to overlay on top of preview.
+ 4) Call getCorners to get a rectangle (if findTicket returns NONE) or a polygon (if findTicket returns RECT_NOT_FOUND).
+
+User shoots a photo:
+ 1) Use ImageProcessor instance of last frame when rectangle was found.
+ 2) Call findTicket(false);
+ 3) If findTicket returns NONE proceed to step 5)
+ 4) If findTicket returns RECT_NOT_FOUND, let user drag the rectangle corners into position,
+    then proceed to call setCorners().
+ 5) Call OcrManager.getTicket passing this ImagePreprocessor instance.
+    Call undistort to get the photo of the ticket unwarped.
+
+New photo loaded from storage:
+ Same as when user shot a photo, but ImagePreprocessor must be created with loaded photo.
+
+Load and show photo already processed:
+ 1) Create new ImagePreprocessor passing the photo and the corners.
+ 2) Call undistort().
+ 
+ */
 
 /**
  * Process an image to be suitable to be used by DataAnalyzer.
@@ -165,7 +194,6 @@ public class ImagePreprocessor {
         copyMakeBorder(img.value, img.value, BORD_THICK, BORD_THICK, BORD_THICK, BORD_THICK, BORDER_CONSTANT);
     }
 
-
     private static Mat prepareBinaryImg(Mat img) {
         Ref<Mat> imgRef = new Ref<>(img);
         // I used Ref parameters to enable me to easily reorder the methods
@@ -197,13 +225,12 @@ public class ImagePreprocessor {
             // select outer contours, i.e. contours that have no parent (hierarchy-1)
             // to know more, go to the link below, look for "RETR_CCOMP":
             // https://docs.opencv.org/3.1.0/d9/d8b/tutorial_py_contours_hierarchy.html
-            double[] h = hierarchy.get(0, i);
-            if (h[3] == -1) {
+            if (hierarchy.get(0, i)[3] == -1) {
                 MatOfPoint ctr = contours.get(i);
                 podium.tryAdd(new CompPair<>(contourArea(ctr), ctr));
             }
         }
-        return unzipComp(podium.getAll());
+        return Stream.of(podium.getAll()).map(cp -> cp.obj).toList();
     }
 
 
@@ -219,7 +246,7 @@ public class ImagePreprocessor {
     }
 
     private static void findHoughLines() {
-
+        //todo
     }
 
     /**
@@ -261,6 +288,7 @@ public class ImagePreprocessor {
     //INSTANCE FIELDS:
 
     private Mat srcImg;
+
     private List<MatOfPoint> contours;
     private MatOfPoint2f corners;
 
@@ -279,6 +307,11 @@ public class ImagePreprocessor {
      */
     public ImagePreprocessor(Bitmap bm) {
         setImage(bm);
+    }
+
+    public ImagePreprocessor(Bitmap bm, List<android.graphics.Point> corners) {
+        setImage(bm);
+        setCorners(corners);
     }
 
     /**
@@ -331,12 +364,10 @@ public class ImagePreprocessor {
             return TicketError.RECT_NOT_FOUND;
 
         if (!quick) {
-            //shift corners in order to make top-left corner the first of list.
             List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
-            List<CompPair<Double, Integer>> compPairIdxes = new ArrayList<>(4);
-            for (int i = 0; i < 4; i++)
-                compPairIdxes.add(new CompPair<>(corns.get(i).x + corns.get(i).y, i));
-            int topLeftIdx = Collections.min(compPairIdxes).obj;
+            //find index of point closer to top-left corner of image.
+            int topLeftIdx = Collections.min(range(0, 4)
+                    .map(i -> new CompPair<>(corns.get(i).x + corns.get(i).y, i)).toList()).obj;
 
             //shift corns by topLeftIdx
             //NB: sublist creates a view, not a copy.
@@ -345,7 +376,11 @@ public class ImagePreprocessor {
             corners = new MatOfPoint2f(corns.toArray(new Point[4]));
         }
 
+        return TicketError.NONE;
+    }
 
+    public TicketError setCorners(List<android.graphics.Point> corners) {
+        //todo: stub
         return TicketError.NONE;
     }
 
@@ -355,18 +390,19 @@ public class ImagePreprocessor {
      *         The corners might be more or less than 4. Never null.
      */
     public List<android.graphics.Point> getCorners() {
-        List<android.graphics.Point> androidPts = new ArrayList<>(corners.rows());
-        for (Point p : corners.toArray())
-            androidPts.add(new android.graphics.Point((int)p.x, (int)p.y));
-        return androidPts;
+        return Stream.of(corners.toList())
+                .map(p -> new android.graphics.Point((int)p.x, (int)p.y)).toList();
     }
 
     /**
      * Get a Bitmap of a ticket with a perspective correction applied, with a margin.
-     * @param marginMul fraction/percentage of length of shortest side to be used as margin. Ex 0.1
+     * @param marginMul fraction of length of shortest side of the rectangle of the ticket.
+     *                  A good value is 0.02
      * @return Bitmap of ticket with perspective distortion removed
      */
     public Bitmap undistort(double marginMul) {
+        if (corners == null)
+            findTicket(false);
         MatOfPoint2f dstRect;
         Mat dstImg = srcImg.clone();
         if (corners.rows() > 4) {
@@ -390,11 +426,6 @@ public class ImagePreprocessor {
 
         return matToBitmap(dstImg);
     }
-
-
-    //public Bitmap rotate180(int ) {
-
-    //}
 
 
     //UTILITY FUNCTIONS:
