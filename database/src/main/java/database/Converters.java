@@ -9,6 +9,7 @@ import java.util.Date;
 
 /**
  * Created by Federico Taschin on 12/11/2017.
+ *
  */
 
 public final class Converters {
