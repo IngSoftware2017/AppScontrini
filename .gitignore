@@ -10,3 +10,5 @@
 desktop.ini
 **/photos
 .idea/vcs.xml
+database/build/*
+ticketappUI/build/*
