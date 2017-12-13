@@ -460,7 +460,7 @@ public class DataAnalyzer {
                 start++;
             }
         }
-
+        
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
         if(minDistance>=10)
             return null;
