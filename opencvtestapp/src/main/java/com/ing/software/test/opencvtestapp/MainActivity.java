@@ -5,10 +5,8 @@ import android.graphics.*;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.ing.software.common.Ref;
@@ -42,12 +40,10 @@ public class MainActivity extends AppCompatActivity {
     // alias
     private final static Class<?> IP_CLASS = ImagePreprocessor.class;
 
-    final Handler h = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            iv.setImageBitmap((Bitmap)msg.obj);
-        }
-    };
+    final Handler h = new Handler(Looper.getMainLooper(), msg -> {
+        iv.setImageBitmap((Bitmap)msg.obj);
+        return true;
+    });
 
     private void showBitmap(Bitmap bm) {
         h.obtainMessage(0, bm).sendToTarget();
@@ -95,28 +91,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         iv = findViewById(R.id.imageView);
+        iv.setOnClickListener(v -> sem.release());
         mgr = getResources().getAssets();
-        iv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sem.release();
-            }
-        });
 
-        new Thread() {
-            @Override
-            public void run() {
-                backgroundWork();
-            }
-        }.start();
+        new Thread(this::backgroundWork).start();
     }
 
     void backgroundWork() {
         try {
             for (int i = 0; i < mgr.list(folder).length; i++) {
                 ImagePreprocessor ip = new ImagePreprocessor();
-                Bitmap bm = null;
-                bm = BitmapFactory.decodeStream(mgr.open(folder + "/" + String.valueOf(i) + ".jpg"));
+                Bitmap bm = BitmapFactory.decodeStream(mgr.open(folder + "/" + String.valueOf(i) + ".jpg"));
                 ip.setImage(bm);
 
                 Mat srcImg = fieldVal(ip, "srcImg");

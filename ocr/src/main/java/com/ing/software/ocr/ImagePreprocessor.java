@@ -5,6 +5,7 @@ import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 
 import com.ing.software.common.*;
+import static com.ing.software.common.CommonUtils.*;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -191,7 +192,7 @@ public class ImagePreprocessor {
         Mat hierarchy = new Mat();
         findContours(imgRef.value, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
-        Podium<Scored<MatOfPoint>> podium = new Podium<>(k);
+        Podium<CompPair<Double, MatOfPoint>> podium = new Podium<>(k);
         for (int i = 0; i < hierarchy.cols(); i++) {
             // select outer contours, i.e. contours that have no parent (hierarchy-1)
             // to know more, go to the link below, look for "RETR_CCOMP":
@@ -199,14 +200,10 @@ public class ImagePreprocessor {
             double[] h = hierarchy.get(0, i);
             if (h[3] == -1) {
                 MatOfPoint ctr = contours.get(i);
-                podium.tryAdd(new Scored<>(ctr, contourArea(ctr)));
+                podium.tryAdd(new CompPair<>(contourArea(ctr), ctr));
             }
         }
-        List<Scored<MatOfPoint>> ctrList = podium.getAll();
-        List<MatOfPoint> mopList = new ArrayList<>();
-        for (Scored<MatOfPoint> c : ctrList)
-            mopList.add(c.obj);
-        return mopList;
+        return unzipComp(podium.getAll());
     }
 
 
@@ -310,7 +307,7 @@ public class ImagePreprocessor {
         Mat binary = prepareBinaryImg(resized);
         contours = findBiggestContours(binary, quick ? 1 : 3);
 
-        List<Scored<MatOfPoint2f>> candidates = new ArrayList<>();
+        List<CompPair<Double, MatOfPoint2f>> candidates = new ArrayList<>();
         for (MatOfPoint ctr : contours) {
             if (!quick) {
                 // find Hough lines of ticket text
@@ -321,7 +318,7 @@ public class ImagePreprocessor {
                 //todo find Hough lines + RANSAC to find undistort transform matrix
             }
             MatOfPoint2f rect = findRectangle(ctr);
-            candidates.add(new Scored<>(rect, 0));
+            candidates.add(new CompPair<>(0.0, rect));
         }
         //todo assign score and use Collections.max
         corners = candidates.get(0).obj;
@@ -336,10 +333,10 @@ public class ImagePreprocessor {
         if (!quick) {
             //shift corners in order to make top-left corner the first of list.
             List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
-            List<Scored<Integer>> scoredIdxs = new ArrayList<>(4);
+            List<CompPair<Double, Integer>> compPairIdxes = new ArrayList<>(4);
             for (int i = 0; i < 4; i++)
-                scoredIdxs.add(new Scored<>(i, corns.get(i).x + corns.get(i).y));
-            int topLeftIdx = Collections.min(scoredIdxs).obj;
+                compPairIdxes.add(new CompPair<>(corns.get(i).x + corns.get(i).y, i));
+            int topLeftIdx = Collections.min(compPairIdxes).obj;
 
             //shift corns by topLeftIdx
             //NB: sublist creates a view, not a copy.
