@@ -1,0 +1,156 @@
+package database;
+
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
+
+import java.util.List;
+
+
+/**
+ * Created by Federico Taschin on 08/11/2017.
+ * Modified by Marco Olivieri on 28/11/2017
+ *
+ * Modify: improve getPerson from id and complete methods documentation
+ * @author Matteo Mascotto
+ */
+
+//Data Access Objects Interface. Defines the queries using Room libraries
+
+@Dao
+public interface DAO {
+
+    //INSERT
+
+    /** Executes the insert query.
+     * @param ticketEntity TicketEntity not null, the entity to be inserted
+     *               ticketEntity.fileUri not null, must be a valid file path
+     *               ticketEntity.amount not null
+     *               ticketEntity.date not null
+     *               ticketEntity.missionID not null, must be an existing code
+     * @return the number of inserted entities.
+     */
+    @Insert(onConflict = OnConflictStrategy.FAIL)
+    long addTicket(TicketEntity ticketEntity);
+
+    /** Executes the insert query.
+     * @param missionEntity MissionEntity not null, the entity to be inserted
+     *                missionEntity.personID not null, must be an existing code
+     * @return the number of inserted entities.
+     */
+    @Insert(onConflict = OnConflictStrategy.FAIL)
+    long addMission(MissionEntity missionEntity);
+
+    /** Executes the insert query.
+     * @param personEntity PersonEntity not null, the entity to be inserted
+     *               personEntity.name not null
+     * @return the number of inserted entities.
+     */
+    @Insert(onConflict = OnConflictStrategy.FAIL)
+    long addPerson(PersonEntity personEntity);
+
+    //DELETE
+    //------
+    /**Deletes a MissionEntity from the database
+     * @param id int the ID of the MissionEntity to be deleted
+     * @return the number of deleted entities.
+     */
+    @Query("DELETE FROM "+ Constants.MISSION_TABLE_NAME+" WHERE "+ Constants.MISSION_PRIMARY_KEY_NAME+" = :id")
+    int deleteMission(int id);
+
+    /**Deletes a PersonEntity from the database
+     * @param id int the ID of the PersonEntity to be deleted
+     * @return the number of deleted entities.
+     */
+    @Query("DELETE FROM "+ Constants.PERSON_TABLE_NAME+" WHERE "+ Constants.PERSON_PRIMARY_KEY_NAME+" = :id")
+    int deletePerson(int id);
+
+    /**Deletes a TicketEntity from the database
+     * @param id int the ID of the TicketEntity to be deleted
+     * @return the number of deleted entities.
+     */
+    @Query("DELETE FROM "+ Constants.TICKET_TABLE_NAME+" WHERE "+ Constants.TICKET_PRIMARY_KEY_NAME+" = :id")
+    int deleteTicket(int id);
+
+    //UPDATE
+    //------
+    /**Updates the given TicketEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+     * @param ticketEntity TicketEntity not null, the entity to be updated.
+     *               ticketEntity.fileUri not null
+     *               ticketEntity.amount not null
+     *               ticketEntity.date not null
+     * @return the number of updated entities
+     */
+    @Update
+    int updateTicket(TicketEntity ticketEntity);
+
+    /**Updates the given MissionEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+     * @param missionEntity MissionEntity not null, the entity to be inserted
+     *               missionEntity.personID not null, must be an existing code
+     * @return the number of updated entities
+     */
+    @Update
+    int updateMission(MissionEntity missionEntity);
+
+    /**Updates the given PersonEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+     * @param personEntity PersonEntity not null, the entity to be inserted
+     *               personEntity.name not null
+     * @return the number of updated entities
+     */
+    @Update
+    int updatePerson(PersonEntity personEntity);
+
+    //SELECT ALL
+    //----------
+    /**
+     * Executes a SELECT of all the entities in the database
+     * @return List<TicketEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.TICKET_TABLE_NAME)
+    List<TicketEntity> getAllTickets();
+
+    /**
+     * Executes a SELECT of all the entities in the database
+     * @return List<MissionEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.MISSION_TABLE_NAME)
+    List<MissionEntity> getAllMission();
+
+    /**
+     * Executes a SELECT of all the entities in the database
+     * @return List<PersonEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
+    List<PersonEntity> getAllPerson();
+
+    //SELECT FROM ID
+    //--------------
+    /**
+     * Executes a SELECT of the all tickets of the mission
+     *
+     * @param id identifier of the Mission
+     * @return List<TicketEntity>
+     */
+    @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
+    List<TicketEntity> getTicketsForMission(int id);
+
+    /**
+     * Executes a SELECT of a specific ticket from id
+     *
+     * @param id identifier of the ticket
+     * @return TicketEntity
+     */
+    @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY_NAME+" =:id")
+    TicketEntity getTicket(int id);
+
+    /**
+     * Executes a SELECT of a specific person from id
+     *
+     * @param id identifier of the person
+     * @return PersonEntity
+     */
+    @Query("SELECT * FROM " + Constants.PERSON_TABLE_NAME + " WHERE " + Constants.PERSON_PRIMARY_KEY_NAME + " =:id")
+    PersonEntity getPerson(int id);
+}

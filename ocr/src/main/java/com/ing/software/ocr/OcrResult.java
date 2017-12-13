@@ -76,7 +76,7 @@ class OcrResult {
                 int probability = result.getPercentage();
                 list.append("POSSIBLE DATE: ").append(result.getText().getDetection()).append(" with probability: ")
                         .append(probability);
-                log(2,"POSSIBLE DATE: ", result.getText().getDetection() + " with probability: "
+                log(5,"POSSIBLE DATE: ", result.getText().getDetection() + " with probability: "
                         + probability + " and distance: " + DataAnalyzer.findDate(result.getText().getDetection()));
                 list.append("\n");
             }

@@ -22,7 +22,7 @@ import static com.ing.software.ocr.OcrUtils.levDistance;
  * Class used to extract informations from raw data
  * todo: fallback, if no amount is present try to decode a possible pricelist
  */
-public class DataAnalyzer {
+class DataAnalyzer {
 
     /**
      * @author Michelon
