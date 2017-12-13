@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -31,7 +32,7 @@ import database.PersonEntity;
  * @author Matteo Mascotto on 07-12-2017
  */
 
-public class AddMission extends AppCompatActivity implements View.OnClickListener{
+public class AddMission extends AppCompatActivity implements View.OnClickListener {
 
     private final String DEBUG_TAG = "ADM_DEBUG";
 
@@ -54,18 +55,17 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.activity_add_mission);
 
         nameMissionText = findViewById(R.id.nameText);
-        /*
         nameMissionText.setOnClickListener(this);
         nameMissionText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nameMissionText.setText("");
-                nameMissionText.setEnabled(true);
+                Toast.makeText(AddMission.this, "Field tappable", Toast.LENGTH_SHORT).show();
             }
         });
-        */
+
 
         startDateMissionText = findViewById(R.id.starMissionText);
+        startDateMissionText.setOnClickListener(this);
         /*
         startDateMissionText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +76,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         */
 
         endDateMissionText = findViewById(R.id.endMissionText);
+        endDateMissionText.setOnClickListener(this);
         /*
         endDateMissionText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,20 +87,21 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         */
 
         addPersonaEditText =findViewById(R.id.addPersonaEditText);
-        /*
+        addPersonaEditText.setOnClickListener(this);
         addPersonaEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addPersonaEditText.setText("");
+                //addPersonaEditText.setText("");
+                Toast.makeText(AddMission.this, "Field tappable", Toast.LENGTH_SHORT).show();
             }
         });
-        */
+
         personsList = findViewById(R.id.personsList);
 
         saveMissionButton = findViewById(R.id.saveButton);
         saveMissionButton.setOnClickListener(this);
 
-        /* Matteo Mascotto - TO-DO: Improve different code for the autocomplete of the Person
+        /* Matteo Mascotto - TODO: Improve different code for the autocomplete of the Person
             this code cause problem with the layout addMissionPage
         personEntities = DataManager.getInstance(this).getAllPerson();
         PersonAdapter adapter = new PersonAdapter(this, R.layout.persona_row_item, personEntities);
@@ -160,11 +162,11 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
             } else {
 
                 MissionEntity missionEntity = new MissionEntity();
-
+/*
                 if (addPersonaEditText.getPersonEntity() != null) {
                     missionEntity.setPersonID(addPersonaEditText.getPersonEntity().getID());
                 }
-
+*/
                 missionEntity.setName(nameMissionText.getText().toString());
                 DataManager.getInstance(this).addMission(missionEntity);
                 Intent callBillActivity = new Intent(this, BillActivityGruppo1.class);
@@ -189,7 +191,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 callBillActivity.putExtra(IntentCodes.MISSION_OBJECT,missionEntity);
                 startActivity(callBillActivity);
             }
-            */
+    */
         }
     }
 

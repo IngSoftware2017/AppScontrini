@@ -23,7 +23,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:enabled="true"
         android:focusable="true"
+        android:clickable="true"
         tools:ignore="MissingConstraints" />
 
     <EditText
@@ -42,7 +44,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameText"
-        android:focusable="true"
+        android:enabled="true"
+        android:clickable="true"
+        android:focusable="false"
         tools:ignore="MissingConstraints" />
 
     <EditText
@@ -61,6 +65,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/starMissionText"
+        android:clickable="true"
         android:focusable="true"
         tools:ignore="MissingConstraints" />
 
@@ -123,6 +128,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.982"
         app:srcCompat="@android:drawable/ic_menu_save"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        android:focusable="true"
+        />
 
 </android.support.constraint.ConstraintLayout>
