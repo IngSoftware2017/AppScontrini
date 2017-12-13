@@ -1,12 +1,8 @@
 package com.ing.software.common;
 
-import org.junit.Test;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Riccardo Zaglia
@@ -27,7 +23,9 @@ public class Reflect {
      * @throws NoSuchMethodException: The method name, the number or type of parameters is wrong
      * @throws NullPointerException: Calling an instance method with a class type.
      * @throws ClassCastException: Return type mismatch.
-     * @throws UnknownException: Something went wrong.
+     * @throws UnknownException: Something went wrong. The causes might be:
+     *                           * parameters incompatible with method annotations;
+     *                           * exception raised inside method.
      */
     @SuppressWarnings("unchecked")
     public static <T> T invoke(Object clazz, String methodName, Object... params)
@@ -74,6 +72,7 @@ public class Reflect {
                         throw e;
                     }
                     catch (Exception e) {
+                        System.out.println();
                         throw new UnknownException();
                     }
 
@@ -81,53 +80,5 @@ public class Reflect {
             }
         }
         throw new NoSuchMethodException();
-    }
-
-    @Test
-    @SuppressWarnings("UnnecessaryBoxing")
-    public void testInvokeWithInstance() throws Exception {
-        int r = invoke(new TestClass(), "testPrivateWithParams", new Integer(10), 20.0f);
-        assertEquals(30, r);
-    }
-
-    @Test
-    public void testInvokeWithClassType() throws Exception {
-        TestClass r = invoke(TestClass.class, "testProtectedNoParamsReturnObject");
-        assertNotEquals(null, r);
-    }
-
-    @Test
-    public void testInvokeReturnVoid() throws Exception {
-        TestClass tc = new TestClass();
-        invoke(tc, "testPublicReturnVoid");
-        assertEquals(1, tc.field);
-    }
-
-    @Test
-    public void testInvokeNullParam() throws Exception {
-        int r = invoke(new TestClass(), "testPrivateWithParams", 0, null);
-        assertEquals(-1, r);
-    }
-
-    //These tests are not exhaustive but invoke will be used enough in other tests.
-}
-
-class TestClass {
-
-    int field = 0;
-
-    private int testPrivateWithParams(int a, Float b){
-        if (b != null)
-            return a + b.intValue();
-        else
-            return -1;
-    }
-
-    protected static TestClass testProtectedNoParamsReturnObject(){
-        return new TestClass();
-    }
-
-    public void testPublicReturnVoid(){
-        field = 1;
     }
 }

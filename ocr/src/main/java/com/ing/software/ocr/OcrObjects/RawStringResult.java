@@ -4,6 +4,7 @@ package com.ing.software.ocr.OcrObjects;
 import android.support.annotation.NonNull;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,9 +12,10 @@ import java.util.List;
  * @author Michelon
  */
 
-public class RawStringResult {
+public class RawStringResult implements Comparable<RawStringResult>{
 
     private RawText sourceText;
+    private String sourceString;
     private int distanceFromTarget;
     private List<RawText> detectedTexts = null;
 
@@ -21,8 +23,10 @@ public class RawStringResult {
      * Constructor. Set source rawText and its distance from target string
      * @param rawText source RawText
      * @param distanceFromTarget distance from target String
+     * @param sourceString source string
      */
-    RawStringResult(RawText rawText, int distanceFromTarget) {
+    RawStringResult(RawText rawText, int distanceFromTarget, String sourceString) {
+        this.sourceString = sourceString;
         this.sourceText = rawText;
         this.distanceFromTarget = distanceFromTarget;
     }
@@ -38,6 +42,16 @@ public class RawStringResult {
             this.detectedTexts.addAll(detectedTexts);
     }
 
+    /**
+     * Adds rawText found in extended rect
+     * @param detectedText rawText detected. Not null.
+     */
+    public void addDetectedTexts(@NonNull RawText detectedText) {
+        if (this.detectedTexts == null)
+            this.detectedTexts = new ArrayList<>();
+        this.detectedTexts.add(detectedText);
+    }
+
     public RawText getSourceText() {
         return sourceText;
     }
@@ -48,5 +62,14 @@ public class RawStringResult {
 
     public List<RawText> getDetectedTexts() {
         return detectedTexts;
+    }
+
+    public String getSourceString() {
+        return sourceString;
+    }
+
+    @Override
+    public int compareTo(@NonNull RawStringResult rawStringResult) {
+        return distanceFromTarget - rawStringResult.getDistanceFromTarget();
     }
 }

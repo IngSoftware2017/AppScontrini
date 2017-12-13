@@ -7,13 +7,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+
+import static com.ing.software.ocr.TestUtils.*;
 import static junit.framework.Assert.*;
 
-import com.ing.software.common.Ticket;
+import com.ing.software.common.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -24,34 +25,12 @@ import org.junit.runner.RunWith;
 public class OcrInstrumentedTests {
 
     @Test
-    public void findCornersTest() throws Exception {
-        //ImagePreprocessor.findCorners(getBitmap(0));
-        assertEquals(4, 2 + 2);
-    }
-
-    public static final String folder = "photos";
-
-    public static int getTotImgs() throws Exception {
-        AssetManager mgr = InstrumentationRegistry.getInstrumentation()
-                .getContext().getResources().getAssets();
-        return mgr.list(folder).length;
-    }
-
-    public static Bitmap getBitmap(int i) throws Exception {
-        AssetManager mgr = InstrumentationRegistry.getInstrumentation()
-                .getContext().getResources().getAssets();
-        if (i < getTotImgs())
-            return BitmapFactory.decodeStream(mgr.open(folder + "/" + String.valueOf(i) + ".jpg"));
-        return null;
-    }
-
-    @Test
     public void ocrMainTest() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
         final Semaphore sem = new Semaphore(0);
         int imgsTot = getTotImgs();
 
-        DataAnalyzer analyzer = new DataAnalyzer();
+        OcrManager analyzer = new OcrManager();
 
         int c = 0;
         int TIMEOUT = 60; // 1 min
