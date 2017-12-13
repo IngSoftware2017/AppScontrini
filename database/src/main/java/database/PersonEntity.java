@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 /**
  * Represents one person that does some missions
- * @author Marco Olivieri on 26/11/2017 (Team 3)
+ * @author Marco Olivieri(Team 3)
  */
 
 @Entity(tableName = Constants.PERSON_TABLE_NAME)

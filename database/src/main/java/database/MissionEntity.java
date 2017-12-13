@@ -12,7 +12,7 @@ import android.net.Uri;
 
 /**
  * Represents one mission and its associated information
- * @author Marco Olivieri on 26/11/2017 (Team 3)
+ * @author Marco Olivieri(Team 3)
  */
 
 @Entity(tableName = Constants.MISSION_TABLE_NAME,

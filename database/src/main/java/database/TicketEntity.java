@@ -179,4 +179,5 @@ public class TicketEntity {
     public String toString(){
         return getShop()+"\nTotale: "+getAmount();
     }
+
 }
