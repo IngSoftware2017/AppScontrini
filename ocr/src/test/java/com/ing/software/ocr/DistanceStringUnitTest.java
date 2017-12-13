@@ -464,11 +464,7 @@ public class DistanceStringUnitTest {
     @Test
     public void GetDateTest4() throws Exception {
 
-<<<<<<< HEAD
-        String a = "il questo testo la data non è  dsad 2jk hjh3-6-19";
-=======
         String a = "in questo testo la data non è dsad 2jk hjh3-16-19";
->>>>>>> gruppo2-modular
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
         String r = (String) method.invoke(null,a);
@@ -479,11 +475,7 @@ public class DistanceStringUnitTest {
     @Test
     public void GetDateTest5() throws Exception {
 
-<<<<<<< HEAD
-        String a = "il questo test33-20-29od la data non è dsad 2jk hj 95-6-19";
-=======
         String a = "il questo test 33-20-29 od la data non è dsad 2jk";
->>>>>>> gruppo2-modular
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
         String r = (String) method.invoke(null,a);

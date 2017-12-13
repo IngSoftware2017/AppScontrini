@@ -273,10 +273,7 @@ public class OcrUtils {
             return -1;
         int minDistance = substring.length();
         int subLength = minDistance;
-<<<<<<< HEAD
 
-=======
->>>>>>> gruppo2-modular
         /*
         //Splits the string into tokens
         String[] pack = text.split("\\s");
@@ -289,15 +286,9 @@ public class OcrUtils {
 
         }
         */
-<<<<<<< HEAD
 
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
-
-=======
-        //Analyze the text by removing the spaces
-        String text_w_o_space =  text.replace(" ", "");
->>>>>>> gruppo2-modular
         //If the text is smaller than the searched string, invert the strings
         if(text_w_o_space.length() < minDistance)
         {
@@ -305,10 +296,7 @@ public class OcrUtils {
             text_w_o_space = substring;
             substring = temp_text;
         }
-<<<<<<< HEAD
 
-=======
->>>>>>> gruppo2-modular
         //Search a piece of string as long as the length of the searched string in the text
         int start=0;
         for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
@@ -318,22 +306,7 @@ public class OcrUtils {
                 minDistance = distanceNow;
             start++;
             }
-<<<<<<< HEAD
 
-        return minDistance;
-
-    }
-
-
-
-
-
-
-
-
-
-
-=======
         return minDistance;
     }
 
@@ -410,5 +383,5 @@ public class OcrUtils {
         }
         return counter >= s.length()/2;
     }
->>>>>>> gruppo2-modular
+
 }
