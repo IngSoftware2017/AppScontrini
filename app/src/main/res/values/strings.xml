@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">TicketManager</string>
+
+    <string name="title_activity_collapse">Collapse</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="action_addMission">Aggiungi Missione</string>
+    <string name="action_deleteMission">Elimina Missione</string>
+    <string name="billTitle">Il tuo scontrino</string>
+    <string name="name">Nome</string>
+    <string name="description">Descrizione</string>
+    <string name="total">Totale</string>
+    <string name="lastMod">Ultima modifica</string>
+    <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="dateStart">Data inizio</string>
+    <string name="dateFinish">Data fine</string>
+</resources>
