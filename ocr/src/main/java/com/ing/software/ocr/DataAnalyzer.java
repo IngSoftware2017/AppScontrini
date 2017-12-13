@@ -17,7 +17,6 @@ import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
 
-<<<<<<< HEAD
 
 /*
 USAGE:
@@ -26,8 +25,7 @@ USAGE:
 3) Call getTicket ad libitum to extract information (Ticket object) from a photo of a ticket.
 4) Call release() to release internal resources.
  */
-=======
->>>>>>> gruppo2-modular
+
 
 /**
  * Class used to extract informations from raw data
@@ -382,11 +380,7 @@ public class DataAnalyzer {
      * @return the absolute value of the minimum distance found between all combinations,
      * if the distance is >= 10 or the inserted text is empty returns -1
      */
-<<<<<<< HEAD
-    private static int findDate(String text) {
-=======
     static int findDate(String text) {
->>>>>>> gruppo2-modular
         if (text.length() == 0)
             return -1;
 
@@ -414,10 +408,7 @@ public class DataAnalyzer {
         else
             //Returns the absolute value of the distance by subtracting the minimum character
             return Math.abs(minCharaterDate-minDistance);
-<<<<<<< HEAD
 
-=======
->>>>>>> gruppo2-modular
     }
 
 
@@ -428,36 +419,6 @@ public class DataAnalyzer {
      * @param text The text to find the date
      * @return date or null if the date is not there
      */
-<<<<<<< HEAD
-    private static String getDate(String text) {
-        if (text.length() == 0)
-            return null;
-
-        //Splits the string into tokens
-        String[] pack = text.split("\\s");
-
-        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
-
-        //Maximum number of characters in the date format
-        int minDistance = 10;
-        String dataSearch = null;
-
-        for (String p : pack) {
-            for (String d : formatDate) {
-                //Convert string to uppercase
-                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
-                if (distanceNow < minDistance)
-                {
-                    minDistance = distanceNow;
-                    dataSearch = p.toUpperCase();
-                }
-
-            }
-        }
-
-
-        return dataSearch;
-=======
     static String getDate(String text) {
         if (text.length() == 0)
             return null;
@@ -516,6 +477,5 @@ public class DataAnalyzer {
         else
             return dataSearch;
 
->>>>>>> gruppo2-modular
     }
 }
