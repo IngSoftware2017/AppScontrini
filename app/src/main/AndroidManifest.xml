@@ -50,9 +50,6 @@
             android:name="com.unipd.ingsw.gruppo3.AddNewMissionGruppo1"
             android:parentActivityName="com.unipd.ingsw.gruppo3.MainActivity">
         </activity>
-        <activity
-            android:name="com.unipd.ingsw.gruppo3.AddMission"
-            android:parentActivityName=".MainActivityGruppo1"></activity>
     </application>
 
 </manifest>

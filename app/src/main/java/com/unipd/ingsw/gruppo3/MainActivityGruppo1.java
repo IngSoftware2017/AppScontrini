@@ -41,7 +41,7 @@ public class MainActivityGruppo1 extends AppCompatActivity implements OnTicketRe
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent addMission = new Intent(v.getContext(), AddMission.class);
+                Intent addMission = new Intent(v.getContext(), AddNewMissionGruppo1.class);
                 startActivity(addMission);
             }
         });
