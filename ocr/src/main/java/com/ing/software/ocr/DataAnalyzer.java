@@ -413,27 +413,59 @@ public class DataAnalyzer {
         if (text.length() == 0)
             return null;
 
-        //Splits the string into tokens
-        String[] pack = text.split("\\s");
+        //Possible date formats
+        String[] formatDate = {"xx/xxxx/xx", "xxxx/xx/xx","xx/xx/xxxx", "xx-xxxx-xx", "xxxx-xx-xx","xx-xx-xxxx","xx.xxxx.xx","xxxx.xx.xx" ,"xx.xx.xxxx"};
 
-        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
+        //Analyze the text by removing the spaces
+        String text_w_o_space =  text.replace(" ", "");
 
-        //Maximum number of characters in the date format
-        int minDistance = 10;
+        //Set the maximum length of the string as the minimum distance
+        int minDistance = text_w_o_space.length();
         String dataSearch = null;
 
-        for (String p : pack) {
-            for (String d : formatDate) {
-                //Convert string to uppercase
-                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
-                if (distanceNow < minDistance)
-                {
-                    minDistance = distanceNow;
-                    dataSearch = p.toUpperCase();
-                }
+        //Search a piece of string as long as the length of the searched string in the text
+        int start;
+        for (String d : formatDate) {
+            int subLength = d.length();
+            start = 0;
+            int tokenLength = 6; //Set at 6 the minimum number of characters that a date can have (x-x-xx)
+            for (int finish = subLength; finish <= (text_w_o_space.length()); finish++) {
+                String token = text_w_o_space.substring(start, finish);
+                token = token.toUpperCase();
+                String tokenNUmber = "";
+                //Check if there are letters or 'S', in this case the change in 5
+                char[] string = token.toCharArray();
+                for (char c : string){
+                    boolean isLetter = Character.isDigit(c);
+                    if(isLetter)
+                        tokenNUmber = tokenNUmber+c;
+                    else
+                    {
+                        if(c == 'S')
+                            tokenNUmber = tokenNUmber+'5';
+                        else if (c == '-' || c == '.' || c == '/')
+                            tokenNUmber = tokenNUmber+c;
+                    }
 
+                }
+                //Check if the length of characters is greater than the last one found
+                if(tokenNUmber.length()>=tokenLength) {
+                    int distanceNow = levDistance(tokenNUmber, d.toUpperCase());
+                    if (distanceNow <= minDistance) {
+                        minDistance = distanceNow;
+                        dataSearch = tokenNUmber;
+                        tokenLength = tokenNUmber.length();
+                    }
+                }
+                start++;
             }
         }
-        return dataSearch;
+        
+        //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
+        if(minDistance>=10)
+            return null;
+        else
+            return dataSearch;
+
     }
 }
