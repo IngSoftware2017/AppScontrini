@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.ing.software.common.Ref;
 import com.ing.software.common.Ticket;
+import com.ing.software.common.TicketError;
+import com.ing.software.ocr.ImagePreprocessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
 
@@ -139,7 +141,8 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             case STATUS_FINISHED:
                 //Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                 //        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
-                s = "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
+                s = "\nRectangle: " + resultData.getString(RECTANGLE_RECEIVED) +
+                        "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                         "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds";
                 break;
             case STATUS_ERROR:
@@ -150,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 break;
             case STATUS_AVERAGE:
                 s = "\n\nAVERAGE TIME: " + resultData.getString(DURATION_RECEIVED) + " seconds\n";
-
+                break;
         }
         tv.append(s);
         //scrollView.addView(tv);
@@ -224,23 +227,30 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     OcrUtils.log(1, "OcrHandler", "_____________________________________________________");
                     bundle.putString(IMAGE_RECEIVED, aFile.getName());
                     receiver.send(STATUS_RUNNING, bundle);
-                    ocrAnalyzer.getTicket(testBmp, result -> {
-                        OcrUtils.log(1, "OcrHandler", "Detection complete");
-                        long endTime = System.nanoTime();
-                        double duration = ((double) (endTime - startTime)) / 1000000000;
-                        durationSum.value += duration;
-                        if (result.amount != null) {
-                            OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
-                            bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
-                            bundle.putString(DURATION_RECEIVED, duration + "");
-                            receiver.send(STATUS_FINISHED, bundle);
-                        } else {
-                            OcrUtils.log(1, "OcrHandler", "No amount found");
-                            bundle.putString(AMOUNT_RECEIVED, "Not found.");
-                            bundle.putString(DURATION_RECEIVED, duration + "");
-                            receiver.send(STATUS_FINISHED, bundle);
-                        }
-                        sem.release();
+
+                    ImagePreprocessor preproc = new ImagePreprocessor(testBmp);
+                    preproc.findTicket(false, err -> {
+                        String rectString = (err == TicketError.NONE ? "found" : "not found");
+                        OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);
+                        bundle.putString(RECTANGLE_RECEIVED, rectString);
+                        ocrAnalyzer.getTicket(preproc, result -> {
+                            OcrUtils.log(1, "OcrHandler", "Detection complete");
+                            long endTime = System.nanoTime();
+                            double duration = ((double) (endTime - startTime)) / 1000000000;
+                            durationSum.value += duration;
+                            if (result.amount != null) {
+                                OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
+                                bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
+                                bundle.putString(DURATION_RECEIVED, duration + "");
+                                receiver.send(STATUS_FINISHED, bundle);
+                            } else {
+                                OcrUtils.log(1, "OcrHandler", "No amount found");
+                                bundle.putString(AMOUNT_RECEIVED, "Not found.");
+                                bundle.putString(DURATION_RECEIVED, duration + "");
+                                receiver.send(STATUS_FINISHED, bundle);
+                            }
+                            sem.release();
+                        });
                     });
                     try {
                         sem.acquire();

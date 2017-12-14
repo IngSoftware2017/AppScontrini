@@ -36,12 +36,12 @@ public class OcrManager {
      * @author Zaglia
      */
     class AnalyzeRequest {
-        Bitmap photo;
-        Consumer<Ticket> ticketCb;
+        ImagePreprocessor preproc;
+        Consumer<Ticket> cb;
 
-        AnalyzeRequest(Bitmap bm, Consumer<Ticket> cb) {
-            photo = bm;
-            ticketCb = cb;
+        AnalyzeRequest(ImagePreprocessor preprocessor, Consumer<Ticket> ticketCb) {
+            preproc = preprocessor;
+            cb = ticketCb;
         }
     }
 
@@ -66,11 +66,11 @@ public class OcrManager {
     /**
      * Get a Ticket from a Bitmap. Some fields of the new ticket can be null.
      *
-     * @param photo    Bitmap. Not null.
-     * @param ticketCb callback to get the ticket. Not null.
+     * @param preprocessor ImagePreprocessor. Not null.
+     * @param ticketCb     callback to get the ticket. Not null.
      */
-    public void getTicket(@NonNull Bitmap photo, final Consumer<Ticket> ticketCb) {
-        analyzeQueue.add(new OcrManager.AnalyzeRequest(photo, ticketCb));
+    public void getTicket(@NonNull ImagePreprocessor preprocessor, final Consumer<Ticket> ticketCb) {
+        analyzeQueue.add(new OcrManager.AnalyzeRequest(preprocessor, ticketCb));
         dispatchAnalysis();
     }
 
@@ -87,8 +87,9 @@ public class OcrManager {
                 while (!analyzeQueue.isEmpty()) {
                     AnalyzeRequest req = analyzeQueue.remove();
                     long startTime = System.nanoTime();
-                    OcrResult result = analyzer.analyze(req.photo);
-                    req.ticketCb.accept(getTicketFromResult(result));
+                    Bitmap bm = req.preproc.undistort(0.05);
+                    OcrResult result = analyzer.analyze(bm);
+                    req.cb.accept(getTicketFromResult(result));
                     long endTime = System.nanoTime();
                     double duration = ((double) (endTime - startTime)) / 1000000000;
                     OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
