@@ -123,9 +123,16 @@ public class MainActivity extends AppCompatActivity {
                 drawContour(imgResized, contours.get(0), blue);
                 showMat(imgResized);
 
-                TicketError err = ip.findTicket(false);
+                Semaphore sem = new Semaphore(0);
+                final Ref<TicketError> err = new Ref<>(TicketError.NONE);
+                ip.findTicket(false, e -> {
+                    err.value = e;
+                    sem.release();
+                });
+                sem.acquire();
+
                 List<Point> pts = ip.getCorners();
-                showBitmap(drawPoly(bm, pts, err == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
+                showBitmap(drawPoly(bm, pts, err.value == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
 
                 showBitmap(ip.undistort(0.02));
             }

@@ -22,7 +22,6 @@ import com.ing.software.common.Ref;
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
-import com.ing.software.ocr.OnTicketReadyListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -225,26 +224,23 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     OcrUtils.log(1, "OcrHandler", "_____________________________________________________");
                     bundle.putString(IMAGE_RECEIVED, aFile.getName());
                     receiver.send(STATUS_RUNNING, bundle);
-                    ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
-                        @Override
-                        public void onTicketReady(Ticket result) {
-                            OcrUtils.log(1, "OcrHandler", "Detection complete");
-                            long endTime = System.nanoTime();
-                            double duration = ((double) (endTime - startTime)) / 1000000000;
-                            durationSum.value += duration;
-                            if (result.amount != null) {
-                                OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
-                                bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
-                                bundle.putString(DURATION_RECEIVED, duration + "");
-                                receiver.send(STATUS_FINISHED, bundle);
-                            } else {
-                                OcrUtils.log(1, "OcrHandler", "No amount found");
-                                bundle.putString(AMOUNT_RECEIVED, "Not found.");
-                                bundle.putString(DURATION_RECEIVED, duration + "");
-                                receiver.send(STATUS_FINISHED, bundle);
-                            }
-                            sem.release();
+                    ocrAnalyzer.getTicket(testBmp, result -> {
+                        OcrUtils.log(1, "OcrHandler", "Detection complete");
+                        long endTime = System.nanoTime();
+                        double duration = ((double) (endTime - startTime)) / 1000000000;
+                        durationSum.value += duration;
+                        if (result.amount != null) {
+                            OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
+                            bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
+                            bundle.putString(DURATION_RECEIVED, duration + "");
+                            receiver.send(STATUS_FINISHED, bundle);
+                        } else {
+                            OcrUtils.log(1, "OcrHandler", "No amount found");
+                            bundle.putString(AMOUNT_RECEIVED, "Not found.");
+                            bundle.putString(DURATION_RECEIVED, duration + "");
+                            receiver.send(STATUS_FINISHED, bundle);
                         }
+                        sem.release();
                     });
                     try {
                         sem.acquire();

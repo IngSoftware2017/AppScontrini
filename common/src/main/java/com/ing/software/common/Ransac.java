@@ -7,8 +7,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+//////////////////////// WORK IN PROGRESS /////////////////////////////
+
 /**
- *
+ * Modified RANSAC algorithm
+ * WORK IN PROGRESS
  * @param <T> Element type
  * @param <U> Model
  */
@@ -55,7 +58,9 @@ public class Ransac<T, U> {
             List<T> consensus = new ArrayList<>(inliers);
             for (int i = 0; i < elems.size(); i++) {
                 //consensus.add()
+                //todo
             }
+            //todo
             iters++;
         }
         return false;

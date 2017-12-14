@@ -5,6 +5,7 @@ import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 import com.ing.software.common.*;
 
 import org.opencv.android.OpenCVLoader;
@@ -17,6 +18,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import static org.opencv.core.Core.*;
 import static org.opencv.core.CvType.*;
@@ -334,7 +336,8 @@ public class ImagePreprocessor {
      *                                               or for analyzing an imported image.
      * @return TicketError NONE or RECT_NOT_FOUND
      */
-    public TicketError findTicket(boolean quick) {
+    public void findTicket(boolean quick, Consumer<TicketError> cb) {
+
         contours = new ArrayList<>();
         Mat resized = downScaleRGBA(srcImg);
         Mat binary = prepareBinaryImg(resized);
@@ -360,8 +363,10 @@ public class ImagePreprocessor {
         double scaleMul = (double)srcImg.cols() / resized.cols();
         multiply(corners.clone(), new Scalar(scaleMul, scaleMul), corners);
 
-        if (corners.rows() != 4)
-            return TicketError.RECT_NOT_FOUND;
+        if (corners.rows() != 4) {
+            cb.accept(TicketError.RECT_NOT_FOUND);
+            return;
+        }
 
         if (!quick) {
             List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
@@ -375,8 +380,7 @@ public class ImagePreprocessor {
             corns.subList(0, topLeftIdx).clear();
             corners = new MatOfPoint2f(corns.toArray(new Point[4]));
         }
-
-        return TicketError.NONE;
+        cb.accept(TicketError.NONE);
     }
 
     public TicketError setCorners(List<android.graphics.Point> corners) {
@@ -402,17 +406,20 @@ public class ImagePreprocessor {
      * @return Bitmap of ticket with perspective distortion removed
      */
     public Bitmap undistort(double marginMul) {
-        if (corners == null)
-            findTicket(false);
+        Semaphore sem = new Semaphore(0);
+        if (corners == null) {
+            findTicket(false, err -> sem.notify());
+            try {
+                sem.acquire();
+            }
+            catch (InterruptedException e) {
+                System.out.println();
+            }
+        }
         MatOfPoint2f dstRect;
         Mat dstImg = srcImg.clone();
-        if (corners.rows() > 4) {
-            //todo select
-            return matToBitmap(dstImg); // todo remove
-        }
-        else if (corners.rows() < 4) { // very unlikely case where the biggest contour is a triangle
+        if (corners.rows() != 4) // at this point "corners" should have always 4 points.
             return matToBitmap(dstImg);
-        }
 
         Size sz = getRectSizeSimple(corners);
         double m = marginMul * Math.min(sz.width, sz.height);

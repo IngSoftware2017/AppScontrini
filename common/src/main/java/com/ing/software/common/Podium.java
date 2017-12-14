@@ -27,7 +27,7 @@ public class Podium<T extends Comparable<T>> {
 
     /**
      * Try add element to podium.
-     * Complexity: O(log(k))
+     * Complexity: Theta(1); O(k)
      * @param obj element to add. Not null.
      * @return true if obj is added to podium, false otherwise
      */

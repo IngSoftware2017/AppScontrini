@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import com.annimon.stream.function.Consumer;
 
 import static com.ing.software.ocr.AmountComparator.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
@@ -36,9 +37,9 @@ public class OcrManager {
      */
     class AnalyzeRequest {
         Bitmap photo;
-        OnTicketReadyListener ticketCb;
+        Consumer<Ticket> ticketCb;
 
-        AnalyzeRequest(Bitmap bm, OnTicketReadyListener cb) {
+        AnalyzeRequest(Bitmap bm, Consumer<Ticket> cb) {
             photo = bm;
             ticketCb = cb;
         }
@@ -68,7 +69,7 @@ public class OcrManager {
      * @param photo    Bitmap. Not null.
      * @param ticketCb callback to get the ticket. Not null.
      */
-    public void getTicket(@NonNull Bitmap photo, final OnTicketReadyListener ticketCb) {
+    public void getTicket(@NonNull Bitmap photo, final Consumer<Ticket> ticketCb) {
         analyzeQueue.add(new OcrManager.AnalyzeRequest(photo, ticketCb));
         dispatchAnalysis();
     }
@@ -87,7 +88,7 @@ public class OcrManager {
                     AnalyzeRequest req = analyzeQueue.remove();
                     long startTime = System.nanoTime();
                     OcrResult result = analyzer.analyze(req.photo);
-                    req.ticketCb.onTicketReady(getTicketFromResult(result));
+                    req.ticketCb.accept(getTicketFromResult(result));
                     long endTime = System.nanoTime();
                     double duration = ((double) (endTime - startTime)) / 1000000000;
                     OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
