@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocr/ocr.iml" filepath="$PROJECT_DIR$/ocr/ocr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocrtestapp/ocrtestapp.iml" filepath="$PROJECT_DIR$/ocrtestapp/ocrtestapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opencvtestapp/opencvtestapp.iml" filepath="$PROJECT_DIR$/opencvtestapp/opencvtestapp.iml" />
+    </modules>
+  </component>
+</project>
