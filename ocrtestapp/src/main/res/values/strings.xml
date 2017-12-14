@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">OCRTestApp</string>
+    <string name="action_settings">Settings</string>
+</resources>
