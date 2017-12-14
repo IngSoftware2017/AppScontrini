@@ -16,7 +16,8 @@ import java.util.List;
 import static com.ing.software.ocr.DataAnalyzer.analyzeAmount;
 
 /**
- * Class to analyze amount and compare it with list of prices, subtotal, cash paid, change
+ * Class to analyze amount and compare it with list of prices, subtotal, cash paid, change.
+ * Get methods are not private 'cause I want them to be accessible from outside for future implementations.
  * todo: handle tips and taxes
  */
 
@@ -183,7 +184,7 @@ class AmountComparator {
 
     /**
      * @author Michelon
-     * @date 10-12-17
+     * @date 14-12-17
      * Analyze a list of possible prices and sum them. Then try to find subtotal, if present.
      * If found update this object accordingly
      * todo: handle tips and explicit taxes
@@ -208,9 +209,9 @@ class AmountComparator {
         }
         if (productsSum != null)
             OcrUtils.log(3, "analyzePrices", "List of prices, first value is: " + productsSum.toString());
-        while (index < possiblePrices.size()) {
-            if (possiblePrices.get(index).getPercentage() <= 0)
-                break;
+        else
+            OcrUtils.log(3, "analyzePrices", "List of prices, no value found");
+        while (index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
             String s = possiblePrices.get(index).getText().getDetection();
             if (OcrUtils.isPossibleNumber(s)) {
                 BigDecimal adder = analyzeAmount(s);
@@ -266,7 +267,7 @@ class AmountComparator {
         int index = 0;
         //Search for first parsable product price
         while (cash == null && index < possiblePrices.size()) {
-            if (possiblePrices.get(index).getPercentage() < 0) //must be below total
+            if (possiblePrices.get(index).getPercentage() < 0) {//must be below total
                 if (OcrSchemer.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
                     String s = possiblePrices.get(index).getText().getDetection();
                     if (OcrUtils.isPossibleNumber(s)) {
@@ -274,6 +275,7 @@ class AmountComparator {
                         cashText = possiblePrices.get(index).getText();
                     }
                 }
+            }
             ++index;
         }
         if (cash != null) {
@@ -311,7 +313,6 @@ class AmountComparator {
                 }
             }
         }
-
     }
 
     /**
@@ -326,7 +327,7 @@ class AmountComparator {
             int distanceFromSubtotal = -1;
             int distanceFromPriceList = -1;
             int distanceFromCash = -1;
-            if (hasSubtotal)
+            if (hasSubtotal) //necessary for the .toString()
                 distanceFromSubtotal = OcrUtils.findSubstring(getSubTotal().toString(), getAmount().toString());
             if (hasPriceList)
                 distanceFromPriceList = OcrUtils.findSubstring(getPriceList().toString(), getAmount().toString());

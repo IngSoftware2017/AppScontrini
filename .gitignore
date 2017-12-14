@@ -12,3 +12,4 @@ desktop.ini
 .idea/vcs.xml
 database/build/*
 ticketappUI/build/*
+**/build/*
