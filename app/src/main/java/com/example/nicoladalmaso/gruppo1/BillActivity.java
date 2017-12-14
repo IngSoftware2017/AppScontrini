@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -20,8 +21,11 @@ import android.widget.ListView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -425,4 +429,152 @@ public class BillActivity extends AppCompatActivity {
             boolean deleted = file.delete();
         }//if
     }//deletePickedFile */
+
+    //-----------------------------------------------------------------------------------
+
+    /**
+     * Federico
+     * <p>
+     * Call the camera, the method to merge and save the united bitmaps
+     */
+    private void mergePhoto() {
+        takePhotoIntent();
+        File[] photo = readAllImages();
+        int secondLast = photo.length - 2;
+        int lastPh = photo.length - 1;
+        Bitmap f = BitmapFactory.decodeFile(photo[secondLast].getAbsolutePath());
+        Bitmap s = BitmapFactory.decodeFile(photo[lastPh].getAbsolutePath());
+
+        savePickedFile(merge(f, s));
+    }
+
+    /**
+     * Federico
+     * <p>
+     * Method that combines two bitmaps
+     *
+     * @param f first bitmap to merge
+     * @param s second bitmap to merge
+     * @return bitmap formed by the union of two bitmaps passed as a parameter
+     */
+    private Bitmap merge(Bitmap f, Bitmap s) {
+        Bitmap cs = null;
+
+        int width, height = 0;
+
+        if (f.getWidth() > s.getWidth()) {
+            width = f.getWidth();
+            height = f.getHeight() + s.getHeight();
+        } else {
+            width = s.getWidth();
+            height = f.getHeight() + s.getHeight();
+        }
+
+        cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas comboImage = new Canvas(cs);
+
+        comboImage.drawBitmap(f, 0f, 0f, null);
+        comboImage.drawBitmap(s, 0f, f.getHeight(), null);
+
+        return cs;
+    }
+
+    /*Federico
+     *
+     *---TO EXPORT MISSION USE THE EXPORT + COPY METHOD OR THE EXP + SAVE METHOD---
+     */
+
+    /**
+     * Federico
+     *
+     * Method that exports all the photos
+     * @throws IOException
+     */
+    private void export() throws IOException {
+        File[] ph = readAllImages();
+        //Destination file path
+        File targetLocation = new File(Environment.getDataDirectory().toString());
+
+        for(int i = 0; i < ph.length; i++){
+            File sourceLocation = ph[i];
+            copy(sourceLocation, targetLocation);
+        }
+    }
+
+    /**
+     * Federico
+     *
+     * Method that copies a folder with the files contained or individual files
+     * @param sourceLocation file to move
+     * @param targetLocation destination file
+     * @throws IOException
+     */
+    private void copy(File sourceLocation , File targetLocation) throws IOException {
+        //if you copy a folder
+        if (sourceLocation.isDirectory()) {
+            if (!targetLocation.exists()) {
+                targetLocation.mkdir();
+            }
+            //list all the directory contents
+            String[] files = sourceLocation.list();
+            for (int i=0; i<files.length; i++) {
+                copy(new File(sourceLocation, files[i]),
+                        new File(targetLocation, files[i]));
+            }
+        }
+        //if you copy a file
+        else {
+            InputStream in = new FileInputStream(sourceLocation);
+            OutputStream out = new FileOutputStream(targetLocation);
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+    }
+
+    /**
+     * Federico
+     *
+     * Method that calls the function to export photos
+     */
+    private void exp(){
+        String destinationPath = Environment.getExternalStorageDirectory().toString();
+        File[] source = readAllImages();
+        save(destinationPath, source);
+    }
+
+    /**
+     * Federico
+     *
+     * Method that exports all missions
+     *(Imported external Apache Common IO library)
+     */
+    private void save(String destinationPath, File[] source){
+        String nameFolder = "AllMission";
+        File target = new File(destinationPath, nameFolder);
+        for (int i = 0; i < source.length; i++){
+            //if you copy a folder
+            if(source[i].isDirectory()){
+                try {
+                    FileUtils.copyDirectory(source[i], target);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            //if you copy a file
+            else{
+                try {
+                    FileUtils.copyFile(source[i], target);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
