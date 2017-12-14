@@ -55,6 +55,7 @@ Load and show photo already processed:
 
 /**
  * Class used to process an image of a ticket.
+ * Every public method is thread safe.
  * @author Riccardo Zaglia
  */
 /*
@@ -115,8 +116,8 @@ public class ImagePreprocessor {
     /**
      * Downscale image.
      * This method ensures that any image at any resolution or orientation is processed at the same level of detail.
-     * @param img Mat RGBA. Not null.
-     * @return Mat RGBA
+     * @param img RGBA Mat. Not null.
+     * @return RGBA Mat.
      */
     private static Mat downScaleRGBA(Mat img) {
         float aspectRatio = (float)img.rows() / img.cols();
@@ -187,7 +188,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Smooth mask contours
+     * Smooth mask contours.
      * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
     // unused
@@ -198,7 +199,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Make sure that the mask is not touching image edges
+     * Make sure that the mask is not touching image edges.
      * @param imgRef in-out ref to B&W Mat. Original mat IS modified. Not null.
      */
     private static void enclose(Ref<Mat> imgRef) {
@@ -206,9 +207,9 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Downscale + convert to gray + bilateral filter + adaptive threshold + enclose
-     * @param img
-     * @return
+     * Downscale + convert to gray + bilateral filter + adaptive threshold + enclose, in this order.
+     * @param img RGBA Mat. Not null.
+     * @return B&W Mat.
      */
     private static Mat prepareBinaryImg(Mat img) {
         Ref<Mat> imgRef = new Ref<>(img);
@@ -249,8 +250,13 @@ public class ImagePreprocessor {
         return Stream.of(podium.getAll()).map(cp -> cp.obj).toList();
     }
 
-
-    private static Mat removeBackground(Mat img, MatOfPoint contour) {
+    /**
+     * Find all edges of thresholded image inside contour.
+     * @param img B&W Mat. Not null.
+     * @param contour MatOfPoint not null.
+     * @return Mat with white edges and black background.
+     */
+    private static Mat findEdges(Mat img, MatOfPoint contour) {
         List<MatOfPoint> ctrList = new ArrayList<>(1);
         ctrList.add(contour);
         Mat mask = new Mat(img.rows(), img.cols(), CV_8UC1, new Scalar(255));
@@ -258,6 +264,7 @@ public class ImagePreprocessor {
         Ref<Mat> maskRef = new Ref<>(mask);
         dilate(maskRef, ERODE_ITERS + 1);
         bitwise_or(img, img, maskRef.value);
+        Canny(img, img, 1, 1);
         return img;
     }
 
@@ -287,11 +294,9 @@ public class ImagePreprocessor {
 
     /**
      * Find the polygon from a contour.
-     * @param contour A MatOfPoint containing a contour.
-     * @return Polygon corners.
+     * @param contour MatOfPoint containing a contour.
+     * @return MatOfPoint2f polygon corners.
      */
-    // I used another method to retrieve the corners to make it optional
-    // and to allow me to return the TicketError instead.
     private static MatOfPoint2f findRectangle(MatOfPoint contour) {
         MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
         MatOfPoint2f corns = new MatOfPoint2f();
@@ -304,7 +309,7 @@ public class ImagePreprocessor {
     //INSTANCE FIELDS:
 
     private Mat srcImg;
-
+    private boolean processing = false;
     private List<MatOfPoint> contours;
     private MatOfPoint2f corners;
 
@@ -318,16 +323,11 @@ public class ImagePreprocessor {
     public ImagePreprocessor() {}
 
     /**
-     * No need to call setBitmap()
+     * No need to call setBitmap().
      * @param bm ticket bitmap
      */
     public ImagePreprocessor(Bitmap bm) {
         setImage(bm);
-    }
-
-    public ImagePreprocessor(Bitmap bm, List<android.graphics.Point> corners) {
-        setImage(bm);
-        setCorners(corners);
     }
 
     /**
@@ -345,66 +345,81 @@ public class ImagePreprocessor {
      * Find the four corners of a ticket, ordered counter-clockwise from the top-left corner of the ticket.
      * The corners are ordered to get a straight ticket (but could be upside down).
      * To obtain the corners, call getCorners().
-     * @param quick true: faster but more errors: good for real time visual feedback. No orientation detection.
-     *              false: slower but more accurate: good for recalculating the rectangle after the shot.
+     * This method should never
+     * @param quick true: faster but more inaccurate: good for real time visual feedback. No orientation detection.
+     *              false: slower but more accurate: good for recalculating the rectangle after the shot
      *                                               or for analyzing an imported image.
-     * @return TicketError NONE or RECT_NOT_FOUND
+     * @param callback callback with TicketError argument called when computation is finished.
+     *                 The error can be NONE or RECT_NOT_FOUND.
      */
-    public void findTicket(boolean quick, Consumer<TicketError> cb) {
+    public void findTicket(boolean quick, Consumer<TicketError> callback) {
+        new Thread(() -> {
+            synchronized (this) { // make sure this code is not executed concurrently when findTicket
+                                  // is called more than once consecutively
+                if (srcImg == null)
+                    return;
+                contours = new ArrayList<>();
+                Mat resized = downScaleRGBA(srcImg);
+                Mat binary = prepareBinaryImg(resized);
+                contours = findBiggestContours(binary, quick ? 1 : 3);
 
-        contours = new ArrayList<>();
-        Mat resized = downScaleRGBA(srcImg);
-        Mat binary = prepareBinaryImg(resized);
-        contours = findBiggestContours(binary, quick ? 1 : 3);
+                List<CompPair<Double, MatOfPoint2f>> candidates = new ArrayList<>();
+                for (MatOfPoint ctr : contours) {
+                    if (!quick) {
+                        // find Hough lines of ticket text
+                        Ref<Mat> binRef = new Ref<>(binary);
+                        //NB: original "binary" is not modified
+                        erode(binRef, ERODE_ITERS);
+                        Mat houghReady = findEdges(binRef.value, ctr);
+                        //todo find Hough lines + RANSAC to find undistort transform matrix
+                    }
+                    MatOfPoint2f rect = findRectangle(ctr);
+                    candidates.add(new CompPair<>(0.0, rect));
+                }
+                //todo assign score and use Collections.max
+                corners = candidates.get(0).obj;
 
-        List<CompPair<Double, MatOfPoint2f>> candidates = new ArrayList<>();
-        for (MatOfPoint ctr : contours) {
-            if (!quick) {
-                // find Hough lines of ticket text
-                Ref<Mat> binRef = new Ref<>(binary);
-                //NB: original "binary" is not modified
-                erode(binRef, ERODE_ITERS);
-                Mat houghReady = removeBackground(binRef.value, ctr);
-                //todo find Hough lines + RANSAC to find undistort transform matrix
+                //scale up the the corners to match the scale of the original image
+                double scaleMul = (double)srcImg.cols() / resized.cols();
+                multiply(corners.clone(), new Scalar(scaleMul, scaleMul), corners);
+
+                if (corners.rows() != 4) {
+                    callback.accept(TicketError.RECT_NOT_FOUND);
+                    return;
+                }
+
+                if (!quick) {
+                    List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
+                    //find index of point closer to top-left corner of image (using taxicab distance).
+                    int topLeftIdx = Collections.min(range(0, 4)
+                            .map(i -> new CompPair<>(corns.get(i).x + corns.get(i).y, i)).toList()).obj;
+
+                    //shift corns by topLeftIdx
+                    //NB: sublist creates a view, not a copy.
+                    corns.addAll(corns.subList(0, topLeftIdx));
+                    corns.subList(0, topLeftIdx).clear();
+                    corners = new MatOfPoint2f(corns.toArray(new Point[4]));
+                }
+                callback.accept(TicketError.NONE);
             }
-            MatOfPoint2f rect = findRectangle(ctr);
-            candidates.add(new CompPair<>(0.0, rect));
-        }
-        //todo assign score and use Collections.max
-        corners = candidates.get(0).obj;
-
-        //scale up the the corners to match the scale of the original image
-        double scaleMul = (double)srcImg.cols() / resized.cols();
-        multiply(corners.clone(), new Scalar(scaleMul, scaleMul), corners);
-
-        if (corners.rows() != 4) {
-            cb.accept(TicketError.RECT_NOT_FOUND);
-            return;
-        }
-
-        if (!quick) {
-            List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
-            //find index of point closer to top-left corner of image.
-            int topLeftIdx = Collections.min(range(0, 4)
-                    .map(i -> new CompPair<>(corns.get(i).x + corns.get(i).y, i)).toList()).obj;
-
-            //shift corns by topLeftIdx
-            //NB: sublist creates a view, not a copy.
-            corns.addAll(corns.subList(0, topLeftIdx));
-            corns.subList(0, topLeftIdx).clear();
-            corners = new MatOfPoint2f(corns.toArray(new Point[4]));
-        }
-        cb.accept(TicketError.NONE);
+        }).start();
     }
 
+    /**
+     * Set rectangle corners.
+     * @param corners must be 4, ordered counter-clockwise, first is top-left of ticket.
+     * @return TicketError. NONE: corners are valid.
+     *                      INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
+     */
     public TicketError setCorners(List<android.graphics.Point> corners) {
         this.corners = new MatOfPoint2f(Stream.of(corners)
                 .map(p -> new Point(p.x, p.y)).toArray(v -> new Point[corners.size()]));
+        //todo check if corners are ordered correctly
         return corners.size() == 4 ? TicketError.NONE : TicketError.INVALID_POINTS;
     }
 
     /**
-     * Get rectangle (or polygon) corners.
+     * Get rectangle corners.
      * @return List of points in bitmap space (range from (0,0) to (width, height) ).
      *         The corners might be more or less than 4. Never null.
      */
@@ -417,19 +432,12 @@ public class ImagePreprocessor {
      * Get a Bitmap of a ticket with a perspective correction applied, with a margin.
      * @param marginMul fraction of length of shortest side of the rectangle of the ticket.
      *                  A good value is 0.02
-     * @return Bitmap of ticket with perspective distortion removed
+     * @return Bitmap of ticket with perspective distortion removed. Null if error.
      */
-    public Bitmap undistort(double marginMul) {
-        Semaphore sem = new Semaphore(0);
-        if (corners == null) {
-            findTicket(false, err -> sem.notify());
-            try {
-                sem.acquire();
-            }
-            catch (InterruptedException e) {
-                System.out.println();
-            }
-        }
+    public synchronized Bitmap undistort(double marginMul) {
+        if (corners == null)
+            return null;
+
         MatOfPoint2f dstRect;
         Mat dstImg = srcImg.clone();
         if (corners.rows() != 4) // at this point "corners" should have always 4 points.
