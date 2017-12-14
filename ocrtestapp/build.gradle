@@ -18,27 +18,9 @@ android {
         }
     }
 
-    //for javacv
-    lintOptions {
-        warning 'InvalidPackage'
-    }
-
-    packagingOptions {
-        exclude 'org/bytedeco/javacpp/**'
-        exclude '**/libav*.so'
-    }
-
-    flavorDimensions "isEmulator"
-    productFlavors {
-        realPhone {
-            dimension "isEmulator"
-            packagingOptions {
-                exclude 'lib/x86/*'
-            }
-        }
-        emululator {
-            dimension "isEmulator"
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
