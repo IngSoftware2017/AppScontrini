@@ -14,9 +14,6 @@ import com.annimon.stream.function.Function;
  */
 public class Reflect {
 
-    public static class UnknownException extends Exception {
-    }
-
     /**
      * Invoke a static or non static method (with any access level) of a class.
      *

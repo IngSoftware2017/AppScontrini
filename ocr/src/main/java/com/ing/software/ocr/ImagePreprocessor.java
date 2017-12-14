@@ -54,7 +54,7 @@ Load and show photo already processed:
  */
 
 /**
- * Process an image to be suitable to be used by DataAnalyzer.
+ * Class used to process an image of a ticket.
  * @author Riccardo Zaglia
  */
 /*
@@ -129,73 +129,87 @@ public class ImagePreprocessor {
 
     /**
      * Convert Mat from RGBA to gray
-     * @param img in-out ref to Mat (in: BGR, out: gray). Original mat is not modified. Not null.
+     * @param imgRef in-out ref to Mat (in: RGBA, out: gray). Original mat is not modified. Not null.
      */
-    private static void RGBA2Gray(Ref<Mat> img) {
-        Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        cvtColor(img.value, img2, COLOR_RGBA2GRAY);
-        img.value = img2;
+    private static void RGBA2Gray(Ref<Mat> imgRef) {
+        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
+        cvtColor(imgRef.value, img2, COLOR_RGBA2GRAY);
+        imgRef.value = img2;
     }
 
     /**
      * Bilateral filter
-     * @param img in-out ref to gray Mat. Original mat is not modified. Not null.
+     * @param imgRef in-out ref to gray Mat. Original mat is not modified. Not null.
      */
-    private static void bilateralFilter(Ref<Mat> img) {
-        Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        Imgproc.bilateralFilter(img.value, img2, BF_KER_SZ, BF_SIGMA, BF_SIGMA);
-        img.value = img2;
+    private static void bilateralFilter(Ref<Mat> imgRef) {
+        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
+        Imgproc.bilateralFilter(imgRef.value, img2, BF_KER_SZ, BF_SIGMA, BF_SIGMA);
+        imgRef.value = img2;
     }
 
     /**
      * Transform a gray image into a mask using an adaptive threshold
-     * @param img in-out ref to Mat (in: gray, out: black & white). Original mat is not modified. Not null.
+     * @param imgRef in-out ref to Mat (in: gray, out: black & white). Original mat is not modified. Not null.
      */
-    private static void threshold(Ref<Mat> img) {
-        Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        adaptiveThreshold(img.value, img2, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, THR_WIN_SZ, THR_OFFSET);
-        img.value = img2;
-    }
-
-    private static void erode(Ref<Mat> img, int iters) {
-        Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        Imgproc.erode(img.value, img2, new Mat(), new Point(-1, -1), iters);
-        img.value = img2;
-    }
-
-    private static void dilate(Ref<Mat> img, int iters) {
-        Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        Imgproc.dilate(img.value, img2, new Mat(), new Point(-1, -1), iters);
-        img.value = img2;
+    private static void threshold(Ref<Mat> imgRef) {
+        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
+        adaptiveThreshold(imgRef.value, img2, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, THR_WIN_SZ, THR_OFFSET);
+        imgRef.value = img2;
     }
 
     /**
-     * Grow + shrink mask.
-     * @param img in-out ref to B&W Mat. Original mat is not modified. Not null.
+     * Shrink mask.
+     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
-    private static void erodeDilate(Ref<Mat> img) {
-        erode(img, E_D_ITERS);
-        dilate(img, E_D_ITERS);
+    private static void erode(Ref<Mat> imgRef, int iters) {
+        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
+        Imgproc.erode(imgRef.value, img2, new Mat(), new Point(-1, -1), iters);
+        imgRef.value = img2;
+    }
+
+    /**
+     * Grow mask.
+     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
+     */
+    private static void dilate(Ref<Mat> imgRef, int iters) {
+        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
+        Imgproc.dilate(imgRef.value, img2, new Mat(), new Point(-1, -1), iters);
+        imgRef.value = img2;
+    }
+
+    /**
+     * Shrink + grow mask.
+     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
+     */
+    private static void erodeDilate(Ref<Mat> imgRef) {
+        erode(imgRef, E_D_ITERS);
+        dilate(imgRef, E_D_ITERS);
     }
 
     /**
      * Smooth mask contours
-     * @param img in-out ref to B&W Mat. Original mat is not modified. Not null.
+     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
-    private static void median(Ref<Mat> img) {
-        Mat img2 = new Mat(img.value.size(), CV_8UC1);
-        medianBlur(img.value, img2, MED_SZ);
-        img.value = img2;
+    // unused
+    private static void median(Ref<Mat> imgRef) {
+        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
+        medianBlur(imgRef.value, img2, MED_SZ);
+        imgRef.value = img2;
     }
 
     /**
-     * Make sure that no white area is touching image edges
-     * @param img in-out ref to B&W Mat. Original mat IS modified. Not null.
+     * Make sure that the mask is not touching image edges
+     * @param imgRef in-out ref to B&W Mat. Original mat IS modified. Not null.
      */
-    private static void enclose(Ref<Mat> img) {
-        copyMakeBorder(img.value, img.value, BORD_THICK, BORD_THICK, BORD_THICK, BORD_THICK, BORDER_CONSTANT);
+    private static void enclose(Ref<Mat> imgRef) {
+        copyMakeBorder(imgRef.value, imgRef.value, BORD_THICK, BORD_THICK, BORD_THICK, BORD_THICK, BORDER_CONSTANT);
     }
 
+    /**
+     * Downscale + convert to gray + bilateral filter + adaptive threshold + enclose
+     * @param img
+     * @return
+     */
     private static Mat prepareBinaryImg(Mat img) {
         Ref<Mat> imgRef = new Ref<>(img);
         // I used Ref parameters to enable me to easily reorder the methods

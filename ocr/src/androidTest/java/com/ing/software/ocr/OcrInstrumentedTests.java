@@ -45,16 +45,18 @@ public class OcrInstrumentedTests {
                 final Ticket target = null; //todo: initialize
                 Bitmap photo = getBitmap(i);
                 if (photo != null) {
-                    analyzer.getTicket(photo, ticket -> {
+                    ImagePreprocessor preproc = new ImagePreprocessor(photo);
+                    preproc.findTicket(false, err -> {
+                        analyzer.getTicket(preproc, ticket -> {
 
-                        //todo: compare Ticket to dataset
-                        //assertEquals(target, ticket);
+                            //todo: compare Ticket to dataset
+                            //assertEquals(target, ticket);
 
-                        sem.release();
-                        System.out.println("Done img " + String.valueOf(idx));
+                            sem.release();
+                            System.out.println("Done img " + String.valueOf(idx));
+                        });
                     });
                 }
-
                 sem.acquire();
             }
         }
