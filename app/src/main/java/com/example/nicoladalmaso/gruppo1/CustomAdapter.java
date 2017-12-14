@@ -92,8 +92,8 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
             public void onClick(View v) {
                 pos =  Integer.parseInt(v.getTag().toString());
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(text.deleteTicketToast)
-                        .setTitle("Cancellazione");
+                builder.setMessage(context.getString(R.string.deleteTicketToast))
+                        .setTitle(context.getString(R.string.deleteTitle));
                 String toDelete = "";
                 for(int i = 0; i < t.size(); i++){
                     if(t.get(i).getID() == pos){
@@ -102,7 +102,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                 }
                 final File ticketDelete = new File(toDelete);
                 // Add the buttons
-                builder.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TicketID", ""+pos);
                         if(DB.deleteTicket(pos) && ticketDelete.delete()){
@@ -113,7 +113,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                         }
                     }
                 });
-                builder.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
                     }

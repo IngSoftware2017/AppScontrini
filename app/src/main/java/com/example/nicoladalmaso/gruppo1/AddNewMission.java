@@ -28,9 +28,10 @@ public class AddNewMission extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DB = new DataManager(this.getApplicationContext());
-        setTitle("New Mission");
-        setContentView(R.layout.activity_add_new_mission);
         context = this.getApplicationContext();
+        setTitle(context.getString(R.string.newMission));
+        setContentView(R.layout.activity_add_new_mission);
+
     }
 
     /** Dal Maso
@@ -64,21 +65,14 @@ public class AddNewMission extends AppCompatActivity{
                 String name = editName.getText().toString();
                 String description = editDescription.getText().toString();
                 Log.d("verify null",name);
-                String voidChar=" ";
-                if((name==null)||name.equals("")) {
+                String checkName= name.replaceAll(" ","");
+                if((name==null)||checkName.equals("")) {
                     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                     name = timeStamp;
                 }
-                for(int i=0;i<50;i++)
-                {
-                    voidChar=voidChar+" ";
-                    if(name.equals(voidChar))
-                    { String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                    name = timeStamp;}
 
-                }
                 if((description==null)||description.equals("")){
-                    description = text.defaultDescription;
+                    description = context.getString(R.string.defaultDescription);
                 }
                 Mission miss = new Mission();
                 int missionID = 0;

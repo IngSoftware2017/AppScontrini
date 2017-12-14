@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DB = new DataManager(this.getApplicationContext());
-        setTitle("Missioni");
+        setTitle(getString(R.string.titleMission));
         Variables.getInstance().setCurrentMissionDir(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
@@ -130,12 +130,14 @@ public class MainActivity extends AppCompatActivity {
      * clear the view after I've eliminated a mission(before to call printAllMissions)
      *
      */
-    public void clearAllMissions(){
+    public void clearAllMissions()
+    {
         ListView listView = (ListView)findViewById(R.id.listMission);
         MissionAdapter emptyAdapter = new MissionAdapter(this, R.layout.mission_card, list);
         emptyAdapter.clear();
         emptyAdapter.notifyDataSetChanged();
-        listView.setAdapter(emptyAdapter);}
+        listView.setAdapter(emptyAdapter);
+    }
 
     /** Dal Maso (NOT USED)
      *  Stampa tutte le immagini

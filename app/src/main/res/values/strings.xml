@@ -1,3 +1,5 @@
+
+
 <resources>
     <string name="app_name">TicketManager</string>
 
@@ -15,4 +17,13 @@
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
+    <!--lazzarin-->
+    <string name="newMission">Nuova missione</string>
+    <string name="deleteMissionToast">Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati</string>
+    <string name="buttonDelete">Elimina</string>
+    <string name="cancel">Annulla</string>
+    <string name="deleteTicketToast">Sei sicuro di voler eliminare lo scontrino?</string>
+    <string name="titleMission">Missioni</string>
+    <string name="defaultDescription">Nessuna descrizione</string>
+    <string name="deleteTitle">Cancellazione</string>
 </resources>

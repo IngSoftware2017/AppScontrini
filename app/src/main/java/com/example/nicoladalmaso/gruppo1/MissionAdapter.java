@@ -97,7 +97,7 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
 
                       AlertDialog.Builder toast = new AlertDialog.Builder(context);
                       toast.setMessage("Sei sicuro di voler eliminare la missione?Tutti gli scontrini verranno eliminati")
-                              .setTitle("Cancellazione");
+                              .setTitle(context.getString(R.string.deleteTitle);
 
                       toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
                           public void onClick(DialogInterface dialog, int id) {

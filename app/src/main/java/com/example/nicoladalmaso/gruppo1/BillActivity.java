@@ -182,10 +182,10 @@ public class BillActivity extends AppCompatActivity {
         Log.d("tagMission", "" + pos);
         AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
 
-        toast.setMessage(text.deleteMissionToast)
-                .setTitle("Cancellazione");
+        toast.setMessage(context.getString(R.string.deleteMissionToast))
+                .setTitle(context.getString(R.string.deleteTitle));
 
-        toast.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
+        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -199,7 +199,7 @@ public class BillActivity extends AppCompatActivity {
             }
         });
 
-        toast.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
+        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //Nothing to do
             }
@@ -220,7 +220,10 @@ public class BillActivity extends AppCompatActivity {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-            } catch (IOException e) {}
+            } catch (IOException e)
+            {
+             Log.d("IOException","error using createImageFile method");
+            }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
                         "com.example.android.fileprovider",
