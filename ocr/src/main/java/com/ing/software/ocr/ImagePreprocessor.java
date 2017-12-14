@@ -380,8 +380,9 @@ public class ImagePreprocessor {
     }
 
     public TicketError setCorners(List<android.graphics.Point> corners) {
-        //todo: stub
-        return TicketError.NONE;
+        this.corners = new MatOfPoint2f(Stream.of(corners)
+                .map(p -> new Point(p.x, p.y)).toArray(v -> new Point[corners.size()]));
+        return corners.size() == 4 ? TicketError.NONE : TicketError.INVALID_POINTS;
     }
 
     /**

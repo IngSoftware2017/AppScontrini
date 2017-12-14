@@ -40,10 +40,14 @@ public class Ransac<T, U> {
         while (iters < maxIters) {
             List<Boolean> outliers = new ArrayList<>(Collections.nCopies(elems.size(), true));
             List<T> inliers = new ArrayList<>();
-            for (int i = 0; i < n; i++) {
+            int c = 0;
+            while (c < n) {
                 int idx = rnd.nextInt(elems.size());
-                inliers.add(elems.get(idx));
-                outliers.set(idx, false);
+                if (outliers.get(idx)) {
+                    inliers.add(elems.get(idx));
+                    outliers.set(idx, false);
+                    c++;
+                }
             }
             Ref<U> newModRef = new Ref<>(null);
             hdl.calcModelFromElements(inliers, newModRef);

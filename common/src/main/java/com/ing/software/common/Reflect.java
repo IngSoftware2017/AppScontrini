@@ -5,6 +5,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
+
 /**
  * @author Riccardo Zaglia
  */
@@ -32,18 +36,13 @@ public class Reflect {
      */
     @SuppressWarnings("unchecked")
     public static <T> T invoke(Object clazz, String methodName, Object... params) throws Exception {
-        List<Class<?>> paramsTypes = new ArrayList<>(params.length);
-        for (Object p : params) {
-            if (p != null)
-                paramsTypes.add(p.getClass());
-            else
-                paramsTypes.add(null);
-        }
+        //get type of parameters, or null if null
+        List<Class<?>> paramsTypes = Stream.of(params)
+                .map((Function<Object, Class<?>>) p -> p != null ? p.getClass() : null).toList();
 
         boolean isType = clazz instanceof Class<?>;
-        Method[] methods = (isType ? (Class<?>)clazz : clazz.getClass()).getDeclaredMethods();
 
-        for (Method m : methods) {
+        for (Method m : (isType ? (Class<?>)clazz : clazz.getClass()).getDeclaredMethods()) {
             Class<?>[] mParamsTypes = m.getParameterTypes();
             if (m.getName().equals(methodName) && mParamsTypes.length == paramsTypes.size()) {
                 boolean paramsMatch = true;
@@ -51,7 +50,7 @@ public class Reflect {
                     Class<?> need = mParamsTypes[i], got = paramsTypes.get(i);
 
                     //Problem: since params is an array of objects, primitive types are boxed to respective wrappers.
-                    // so if a wrapper is passed, we accept the match with the primitive type.
+                    // so if a wrapper is passed, we accept it as if it was the primitive type.
                     paramsMatch &= (boolean.class.equals(need) && Boolean.class.equals(got))
                             || (byte.class.equals(need) && Byte.class.equals(got))
                             || (short.class.equals(need) && Short.class.equals(got))

@@ -82,18 +82,15 @@ public class OcrManager {
     private void dispatchAnalysis() {
         if (!analyzing) {
             analyzing = true;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!analyzeQueue.isEmpty()) {
-                        final OcrManager.AnalyzeRequest req = analyzeQueue.remove();
-                        final long startTime = System.nanoTime();
-                        OcrResult result = analyzer.analyze(req.photo);
-                        req.ticketCb.onTicketReady(getTicketFromResult(result));
-                        long endTime = System.nanoTime();
-                        double duration = ((double) (endTime - startTime)) / 1000000000;
-                        OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
-                    }
+            new Thread(() -> {
+                while (!analyzeQueue.isEmpty()) {
+                    AnalyzeRequest req = analyzeQueue.remove();
+                    long startTime = System.nanoTime();
+                    OcrResult result = analyzer.analyze(req.photo);
+                    req.ticketCb.onTicketReady(getTicketFromResult(result));
+                    long endTime = System.nanoTime();
+                    double duration = ((double) (endTime - startTime)) / 1000000000;
+                    OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
                 }
             }).start();
             analyzing = false;
