@@ -31,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
         newMissionButton = findViewById(R.id.newMissionButton);
         missionsList = findViewById(R.id.missionsList);
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
-        MissionEntity test = new MissionEntity("name",null,null,"location",1);
+        //MissionEntity test = new MissionEntity("name",null,null,"location",1);
         List<MissionEntity> missions = new ArrayList<MissionEntity>();
-        missions.add(test);
+        //missions.add(test);
         MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_row_custom, missions);
         missionsList.setAdapter(adapter);
         checkInitialization();

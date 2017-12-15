@@ -48,6 +48,7 @@ public class MissionAdapterGruppo1 extends ArrayAdapter<MissionEntity> {
 
         //Dal Maso
         //Sets a default background color for the mission's card
+
         switch (position%4){
             case 0:
                 card.setBackgroundColor(Color.parseColor("#1F566D"));
