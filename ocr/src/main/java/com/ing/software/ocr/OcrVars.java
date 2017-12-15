@@ -3,7 +3,7 @@ package com.ing.software.ocr;
 /**
  * List of static vars used in Ocr
  */
-public class OcrVars {
+class OcrVars {
 
     static final boolean IS_DEBUG_ENABLED = false;
     static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
