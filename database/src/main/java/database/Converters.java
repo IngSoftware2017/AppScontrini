@@ -21,8 +21,8 @@ public final class Converters {
 
     /**
      * Converts from a timestamp to a Date object
-     * @param value the timestamp
-     * @return the corresponding Date object
+     * @param Long value the timestamp
+     * @return the corresponding Date object, null if value is null
      */
     @TypeConverter
     public Date fromTimestamp(Long value) {
@@ -31,8 +31,8 @@ public final class Converters {
 
     /**
      * Converts from Date to the corresponding timestamp
-     * @param date not null, the Date object to be converted
-     * @return the corresponding timestamp
+     * @param Date date, the Date object to be converted
+     * @return the corresponding timestamp, null if date is null
      */
     @TypeConverter
     public Long dateToTimestamp(Date date) {
@@ -41,8 +41,8 @@ public final class Converters {
 
     /**
      * Converts from a double to a BigDecimal object
-     * @param value the value to be converted
-     * @return the corresponding BigDecimal
+     * @param Double value the value to be converted
+     * @return the corresponding BigDecimal, null if value is null
      */
     @TypeConverter
     public BigDecimal fromDouble(Double value){
@@ -51,20 +51,30 @@ public final class Converters {
 
     /**
      * Converts from BigDecimal to double
-     * @param value not null
-     * @return
+     * @param BigDecimal value to be converted
+    * @return Double with the correspondent value, null if value is null
      */
     @TypeConverter
     public Double bigDecimalToDoouble(BigDecimal value){
         return value == null ? null:value.doubleValue();
     }
 
+    /**
+    * Converts from Uri to String
+    * @param Uri uri to be converted
+    * @return String with the Uri path, null if Uri is null
+    */
     @TypeConverter
     public String toString(Uri uri){
         return uri == null ? null: uri.getPath();
         //return uri.getPath();
     }
 
+    /**
+    * Converts from String to Uri
+    * @param String path to be converted
+    * @return Uri with the given path, null if path is null
+    */
     @TypeConverter
     public Uri toUri(String path){
         return path == null ? null : Uri.fromFile(new File(path));
