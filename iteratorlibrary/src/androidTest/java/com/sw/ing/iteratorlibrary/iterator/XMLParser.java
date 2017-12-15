@@ -22,9 +22,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by Federico Taschin on 02/12/2017.
+ * This class reads the XML file with the Ticket information and creates an ArrayList of TicketInfo objects. 
+ * A TicketInfo object contains the information of a single ticket  
  */
 
 public class XMLParser {
+    //Names of the tags in the XML file. The TICKET_TAG contains all other tags
     private static final String TICKET_TAG = "Ticket";
     private static final String ID_TAG = "ID";
     private static final String DATE_TAG = "Date";
@@ -35,7 +38,7 @@ public class XMLParser {
     private static final String FEATURES_TAG = "Features";
 
     private int current;
-    private ArrayList<TicketInfo> tickets;
+    private ArrayList<TicketInfo> tickets;// List of all the parsed tikets 
     private String xmlName;
 
     public XMLParser(String xmlName){
@@ -46,23 +49,26 @@ public class XMLParser {
 
     /**
      *Created by Federico Taschin
+     * parses the whole XML file and for each Ticket tag creates and adds to the list the correspondent TicketInfo object with
+     * the parsed information. An XML has a DOM (document object model), a tree with the tags as nodes. 
+     * Each node (Ticket) has its children (the attributes such as Date, Position etc)
      * @throws IOException if an error in the opening of the xml file occurs
      * @throws ParserConfigurationException
      * @throws SAXException if an error in the parsing of the xml occurs
      */
     public void parseXML() throws IOException, ParserConfigurationException, SAXException {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-    /* Parse the xml-data from our URL. */
+    /* read the xml-data from our URL. */
             InputStream inputStream = InstrumentationRegistry.getInstrumentation().getContext().getResources().getAssets().open(xmlName);
     /*Get Document Builder*/
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
-            Document dom = builder.parse(inputStream);
+            Document dom = builder.parse(inputStream); // creates the DOM of the xml
 
-            Element rootElement = dom.getDocumentElement();
-            NodeList list = rootElement.getElementsByTagName(TICKET_TAG);
-            for(int i = 0; i<list.getLength(); i++){
-                try {
-                    tickets.add(readTicket(list.item(i)));
+            Element rootElement = dom.getDocumentElement(); 
+            NodeList list = rootElement.getElementsByTagName(TICKET_TAG); //Get all the Ticket tags in the XML
+            for(int i = 0; i<list.getLength(); i++){ //for each Ticket tag
+                try { 
+                    tickets.add(readTicket(list.item(i))); //calls the parsing method for that ticket
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -72,7 +78,8 @@ public class XMLParser {
 
     /**
      *Created by Federico Taschin
-     * @param node the node to be parsed
+     * This method gets the Node object of a Ticket Tag and creates the correspondent TicketInfo object
+     * @param node the node (Ticket tag) to be parsed
      * @return TicketInfo with the information about the xml Ticket element
      * @throws ParseException if a field of the <Ticket> element is in the wrong format
      */
@@ -88,11 +95,11 @@ public class XMLParser {
         //Already valid values
         String shop = element.getElementsByTagName(SHOP_TAG).item(0).getTextContent();
         String features = element.getElementsByTagName(FEATURES_TAG).item(0).getTextContent();
-        //Parsing values
+        //Parsing values that need to be translated into object
         int id = Integer.parseInt(idValue);
         SimpleDateFormat dateformat = null;
         Date date = null;
-        try{
+        try{ //DEFAULT CASE design pattern
             dateformat = new SimpleDateFormat("dd-mm-yyyy");
             date = dateformat.parse(dateValue);
         }catch(Exception e){
@@ -121,6 +128,7 @@ public class XMLParser {
 
     /**
      * Created by Federico Taschin
+     * translate a string with the coordinates into a integer array with the x and y values
      * @param coords String in the format (xcoord, ycoord)
      * @return array of x and y values
      */
@@ -133,6 +141,8 @@ public class XMLParser {
         return new int[]{Integer.parseInt(x), Integer.parseInt(y)};
     }
 
+    //METHODS FOR THE ACCESS TO THE TicketInfo LIST
+    
     /**Created by Federico Taschin
      * @return an ArrayList<TicketInfo> containing all the TicketInfo of the xml
      */
