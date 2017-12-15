@@ -9,7 +9,12 @@ import java.util.Date;
 
 /**
  * Created by Federico Taschin on 12/11/2017.
- *
+ * This class defines the converters for the database. In fact, the Room library cannot handle Date, BigDecimal and Uri objects.
+ * Therefore, we defined these methods that transform those objects into objects that the Database can handle. 
+ * For instance, we defined the dateToTimeStamp(Date date) method. When the Database has to write a Date object, it uses the 
+ * dateToTimeStamp(Date date) method to cast it to a Long object (that the Database can read). Conversely, when the Database needs 
+ * to read a Date object, it reads a Long and then it cast it to Date with the fromTimestamp(Long value) method.
+ * These methods are automatically called by the Room library since they're annotated with @TypeConverter.
  */
 
 public final class Converters {
