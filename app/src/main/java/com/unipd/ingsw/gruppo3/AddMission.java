@@ -1,5 +1,6 @@
 package com.unipd.ingsw.gruppo3;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,14 +10,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import database.Constants;
@@ -29,6 +35,9 @@ import database.PersonEntity;
  *
  * Modify: Implement the method checkCorrectField(), remove the auto setting of empty text to the Items
  * @author Matteo Mascotto on 07-12-2017
+ *
+ * Modify: Use Calendar (DatePicker) to set start and end of the Mission
+ * @author Matteo Mascotto on 15-12-2017
  */
 
 public class AddMission extends AppCompatActivity implements View.OnClickListener{
@@ -53,38 +62,66 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         setContentView(R.layout.activity_add_mission);
 
+        // Nome Missione
         nameMissionText = findViewById(R.id.nameText);
-        /*
         nameMissionText.setOnClickListener(this);
-        nameMissionText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                nameMissionText.setText("");
-                nameMissionText.setEnabled(true);
-            }
-        });
-        */
 
+        // Data Inizio Missione
         startDateMissionText = findViewById(R.id.starMissionText);
-        /*
-        startDateMissionText.setOnClickListener(new View.OnClickListener() {
+        startDateMissionText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            int mYear, mMonth, mDay;
             @Override
-            public void onClick(View view) {
-                startDateMissionText.setText("");
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    Calendar currentDate = Calendar.getInstance();
+
+                    mYear = currentDate.get(Calendar.YEAR);
+                    mMonth = currentDate.get(Calendar.MONTH);
+                    mDay = currentDate.get(Calendar.DAY_OF_MONTH);
+
+                    // Show the calendar, with the onDateSet return
+                    DatePickerDialog mDatePicker = new DatePickerDialog(AddMission.this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+                            startDateMissionText.setText(selectedDay + "/" + selectedMonth + "/" + selectedYear);
+                        }
+                    },mYear, mMonth, mDay);
+                    mDatePicker.setTitle("Data Inizio Missione");
+                    mDatePicker.show();
+                }
             }
         });
-        */
 
+
+        // Data Fine Missione
         endDateMissionText = findViewById(R.id.endMissionText);
-        /*
-        endDateMissionText.setOnClickListener(new View.OnClickListener() {
+        endDateMissionText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            int mYear, mMonth, mDay;
             @Override
-            public void onClick(View view) {
-                endDateMissionText.setText("");
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    Calendar currentDate = Calendar.getInstance();
+
+                    mYear = currentDate.get(Calendar.YEAR);
+                    mMonth = currentDate.get(Calendar.MONTH);
+                    mDay = currentDate.get(Calendar.DAY_OF_MONTH);
+
+                    // Show the calendar, with the onDateSet return
+                    DatePickerDialog mDatePicker = new DatePickerDialog(AddMission.this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+                            endDateMissionText.setText(selectedDay + "/" + selectedMonth + "/" + selectedYear);
+                        }
+                    },mYear, mMonth, mDay);
+                    mDatePicker.setTitle("Data Fine Missione");
+                    mDatePicker.show();
+                }
             }
         });
-        */
 
+        // Persona
         addPersonaEditText =findViewById(R.id.addPersonaEditText);
         /*
         addPersonaEditText.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +145,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     }
 
     /**
-     * It control if the Mission data are corrects
+     * It control if the Mission data are corrects.
+     * If it is not will return the object where we do the check, null otherwise
      * (not empty for text fields, correct date format for date fields)
      *
      * @author Marco Olivieri on 03/12/2017 (Team 3)
@@ -118,13 +156,14 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
      */
     private Object checkCorrectField(){
 
-        String dateInput;
+        String dateEndMission;
 
         if (nameMissionText.getText().toString().equals("")) return nameMissionText;
         if (startDateMissionText.getText().toString().equals("")) return startDateMissionText;
         if (endDateMissionText.getText().toString().equals("")) return endDateMissionText;
         if (addPersonaEditText.getText().toString().equals("")) return addPersonaEditText;
 
+        /* TODO: This control isn't correct, find a mode to check the correct date format
         dateInput = startDateMissionText.getText().toString();
         if (dateInput.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}") || dateInput.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
             return startDateMissionText;
@@ -133,10 +172,11 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         dateInput = endDateMissionText.getText().toString();
         if (dateInput.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}") || dateInput.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
             return endDateMissionText;
-        }
+        }*/
 
-        // Compare the beginDate and endDate of the Mission to check if it contain a correct interval
-        if (dateInput.compareTo(startDateMissionText.getText().toString()) > 0) {
+        dateEndMission = endDateMissionText.getText().toString();
+        // Compare the startDate and endDate of the Mission to check if it contain a correct interval
+        if (dateEndMission.compareTo(startDateMissionText.getText().toString()) > 0) {
             return endDateMissionText;
         }
 
