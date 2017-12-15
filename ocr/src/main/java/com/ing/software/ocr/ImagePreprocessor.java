@@ -342,10 +342,9 @@ public class ImagePreprocessor {
 
 
     /**
-     * Find the four corners of a ticket, ordered counter-clockwise from the top-left corner of the ticket.
+     * Find the 4 corners of a ticket, ordered counter-clockwise from the top-left corner of the ticket.
      * The corners are ordered to get a straight ticket (but could be upside down).
      * To obtain the corners, call getCorners().
-     * This method should never
      * @param quick true: faster but more inaccurate: good for real time visual feedback. No orientation detection.
      *              false: slower but more accurate: good for recalculating the rectangle after the shot
      *                                               or for analyzing an imported image.
