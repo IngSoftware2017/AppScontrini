@@ -21,10 +21,14 @@ import static com.ing.software.common.Reflect.fieldVal;
 import static com.ing.software.common.Reflect.invoke;
 import static org.opencv.imgproc.Imgproc.drawContours;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+/**
+ * This app shows in order the pipeline steps to find the ticket rectangle
+ */
 public class MainActivity extends AppCompatActivity {
     public static final String folder = "photos";
 
@@ -40,11 +44,19 @@ public class MainActivity extends AppCompatActivity {
     // alias
     private final static Class<?> IP_CLASS = ImagePreprocessor.class;
 
+    /**
+     * this object is used to execute code on the main thread, from another thread.
+     */
     final Handler h = new Handler(Looper.getMainLooper(), msg -> {
         iv.setImageBitmap((Bitmap)msg.obj);
         return true;
     });
 
+    /**
+     * Show on screen an Android bitmap
+     * This method is blocked until user taps screen.
+     * @param bm bitmap
+     */
     private void showBitmap(Bitmap bm) {
         h.obtainMessage(0, bm).sendToTarget();
         try {
@@ -55,24 +67,43 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Show on screen an OpenCV Mat.
+     * This method is blocked until user taps screen.
+     * @param img Mat any color
+     */
     private void showMat(Mat img) throws Exception {
-        Bitmap bm = invoke(IP_CLASS, "matToBitmap", img);
-        showBitmap(bm);
+        try {
+            Bitmap bm = invoke(IP_CLASS, "matToBitmap", img);
+            showBitmap(bm);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    void drawContour(Mat dst, MatOfPoint contour, Scalar color) {
-        //MatVector contourVec = new MatVector(1);
-        //contourVec.put(0, contour);
+    /**
+     * Draw on contour inside Mat
+     * @param img in-out Mat RGBA
+     * @param contour MatOfPoint
+     * @param color Scalar with 3 or 4 channels
+     */
+    void drawContour(Mat img, MatOfPoint contour, Scalar color) {
         List<MatOfPoint> ctrList = Collections.singletonList(contour);
-        //drawContours();
-        drawContours(dst, ctrList, 0, color, 3);
+        drawContours(img, ctrList, 0, color, 3);
     }
 
-    Bitmap drawPoly(Bitmap src, List<Point> corns, int color) {
-        //Bitmap copy; = Bitmap.createScaledBitmap(src, src.getWidth(), src.getHeight(), false);
-        Bitmap copy = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
+    /**
+     * Draw polygon lines on a Bitmap
+     * @param bm input bitmap
+     * @param corns list of corners
+     * @param color integer containing channel values in the order: A R G B
+     * @return final bitmap
+     */
+    Bitmap drawPoly(Bitmap bm, List<Point> corns, int color) {
+        Bitmap copy = Bitmap.createBitmap(bm.getWidth(), bm.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(copy);
-        c.drawBitmap(src, 0, 0, null);
+        c.drawBitmap(bm, 0, 0, null);
 
         Paint p = new Paint();
         p.setColor(color);
@@ -97,6 +128,10 @@ public class MainActivity extends AppCompatActivity {
         new Thread(this::backgroundWork).start();
     }
 
+    /**
+     * The entire image processing pipeline in one method.
+     * showMat stops the method execution until the screen is tapped.
+     */
     void backgroundWork() {
         try {
             for (int i = 0; i < mgr.list(folder).length; i++) {
@@ -125,14 +160,14 @@ public class MainActivity extends AppCompatActivity {
 
                 Semaphore sem = new Semaphore(0);
                 final Ref<TicketError> err = new Ref<>(TicketError.NONE);
+                final Ref<List<Point>> ptsRef = new Ref<>();
                 ip.findTicket(false, e -> {
                     err.value = e;
+                    ptsRef.value = ip.getCorners();
                     sem.release();
                 });
                 sem.acquire();
-
-                List<Point> pts = ip.getCorners();
-                showBitmap(drawPoly(bm, pts, err.value == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
+                showBitmap(drawPoly(bm, ptsRef.value, err.value == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
 
                 showBitmap(ip.undistort(0.02));
             }

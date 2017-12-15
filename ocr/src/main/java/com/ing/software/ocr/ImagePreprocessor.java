@@ -284,6 +284,10 @@ public class ImagePreprocessor {
         if (perspRect.rows() == 4) {
             for (int i = 0; i < 4; i++)
                 v[i] = perspRect.row(i);
+            // The width is calculated summing the distance between the two upper and two lowe corners
+            // then dividing by tho to get the average.
+            // Similarly the height is calculated finding the distance between the leftmost
+            // and rightmost corners.
             w = (norm(v[1], v[2]) + norm(v[3], v[0])) / 2;
             h = (norm(v[0], v[1]) + norm(v[2], v[3])) / 2;
         }
@@ -399,6 +403,9 @@ public class ImagePreprocessor {
                     corns.subList(0, topLeftIdx).clear();
                     corners = new MatOfPoint2f(corns.toArray(new Point[4]));
                 }
+                // Although this thread is synchronized, calling another synchronized method of
+                // this class instance from this thread is not gonna hang the thread
+                // because no other method uses synchronized inside a new Thread().
                 callback.accept(TicketError.NONE);
             }
         }).start();
@@ -410,7 +417,7 @@ public class ImagePreprocessor {
      * @return TicketError. NONE: corners are valid.
      *                      INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
      */
-    public TicketError setCorners(List<android.graphics.Point> corners) {
+    public synchronized TicketError setCorners(List<android.graphics.Point> corners) {
         this.corners = new MatOfPoint2f(Stream.of(corners)
                 .map(p -> new Point(p.x, p.y)).toArray(v -> new Point[corners.size()]));
         //todo check if corners are ordered correctly
@@ -422,8 +429,8 @@ public class ImagePreprocessor {
      * @return List of points in bitmap space (range from (0,0) to (width, height) ).
      *         The corners might be more or less than 4. Never null.
      */
-    public List<android.graphics.Point> getCorners() {
-        return Stream.of(corners.toList())
+    public synchronized List<android.graphics.Point> getCorners() {
+        return corners == null ? new ArrayList<>() : Stream.of(corners.toList())
                 .map(p -> new android.graphics.Point((int)p.x, (int)p.y)).toList();
     }
 
