@@ -31,88 +31,91 @@
             app:srcCompat="@drawable/ic_done_white" />
     </RelativeLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/billTitle"
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:text="@string/billTitle"
-            android:textSize="26dp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/nameTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/name" />
+            <TextView
+                android:id="@+id/billTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:text="@string/billTitle"
+                android:textSize="26dp" />
 
-        <TextView
-            android:id="@+id/billName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="..." />
+            <TextView
+                android:id="@+id/nameTxt"
+                android:layout_marginTop="22dp"
+                android:layout_marginLeft="32dp"
+                android:textSize="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/name" />
 
-        <TextView
-            android:id="@+id/descTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/description" />
+            <TextView
+                android:id="@+id/billName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="..." />
 
-        <TextView
-            android:id="@+id/billDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="Cena al ristorante" />
+            <TextView
+                android:id="@+id/descTxt"
+                android:layout_marginTop="22dp"
+                android:layout_marginLeft="32dp"
+                android:textSize="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/description" />
 
-        <TextView
-            android:id="@+id/totalTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/total" />
+            <TextView
+                android:id="@+id/billDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="Cena al ristorante" />
 
-        <TextView
-            android:id="@+id/billTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="22.50€" />
+            <TextView
+                android:id="@+id/totalTxt"
+                android:layout_marginTop="22dp"
+                android:layout_marginLeft="32dp"
+                android:textSize="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/total" />
 
-        <TextView
-            android:id="@+id/lastModTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/lastMod" />
+            <TextView
+                android:id="@+id/billTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="22.50€" />
 
-        <TextView
-            android:id="@+id/billLastMod"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="..." />
+            <TextView
+                android:id="@+id/lastModTxt"
+                android:layout_marginTop="22dp"
+                android:layout_marginLeft="32dp"
+                android:textSize="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/lastMod" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/billLastMod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="..." />
 
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

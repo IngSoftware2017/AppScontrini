@@ -74,7 +74,11 @@ public class BillActivity extends AppCompatActivity {
         initializeComponents();
     }
 
-    //Dal Maso (adding menu delete option)
+    /** Dal Maso
+     * Setting toolbar delete button and style from /res/menu
+     * @param menu
+     * @return success flag
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -100,7 +104,7 @@ public class BillActivity extends AppCompatActivity {
     }
 
     /** Dal Maso
-     *  Gestione delle animazioni e visualizzazione delle foto salvate precedentemente
+     *  Manage all animations and catch onclick events about FloatingActionButtons
      */
     public void initializeComponents(){
         printAllImages();
@@ -131,7 +135,7 @@ public class BillActivity extends AppCompatActivity {
     }
 
     /** Dal Maso
-     *  Animazioni per il Floating Action Button (FAB)
+     *  Animations for Floating Action Button (FAB)
      */
     public void animateFAB(){
 
@@ -159,13 +163,13 @@ public class BillActivity extends AppCompatActivity {
     }
 
     /** Dal Maso
-     * Aggiunge una card alla lista
-     * @param fileUri
-     * @param amount
-     * @param shop
-     * @param date
-     * @param title
-     * @param missionID
+     * Add new ticket to the list
+     * @param fileUri ticket uri
+     * @param amount ticket amount
+     * @param shop shop name
+     * @param date ticket date
+     * @param title name of the file
+     * @param missionID ticket's mission id
      */
     public void addToList(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID){
         list.add(new Ticket(fileUri, amount, shop, date, title, missionID));
@@ -175,16 +179,15 @@ public class BillActivity extends AppCompatActivity {
     }
 
     /** Dal Maso (Using Lazzarin code)
-     * Delete the mission from the bills viewer (inside the mission)
+     * Delete the mission from the bill viewer (inside the mission)
      */
     public void deleteMission(){
         //Lazzarin
-        Log.d("tagMission", "" + pos);
         AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
-
+        //Dialog
         toast.setMessage(context.getString(R.string.deleteMissionToast))
                 .setTitle(context.getString(R.string.deleteTitle));
-
+        //Positive button
         toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
@@ -198,13 +201,13 @@ public class BillActivity extends AppCompatActivity {
                 context.startActivity(startMissionView);
             }
         });
-
+        //Negative button
         toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //Nothing to do
             }
         });
-        
+        //Show toast
         AlertDialog alert = toast.show();
         Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
         nbutton.setTextColor(Color.parseColor("#2196F3"));
@@ -256,7 +259,7 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Dal Maso
-     *  Cancella i file temporanei utilizzati per il salvataggio delle foto da fotocamera
+     *  Delete all temp files used for saving camera's images
      */
     public void deleteTempFiles(){
         File[] files = readAllImages();
@@ -273,7 +276,7 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Dal Maso
-     *  Selezione foto da galleria
+     *  Pick up photo from gallery
      */
     public void pickImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -283,10 +286,10 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Dal Maso
-     * Cattura risultato degli intent
-     * @param requestCode ritorna il numero di azione compiuta
-     * @param resultCode indica se l'operazione è andata a buon fine
-     * @param data Risultato dell'operazione
+     * Catch intent results
+     * @param requestCode action number
+     * @param resultCode intent result code
+     * @param data intent data
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -310,7 +313,7 @@ public class BillActivity extends AppCompatActivity {
                     break;
 
                 //Dal Maso
-                //Foto presa da galleria
+                //Gallery photo
                 case (PICK_PHOTO_FOR_AVATAR):
                     photoURI = data.getData();
                     try {
@@ -325,7 +328,7 @@ public class BillActivity extends AppCompatActivity {
                     }
                     break;
                 //Dal Maso
-                //Gestisco il risultato del Resize
+                //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     Log.d("Crop", "OK");
                     waitDB();
@@ -336,7 +339,9 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-
+    /** Dal Maso
+     * Thread sleep for 1 second for right tickets real-time vision
+     */
     public void waitDB(){
         try {
             Log.i("Waiting db", "Going to sleep");
@@ -345,9 +350,10 @@ public class BillActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     /** Dal Maso
-     * Salva il bitmap passato nell'apposita cartella
-     * @param imageToSave bitmap da salvare come jpeg
+     * Save the bitmap passed
+     * @param imageToSave bitmap to save
      */
     private void savePickedFile(Bitmap imageToSave) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -443,8 +449,8 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Dal Maso
-     * Legge tutte le immagini
-     * @return ritorna tutti i file letti nella cartella
+     * read all images
+     * @return all read files in the folder
      */
     private File[] readAllImages(){
         String path = root;
@@ -462,7 +468,7 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Dal Maso
-     *  Stampa tutte le immagini
+     *  Print all tickets, get it from DB
      */
     public void printAllImages(){
         List<Ticket> ticketList = DB.getAllTickets();
@@ -476,6 +482,7 @@ public class BillActivity extends AppCompatActivity {
                 addToList(t.getFileUri(), t.getAmount(), t.getShop(), t.getDate(), t.getTitle(), t.getID());
             }
         }
+        //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
         if(count == 0){
             noBills.setVisibility(View.VISIBLE);
@@ -487,7 +494,7 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Dal Maso (NOT USED)
-     *  Stampa l'ultima foto
+     *  Print last image (Old method)
      */
     private void printLastImage(){
         File[] files = readAllImages();

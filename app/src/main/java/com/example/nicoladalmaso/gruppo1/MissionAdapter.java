@@ -44,8 +44,6 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
         CardView card = (CardView) convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView description = (TextView)convertView.findViewById(R.id.missionDescription);
-        //FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
-        //missionDelete.setTag(position);
         Missione c = getItem(position);
         title.setText(c.getTitolo());
         description.setText(c.getDescrizione());
@@ -68,6 +66,8 @@ public class MissionAdapter extends ArrayAdapter<Missione> {
                 break;
         }
 
+        //Dal Maso
+        //Open the mission
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());

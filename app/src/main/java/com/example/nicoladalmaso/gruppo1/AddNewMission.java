@@ -35,9 +35,9 @@ public class AddNewMission extends AppCompatActivity{
     }
 
     /** Dal Maso
-     * Opzioni per settaggio nuova toolbar dal /res/menu
+     * Setting toolbar buttons and style from /res/menu
      * @param menu
-     * @return flag di successo
+     * @return success flag
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
