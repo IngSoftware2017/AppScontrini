@@ -14,8 +14,12 @@ import java.util.List;
  * Modified by Marco Olivieri on 28/11/2017
  */
 
-//Data Access Objects Interface. Defines the queries using Room libraries
-
+/*Data Access Objects Interface. Defines the queries using Room libraries
+  These methods won't be implemented in any class, since the Room library takes care of doing the SQL operatoins by taking the  
+  methods parameters and executing the SQL operation defined in the correspondent '@' annotation.
+  For instance, when the method addTicket(TicketEntity ticketEntity) is called, the Room library takes the ticketEntity object
+  in the parameters and executes the correspondent SQL INSERT query. The use of these methods can be seen in the DataManager class.
+*/
 @Dao
 public interface DAO {
 
@@ -27,7 +31,7 @@ public interface DAO {
      *               ticketEntity.amount not null
      *               ticketEntity.date not null
      *               ticketEntity.missionID not null, must be an existing code
-     * @return the number of inserted entities.
+     * @return the id of the inserted entity.
      */
     @Insert(onConflict = OnConflictStrategy.FAIL)
     long addTicket(TicketEntity ticketEntity);
@@ -35,7 +39,7 @@ public interface DAO {
     /** Executes the insert query.
      * @param missionEntity MissionEntity not null, the entity to be inserted
      *                missionEntity.personID not null, must be an existing code
-     * @return the number of inserted entities.
+     * @return the id of inserted entity.
      */
     @Insert(onConflict = OnConflictStrategy.FAIL)
     long addMission(MissionEntity missionEntity);
@@ -43,7 +47,7 @@ public interface DAO {
     /** Executes the insert query.
      * @param personEntity PersonEntity not null, the entity to be inserted
      *               personEntity.name not null
-     * @return the number of inserted entities.
+     * @return the id of inserted entity.
      */
     @Insert(onConflict = OnConflictStrategy.FAIL)
     long addPerson(PersonEntity personEntity);
@@ -122,9 +126,19 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
+    /**
+    *Gets all the TicketEnt of a MissionEntity
+    *@param int id, the id of the MissionEntity 
+    *@return List<MissionEntity> not null (at least of 0 size) which contains all the tickets for the given mission id 
+    */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
     public List<TicketEntity> getTicketsForMission(int id);
 
+    /**
+    *Executes a SELECT query for a specified TicketEntity id
+    *@param int id, the id of the TicketEntity 
+    *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
+    */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY_NAME+" =:id")
     public TicketEntity getTicket(int id);
 }
