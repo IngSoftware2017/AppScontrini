@@ -172,13 +172,13 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         dateInput = endDateMissionText.getText().toString();
         if (dateInput.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}") || dateInput.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
             return endDateMissionText;
-        }*/
+        }
 
         dateEndMission = endDateMissionText.getText().toString();
         // Compare the startDate and endDate of the Mission to check if it contain a correct interval
-        if (dateEndMission.compareTo(startDateMissionText.getText().toString()) > 0) {
+        if (dateEndMission.compareTo(startDateMissionText.getText().toString())  0) {
             return endDateMissionText;
-        }
+        }*/
 
         return null;
     }
