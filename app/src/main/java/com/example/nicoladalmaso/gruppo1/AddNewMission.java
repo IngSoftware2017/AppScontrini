@@ -16,6 +16,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import database.DataManager;
 import database.Mission;
@@ -67,7 +68,7 @@ public class AddNewMission extends AppCompatActivity{
                 Log.d("verify null",name);
                 String checkName= name.replaceAll(" ","");
                 if((name==null)||checkName.equals("")) {
-                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
                     name = timeStamp;
                 }
 
