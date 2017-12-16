@@ -127,28 +127,28 @@ public class TicketEntity {
     public void setShop (String shop) { this.shop = shop; }
 
     /**
-     * Restituisce il titolo del TicketEntity
+     * Returns the title of the ticket
      *
      * @return title
      */
     public String getTitle() { return title; }
 
     /**
-     * Imposta il titolo del TicketEntity
+     * Sets the title of the ticket
      *
      * @param title not null
      */
     public void setTitle (String title) { this.title = title; }
 
     /**
-     * Restituisce la categoria del TicketEntity
+     * Returns the category of the ticket
      *
      * @return title
      */
     public String getCategory() { return category; }
 
     /**
-     * Imposta la categoria del TicketEntity
+     * Sets the category of the ticket
      *
      * @param category not null
      */

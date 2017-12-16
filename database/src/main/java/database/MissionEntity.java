@@ -175,10 +175,18 @@ public class MissionEntity {
         this.personID = personID;
     }
 
+    /**
+     * Returns the name of this mission
+     * @return name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of this mission
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
