@@ -1,9 +1,11 @@
 package com.unipd.ingsw.gruppo3;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -15,9 +17,13 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
@@ -38,6 +44,9 @@ import database.PersonEntity;
  *
  * Modify: Use Calendar (DatePicker) to set start and end of the Mission
  * @author Matteo Mascotto on 15-12-2017
+ *
+ * Modify: Implement of the person management
+ * @author Matteo Mascotto on 16-12-2017
  */
 
 public class AddMission extends AppCompatActivity implements View.OnClickListener{
@@ -54,7 +63,15 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     ListView personsList;
     List<PersonEntity> personEntities;
+    TextView noticeEmptyText;
 
+    /**
+     * It sets the listener to the all AddMission objects and manage the calendar show for make
+     * faster the date insert
+     * @author: Matteo Mascotto
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +101,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                     DatePickerDialog mDatePicker = new DatePickerDialog(AddMission.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+                            // The month coding begin from 0 to 11, so to have the right month number is necessary + 1
+                            selectedMonth = selectedMonth + 1;
                             startDateMissionText.setText(selectedDay + "/" + selectedMonth + "/" + selectedYear);
                         }
                     },mYear, mMonth, mDay);
@@ -92,7 +111,6 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 }
             }
         });
-
 
         // Data Fine Missione
         endDateMissionText = findViewById(R.id.endMissionText);
@@ -112,6 +130,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                     DatePickerDialog mDatePicker = new DatePickerDialog(AddMission.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+                            // The month coding begin from 0 to 11, so to have the right month number is necessary + 1
+                            selectedMonth = selectedMonth + 1;
                             endDateMissionText.setText(selectedDay + "/" + selectedMonth + "/" + selectedYear);
                         }
                     },mYear, mMonth, mDay);
@@ -122,26 +142,33 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         });
 
         // Persona
-        addPersonaEditText =findViewById(R.id.addPersonaEditText);
-        /*
-        addPersonaEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addPersonaEditText.setText("");
-            }
-        });
-        */
+        addPersonaEditText = findViewById(R.id.addPersonaEditText);
+
+        // Lista Persone salvate
         personsList = findViewById(R.id.personsList);
+        noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
 
-        saveMissionButton = findViewById(R.id.saveButton);
-        saveMissionButton.setOnClickListener(this);
-
-        /* Matteo Mascotto - TO-DO: Improve different code for the autocomplete of the Person
-            this code cause problem with the layout addMissionPage
         personEntities = DataManager.getInstance(this).getAllPerson();
         PersonAdapter adapter = new PersonAdapter(this, R.layout.persona_row_item, personEntities);
         personsList.setAdapter(adapter);
-        */
+        checkInitialization();
+
+        // Bottone SAVE
+        saveMissionButton = findViewById(R.id.saveButton);
+        saveMissionButton.setOnClickListener(this);
+    }
+
+    /**
+     * Initialize of activity
+     * Check if there are some persons and show a message
+     *
+     * @author Matteo Mascotto
+     */
+    private void checkInitialization(){
+        if(personsList.getAdapter().getCount()==0){
+            noticeEmptyText.setEnabled(Boolean.TRUE);
+            personsList.setEnabled(Boolean.FALSE);
+        }
     }
 
     /**
@@ -183,6 +210,12 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         return null;
     }
 
+    /**
+     * It manage the all click that are done, inside there is a management of the different object clicked
+     * @author Matteo Mascotto
+     *
+     * @param view
+     */
     @Override
     public void onClick(View view) {
         // Action after activate the request to Save the Mission
@@ -190,31 +223,44 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
             Log.d(DEBUG_TAG, "EDIT TEXT:" + addPersonaEditText.getText() + ".");
 
             if (checkCorrectField() == nameMissionText) {
-                showErrorDialog("Inserire un valore corretto di Missione");
+                showErrorDialog(String.valueOf(R.string.missionErrorMessage));
             } else if (checkCorrectField() == startDateMissionText) {
-                showErrorDialog("Inserire un valore corretto di data di inizio Missione");
+                showErrorDialog(String.valueOf(R.string.startErrorMessage));
             } else if (checkCorrectField() == endDateMissionText) {
-                showErrorDialog("Inserire un valore corretto di data di fine Missione");
+                showErrorDialog(String.valueOf(R.string.endErrorMessage));
             } else if (checkCorrectField() == addPersonaEditText) {
-                showErrorDialog("Inserire o selezionare una persona");
+                showErrorDialog(String.valueOf(R.string.personErrorMessage));
             } else {
 
                 MissionEntity missionEntity = new MissionEntity();
 
+                // If the person it's already present it assign it to the Mission, otherwise it create a new one
+                // lastName and academicTitle are not yet implemented
+                if (addPersonaEditText.getPersonEntity() == null) {
+                    String newPerson = addPersonaEditText.getText().toString();
+                    PersonEntity personEntity = new PersonEntity(newPerson, "", "");
+                    DataManager.getInstance(this).addPerson(personEntity);
+                }
+
+                /*
                 if (addPersonaEditText.getPersonEntity() != null) {
                     missionEntity.setPersonID(addPersonaEditText.getPersonEntity().getID());
                 }
+                 */
 
+                missionEntity.setPersonID(addPersonaEditText.getPersonEntity().getID());
                 missionEntity.setName(nameMissionText.getText().toString());
                 DataManager.getInstance(this).addMission(missionEntity);
+
                 Intent callBillActivity = new Intent(this, BillActivityGruppo1.class);
                 callBillActivity.putExtra(IntentCodes.MISSION_OBJECT, missionEntity);
                 startActivity(callBillActivity);
             }
-    /*
+
                 if(addPersonaEditText.getText().toString().equals("")){
                     showErrorDialog("Inserire o selezionare una persona");
-                }else{
+                }
+                /*else{
                     MissionEntity missionEntity = new MissionEntity();
                     if(addPersonaEditText.getPersonEntity()==null){
                     PersonEntity personEntity = new PersonEntity();
@@ -235,6 +281,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     /**
      * Lunch the error message by Toast
+     * @author Marco Olivieri
      *
      * @param errorMessage it contains the error message to write in the Toast
      */
