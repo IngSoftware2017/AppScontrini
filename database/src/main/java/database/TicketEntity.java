@@ -9,6 +9,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.net.Uri;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -32,7 +33,7 @@ public class TicketEntity {
     private String shop;
     private Date date;
     private String title;
-    private String category;
+    private List<String> category;
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
@@ -141,18 +142,18 @@ public class TicketEntity {
     public void setTitle (String title) { this.title = title; }
 
     /**
-     * Returns the category of the ticket
+     * Returns the list of categories of the ticket
      *
-     * @return title
+     * @return category
      */
-    public String getCategory() { return category; }
+    public List<String> getCategory() { return category; }
 
     /**
-     * Sets the category of the ticket
+     * Adds a category of the ticket
      *
      * @param category not null
      */
-    public void setCategory (String category) { this.category = category; }
+    public void addCategory (String category) { this.category.add(category); }
 
     /**
      * Returns the mission id of this ticket

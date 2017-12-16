@@ -24,8 +24,8 @@ public class DataManager {
      *               ticketEntity.getMissionId() not null
      * @return ID of the created record, -1 if the method fails
      */
-    public int addTicket(TicketEntity ticketEntity){
-        ticketEntity.setID((int) database.ticketDao().addTicket(ticketEntity));
+    public long addTicket(TicketEntity ticketEntity){
+        ticketEntity.setID(database.ticketDao().addTicket(ticketEntity));
         return ticketEntity.getID();
     }
 
@@ -34,8 +34,8 @@ public class DataManager {
      *                missionEntity.personID not null, must be an existing code
      * @return the id of the inserted missionEntity
      */
-    public int addMission(MissionEntity missionEntity){
-        missionEntity.setID((int) database.ticketDao().addMission(missionEntity));
+    public long addMission(MissionEntity missionEntity){
+        missionEntity.setID(database.ticketDao().addMission(missionEntity));
         return missionEntity.getID();
     }
 
@@ -43,8 +43,8 @@ public class DataManager {
      * @param personEntity PersonEntity not null, the entity to be inserted
      * @return the id of the inserted personEntity
      */
-    public int addPerson(PersonEntity personEntity){
-        personEntity.setID((int) database.ticketDao().addPerson(personEntity));
+    public long addPerson(PersonEntity personEntity){
+        personEntity.setID(database.ticketDao().addPerson(personEntity));
         return personEntity.getID();
     }
 
