@@ -13,6 +13,8 @@ import database.MissionEntity;
 
 /**
  * Created by Step on 03/12/2017.
+ * Old MissionAdapter, now using MissionAdapterGruppo1 until we decide if we want to change
+ * the card view created by Nicola Dal Maso with something else
  */
 
 public class MissionAdapter extends ArrayAdapter<MissionEntity> {

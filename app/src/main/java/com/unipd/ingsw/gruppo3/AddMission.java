@@ -33,7 +33,7 @@ import database.PersonEntity;
  * Modify: Implement the method checkCorrectField(), remove the auto setting of empty text to the Items
  * @author Matteo Mascotto on 07-12-2017
  *
- * Modify: Implement DataPicker for startMission EditText and endMission EditText
+ * @author Stefano Elardo on 15-12-2017 Implement DataPicker for startMission EditText and endMission EditText
  */
 
 public class AddMission extends AppCompatActivity implements View.OnClickListener{

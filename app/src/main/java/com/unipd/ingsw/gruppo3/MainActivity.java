@@ -13,6 +13,7 @@ import database.DataManager;
 import database.MissionEntity;
 
 /**
+ * Old MainActivity, now using MainActivityGruppo1 because is done better
  * Modified by Marco Olivieri on 03/12/2017
  * Modified by Step on 03/12/2017.
  */
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
         //MissionEntity test = new MissionEntity("name",null,null,"location",1);
         List<MissionEntity> missions = new ArrayList<MissionEntity>();
-        //missions.add(test);
+        //missions.add(test);  //test the insert in the ListView
         MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_row_custom, missions);
         missionsList.setAdapter(adapter);
         checkInitialization();
