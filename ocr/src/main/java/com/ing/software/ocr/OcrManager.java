@@ -10,8 +10,6 @@ import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import com.annimon.stream.function.Consumer;
 
 import static com.ing.software.ocr.AmountComparator.*;
@@ -21,32 +19,18 @@ import static com.ing.software.ocr.DataAnalyzer.*;
 USAGE:
 1) Instantiate OcrManager;
 2) Call initialize(context) until it returns 0;
-3) Call getTicket(bitmap, callback) ad libitum to extract information (Ticket object) from a photo of a ticket.
+3) Call getTicket(preproc, callback) ad libitum to extract information (Ticket object) from a photo of a ticket.
 4) Call release() to release internal resources.
 */
 /**
  * Class to control ocr analysis
+ * This class is thread-safe.
  */
 
 public class OcrManager {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
-
-    /**
-     * @author Zaglia
-     */
-    class AnalyzeRequest {
-        ImagePreprocessor preproc;
-        Consumer<Ticket> cb;
-
-        AnalyzeRequest(ImagePreprocessor preprocessor, Consumer<Ticket> ticketCb) {
-            preproc = preprocessor;
-            cb = ticketCb;
-        }
-    }
-
-    private Queue<OcrManager.AnalyzeRequest> analyzeQueue = new ConcurrentLinkedQueue<>();
-    private boolean analyzing = false;
+    private boolean operative = false;
 
     /**
      * Initialize OcrAnalyzer
@@ -54,49 +38,40 @@ public class OcrManager {
      * @param context Android context
      * @return 0 if everything ok, negative number if an error occurred
      */
-    public int initialize(Context context) {
+    public synchronized int initialize(Context context) {
         OcrUtils.log(1, "OcrManager", "Initializing OcrManager");
-        return analyzer.initialize(context);
+        int r = analyzer.initialize(context);
+        operative = r == 0;
+        return r;
     }
 
-    public void release() {
+    public synchronized void release() {
+        operative = false;
         analyzer.release();
     }
 
     /**
-     * Get a Ticket from a Bitmap. Some fields of the new ticket can be null.
-     *
+     * Get a Ticket from an ImagePreprocessor. Some fields of the new ticket can be null.
      * @param preprocessor ImagePreprocessor. Not null.
      * @param ticketCb     callback to get the ticket. Not null.
-     */
-    public void getTicket(@NonNull ImagePreprocessor preprocessor, final Consumer<Ticket> ticketCb) {
-        analyzeQueue.add(new OcrManager.AnalyzeRequest(preprocessor, ticketCb));
-        dispatchAnalysis();
-    }
-
-    /**
-     * Handle analysis requests
      *
-     * @author Michelon
-     * @author Zaglia
+     * @author Luca Michelon
+     * @author Riccardo Zaglia
      */
-    private void dispatchAnalysis() {
-        if (!analyzing) {
-            analyzing = true;
-            new Thread(() -> {
-                while (!analyzeQueue.isEmpty()) {
-                    AnalyzeRequest req = analyzeQueue.remove();
-                    long startTime = System.nanoTime();
-                    Bitmap bm = req.preproc.undistort(0.05);
-                    OcrResult result = analyzer.analyze(bm);
-                    req.cb.accept(getTicketFromResult(result));
-                    long endTime = System.nanoTime();
-                    double duration = ((double) (endTime - startTime)) / 1000000000;
-                    OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
-                }
-            }).start();
-            analyzing = false;
-        }
+    public void getTicket(@NonNull ImagePreprocessor preprocessor, Consumer<Ticket> ticketCb) {
+        new Thread(() -> {
+            synchronized (this) {
+                if (!operative)
+                    return;
+                long startTime = System.nanoTime();
+                Bitmap bm = preprocessor.undistort(0.05);
+                OcrResult result = analyzer.analyze(bm);
+                ticketCb.accept(getTicketFromResult(result));
+                long endTime = System.nanoTime();
+                double duration = ((double) (endTime - startTime)) / 1000000000;
+                OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+            }
+        }).start();
     }
 
     /**
