@@ -39,7 +39,7 @@ public class MissionEntity {
 
     @Ignore
     /**
-     * Non parametric constructor
+     * Non parametric constructor to use when you don't want set all fields
      */
     public MissionEntity() {
     }

@@ -25,7 +25,7 @@ public class PersonEntity {
 
     @Ignore
     /**
-     * Non parametric constructor
+     * Non parametric constructor to use when you don't want set all fields
      */
     public PersonEntity() {
     }
@@ -41,6 +41,7 @@ public class PersonEntity {
         this.name = name;
         this.lastName = lastName;
         this.academicTitle = academicTitle;
+
     }
 
     /**
