@@ -2,9 +2,6 @@ package com.ing.software.common;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.ing.software.common.Reflect.*;
 import static org.junit.Assert.*;
 
@@ -49,25 +46,34 @@ public class ReflectTest {
     }
 
 
-    // fieldVal
+    // getField
 
     @Test
-    public void testFieldValPrimitive() throws Exception {
-        assertEquals(1, (int)fieldVal(new TestClass(), "intField"));
+    public void testGetFieldPrimitive() throws Exception {
+        assertEquals(1, (int) getField(new TestClass(), "intField"));
     }
 
     @Test
-    public void testFieldValObj() throws Exception {
-        assertNotEquals(null, fieldVal(TestClass.class, "staticObj"));
+    public void testGetFieldObj() throws Exception {
+        assertNotEquals(null, getField(TestClass.class, "staticObj"));
     }
 
     @Test
-    public void testFieldValNull() throws Exception {
-        assertEquals(null, (Object)fieldVal(new TestClass(), "nullObj"));
+    public void testGetFieldNull() throws Exception {
+        assertEquals(null, (Object) getField(new TestClass(), "nullObj"));
     }
 
 
-    //These tests are not exhaustive but invoke and fieldVal will be used enough in other tests.
+    // setField
+
+    @Test
+    public void testSetFieldPrimitive() throws Exception {
+        TestClass tc = new TestClass();
+        setField(tc, "intField", 2);
+        assertEquals(2, tc.intField);
+    }
+
+    //These tests are not exhaustive but invoke and getField will be used enough in other tests.
 }
 
 class TestClass {

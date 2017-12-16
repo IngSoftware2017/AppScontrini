@@ -17,11 +17,9 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
 
-import static com.ing.software.common.Reflect.fieldVal;
-import static com.ing.software.common.Reflect.invoke;
+import static com.ing.software.common.Reflect.*;
 import static org.opencv.imgproc.Imgproc.drawContours;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -139,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bm = BitmapFactory.decodeStream(mgr.open(folder + "/" + String.valueOf(i) + ".jpg"));
                 ip.setImage(bm);
 
-                Mat srcImg = fieldVal(ip, "srcImg");
+                Mat srcImg = getField(ip, "srcImg");
                 Mat imgResized = invoke(IP_CLASS, "downScaleRGBA", srcImg);
                 Ref<Mat> imgRef = new Ref<>(imgResized);
                 showMat(imgRef.value);

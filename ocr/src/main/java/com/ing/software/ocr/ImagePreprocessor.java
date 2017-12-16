@@ -18,7 +18,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import static org.opencv.core.Core.*;
 import static org.opencv.core.CvType.*;

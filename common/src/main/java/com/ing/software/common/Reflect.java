@@ -77,11 +77,26 @@ public class Reflect {
      * @throws Exception exception
      */
     @SuppressWarnings("unchecked")
-    public static <T> T fieldVal(Object clazz, String fieldName) throws Exception {
+    public static <T> T getField(Object clazz, String fieldName) throws Exception {
         boolean isType = clazz instanceof Class<?>;
         Field f = (isType ? (Class<?>)clazz : clazz.getClass()).getDeclaredField(fieldName);
         f.setAccessible(true);
         return (T)f.get(isType ? null : clazz);
+    }
+
+    /**
+     * Set value of a static or non static field (with any access level).
+     * @param clazz A class instance or class type. Not null
+     * @param fieldName Field name. Not null
+     * @param newVal new value of the field.
+     *
+     * @throws Exception exception
+     */
+    public static void setField(Object clazz, String fieldName, Object newVal) throws Exception {
+        boolean isType = clazz instanceof Class<?>;
+        Field f = (isType ? (Class<?>)clazz : clazz.getClass()).getDeclaredField(fieldName);
+        f.setAccessible(true);
+        f.set(isType ? null : clazz, newVal);
     }
 
 }
