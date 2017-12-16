@@ -147,18 +147,20 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
+
+
         // Action after activate the request to Save the Mission
         if (view.getId() == saveMissionButton.getId()) {
             Log.d(DEBUG_TAG, "EDIT TEXT:" + addPersonaEditText.getText() + ".");
 
             if (checkCorrectField() == nameMissionText) {
-                showErrorDialog("Inserire un valore corretto di Missione");
+                showErrorDialog(String.valueOf(R.string.missionErrorMessage));
             } else if (checkCorrectField() == startDateMissionText) {
-                showErrorDialog("Inserire un valore corretto di data di inizio Missione");
+                showErrorDialog(String.valueOf(R.string.startErrorMessage));
             } else if (checkCorrectField() == endDateMissionText) {
-                showErrorDialog("Inserire un valore corretto di data di fine Missione");
+                showErrorDialog(String.valueOf(R.string.endErrorMessage));
             } else if (checkCorrectField() == addPersonaEditText) {
-                showErrorDialog("Inserire o selezionare una persona");
+                showErrorDialog(String.valueOf(R.string.personErrorMessage));
             } else {
 
                 MissionEntity missionEntity = new MissionEntity();
