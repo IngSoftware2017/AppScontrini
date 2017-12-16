@@ -18,7 +18,7 @@ public class PersonEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.PERSON_PRIMARY_KEY_NAME)
-    private int ID;
+    private long ID;
     private String name;
     private String lastName;
     private String academicTitle;
@@ -47,7 +47,7 @@ public class PersonEntity {
      * Returns the PersonEntity ID
      * @return ID
      */
-    public int getID() {
+    public long getID() {
         return ID;
     }
 
@@ -56,7 +56,7 @@ public class PersonEntity {
      * Sets person id
      * @param ID not null
      */
-    public void setID(int ID) {
+    public void setID(long ID) {
         this.ID = ID;
     }
 

@@ -17,14 +17,16 @@ import android.net.Uri;
 
 
 @Entity(tableName = Constants.MISSION_TABLE_NAME,
-        foreignKeys = @ForeignKey(entity = PersonEntity.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
+        foreignKeys = @ForeignKey(entity = PersonEntity.class,
+                parentColumns = Constants.PERSON_PRIMARY_KEY_NAME,
+                childColumns = Constants.PERSON_CHILD_COLUMNS))
 @TypeConverters(Converters.class) // automatic converters for database correct type
 
 public class MissionEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
-    private int ID;
+    private long ID;
     private Date startMission;
     private Date endMission;
     private String location;
@@ -64,7 +66,7 @@ public class MissionEntity {
      * Returns the mission ID
      * @return  ID
      */
-    public int getID() {
+    public long getID() {
         return ID;
     }
 
@@ -73,7 +75,7 @@ public class MissionEntity {
      * Set mission id
      * @param ID not null
      */
-    public void setID(int ID) {
+    public void setID(long ID) {
         this.ID = ID;
     }
 
