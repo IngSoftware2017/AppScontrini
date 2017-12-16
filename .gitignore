@@ -20,4 +20,3 @@ captures/
 .externalNativeBuild
 desktop.ini
 **/photos
-**/build/*
