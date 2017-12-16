@@ -16,16 +16,18 @@ import static com.ing.software.ocr.AmountComparator.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
 
 /*
-USAGE:
-1) Instantiate OcrManager;
-2) Call initialize(context) until it returns 0;
-3) Call getTicket(preproc, callback) ad libitum to extract information (Ticket object) from a photo of a ticket.
-4) Call release() to release internal resources.
 */
 /**
  * Class to control ocr analysis
- * This class is thread-safe.
+ * <p> This class is thread-safe. </p>
+ *
+ * <p>USAGE:</p>
+ * <ol> Instantiate OcrManager; </ol>
+ * <ol> Call initialize(context) until it returns 0;</ol>
+ * <ol> Call getTicket(preproc, callback) ad libitum to extract information (Ticket object) from a photo of a ticket.</ol>
+ * <ol> Call release() to release internal resources.</ol>
  */
+
 
 public class OcrManager {
 

@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 /**
  * Sorted data structure (descending order) used to select best k elements.
  * @author Riccardo Zaglia
+ *
  */
 public class Podium<T extends Comparable<T>> {
     private int k = 0;

@@ -25,70 +25,34 @@ import static org.opencv.core.CvType.*;
 import static org.opencv.imgproc.Imgproc.*;
 import static com.annimon.stream.Stream.*;
 
-
-/*
-USAGE CASES:
-
-Real time visual feedback when framing a ticket:
- 1) Create new ImagePreprocessor passing a the bitmap of the preview frame.
- 2) Call findTicket(true);
- 3) If findTicket returns NONE, call getCorners to get the rectangle corners to overlay on top of preview.
- 4) Call getCorners to get a rectangle (if findTicket returns NONE) or a polygon (if findTicket returns RECT_NOT_FOUND).
-
-User shoots a photo:
- 1) Use ImageProcessor instance of last frame when rectangle was found.
- 2) Call findTicket(false);
- 3) If findTicket returns NONE proceed to step 5)
- 4) If findTicket returns RECT_NOT_FOUND, let user drag the rectangle corners into position,
-    then proceed to call setCorners().
- 5) Call OcrManager.getTicket passing this ImagePreprocessor instance.
-    Call undistort to get the photo of the ticket unwarped.
-
-New photo loaded from storage:
- Same as when user shot a photo, but ImagePreprocessor must be created with loaded photo.
-
-Load and show photo already processed:
- 1) Create new ImagePreprocessor passing the photo and the corners.
- 2) Call undistort().
- 
- */
-
-import static org.opencv.core.Core.*;
-import static org.opencv.core.CvType.*;
-import static org.opencv.imgproc.Imgproc.*;
-import static com.annimon.stream.Stream.*;
-
-
-/*
-USAGE CASES:
-
-Real time visual feedback when framing a ticket:
- 1) Create new ImagePreprocessor passing a the bitmap of the preview frame.
- 2) Call findTicket(true);
- 3) If findTicket returns NONE, call getCorners to get the rectangle corners to overlay on top of preview.
- 4) Call getCorners to get a rectangle (if findTicket returns NONE) or a polygon (if findTicket returns RECT_NOT_FOUND).
-
-User shoots a photo:
- 1) Use ImageProcessor instance of last frame when rectangle was found.
- 2) Call findTicket(false);
- 3) If findTicket returns NONE proceed to step 5)
- 4) If findTicket returns RECT_NOT_FOUND, let user drag the rectangle corners into position,
-    then proceed to call setCorners().
- 5) Call OcrManager.getTicket passing this ImagePreprocessor instance.
-    Call undistort to get the photo of the ticket unwarped.
-
-New photo loaded from storage:
- Same as when user shot a photo, but ImagePreprocessor must be created with loaded photo.
-
-Load and show photo already processed:
- 1) Create new ImagePreprocessor passing the photo and the corners.
- 2) Call undistort().
- 
- */
-
 /**
  * Class used to process an image of a ticket.
- * This class is thread safe.
+ * <p>This class is thread safe.</p>
+ *
+ * <p>USAGE CASES:</p>
+ *
+ * <p>Real time visual feedback when framing a ticket:</p>
+ * <ol> Create new ImagePreprocessor passing a the bitmap of the preview frame.</ol>
+ * <ol> Call findTicket(true)</ol>
+ * <ol> If findTicket returns NONE, call getCorners to get the rectangle corners to overlay on top of preview.</ol>
+ * <ol> Call getCorners to get a rectangle (if findTicket returns NONE) or a polygon (if findTicket returns RECT_NOT_FOUND).</ol>
+ *
+ * <p>User shoots a photo:</p>
+ * <ol> Use ImageProcessor instance of last frame when rectangle was found.</ol>
+ * <ol> Call findTicket(false);</ol>
+ * <ol> If findTicket returns NONE proceed to step 5)</ol>
+ * <ol> If findTicket returns RECT_NOT_FOUND, let user drag the rectangle corners into position,
+ *     then proceed to call setCorners().</ol>
+ * <ol> Call OcrManager.getTicket passing this ImagePreprocessor instance.
+ *     Call undistort to get the photo of the ticket unwarped.</ol>
+ *
+ * <p>New photo loaded from storage:</p>
+ * <ol> Same as when user shot a photo, but ImagePreprocessor must be created with loaded photo.</ol>
+ *
+ * <p>Load and show photo already processed:</p>
+ * <ol> Create new ImagePreprocessor passing the photo and the corners.</ol>
+ * <ol> Call undistort().</ol>
+ *
  * @author Riccardo Zaglia
  */
 /*
@@ -381,8 +345,8 @@ public class ImagePreprocessor {
      * Find the 4 corners of a ticket, ordered counter-clockwise from the top-left corner of the ticket.
      * The corners are ordered to get a straight ticket (but could be upside down).
      * To obtain the corners, call getCorners().
-     * @param quick true: faster but more inaccurate: good for real time visual feedback. No orientation detection.
-     *              false: slower but more accurate: good for recalculating the rectangle after the shot
+     * @param quick - true: faster but more inaccurate: good for real time visual feedback. No orientation detection.
+     *              - false: slower but more accurate: good for recalculating the rectangle after the shot
      *                                               or for analyzing an imported image.
      * @param callback callback with TicketError argument called when computation is finished.
      *                 The error can be NONE or RECT_NOT_FOUND.
