@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         Variables.getInstance().setCurrentMissionDir(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+
+
         /*/PICCOLO Aggiungo delle missioni di prova
         Date data1= new Date();
         data1.setTime(2041920531);
@@ -79,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Dir", inFile.toString());
             }
         }*/
+
+
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -86,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(addMission);
             }
         });
-        //printAllMissions();
+
+
         printAllMissionsDB();
     }
 
@@ -102,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Dal Maso
-     * Aggiunge alla lista la nuova missione
-     * @param title Tilolo missione
-     * @param desc descrizione missione
+     * Add new mission to the list
+     * @param title mission title
+     * @param desc mission description
      */
     public void addToList(String title, String desc){
         list.add(new Missione(title, desc));
@@ -128,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
 
     /**Lazzarin
      * clear the view after I've eliminated a mission(before to call printAllMissions)
-     *
      */
     public void clearAllMissions()
     {
@@ -160,7 +164,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Dal Maso
+    /** Dal Maso
+     * get all missions from the DB and print
+     */
     public void printAllMissionsDB(){
         List<Mission> missions = DB.getAllMissions();
         List<Person> persons = DB.getAllPersons();

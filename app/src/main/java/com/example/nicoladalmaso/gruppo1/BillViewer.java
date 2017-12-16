@@ -26,6 +26,7 @@ public class BillViewer extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_bill_viewer);
         Intent intent = getIntent();
+        //Get data from parent view
         String imgPath = intent.getExtras().getString("imagePath");
         String imgName = intent.getExtras().getString("imageName");
         String imgLastMod = intent.getExtras().getString("imgLastMod");
@@ -47,7 +48,7 @@ public class BillViewer extends AppCompatActivity {
         imgView.setImageBitmap(bitmap);
 
     }
-    //Dal Maso
+    //Dal Maso, manage back button
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

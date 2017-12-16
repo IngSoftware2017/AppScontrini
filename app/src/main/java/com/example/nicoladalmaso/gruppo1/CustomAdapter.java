@@ -47,6 +47,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
     DataManager DB;
     List<Ticket> t = new ArrayList<Ticket>();
 
+    //Dal Maso, adapter declare
     public CustomAdapter(Context context, int textViewResourceId,
                          List<Ticket> objects, int missionID, DataManager DB) {
         super(context, textViewResourceId, objects);
@@ -59,6 +60,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.cardview, null);
@@ -67,34 +69,43 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
         TextView tot = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
+
         Ticket c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
         title.setText(photo.getName());
+
+        //Amount text fixes
         String amount = "";
         if(c.getAmount() == null){
             amount = "Prezzo non rilevato";
+            tot.setText(amount);
         }
         else {
             amount = c.getAmount().toString();
+            tot.setText("Totale: "+amount+"€");
         }
-        tot.setText("Totale: "+amount+"€");
 
+        //Ticket image bitmap set
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
         img.setImageBitmap(bitmap);
-        Log.d("LocalID", ""+c.toString());
+
+        //For next ticket manages
         fabDelete.setTag(c.getID());
         convertView.setTag(c.getID());
 
-        //Dal Maso
+        //Dal Maso, delete ticket
         fabDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
                 pos =  Integer.parseInt(v.getTag().toString());
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(context.getString(R.string.deleteTicketToast))
                         .setTitle(context.getString(R.string.deleteTitle));
                 String toDelete = "";
+
+                //Get the ticket to delete
                 for(int i = 0; i < t.size(); i++){
                     if(t.get(i).getID() == pos){
                         toDelete = t.get(i).getFileUri().toString().substring(7);
@@ -134,6 +145,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
         });
 
         //Dal Maso
+        //
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());
@@ -142,6 +154,8 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                         Ticket thisPhoto = t.get(i);
                         Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
                         File photo = new File(thisPhoto.getFileUri().toString().substring(7));
+
+                        //Put data to next activity
                         startImageView.putExtra("imagePath", thisPhoto.getFileUri().toString().substring(7));
                         startImageView.putExtra("imageName", photo.getName());
                         SimpleDateFormat simpleDateFormat =
@@ -149,6 +163,8 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                         String date = simpleDateFormat.format(photo.lastModified());
                         startImageView.putExtra("imgLastMod", date);
                         startImageView.putExtra("imgPrice", thisPhoto.getAmount().toString()+"€");
+
+                        //Start new activity
                         context.startActivity(startImageView);
                         return;
                     }
