@@ -23,7 +23,7 @@ import static com.ing.software.ocr.OcrUtils.levDistance;
  * todo: fallback, if no amount is present try to decode a possible pricelist
  * todo: remove rectangle-probability and use block-specific-probability
  */
-public class DataAnalyzer {
+class DataAnalyzer {
 
     /**
      * @author Michelon

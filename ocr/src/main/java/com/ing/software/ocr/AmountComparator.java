@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.ing.software.ocr.DataAnalyzer.analyzeAmount;
@@ -138,21 +137,6 @@ class AmountComparator {
     /**
      * @author Michelon
      * @date 9-12-17
-     * Get a list of flags for this object
-     * @return list of hit
-     */
-    HashMap<String, Boolean> getFlags() {
-        HashMap<String, Boolean> flags = new HashMap<>();
-        flags.put("hasSubtotal", hasSubtotal);
-        flags.put("hasPriceList", hasPriceList);
-        flags.put("hasCash", hasCash);
-        flags.put("hasChange", hasChange);
-        return flags;
-    }
-
-    /**
-     * @author Michelon
-     * @date 9-12-17
      * @return subtotal
      */
     BigDecimal getSubTotal() {
@@ -184,6 +168,42 @@ class AmountComparator {
      */
     BigDecimal getCash() {
         return cash;
+    }
+
+    /**
+     * @author Michelon
+     * @date 17-12-17
+     * @return true if subtotal is not null
+     */
+    boolean hasSubtotal() {
+        return hasSubtotal;
+    }
+
+    /**
+     * @author Michelon
+     * @date 17-12-17
+     * @return true if productList is not null
+     */
+    boolean hasPriceList() {
+        return hasPriceList;
+    }
+
+    /**
+     * @author Michelon
+     * @date 17-12-17
+     * @return true if cash is not null
+     */
+    boolean hasCash() {
+        return hasCash;
+    }
+
+    /**
+     * @author Michelon
+     * @date 17-12-17
+     * @return true if change is not null
+     */
+    boolean hasChange() {
+        return hasChange;
     }
 
     /**
@@ -335,15 +355,15 @@ class AmountComparator {
             BigDecimal cash = null;
             BigDecimal prices = null;
             BigDecimal amount = getAmount();
-            if (hasCash && !hasChange)
+            if (hasCash() && !hasChange())
                 cash = getCash();
-            else if (hasCash)
+            else if (hasCash())
                 cash = getCash().subtract(getChange());
-            if (hasPriceList)
+            if (hasPriceList())
                 prices = getPriceList();
-            if (hasSubtotal)
+            if (hasSubtotal())
                 subtotal = getSubTotal();
-            if (hasPriceList && hasCash) {
+            if (hasPriceList() && hasCash()) {
                 boolean cashPrices = cash.compareTo(prices)==0;
                 boolean cashAmount = cash.compareTo(amount)==0;
                 if (cashPrices) {//Probably if both pricelist and cash are the same amount is wrong
@@ -354,7 +374,7 @@ class AmountComparator {
                     OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
                     return cash;
                 }
-            } else if (hasSubtotal && hasPriceList) {
+            } else if (hasSubtotal() && hasPriceList()) {
                 boolean subtotalPrices = subtotal.compareTo(prices)==0;
                 boolean subtotalAmount = subtotal.compareTo(amount)==0;
                 if (subtotalPrices) { //Probably if both subtotal and cash are the same amount is wrong
@@ -365,7 +385,7 @@ class AmountComparator {
                     OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
                     return subtotal;
                 }
-            } else if (hasSubtotal && hasCash) {
+            } else if (hasSubtotal() && hasCash()) {
                 boolean cashSubtotal = cash.compareTo(subtotal)==0;
                 boolean cashAmount = cash.compareTo(amount)==0;
                 if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
