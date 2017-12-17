@@ -13,7 +13,7 @@ import java.util.PriorityQueue;
  *
  */
 public class Podium<T extends Comparable<T>> {
-    private int k = 0;
+    private int tgtSize = 0;
     private PriorityQueue<T> pq = null;
     // NB: the first element is the lowest/worst one
 
@@ -22,8 +22,8 @@ public class Podium<T extends Comparable<T>> {
      * @param k > 0. Size of podium.
      */
     public Podium(@Size(min = 1) int k) {
-        this.k = k;
-        pq = new PriorityQueue<>(k + 1);
+        tgtSize = k;
+        pq = new PriorityQueue<>(tgtSize + 1);
     }
 
     /**
@@ -34,7 +34,7 @@ public class Podium<T extends Comparable<T>> {
      */
     public boolean tryAdd(@NonNull T obj) {
         pq.offer(obj);
-        return pq.size() <= k || pq.poll() != obj; // if lowest is obj -> add failed
+        return pq.size() <= tgtSize || pq.poll() != obj; // if lowest is obj -> add failed
     }
 
     /**

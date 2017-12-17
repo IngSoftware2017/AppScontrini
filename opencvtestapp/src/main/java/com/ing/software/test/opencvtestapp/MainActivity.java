@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
 
     final Semaphore sem = new Semaphore(0);
 
-    private static final Scalar blue = new Scalar(0,0,255, 255);
-    private static final int redInt = 0xFFFF0000;
-    private static final int greenInt = 0xFF00FF00;
+    private static final Scalar BLUE = new Scalar(0,0,255, 255);
+    private static final int RED_INT = 0xFFFF0000;
+    private static final int GREEN_INT = 0xFF00FF00;
 
     // alias
     private final static Class<?> IP_CLASS = ImagePreprocessor.class;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             sem.acquire();
         }
         catch (Exception e) {
-            System.out.println();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Mat contourReady = invoke(IP_CLASS, "prepareBinaryImg", imgResized);
                 List<MatOfPoint> contours = invoke(IP_CLASS, "findBiggestContours", contourReady, 1);
-                drawContour(imgResized, contours.get(0), blue);
+                drawContour(imgResized, contours.get(0), BLUE);
                 showMat(imgResized);
 
                 Semaphore sem = new Semaphore(0);
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                     sem.release();
                 });
                 sem.acquire();
-                showBitmap(drawPoly(bm, ptsRef.value, err.value == TicketError.RECT_NOT_FOUND ? redInt : greenInt));
+                showBitmap(drawPoly(bm, ptsRef.value, err.value == TicketError.RECT_NOT_FOUND ? RED_INT : GREEN_INT));
 
                 showBitmap(ip.undistort(0.02));
             }

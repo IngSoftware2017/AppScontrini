@@ -18,7 +18,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import static org.opencv.core.Core.*;
 import static org.opencv.core.CvType.*;
@@ -116,7 +115,7 @@ public class ImagePreprocessor {
      * @param img RGBA Mat. Not null.
      * @return RGBA Mat.
      */
-    private static Mat downScaleRGBA(Mat img) {
+    private static Mat downScaleRgba(Mat img) {
         float aspectRatio = (float)img.rows() / img.cols();
         Size size = aspectRatio > 1 ? new Size(SHORT_SIDE, (int)(SHORT_SIDE * aspectRatio))
                 : new Size((int)(SHORT_SIDE / aspectRatio), SHORT_SIDE);
@@ -129,7 +128,7 @@ public class ImagePreprocessor {
      * Convert Mat from RGBA to gray
      * @param imgRef in-out ref to Mat (in: RGBA, out: gray). Original mat is not modified. Not null.
      */
-    private static void RGBA2Gray(Ref<Mat> imgRef) {
+    private static void rgba2Gray(Ref<Mat> imgRef) {
         Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
         cvtColor(imgRef.value, img2, COLOR_RGBA2GRAY);
         imgRef.value = img2;
@@ -156,7 +155,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Shrink mask.
+     * Erode a mask.
      * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
     private static void erode(Ref<Mat> imgRef, int iters) {
@@ -166,7 +165,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Grow mask.
+     * Dilate a mask.
      * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
     private static void dilate(Ref<Mat> imgRef, int iters) {
@@ -176,7 +175,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Shrink + grow mask.
+     * Erode + dilate a mask.
      * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
      */
     private static void erodeDilate(Ref<Mat> imgRef) {
@@ -212,7 +211,7 @@ public class ImagePreprocessor {
         Ref<Mat> imgRef = new Ref<>(img);
         // I used Ref parameters to enable me to easily reorder the methods
         // and experiment with the image processing pipeline
-        RGBA2Gray(imgRef);
+        rgba2Gray(imgRef);
         bilateralFilter(imgRef);
         threshold(imgRef);
         enclose(imgRef);
@@ -247,13 +246,17 @@ public class ImagePreprocessor {
         return Stream.of(podium.getAll()).map(cp -> cp.obj).toList();
     }
 
+    private static Mat removeBackground(Mat img, MatOfPoint contour) {
+        return null; // todo
+    }
+
     /**
      * Find all edges of thresholded image inside contour.
      * @param img B&W Mat. Not null.
      * @param contour MatOfPoint not null.
      * @return Mat with white edges and black background.
      */
-    private static Mat findEdges(Mat img, MatOfPoint contour) {
+    private static Mat toEdges(Mat img, MatOfPoint contour) {
         List<MatOfPoint> ctrList = new ArrayList<>(1);
         ctrList.add(contour);
         Mat mask = new Mat(img.rows(), img.cols(), CV_8UC1, new Scalar(255));
@@ -276,19 +279,19 @@ public class ImagePreprocessor {
      */
     @NonNull
     private static Size getRectSizeSimple(MatOfPoint2f perspRect) {
-        Mat[] v = new Mat[4];
-        double w = 1, h = 1;
+        double width = 1, height = 1;
         if (perspRect.rows() == 4) {
+            Mat[] pointMats = new Mat[4];
             for (int i = 0; i < 4; i++)
-                v[i] = perspRect.row(i);
-            // The width is calculated summing the distance between the two upper and two lowe corners
-            // then dividing by tho to get the average.
-            // Similarly the height is calculated finding the distance between the leftmost
+                pointMats[i] = perspRect.row(i);
+            // The width is calculated summing the distance between the two upper and two lower corners
+            // then dividing by two to get the average.
+            // Similarly the height is calculated using the distance between the leftmost
             // and rightmost corners.
-            w = (norm(v[1], v[2]) + norm(v[3], v[0])) / 2;
-            h = (norm(v[0], v[1]) + norm(v[2], v[3])) / 2;
+            width = (norm(pointMats[1], pointMats[2]) + norm(pointMats[3], pointMats[0])) / 2;
+            height = (norm(pointMats[0], pointMats[1]) + norm(pointMats[2], pointMats[3])) / 2;
         }
-        return new Size(w, h);
+        return new Size(width, height);
     }
     //todo: use a better approach:
     // http://andrewkay.name/blog/post/aspect-ratio-of-a-rectangle-in-perspective/
@@ -358,7 +361,7 @@ public class ImagePreprocessor {
                 if (srcImg == null)
                     return;
                 contours = new ArrayList<>();
-                Mat resized = downScaleRGBA(srcImg);
+                Mat resized = downScaleRgba(srcImg);
                 Mat binary = prepareBinaryImg(resized);
                 contours = findBiggestContours(binary, quick ? 1 : 3);
 
@@ -369,7 +372,7 @@ public class ImagePreprocessor {
                         Ref<Mat> binRef = new Ref<>(binary);
                         //NB: original "binary" is not modified
                         erode(binRef, ERODE_ITERS);
-                        Mat houghReady = findEdges(binRef.value, ctr);
+                        Mat houghReady = toEdges(binRef.value, ctr);
                         //todo find Hough lines + RANSAC to find undistort transform matrix
                     }
                     MatOfPoint2f rect = findRectangle(ctr);
