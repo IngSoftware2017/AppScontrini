@@ -1,5 +1,7 @@
 package com.ing.software.common;
 
+import android.support.annotation.NonNull;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public class Reflect {
      *                    * exception raised inside method.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T invoke(Object clazz, String methodName, Object... params) throws Exception {
+    public static <T> T invoke(@NonNull Object clazz, @NonNull String methodName, Object... params) throws Exception {
         //get type of parameters, or null if null
         List<Class<?>> givenParamTypes = new ArrayList<>();
         for (Object param : params)
@@ -79,7 +81,7 @@ public class Reflect {
      * @throws Exception exception
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getField(Object clazz, String fieldName) throws Exception {
+    public static <T> T getField(@NonNull Object clazz, @NonNull String fieldName) throws Exception {
         boolean isType = clazz instanceof Class<?>;
         Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
         Field field = classType.getDeclaredField(fieldName);
@@ -95,7 +97,7 @@ public class Reflect {
      *
      * @throws Exception exception
      */
-    public static void setField(Object clazz, String fieldName, Object newVal) throws Exception {
+    public static void setField(@NonNull Object clazz, @NonNull String fieldName, Object newVal) throws Exception {
         boolean isType = clazz instanceof Class<?>;
         Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
         Field field = classType.getDeclaredField(fieldName);

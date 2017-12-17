@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int RED_INT = 0xFFFF0000;
     private static final int GREEN_INT = 0xFF00FF00;
 
+    private static final double margin = 0.02;
+
     // alias
     private final static Class<?> IP_CLASS = ImagePreprocessor.class;
 
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * The entire image processing pipeline in one method.
+     * This method processes all images from the dataset showing every step of the pipeline.
      * showMat stops the method execution until the screen is tapped.
      */
     void backgroundWork() {
@@ -138,11 +140,11 @@ public class MainActivity extends AppCompatActivity {
                 ip.setImage(bm);
 
                 Mat srcImg = getField(ip, "srcImg");
-                Mat imgResized = invoke(IP_CLASS, "downScaleRGBA", srcImg);
+                Mat imgResized = invoke(IP_CLASS, "downScaleRgba", srcImg);
                 Ref<Mat> imgRef = new Ref<>(imgResized);
                 showMat(imgRef.value);
 
-                invoke(IP_CLASS, "RGBA2Gray", imgRef);
+                invoke(IP_CLASS, "rgbaToGray", imgRef);
                 invoke(IP_CLASS, "bilateralFilter", imgRef);
                 showMat(imgRef.value);
 
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 sem.acquire();
                 showBitmap(drawPoly(bm, ptsRef.value, err.value == TicketError.RECT_NOT_FOUND ? RED_INT : GREEN_INT));
 
-                showBitmap(ip.undistort(0.02));
+                showBitmap(ip.undistort(margin));
             }
         }
         catch (Exception e) {

@@ -40,7 +40,7 @@ public class OcrManager {
      * @param context Android context
      * @return 0 if everything ok, negative number if an error occurred
      */
-    public synchronized int initialize(Context context) {
+    public synchronized int initialize(@NonNull Context context) {
         OcrUtils.log(1, "OcrManager", "Initializing OcrManager");
         int r = analyzer.initialize(context);
         operative = r == 0;
@@ -60,7 +60,7 @@ public class OcrManager {
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
-    public void getTicket(@NonNull ImagePreprocessor preprocessor, Consumer<Ticket> ticketCb) {
+    public void getTicket(@NonNull ImagePreprocessor preprocessor, @NonNull Consumer<Ticket> ticketCb) {
         new Thread(() -> {
             synchronized (this) {
                 if (!operative)

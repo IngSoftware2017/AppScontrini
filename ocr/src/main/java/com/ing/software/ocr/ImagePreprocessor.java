@@ -329,7 +329,7 @@ public class ImagePreprocessor {
      * No need to call setBitmap().
      * @param bm ticket bitmap
      */
-    public ImagePreprocessor(Bitmap bm) {
+    public ImagePreprocessor(@NonNull Bitmap bm) {
         setImage(bm);
     }
 
@@ -338,7 +338,7 @@ public class ImagePreprocessor {
      * Always call this method before any other image manipulation method.
      * @param bm ticket bitmap
      */
-    public void setImage(Bitmap bm) {
+    public void setImage(@NonNull Bitmap bm) {
         srcImg = new Mat();
         Utils.bitmapToMat(bm, srcImg);
     }
@@ -354,7 +354,7 @@ public class ImagePreprocessor {
      * @param callback callback with TicketError argument called when computation is finished.
      *                 The error can be NONE or RECT_NOT_FOUND.
      */
-    public void findTicket(boolean quick, Consumer<TicketError> callback) {
+    public void findTicket(boolean quick, @NonNull Consumer<TicketError> callback) {
         new Thread(() -> {
             synchronized (this) { // make sure this code is not executed concurrently when findTicket
                                   // is called more than once consecutively
@@ -416,7 +416,7 @@ public class ImagePreprocessor {
      * @return TicketError. NONE: corners are valid.
      *                      INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
      */
-    public synchronized TicketError setCorners(List<android.graphics.Point> corners) {
+    public synchronized TicketError setCorners(@NonNull List<android.graphics.Point> corners) {
         this.corners = new MatOfPoint2f(Stream.of(corners)
                 .map(p -> new Point(p.x, p.y)).toArray(v -> new Point[corners.size()]));
         //todo check if corners are ordered correctly
@@ -471,7 +471,7 @@ public class ImagePreprocessor {
      * @param angle Rotation angle (degrees)
      * @return Rotated bitmap
      */
-    public static Bitmap rotate(Bitmap src, float angle) {
+    public static Bitmap rotate(@NonNull Bitmap src, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
