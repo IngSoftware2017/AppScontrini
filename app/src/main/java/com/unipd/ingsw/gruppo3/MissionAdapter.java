@@ -19,13 +19,11 @@ import database.MissionEntity;
 
 public class MissionAdapter extends ArrayAdapter<MissionEntity> {
 
-    MissionViewerHolder holder;
-
     /**
      * Parametric constructor
      * @param context application context
      * @param textViewResourceId id of the textView
-     * @param missions array of Mission class objects
+     * @param missions list of Mission class objects
      */
     public MissionAdapter(Context context, int textViewResourceId, List<MissionEntity> missions){
         super(context,textViewResourceId,missions);
@@ -41,6 +39,7 @@ public class MissionAdapter extends ArrayAdapter<MissionEntity> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
 
+        MissionViewerHolder holder;
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null){
             convertView = inflater.inflate(R.layout.mission_row_custom,null);
@@ -58,7 +57,8 @@ public class MissionAdapter extends ArrayAdapter<MissionEntity> {
         holder.locationTextView.setText(mis.getLocation());
         return convertView;
     }
-    static class MissionViewerHolder{
+
+    private static class MissionViewerHolder{
         private TextView nameTextView;
         private TextView locationTextView;
     }

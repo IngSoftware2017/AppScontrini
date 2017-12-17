@@ -176,15 +176,12 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     /**
      * @author Stefano Elardo
      * Method that check if end date is temporally after start date
-     * @return
+     * @return the result of the confrontation between dates
      */
     private boolean checkCorrectInterval(){
         String dateInputStart = startDateMissionText.getText().toString();
         String dateInputEnd = endDateMissionText.getText().toString();
-        if(dateInputStart.compareTo(dateInputEnd)<0)
-            return true;
-        else
-            return false;
+        return (dateInputStart.compareTo(dateInputEnd)<0);
     }
 
 
