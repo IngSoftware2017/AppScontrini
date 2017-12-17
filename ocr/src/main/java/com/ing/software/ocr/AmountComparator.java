@@ -182,7 +182,7 @@ class AmountComparator {
     /**
      * @author Michelon
      * @date 17-12-17
-     * @return true if productList is not null
+     * @return true if priceList is not null
      */
     boolean hasPriceList() {
         return hasPriceList;
