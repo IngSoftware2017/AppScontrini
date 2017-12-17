@@ -215,9 +215,9 @@ class AmountComparator {
         else
             OcrUtils.log(3, "analyzePrices", "List of prices, no value found");
         while (index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
-            String s = possiblePrices.get(index).getText().getDetection();
-            if (OcrUtils.isPossibleNumber(s)) {
-                BigDecimal adder = analyzeAmount(s);
+            String productPrice = possiblePrices.get(index).getText().getDetection();
+            if (OcrUtils.isPossibleNumber(productPrice)) {
+                BigDecimal adder = analyzeAmount(productPrice);
                 if (adder != null) {
                     productsSum = productsSum.add(adder);
                     possibleSubTotal = adder; //this way when i exit the while i'll have in possibleSubTotal last value analyzed
