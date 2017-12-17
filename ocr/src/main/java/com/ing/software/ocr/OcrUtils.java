@@ -227,6 +227,9 @@ public class OcrUtils {
     /**
      * @author Salvagno
      * Returns the distance of Levenshtein between two strings | S | e | T |.
+     * The Levenshtein distance is a string metric for measuring the difference between two sequences.
+     * Informally, the Levenshtein distance between two words is the minimum number of single-character
+     * edits (insertions, deletions or substitutions) required to change one word into the other.
      * The distance is an integer between 0 and the maximum length of the two strings.
      * If only one string is null then return -1
      *
@@ -304,6 +307,9 @@ public class OcrUtils {
             int distanceNow = levDistance(token.toUpperCase(), substring.toUpperCase());
             if (distanceNow < minDistance)
                 minDistance = distanceNow;
+            //Lucky case
+            if(distanceNow == 0)
+                break;
             start++;
             }
 
