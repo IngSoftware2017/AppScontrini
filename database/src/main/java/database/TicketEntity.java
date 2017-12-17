@@ -153,7 +153,9 @@ public class TicketEntity {
      *
      * @param category not null
      */
-    public void addCategory (String category) { this.category.add(category); }
+    public void addCategory (String category) {
+        if(category!="")
+            this.category.add(category); }
 
     /**
      * Returns the mission id of this ticket
