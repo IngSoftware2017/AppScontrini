@@ -42,7 +42,7 @@ public class MissionAdapter extends ArrayAdapter<MissionEntity> {
         MissionViewerHolder holder;
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null){
-            convertView = inflater.inflate(R.layout.mission_row_custom,null);
+            convertView = inflater.inflate(R.layout.mission_row_custom, parent,false);
             holder = new MissionViewerHolder();
             holder.nameTextView = convertView.findViewById(R.id.textViewName);
             holder.locationTextView = convertView.findViewById(R.id.textViewLocation);
