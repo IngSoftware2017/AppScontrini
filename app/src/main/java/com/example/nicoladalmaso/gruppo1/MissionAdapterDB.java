@@ -51,7 +51,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         //missionDelete.setTag(position);
         MissionEntity c = getItem(position);
         title.setText(c.getName());
-        description.setText(c.getDescription());
+        description.setText("Descrizione momentanea");
         convertView.setTag(c.getID());
         Log.d("MID", ""+c.getID());
 

@@ -40,9 +40,7 @@ import java.util.List;
 import database.Constants;
 import database.DAO;
 import database.DataManager;
-import database.Mission;
 import database.MissionEntity;
-import database.Person;
 import database.PersonEntity;
 
 
@@ -94,8 +92,8 @@ public class MainActivity extends AppCompatActivity {
      * get all missions from the DB and print
      */
     public void printAllMissionsDB(){
-        List<MissionEntity> missions = DB.getAllMissions();
-        List<PersonEntity> persons = DB.getAllPersons();
+        List<MissionEntity> missions = DB.getAllMission();
+        List<PersonEntity> persons = DB.getAllPerson();
         //Crea una persona fake per non creare problemi di FOREING KEY
         if(persons.size()==0){
             PersonEntity person = new PersonEntity();
@@ -103,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             person.setAcademicTitle("Studente");
             person.setLastName("Dal Maso");
             DB.addPerson(person);
-            persons = DB.getAllPersons();
+            persons = DB.getAllPerson();
         }
 
         Log.d("Lista Persone", ""+persons.get(0).getID());

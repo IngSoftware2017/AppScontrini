@@ -428,16 +428,13 @@ public class BillActivity extends AppCompatActivity {
      *  Print all tickets, get it from DB
      */
     public void printAllImages(){
-        List<TicketEntity> ticketList = DB.getAllTickets();
+        List<TicketEntity> ticketList = DB.getTicketsForMission(pos);
         Log.d("Tickets", ticketList.toString());
         TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
             t = ticketList.get(i);
-            if(t.getMissionID() == (pos)){
-                count++;
-                addToList(t.getFileUri(), t.getAmount(), t.getShop(), t.getDate(), t.getTitle(), t.getID());
-            }
+            addToList(t.getFileUri(), t.getAmount(), t.getShop(), t.getDate(), t.getTitle(), t.getMissionID());
         }
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);

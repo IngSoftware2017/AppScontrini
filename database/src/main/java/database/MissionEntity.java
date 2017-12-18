@@ -19,7 +19,8 @@ import android.net.Uri;
 @Entity(tableName = Constants.MISSION_TABLE_NAME,
         foreignKeys = @ForeignKey(entity = PersonEntity.class,
                 parentColumns = Constants.PERSON_PRIMARY_KEY_NAME,
-                childColumns = Constants.PERSON_CHILD_COLUMNS))
+                childColumns = Constants.PERSON_CHILD_COLUMNS,
+                onDelete = ForeignKey.CASCADE))
 @TypeConverters(Converters.class) // automatic converters for database correct type
 
 public class MissionEntity {

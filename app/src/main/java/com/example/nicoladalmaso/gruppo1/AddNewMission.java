@@ -76,23 +76,15 @@ public class AddNewMission extends AppCompatActivity{
                     description = context.getString(R.string.defaultDescription);
                 }
                 MissionEntity miss = new MissionEntity();
-                int missionID = 0;
                 miss.setPersonID(1);
                 miss.setName(name);
-                miss.setDescription(description);
-                DB.addMission(miss);
-                List<MissionEntity> missions = DB.getAllMissions();
-                for(int i = 0; i < missions.size(); i++){
-                    if(missions.get(i).getID() > missionID)
-                        missionID = missions.get(i).getID();
-                }
+                long missionID = DB.addMission(miss);
                 Log.d("New mission id", ""+missionID);
                 //create new directory with input text
                 //Start billActivity
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startImageView.putExtra("missionName", name);
-                startImageView.putExtra("missionDescription",description);
                 startImageView.putExtra("missionID", missionID);
                 context.startActivity(startImageView);
                 return true;
