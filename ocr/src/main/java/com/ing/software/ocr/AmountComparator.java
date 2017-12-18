@@ -433,7 +433,7 @@ class AmountComparator {
      */
     private static boolean isProductPrice(@NonNull RawText amount, @NonNull RawText product) {
         int percentage = 50;
-        RectF extendedRect = OcrUtils.partialExtendWidthRect(amount.getRect(), percentage);
+        RectF extendedRect = OcrUtils.extendRect(amount.getRect(), 0, percentage);
         RectF productRect = product.getRect();
         return (extendedRect.left < productRect.left) && (extendedRect.right > productRect.right);
     }

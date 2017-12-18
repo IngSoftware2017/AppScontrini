@@ -14,9 +14,12 @@ import java.util.List;
  * Class to create RawTexts
  */
 
-class RawTextFactory {
+public class RawTextFactory {
 
-    static RawText getRawText(final String value, final Rect rect, Bitmap image) {
+    private static Rect defaultRect = new Rect(10,10,30,50);
+    private static Bitmap defaultImage = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+
+    public static RawText getRawText(final String value, final Rect rect, Bitmap image) {
     Text text = new Text() {
         @Override
         public String getValue() {
@@ -46,19 +49,15 @@ class RawTextFactory {
     return new RawText(text, rawImage);
     }
 
-    static RawText getRawText(final String value, final Rect rect) {
-        Bitmap image = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        return getRawText(value, rect, image);
+    public static RawText getRawText(final String value, final Rect rect) {
+        return getRawText(value, rect, defaultImage);
     }
 
-    static RawText getRawText(final String value) {
-        Bitmap image = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        Rect rect = new Rect(10,10,30,50);
-        return getRawText(value, rect, image);
+    public static RawText getRawText(final String value) {
+        return getRawText(value, defaultRect, defaultImage);
     }
 
-    static RawText getRawText(final String value, Bitmap image) {
-        Rect rect = new Rect(10,10,30,50);
-        return getRawText(value, rect, image);
+    public static RawText getRawText(final String value, Bitmap image) {
+        return getRawText(value, defaultRect, image);
     }
 }

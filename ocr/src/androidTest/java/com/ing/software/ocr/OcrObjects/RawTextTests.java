@@ -1,4 +1,4 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OcrObjects;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -6,20 +6,22 @@ import android.graphics.Rect;
 import org.junit.Test;
 import static junit.framework.Assert.*;
 
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.RawTextFactory;
 
 
 /**
  *
  */
 
-public class RawTextTest {
+public class RawTextTests {
 
     private static String defaultString = "Value";
     private static Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+    private static Bitmap bitmap2 = Bitmap.createBitmap(90, 160, Bitmap.Config.ARGB_8888);
     private static RawText rawText = RawTextFactory.getRawText(defaultString, new Rect(10,10,30,50), bitmap);
     private static RawText rawText2 = RawTextFactory.getRawText(defaultString, new Rect(5,5,60,30), bitmap);
     private static RawText rawText3 = RawTextFactory.getRawText(defaultString, new Rect(10,5,60,30), bitmap);
+
 
     @Test
     public void testrawTextValue() throws Exception {
@@ -45,4 +47,5 @@ public class RawTextTest {
     public void testrawTextCompare4() throws Exception {
         assertTrue(rawText2.compareTo(rawText3) < 0);
     }
+
 }

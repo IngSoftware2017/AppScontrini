@@ -189,7 +189,7 @@ class OcrAnalyzer {
             for (RawStringResult singleResult : results) {
                 RawText rawTextSource = singleResult.getSourceText();
                 log(4,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getDetection());
-                RectF newRect = OcrUtils.extendRect(OcrUtils.getExtendedRect(rawTextSource.getRect(), rawTextSource.getRawImage()), precision);
+                RectF newRect = OcrUtils.extendRect(OcrUtils.getExtendedRect(rawTextSource.getRect(), rawTextSource.getRawImage()), precision, precision);
                 if (rawText.isInside(newRect)) {
                     singleResult.addDetectedTexts(rawText);
                     log(3,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getDetection());
