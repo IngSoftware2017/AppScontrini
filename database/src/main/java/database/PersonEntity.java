@@ -8,25 +8,26 @@ import android.arch.persistence.room.PrimaryKey;
 
 /**
  * Represents one person that does some missions
- * @author Marco Olivieri on 26/11/2017 (Team 3)
+ * @author Marco Olivieri(Team 3)
  */
 
-@Entity(tableName = Constants.PERSON_TABLE_NAME) @TypeConverters(Converters.class)
+@Entity(tableName = Constants.PERSON_TABLE_NAME)
+@TypeConverters(Converters.class) // automatic converters for database correct type
 
-public class Person {
+public class PersonEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.PERSON_PRIMARY_KEY_NAME)
-    private int ID;
+    private long ID;
     private String name;
     private String lastName;
     private String academicTitle;
 
     @Ignore
     /**
-     * Non parametric constructor
+     * Non parametric constructor to use when you don't want set all fields
      */
-    public Person() {
+    public PersonEntity() {
     }
 
     /**
@@ -36,17 +37,18 @@ public class Person {
      * @param lastName Last Name of the person
      * @param academicTitle Academic Title of the person
      */
-    public Person(String name, String lastName, String academicTitle) {
+    public PersonEntity(String name, String lastName, String academicTitle) {
         this.name = name;
         this.lastName = lastName;
         this.academicTitle = academicTitle;
+
     }
 
     /**
-     * Returns the Person ID
+     * Returns the PersonEntity ID
      * @return ID
      */
-    public int getID() {
+    public long getID() {
         return ID;
     }
 
@@ -55,7 +57,7 @@ public class Person {
      * Sets person id
      * @param ID not null
      */
-    public void setID(int ID) {
+    public void setID(long ID) {
         this.ID = ID;
     }
 
@@ -107,5 +109,4 @@ public class Person {
         this.academicTitle = academicTitle;
     }
 
-    //TODO override toString
 }

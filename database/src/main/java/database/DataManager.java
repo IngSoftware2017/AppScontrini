@@ -2,7 +2,6 @@ package database;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,34 +18,34 @@ public class DataManager {
         database = Database.getAppDatabase(context);
     }
 
-    /** Adds a ticket into the database
-     * @param ticket Ticket not null,
-     *               ticket.getFileUri() not null,
-     *               ticket.getMissionId() not null
+    /** Adds a ticketEntity into the database
+     * @param ticketEntity TicketEntity not null,
+     *               ticketEntity.getFileUri() not null,
+     *               ticketEntity.getMissionId() not null
      * @return ID of the created record, -1 if the method fails
      */
-    public int addTicket(Ticket ticket){
-        ticket.setID((int) database.ticketDao().addTicket(ticket));
-        return ticket.getID();
+    public long addTicket(TicketEntity ticketEntity){
+        ticketEntity.setID(database.ticketDao().addTicket(ticketEntity));
+        return ticketEntity.getID();
     }
 
-    /** Adds a mission into the database
-     * @param mission Mission not null, the entity to be inserted
-     *                mission.personID not null, must be an existing code
-     * @return the id of the inserted mission
+    /** Adds a missionEntity into the database
+     * @param missionEntity MissionEntity not null, the entity to be inserted
+     *                missionEntity.personID not null, must be an existing code
+     * @return the id of the inserted missionEntity
      */
-    public int addMission(Mission mission){
-        mission.setID((int) database.ticketDao().addMission(mission));
-        return mission.getID();
+    public long addMission(MissionEntity missionEntity){
+        missionEntity.setID(database.ticketDao().addMission(missionEntity));
+        return missionEntity.getID();
     }
 
     /** Executes the insert query.
-     * @param person Person not null, the entity to be inserted
-     * @return the id of the inserted person
+     * @param personEntity PersonEntity not null, the entity to be inserted
+     * @return the id of the inserted personEntity
      */
-    public int addPerson(Person person){
-        person.setID((int) database.ticketDao().addPerson(person));
-        return person.getID();
+    public long addPerson(PersonEntity personEntity){
+        personEntity.setID(database.ticketDao().addPerson(personEntity));
+        return personEntity.getID();
     }
 
     /**
@@ -76,55 +75,58 @@ public class DataManager {
         return database.ticketDao().deletePerson(id)>0;
     }
 
-    /**Updates values of the ticket with the same id in the database. All fields (except ID) are updated
-    * @param ticket Ticket not null,
-     *              ticket.getFileUri() must be a valid photo path
-     *              ticket.getMissionID() must be a valid Mission ID
+    /**Updates values of the ticketEntity with the same id in the database. All fields (except ID) are updated
+    * @param ticketEntity TicketEntity not null,
+     *              ticketEntity.getFileUri() must be a valid photo path
+     *              ticketEntity.getMissionID() must be a valid MissionEntity ID
     * @return true if the update is executed, false otherwise (i.e. invalid ID)
     */
-    public boolean updateTicket(Ticket ticket){
-         return database.ticketDao().updateTicket(ticket)>0; //true if at least a ticket is updated
+    public boolean updateTicket(TicketEntity ticketEntity){
+         return database.ticketDao().updateTicket(ticketEntity)>0; //true if at least a ticketEntity is updated
     }
 
-    /**Updates values of the mission with the same id in the database. All fields (except ID) are updated
-     * @param mission Mission not null
-     *                mission.getPersonID() must be a valid Person ID
+    /**Updates values of the missionEntity with the same id in the database. All fields (except ID) are updated
+     * @param missionEntity MissionEntity not null
+     *                missionEntity.getPersonID() must be a valid PersonEntity ID
      * @return true if the update is executed, false otherwise (i.e. invalid ID)
      */
-    public boolean updateMission(Mission mission){
-         return database.ticketDao().updateMission(mission)>0;
+    public boolean updateMission(MissionEntity missionEntity){
+         return database.ticketDao().updateMission(missionEntity)>0;
     }
 
-    /**Updates values of the Person with the same id in the database. All fields (except ID) are updated
-     * @param person Person not null
+    /**Updates values of the PersonEntity with the same id in the database. All fields (except ID) are updated
+     * @param personEntity PersonEntity not null
      * @return true if the update is executed, false otherwise (i.e. invalid ID)
      */
-    public boolean updatePerson(Person person){
-        return database.ticketDao().updatePerson(person)>0;
+    public boolean updatePerson(PersonEntity personEntity){
+        return database.ticketDao().updatePerson(personEntity)>0;
     }
 
     /**
-     * @return List<Ticket> not null, which contains all the tickets in the database
+     * @return List<TicketEntity> not null, which contains all the tickets in the database
      */
-    public List<Ticket> getAllTickets(){
+    public List<TicketEntity> getAllTickets(){
         return database.ticketDao().getAllTickets();
     }
 
-    public List<Mission> getAllMissions(){ return database.ticketDao().getAllMission();}
 
-    public List<Person> getAllPersons(){ return database.ticketDao().getAllPerson();}
+    public List<TicketEntity> getTicketsForMission(int id){
+        return database.ticketDao().getTicketsForMission(id);
+    }
 
 
-
+    public TicketEntity getTicket(int id){
+        return database.ticketDao().getTicket(id);
+    }
 //    /**
-//     Turns a List of TicketEntity into a List of Ticket
+//     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null
-//     * @return an instance of Ticket with values from the TicketEntity received
+//     * @return an instance of TicketEntity with values from the TicketEntity received
 //     */
-//    private List<Ticket> toTicket(List<TicketEntity> ticketEntities){
-//        ArrayList<Ticket> tickets = new ArrayList<Ticket>();
-//        for(Ticket entity : ticketEntities){
-//            tickets.add((Ticket) entity);
+//    private List<TicketEntity> toTicket(List<TicketEntity> ticketEntities){
+//        ArrayList<TicketEntity> tickets = new ArrayList<TicketEntity>();
+//        for(TicketEntity entity : ticketEntities){
+//            tickets.add((TicketEntity) entity);
 //        }
 //        return tickets;
 //    }

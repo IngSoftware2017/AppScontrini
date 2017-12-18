@@ -2,12 +2,13 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 import android.util.SparseArray;
 
-import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.ing.software.ocr.OcrObjects.*;
@@ -28,8 +29,7 @@ class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
-    private final int targetPrecision = 100; //Should be passed with image, or calculated with
-        //resolution of source image
+    private final int targetPrecision = 130; //Should be passed with image. todo
 
 
     /**
@@ -60,32 +60,45 @@ class OcrAnalyzer {
      * @return OcrResult containing raw data to be further analyzed.
      */
     OcrResult analyze(@NonNull Bitmap frame){
-        //cropping must be used somewhere else (if used with textRecognizer). Can be used here is using opencv
+        //cropping must be used somewhere else (if used with textRecognizer). Can be used here if using opencv
         //frame = getCroppedPhoto(frame, context);
         mainImage = new RawImage(frame);
 
         //ocrEngine analysis
         SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(frame).build());
 
-        List<RawBlock> rawBlocks = orderBlocks(mainImage, tempArray);
+        List<RawText> rawOrigTexts = orderBlocks(mainImage, tempArray);
+        listEverything(rawOrigTexts);
         List<RawStringResult> valuedTexts = new ArrayList<>();
         for (String amountString : AMOUNT_STRINGS) {
-        	valuedTexts.addAll(searchContinuousString(rawBlocks, amountString));
+        	valuedTexts.addAll(searchContinuousString(rawOrigTexts, amountString));
         }
-        valuedTexts = searchContinuousStringExtended(rawBlocks, valuedTexts, targetPrecision);
-        List<RawGridResult> dateList = getDateList(rawBlocks);
-        return new OcrResult(valuedTexts, dateList);
+        valuedTexts = searchContinuousStringExtended(rawOrigTexts, valuedTexts, targetPrecision);
+        List<RawGridResult> dateList = getDateList(rawOrigTexts);
+        return new OcrResult(valuedTexts, dateList, getProductPrices(rawOrigTexts));
+    }
+
+    /**
+     * List in debug log blocks parsed (detection + grid)
+     * @param texts List of texts. Not null.
+     */
+    private static void listEverything(@NonNull List<RawText> texts) {
+        if (IS_DEBUG_ENABLED)
+            for (RawText text : texts) {
+                OcrUtils.log(2, "FULL LIST: ", text.getDetection());
+                OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
+            }
     }
 
     /**
      * @author Michelon
-     * Orders TextBlock decoded by detector in a list of RawBlocks
+     * Orders TextBlock decoded by detector in a list of RawTexts
      * Order is from top to bottom, from left to right
      * @param photo RawImage of the photo. Not null.
-     * @param origTextBlocks detected blocks. Not null.
-     * @return list of ordered RawBlocks
+     * @param origTextBlocks detected texts. Not null.
+     * @return list of ordered RawTexts
      */
-    private static List<RawBlock> orderBlocks(@NonNull RawImage photo, @NonNull SparseArray<TextBlock> origTextBlocks) {
+    private static List<RawText> orderBlocks(@NonNull RawImage photo, @NonNull SparseArray<TextBlock> origTextBlocks) {
         log(2,"OcrAnalyzer.analyzeST:" , "Preferred grid is: " + photo.getGrid());
         List<TextBlock> newOrderedTextBlocks = new ArrayList<>();
         for (int i = 0; i < origTextBlocks.size(); i++) {
@@ -93,11 +106,13 @@ class OcrAnalyzer {
         }
         newOrderedTextBlocks = OcrUtils.orderTextBlocks(newOrderedTextBlocks);
         log(2,"OcrAnalyzer.analyzeST:" , "New Blocks ordered");
-        List<RawBlock> rawBlocks = new ArrayList<>();
+        List<RawText> rawTexts = new ArrayList<>();
         for (TextBlock textBlock : newOrderedTextBlocks) {
-            rawBlocks.add(new RawBlock(textBlock, photo));
+            for (Text currentText : textBlock.getComponents()) {
+                rawTexts.add(new RawText(currentText, photo));
+            }
         }
-        return rawBlocks;
+        return rawTexts;
     }
 
     /**
@@ -117,7 +132,7 @@ class OcrAnalyzer {
         }
         if (targetText != null) {
             log(3,"OcrAnalyzer.analyzeBFS", "Found first target string: "+ testString + " \nat: " + targetText.getDetection());
-            log(3,"OcrAnalyzer.analyzeBFS", "Target text is at (left, top, right, bottom): "+ targetText.getRect().left + "; "
+            log(5,"OcrAnalyzer.analyzeBFS", "Target text is at (left, top, right, bottom): "+ targetText.getRect().left + "; "
                     + targetText.getRect().top + "; " + targetText.getRect().right + "; "+ targetText.getRect().bottom + ".");
         }
         return targetText;
@@ -125,17 +140,17 @@ class OcrAnalyzer {
 
     /**
      * @author Michelon
-     * Search for all occurrences of target string in detected (and ordered) RawBlocks according to OcrVars.MAX_STRING_DISTANCE
-     * @param rawBlocks list of RawBlocks. Not null.
+     * Search for all occurrences of target string in detected (and ordered) RawTexts according to OcrVars.MAX_STRING_DISTANCE
+     * @param rawTexts list of RawTexts. Not null.
      * @param testString string to find. Length > 0.
      * @return list of RawStringResult containing only source RawText where string is present. Note: this list is not ordered.
      */
-    private static List<RawStringResult> searchContinuousString(@NonNull List<RawBlock> rawBlocks, @Size(min = 1) String testString) {
+    private static List<RawStringResult> searchContinuousString(@NonNull List<RawText> rawTexts, @Size(min = 1) String testString) {
         List<RawStringResult> targetTextList = new ArrayList<>();
-        for (RawBlock rawBlock : rawBlocks) {
-            List<RawStringResult> tempTextList = rawBlock.findContinuous(testString, MAX_STRING_DISTANCE);
+        for (RawText rawText : rawTexts) {
+            RawStringResult tempTextList = rawText.findContinuous(testString, MAX_STRING_DISTANCE);
             if (tempTextList != null) {
-                targetTextList.addAll(tempTextList);
+                targetTextList.add(tempTextList);
             }
         }
         if (targetTextList.size() >0 && IS_DEBUG_ENABLED) {
@@ -143,7 +158,7 @@ class OcrAnalyzer {
                 RawText text = stringText.getSourceText();
                 log(3,"OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getDetection()
                         + " with distance: " + stringText.getDistanceFromTarget());
-                log(3,"OcrAnalyzer", "Target text is at (left, top, right, bottom): " + text.getRect().left
+                log(5,"OcrAnalyzer", "Target text is at (left, top, right, bottom): " + text.getRect().left
                         + "; " + text.getRect().top + "; " + text.getRect().right + "; " + text.getRect().bottom + ".");
             }
         }
@@ -153,34 +168,34 @@ class OcrAnalyzer {
     /**
      * @author Michelon
      * From a list of RawTexts, retrieves also RawTexts with similar distance from top and bottom of the photo.
-     * 'Similar' is defined by precision. See {@link RawBlock findByPosition()} for details.
-     * @param rawBlocks list of RawBlocks from original photo. Not null.
+     * 'Similar' is defined by precision. See {@link OcrUtils getExtendedRect()} for details.
+     * @param rawTexts list of RawBlocks from original photo. Not null.
      * @param targetStringList list of target RawTexts. Not null.
-     * @param precision precision to extend rect. See RawBlock.RawText.extendRect()
+     * @param precision precision to extend rect. See OcrUtils.extendRect()
      * @return list of RawStringResults. Adds to the @param targetStringList objects the detected RawTexts
      * in proximity of source RawTexts. Note: this list is not ordered.
      */
     /*How search works::
-    - Take a block
-    - search in extended rect of the source of a stringResult if it contains one or more text of this block
-    - if yes, adds these texts to the detected texts of the stringResults
-    - repeat from 2 until you have no more stringResults left
-    - repeat from 1 until you have no more blocks left
+    1- Take a RawText
+    2- search in extended rect of the source of a stringResult if it contains this RawText
+    3- if yes, adds it to the detected texts of the stringResults
+    4- repeat from 2 until you have no more stringResults left
+    5- repeat from 1 until you have no more RawText left
     */
-    private static List<RawStringResult> searchContinuousStringExtended(@NonNull List<RawBlock> rawBlocks, @NonNull List<RawStringResult> targetStringList, int precision) {
-        List<RawStringResult> results = targetStringList;
+    private static List<RawStringResult> searchContinuousStringExtended(@NonNull List<RawText> rawTexts, @NonNull List<RawStringResult> targetStringList, int precision) {
+        List<RawStringResult> results = targetStringList; //redundant but easier to understand
         log(2,"OcrAnalyzer.SCSE", "StringResult list size is: " + results.size());
-        for (RawBlock rawBlock : rawBlocks) {
+        for (RawText rawText : rawTexts) {
             for (RawStringResult singleResult : results) {
-                RawText rawText = singleResult.getSourceText();
-                log(3,"OcrAnalyzer.SCSE", "Extending rect: " + rawText.getDetection());
-                List<RawText> tempResultList = rawBlock.findByPosition(OcrUtils.getExtendedRect(rawText.getRect(), rawText.getRawImage()), precision);
-                if (tempResultList != null) {
-                    singleResult.addDetectedTexts(tempResultList);
-                    log(3,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawText.getDetection() + "\nin " + tempResultList.size() + " blocks.");
+                RawText rawTextSource = singleResult.getSourceText();
+                log(4,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getDetection());
+                RectF newRect = OcrUtils.extendRect(OcrUtils.getExtendedRect(rawTextSource.getRect(), rawTextSource.getRawImage()), precision);
+                if (rawText.isInside(newRect)) {
+                    singleResult.addDetectedTexts(rawText);
+                    log(3,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getDetection());
                 }
                 else
-                    log(3,"OcrAnalyzer.SCSE", "Nothing found"); //Nothing in this block
+                    log(7,"OcrAnalyzer.SCSE", "Nothing found"); //Nothing in this block
             }
         }
         if (results.size() == 0) {
@@ -191,11 +206,11 @@ class OcrAnalyzer {
             for (RawStringResult rawStringResult : results) {
                 List<RawText> textList = rawStringResult.getDetectedTexts();
                 if (textList == null)
-                    log(2,"OcrAnalyzer.SCSE", "Value not found.");
+                    log(3,"OcrAnalyzer.SCSE", "Value not found.");
                 else {
                     for (RawText rawText : textList) {
-                        log(2,"OcrAnalyzer.SCSE", "Value: " + rawText.getDetection());
-                        log(2,"OcrAnalyzer.SCSE", "Source: " + rawStringResult.getSourceText().getDetection());
+                        log(3,"OcrAnalyzer.SCSE", "Value: " + rawText.getDetection());
+                        log(3,"OcrAnalyzer.SCSE", "Source: " + rawStringResult.getSourceText().getDetection());
                     }
                 }
             }
@@ -206,18 +221,34 @@ class OcrAnalyzer {
     /**
      * @author Michelon
      * Merges Lists with RawTexts + probability to find date from all blocks.
-     * And orders it according to they probability (fallback is position).
-     * @param rawBlocks blocks from which retrieve lists. Not null.
+     * And orders it according to their probability (fallback is position).
+     * @param rawTexts RawTexts from which retrieve lists. Not null.
      * @return List of RawGridResults containing RawTexts + probability
      */
-    private List<RawGridResult> getDateList(@NonNull List<RawBlock> rawBlocks) {
+    private List<RawGridResult> getDateList(@NonNull List<RawText> rawTexts) {
         List<RawGridResult> fullList = new ArrayList<>();
-        for (RawBlock rawBlock : rawBlocks) {
-            fullList.addAll(rawBlock.getDateList());
+        for (RawText rawText : rawTexts) {
+            fullList.add(new RawGridResult(rawText, rawText.getDateProbability()));
         }
-        log(2,"FINAL_LIST_SIZE_IS", " " + fullList.size());
+        log(6,"FINAL_LIST_SIZE_IS", " " + fullList.size());
         Collections.sort(fullList);
         return fullList;
+    }
+
+    /**
+     * @author Michelon
+     * Get a list of prices of products. It actually finds all texts which center is on right side of the receipt
+     * @param texts list of texts. Not null.
+     * @return list of texts on right side of receipt
+     */
+    private static List<RawText> getProductPrices(@NonNull List<RawText> texts) {
+        //blocks = OcrSchemer.findBlocksOnLeft(blocks);
+        texts = OcrSchemer.findTextsOnRight(texts);
+        if (IS_DEBUG_ENABLED)
+            //for (RawBlock block : blocks)
+                for (RawText text : texts)
+                    OcrUtils.log(3,"getProductPrices", "Product found: " + text.getDetection());
+        return texts;
     }
 
     /**
@@ -227,6 +258,7 @@ class OcrAnalyzer {
      * @param context context to run analyzer
      * @return list of all blocks found (ordered from top to bottom, left to right)
      */
+    @Deprecated
     private static List<TextBlock> quickAnalysis(@NonNull Bitmap photo, Context context) {
         SparseArray<TextBlock> origTextBlocks;
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
@@ -252,6 +284,7 @@ class OcrAnalyzer {
      * @param context context to run first analyzer
      * @return smallest cropped photo containing all TextBlocks
      */
+    @Deprecated
     public static Bitmap getCroppedPhoto(@NonNull Bitmap photo, Context context) {
         List<TextBlock> orderedTextBlocks = quickAnalysis(photo, context);
         log(2,"OcrAnalyzer.analyze:" , "Blocks detected");

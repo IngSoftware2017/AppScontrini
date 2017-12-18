@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import database.DataManager;
-import database.Ticket;
+import database.TicketEntity;
 
 /**
  * Created by nicoladalmaso on 28/10/17.
@@ -38,18 +38,18 @@ import database.Ticket;
 
 //Classe utilizzata per dupplicare la view cardview all'interno della ListView
 //Dal Maso
-public class CustomAdapter extends ArrayAdapter<Ticket> {
+public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
     Context context;
     String path = "";
     int pos = 0;
     int missionID;
     DataManager DB;
-    List<Ticket> t = new ArrayList<Ticket>();
+    List<TicketEntity> t = new ArrayList<TicketEntity>();
 
     //Dal Maso, adapter declare
     public CustomAdapter(Context context, int textViewResourceId,
-                         List<Ticket> objects, int missionID, DataManager DB) {
+                         List<TicketEntity> objects, int missionID, DataManager DB) {
         super(context, textViewResourceId, objects);
         this.context = context;
         this.missionID = missionID;
@@ -70,7 +70,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
 
-        Ticket c = getItem(position);
+        TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
         title.setText(photo.getName());
 
@@ -151,7 +151,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                 pos = Integer.parseInt(v.getTag().toString());
                 for(int i = 0; i < t.size(); i++){
                     if(t.get(i).getID() == pos){
-                        Ticket thisPhoto = t.get(i);
+                        TicketEntity thisPhoto = t.get(i);
                         Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
                         File photo = new File(thisPhoto.getFileUri().toString().substring(7));
 
@@ -162,7 +162,7 @@ public class CustomAdapter extends ArrayAdapter<Ticket> {
                                 new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
                         String date = simpleDateFormat.format(photo.lastModified());
                         startImageView.putExtra("imgLastMod", date);
-                        startImageView.putExtra("imgPrice", thisPhoto.getAmount().toString()+"€");
+                        startImageView.putExtra("imgPrice", thisPhoto.getAmount()+"€");
 
                         //Start new activity
                         context.startActivity(startImageView);

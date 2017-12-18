@@ -19,22 +19,21 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
-
-import database.Mission;
+import database.MissionEntity;
 
 /**
  * Created by nicoladalmaso on 30/11/17.
  */
 
-public class MissionAdapterDB extends ArrayAdapter<Mission> {
+public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
     Context context;
     String path = "";
     int pos = 0;
-    List<Mission> missions;
+    List<MissionEntity> missions;
 
     public MissionAdapterDB(Context context, int textViewResourceId,
-                          List<Mission> objects) {
+                          List<MissionEntity> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
         missions = objects;
@@ -50,7 +49,7 @@ public class MissionAdapterDB extends ArrayAdapter<Mission> {
         TextView description = (TextView)convertView.findViewById(R.id.missionDescription);
         //FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
         //missionDelete.setTag(position);
-        Mission c = getItem(position);
+        MissionEntity c = getItem(position);
         title.setText(c.getName());
         description.setText(c.getDescription());
         convertView.setTag(c.getID());

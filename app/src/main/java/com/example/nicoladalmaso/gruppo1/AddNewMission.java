@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 import database.DataManager;
-import database.Mission;
+import database.MissionEntity;
 
 public class AddNewMission extends AppCompatActivity{
 
@@ -75,13 +75,13 @@ public class AddNewMission extends AppCompatActivity{
                 if((description==null)||description.equals("")){
                     description = context.getString(R.string.defaultDescription);
                 }
-                Mission miss = new Mission();
+                MissionEntity miss = new MissionEntity();
                 int missionID = 0;
                 miss.setPersonID(1);
                 miss.setName(name);
                 miss.setDescription(description);
                 DB.addMission(miss);
-                List<Mission> missions = DB.getAllMissions();
+                List<MissionEntity> missions = DB.getAllMissions();
                 for(int i = 0; i < missions.size(); i++){
                     if(missions.get(i).getID() > missionID)
                         missionID = missions.get(i).getID();

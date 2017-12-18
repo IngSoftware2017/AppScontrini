@@ -16,12 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    lintOptions{
-        warning 'InvalidPackage'
-    }
-    packagingOptions{
-        exclude 'org/bytedeco/javacpp/**'
-        exclude '**/libav*.so'
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -31,4 +29,17 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+//    api ('com.google.guava:guava:23.5-android') {
+//        exclude group: 'com.google.code.findbugs'
+//    }
+//    api "org.functionaljava:functionaljava:4.7"
+//    api "org.functionaljava:functionaljava-java-core:4.7"
+
+    api 'com.annimon:stream:1.1.9' // Lightweight-Stream-API
+}
+
+task testAll(dependsOn: ['test', 'connectedAndroidTest']) {
+    group = 'custom_tasks'
+    description = "Run all tests"
 }

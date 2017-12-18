@@ -1,5 +1,7 @@
 package com.ing.software.common;
 
+import android.graphics.Point;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.ArrayList;
@@ -37,11 +39,12 @@ public class Ticket {
     public BigDecimal amount;
 
     /**
+     * List of vertices of rectangle
+     */
+    public List<Point> rectangle;
+
+    /**
      * List of errors related to the creation or manipulation of the Ticket
      */
     public List<TicketError> errors = new ArrayList<>();
-
-    public String toString(){
-        return title+" "+date+" "+amount;
-    }//toString
 }

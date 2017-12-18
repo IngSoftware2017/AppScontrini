@@ -7,6 +7,7 @@ import java.util.HashMap;
  * Static class containing grids for probability regions (WIP)
  * Note: these grids are note definitive yet
  * More ratios are going to be added for next step
+ * As soon as the OcrSchemer will be ready this class will be Deprecated
  * @author Michelon
  */
 public class ProbGrid {

@@ -12,34 +12,36 @@ import android.net.Uri;
 
 /**
  * Represents one mission and its associated information
- * @author Marco Olivieri on 26/11/2017 (Team 3)
+ * @author Marco Olivieri(Team 3)
  */
 
-@Entity(tableName = Constants.MISSION_TABLE_NAME,
-        foreignKeys = @ForeignKey(entity = Person.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
-@TypeConverters(Converters.class)
 
-public class Mission {
+@Entity(tableName = Constants.MISSION_TABLE_NAME,
+        foreignKeys = @ForeignKey(entity = PersonEntity.class,
+                parentColumns = Constants.PERSON_PRIMARY_KEY_NAME,
+                childColumns = Constants.PERSON_CHILD_COLUMNS))
+@TypeConverters(Converters.class) // automatic converters for database correct type
+
+public class MissionEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
-    private int ID;
-    private String name;
-    private String description;
+    private long ID;
     private Date startMission;
     private Date endMission;
     private String location;
     private boolean isRepay;
     private Uri excel;
+    private String name;
 
     @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
     private int personID;
 
     @Ignore
     /**
-     * Non parametric constructor
+     * Non parametric constructor to use when you don't want set all fields
      */
-    public Mission() {
+    public MissionEntity() {
     }
 
     /**
@@ -50,22 +52,21 @@ public class Mission {
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public Mission(Date startMission, Date endMission, String location, int personID, String name, String description) {
+    public MissionEntity(String name, Date startMission, Date endMission, String location, int personID) {
         this.startMission = startMission;
         this.endMission = endMission;
         this.location = location;
         isRepay = false;
         excel = null;
-        this.name = name;
-        this.description = description;
         this.personID = personID;
+        this.name = name;
     }
 
     /**
      * Returns the mission ID
      * @return  ID
      */
-    public int getID() {
+    public long getID() {
         return ID;
     }
 
@@ -74,7 +75,7 @@ public class Mission {
      * Set mission id
      * @param ID not null
      */
-    public void setID(int ID) {
+    public void setID(long ID) {
         this.ID = ID;
     }
 
@@ -127,38 +128,6 @@ public class Mission {
     }
 
     /**
-     * Returns the name of the mission
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of the mission
-     * @param name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Returns the description of the mission
-     * @return description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Sets the description of the mission
-     * @param description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
      * Returns if this mission is repay or not
      * @return
      */
@@ -206,6 +175,21 @@ public class Mission {
         this.personID = personID;
     }
 
-    //TODO override toString
+    /**
+     * Returns the name of this mission
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name of this mission
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }
 

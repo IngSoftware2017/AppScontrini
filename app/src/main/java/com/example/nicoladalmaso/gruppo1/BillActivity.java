@@ -30,7 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.ocr.DataAnalyzer;
-import com.ing.software.ocr.OnTicketReadyListener;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -43,11 +42,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import database.DataManager;
-import database.Ticket;
+import database.TicketEntity;
+
 public class BillActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
     public Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    public List<Ticket> list = new LinkedList<Ticket>();
+    public List<TicketEntity> list = new LinkedList<TicketEntity>();
     public Uri photoURI;
     public boolean isFabOpen = false;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -172,7 +172,7 @@ public class BillActivity extends AppCompatActivity {
      * @param missionID ticket's mission id
      */
     public void addToList(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID){
-        list.add(new Ticket(fileUri, amount, shop, date, title, missionID));
+        list.add(new TicketEntity(fileUri, amount, shop, date, title, missionID));
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, DB);
         listView.setAdapter(adapter);
@@ -385,56 +385,13 @@ public class BillActivity extends AppCompatActivity {
                 }
             });
             ocr.release();
-
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            //PICCOLO_OLD
-            // aggiungo il file al db
-            //DatabaseManager helper = DatabaseManager.getInstance(getApplicationContext());
-            //helper.addPhoto(root+fname); DB ALTERNATIVO
-            //DbManager db = new DbManager(getApplicationContext());
-            //db.addRecord(root+fname,"","","");
             out.flush();
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    /** NOT USED
-     * Lazzarin
-     * @param  imageToCrop is the photo we want to resize. It has to be a Bitmap object.
-     * @return an Uri object taken to the file allocated in "documents",so it isn't show on the gallery
-     *
-     */
-    private Uri savePhotoForCrop (Bitmap imageToCrop) {
-        File allocation = temporaryFile();
-        try {
-            FileOutputStream out = new FileOutputStream(allocation);
-            imageToCrop.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Uri uri=Uri.fromFile(allocation);
-        return uri;
-
-    }
-
-    /** NOT USED
-     * Lazzarin
-     * @return temporary allocation with a File object.
-     */
-    private File temporaryFile()
-    {
-        File myDir = new File(root);
-        String imageFileName = "photoToCrop.jpg";
-        File file = new File(myDir, imageFileName);
-        if (file.exists())
-            file.delete();
-        return file;
-    }
-
 
     /**PICCOLO
      * Metodo che "ripulisce" lo schermo dalle immagini
@@ -471,9 +428,9 @@ public class BillActivity extends AppCompatActivity {
      *  Print all tickets, get it from DB
      */
     public void printAllImages(){
-        List<Ticket> ticketList = DB.getAllTickets();
+        List<TicketEntity> ticketList = DB.getAllTickets();
         Log.d("Tickets", ticketList.toString());
-        Ticket t;
+        TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
             t = ticketList.get(i);
@@ -492,41 +449,6 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-
-    /** Dal Maso (NOT USED)
-     *  Print last image (Old method)
-     */
-    private void printLastImage(){
-        File[] files = readAllImages();
-        Bitmap myBitmap = BitmapFactory.decodeFile(files[files.length-1].getAbsolutePath());
-        //addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
-    }
-
-
-    /** NOT USED
-     * Dal Maso
-     * Stampa il bitmap passato (Solo per testing)
-     * @param myBitmap bitmap da stampare
-     */
-    private void printThisBitmap(Bitmap myBitmap){
-        //addToList("Print this bitmap", "Descrizione della foto", myBitmap);
-    }
-
-
-    /** NOT USED
-     * PICCOLO_Edit by Dal Maso
-     * Metodo che cancella l'i-esimo file in una directory
-     * @param toDelete l'indice del file da cancellare
-     * @param path percorso del file da cancellare
-     * @return se l'operazione è andata a buon fine
-     */
-    public boolean deleteFile(int toDelete, String path){
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        return files[toDelete].delete();
-    }//deleteFile
-
-
     /**PICCOLO_Edit by Dal Maso
      * Metodo che cancella permette all'utente di ridimensionare la foto
      * @param toCrop l'indice della foto di cui fire il resize
@@ -539,19 +461,4 @@ public class BillActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
-
-    /** NOT USED
-     * VERSIONE DATABASE
-     *PICCOLO
-     * @param filename il id del file da cancellare a
-     */
-    /*
-    private void deleteFileAndRow(String filename){
-        DbManager db = new DbManager(getApplicationContext());
-        //cancello il file associato solo se la query va a buon fine
-        if(db.delete(filename)){
-            File file = new File(filename);
-            boolean deleted = file.delete();
-        }//if
-    }//deletePickedFile */
 }
