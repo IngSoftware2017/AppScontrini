@@ -108,7 +108,14 @@ public class DataManager {
     public List<TicketEntity> getAllTickets(){
         return database.ticketDao().getAllTickets();
     }
+    
+    public List<MissionEntity> getAllMission(){
+        return database.ticketDao().getAllMission();
+    }
 
+    public List<PersonEntity> getAllPerson(){
+        return database.ticketDao().getAllPerson();
+    }
 
     public List<TicketEntity> getTicketsForMission(int id){
         return database.ticketDao().getTicketsForMission(id);
