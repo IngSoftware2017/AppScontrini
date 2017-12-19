@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -33,8 +34,11 @@ import java.util.List;
 
 import database.Constants;
 import database.DataManager;
+import database.Database;
 import database.MissionEntity;
 import database.PersonEntity;
+
+import static android.app.PendingIntent.getActivity;
 
 /**
  * Created by Marco Olivieri on 03/12/2017
@@ -64,6 +68,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     ListView personsList;
     List<PersonEntity> personEntities;
     TextView noticeEmptyText;
+
+    int personID;
 
     /**
      * It sets the listener to the all AddMission objects and manage the calendar show for make
@@ -146,6 +152,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
         // Lista Persone salvate
         personsList = findViewById(R.id.personsList);
+
+        // Message for No Mission
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
 
         personEntities = DataManager.getInstance(this).getAllPerson();
@@ -161,7 +169,6 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     /**
      * Initialize of activity
      * Check if there are some persons and show a message
-     *
      * @author Matteo Mascotto
      */
     private void checkInitialization(){
@@ -188,7 +195,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         if (nameMissionText.getText().toString().equals("")) return nameMissionText;
         if (startDateMissionText.getText().toString().equals("")) return startDateMissionText;
         if (endDateMissionText.getText().toString().equals("")) return endDateMissionText;
-        if (addPersonaEditText.getText().toString().equals("")) return addPersonaEditText;
+        // if (addPersonaEditText.getText().toString().equals("")) return addPersonaEditText;
 
         /* TODO: This control isn't correct, find a mode to check the correct date format
         dateInput = startDateMissionText.getText().toString();
@@ -223,13 +230,13 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
             Log.d(DEBUG_TAG, "EDIT TEXT:" + addPersonaEditText.getText() + ".");
 
             if (checkCorrectField() == nameMissionText) {
-                showErrorDialog(String.valueOf(R.string.missionErrorMessage));
+                Toast.makeText(this, R.string.missionErrorMessage, Toast.LENGTH_LONG).show();
             } else if (checkCorrectField() == startDateMissionText) {
-                showErrorDialog(String.valueOf(R.string.startErrorMessage));
+                Toast.makeText(this, R.string.startErrorMessage, Toast.LENGTH_LONG).show();
             } else if (checkCorrectField() == endDateMissionText) {
-                showErrorDialog(String.valueOf(R.string.endErrorMessage));
+                Toast.makeText(this, R.string.endErrorMessage, Toast.LENGTH_LONG).show();
             } else if (checkCorrectField() == addPersonaEditText) {
-                showErrorDialog(String.valueOf(R.string.personErrorMessage));
+                Toast.makeText(this, R.string.personErrorMessage, Toast.LENGTH_LONG).show();
             } else {
 
                 MissionEntity missionEntity = new MissionEntity();

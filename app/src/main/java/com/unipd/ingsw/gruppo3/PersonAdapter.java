@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -33,15 +35,15 @@ import database.PersonEntity;
 public class PersonAdapter extends ArrayAdapter<PersonEntity> {
 
     Context context;
-    DataManager dataManager;
-    // int pos = 0;
+    AddPersonEditText addPersonaEditText;
+    int pos = 0; // The index position of the clicked object inside the Array
 
     /**
      * Constructor of the class
      *
      * @param context it contain the context of the class
-     * @param textViewResourceId
-     * @param objects
+     * @param textViewResourceId it's the ID of the textEdit in which the adapter will update the info
+     * @param objects it contain the object where improve the changes
      */
     public PersonAdapter(Context context, int textViewResourceId, List<PersonEntity> objects) {
         super(context, textViewResourceId, objects);
@@ -51,19 +53,20 @@ public class PersonAdapter extends ArrayAdapter<PersonEntity> {
     /**
      * It sets the card view of the Person List
      *
-     * @param position
-     * @param convertView
-     * @param parent
-     * @return
+     * @param position The position of the item within the PersonAdapter's data set
+     * @param convertView The CardView object
+     * @param parent The parent were the CardView is attached
+     *
+     * @return The CardView with the all Persons
      */
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
 
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.persona_row_item, null);
         CardView card = convertView.findViewById(R.id.personaCardView);
         TextView personNameView = convertView.findViewById(R.id.personNameView);
-        PersonEntity personEntity= getItem(position);
+        final PersonEntity personEntity= getItem(position);
         personNameView.setText(personEntity.getName() + " " + personEntity.getLastName());
         convertView.setTag(position);
 
@@ -78,25 +81,14 @@ public class PersonAdapter extends ArrayAdapter<PersonEntity> {
              * @param v
              */
             public void onClick (View v){
-                /*
-                pos = Integer.parseInt(v.getTag().toString());
-                path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-                Log.d("Directory Mission",path);
-                File directory = new File(path);
-                File[] files = directory.listFiles();
-
-                Intent startMissionView = new Intent(context, BillActivityGruppo1.class);
-                Variables.getInstance().setCurrentMissionDir(files[pos].getPath());
-                Log.d("GlobalDir", Variables.getInstance().getCurrentMissionDir());
-                startMissionView.putExtra("missionName", files[pos].getName());
-                startMissionView.putExtra("missionId", pos);
-                context.startActivity(startMissionView);*/
-
-
                 // Extraction of the persons selected and than assign it to the Mission
-                // TODO Trovare il modo di estrarre l'ID della persona su cui si ha cliccato
-                //      all'interno della lista per poi poterla asseganre alla Missione
+                PersonEntity personEntity= getItem(position);
 
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                v = inflater.inflate(R.layout.activity_add_mission, null);
+
+                addPersonaEditText = v.findViewById(R.id.addPersonaEditText);
+                addPersonaEditText.setPersonEntity(personEntity);
             }
         });
 
