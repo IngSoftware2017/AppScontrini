@@ -181,15 +181,11 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
     public void cropFile(int toCrop){
         Log.d("Crop", "Start crop activity");
         boolean result = false;
-        for(int i = 0; i < t.size(); i++){
-            if(t.get(i).getID() == pos){
-                Uri toCropUri = t.get(i).getFileUri();
-                CropImage.activity(toCropUri)
-                        .setOutputUri(toCropUri)
-                        .start(((BillActivity)context));
-                return;
-            }
-        }
+        TicketEntity ticket = DB.getTicket(pos);
+        Uri toCropUri = ticket.getFileUri();
+        CropImage.activity(toCropUri)
+                .setOutputUri(toCropUri)
+                .start(((BillActivity)context));
     }
 
 }
