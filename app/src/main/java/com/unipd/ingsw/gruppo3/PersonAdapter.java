@@ -87,8 +87,8 @@ public class PersonAdapter extends ArrayAdapter<PersonEntity> {
                 LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = inflater.inflate(R.layout.activity_add_mission, null);
 
-                addPersonaEditText = v.findViewById(R.id.addPersonaEditText);
-                addPersonaEditText.setPersonEntity(personEntity);
+                //addPersonaEditText = v.findViewById(R.id.addPersonaEditText);
+                //addPersonaEditText.setPersonEntity(personEntity);
             }
         });
 

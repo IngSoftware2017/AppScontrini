@@ -24,6 +24,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,17 +60,23 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     //Components
     FloatingActionButton saveMissionButton;
+    FloatingActionButton newPersonButton;
 
     EditText nameMissionText;
     EditText startDateMissionText;
     EditText endDateMissionText;
-    AddPersonEditText addPersonaEditText;
-
-    ListView personsList;
+    //AddPersonEditText addPersonaEditText;
+    Spinner personsSpinner;
+    //ListView personsList;
     List<PersonEntity> personEntities;
     TextView noticeEmptyText;
 
     int personID;
+
+    //Initialization of an user Person who will own every mission without associated Person
+    PersonEntity user = new PersonEntity("user","user","");
+    MissionEntity missionEntity = new MissionEntity();
+
 
     /**
      * It sets the listener to the all AddMission objects and manage the calendar show for make
@@ -85,6 +92,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         setContentView(R.layout.activity_add_mission);
 
+        DataManager.getInstance(this).addPerson(user);
+        missionEntity.setPersonID(user.getID());
         // Nome Missione
         nameMissionText = findViewById(R.id.nameText);
         nameMissionText.setOnClickListener(this);
@@ -148,20 +157,20 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         });
 
         // Persona
-        addPersonaEditText = findViewById(R.id.addPersonaEditText);
+        //addPersonaEditText = findViewById(R.id.addPersonaEditText);
 
         // Lista Persone salvate
-        personsList = findViewById(R.id.personsList);
+        //personsList = findViewById(R.id.personsList);
 
         // Message for No Mission
         noticeEmptyText = findViewById(R.id.emptyNoticeTextView);
 
         personEntities = DataManager.getInstance(this).getAllPerson();
-        PersonAdapter adapter = new PersonAdapter(this, R.layout.persona_row_item, personEntities);
-        personsList.setAdapter(adapter);
-        checkInitialization();
+        //PersonAdapter adapter = new PersonAdapter(this, R.layout.persona_row_item, personEntities);
+        //personsList.setAdapter(adapter);
+        //checkInitialization();
 
-        // Bottone SAVE
+        // Botton SAVE
         saveMissionButton = findViewById(R.id.saveButton);
         saveMissionButton.setOnClickListener(this);
     }
@@ -171,13 +180,13 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
      * Check if there are some persons and show a message
      * @author Matteo Mascotto
      */
-    private void checkInitialization(){
+/*    private void checkInitialization(){
         if(personsList.getAdapter().getCount()==0){
-            noticeEmptyText.setEnabled(Boolean.TRUE);
+            //noticeEmptyText.setEnabled(Boolean.TRUE);
             personsList.setEnabled(Boolean.FALSE);
         }
     }
-
+*/
     /**
      * It control if the Mission data are corrects.
      * If it is not will return the object where we do the check, null otherwise
@@ -227,7 +236,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     public void onClick(View view) {
         // Action after activate the request to Save the Mission
         if (view.getId() == saveMissionButton.getId()) {
-            Log.d(DEBUG_TAG, "EDIT TEXT:" + addPersonaEditText.getText() + ".");
+            //Log.d(DEBUG_TAG, "EDIT TEXT:" + addPersonaEditText.getText() + ".");
 
             if (checkCorrectField() == nameMissionText) {
                 Toast.makeText(this, R.string.missionErrorMessage, Toast.LENGTH_LONG).show();
@@ -235,12 +244,12 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 Toast.makeText(this, R.string.startErrorMessage, Toast.LENGTH_LONG).show();
             } else if (checkCorrectField() == endDateMissionText) {
                 Toast.makeText(this, R.string.endErrorMessage, Toast.LENGTH_LONG).show();
-            } else if (checkCorrectField() == addPersonaEditText) {
-                Toast.makeText(this, R.string.personErrorMessage, Toast.LENGTH_LONG).show();
+            //} else if (checkCorrectField() == addPersonaEditText) {
+               // Toast.makeText(this, R.string.personErrorMessage, Toast.LENGTH_LONG).show();
             } else {
 
-                MissionEntity missionEntity = new MissionEntity();
-
+                missionEntity = new MissionEntity();
+/*
                 // If the person it's already present it assign it to the Mission, otherwise it create a new one
                 // lastName and academicTitle are not yet implemented
                 if (addPersonaEditText.getPersonEntity() == null) {
@@ -249,13 +258,13 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                     DataManager.getInstance(this).addPerson(personEntity);
                 }
 
-                /*
+
                 if (addPersonaEditText.getPersonEntity() != null) {
                     missionEntity.setPersonID(addPersonaEditText.getPersonEntity().getID());
                 }
-                 */
 
-                missionEntity.setPersonID(addPersonaEditText.getPersonEntity().getID());
+*/
+                //missionEntity.setPersonID(addPersonaEditText.getPersonEntity().getID());
                 missionEntity.setName(nameMissionText.getText().toString());
                 DataManager.getInstance(this).addMission(missionEntity);
 
@@ -263,7 +272,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                 callBillActivity.putExtra(IntentCodes.MISSION_OBJECT, missionEntity);
                 startActivity(callBillActivity);
             }
-
+/*
                 if(addPersonaEditText.getText().toString().equals("")){
                     showErrorDialog("Inserire o selezionare una persona");
                 }

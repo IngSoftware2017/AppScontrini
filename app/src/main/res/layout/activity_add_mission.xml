@@ -40,8 +40,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameText"
-        android:focusable="true"
-        tools:ignore="MissingConstraints" />
+        android:windowSoftInputMode="stateHidden"/>
 
     <EditText
         android:id="@+id/endMissionText"
@@ -68,7 +67,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/add_person_surname_label"
+        android:text="@string/select_person_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.307"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -76,30 +75,9 @@
         app:layout_constraintTop_toBottomOf="@+id/endMissionText"
         tools:ignore="MissingConstraints" />
 
-    <ListView
-        android:id="@+id/personsList"
-        android:layout_width="355dp"
-        android:layout_height="203dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addPersonaEditText"
-        tools:ignore="MissingConstraints" />
 
-    <com.unipd.ingsw.gruppo3.AddPersonEditText
-        android:id="@+id/addPersonaEditText"
-        android:layout_width="213dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="text"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:ignore="MissingConstraints" />
+
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/saveButton"
@@ -120,5 +98,29 @@
         app:layout_constraintVertical_bias="0.982"
         app:srcCompat="@android:drawable/ic_menu_save"
         tools:ignore="MissingConstraints" />
+
+    <Spinner
+        android:id="@+id/personsSpinner"
+        android:layout_width="240dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.441" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/newPersonButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="208dp"
+        android:clickable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/personsSpinner"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_add_white_24dp" />
 
 </android.support.constraint.ConstraintLayout>
