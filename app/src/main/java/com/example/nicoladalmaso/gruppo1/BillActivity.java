@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -359,7 +360,14 @@ public class BillActivity extends AppCompatActivity {
         if (file.exists())
             file.delete();
         try {
+            FileOutputStream out = new FileOutputStream(file);
 
+            //TODO: HardCode example, implement ocr here
+
+            DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, pos));
+            imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -407,6 +415,7 @@ public class BillActivity extends AppCompatActivity {
         for(int i = 0; i < ticketList.size(); i++){
             t = ticketList.get(i);
             addToList(t.getFileUri(), t.getAmount(), t.getShop(), t.getDate(), t.getTitle(), t.getMissionID());
+            count++;
         }
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);

@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ing.software.common.Ticket;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -100,17 +101,17 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             public void onClick(View v) {
 
                 pos =  Integer.parseInt(v.getTag().toString());
+                Log.d("Pos", ""+pos);
+                for(int i = 0; i < t.size(); i++){
+                    Log.d("ID", ""+t.get(i).getID());
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(context.getString(R.string.deleteTicketToast))
                         .setTitle(context.getString(R.string.deleteTitle));
+                TicketEntity thisTicket = DB.getTicket(pos);
                 String toDelete = "";
-
                 //Get the ticket to delete
-                for(int i = 0; i < t.size(); i++){
-                    if(t.get(i).getID() == pos){
-                        toDelete = t.get(i).getFileUri().toString().substring(7);
-                    }
-                }
+                toDelete = thisTicket.getFileUri().toString().substring(7);
                 final File ticketDelete = new File(toDelete);
                 // Add the buttons
                 builder.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
