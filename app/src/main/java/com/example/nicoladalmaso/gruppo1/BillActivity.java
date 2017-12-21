@@ -192,11 +192,6 @@ public class BillActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                for(int i = 0; i < list.size(); i++){
-                    if(list.get(i).getMissionID() == pos){
-                        DB.deleteTicket(list.get(i).getID());
-                    }
-                }
                 DB.deleteMission(pos);
                 context.startActivity(startMissionView);
             }
