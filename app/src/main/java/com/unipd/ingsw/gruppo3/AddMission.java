@@ -248,7 +248,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
                // Toast.makeText(this, R.string.personErrorMessage, Toast.LENGTH_LONG).show();
             } else {
 
-                missionEntity = new MissionEntity();
+                //missionEntity = new MissionEntity();
 /*
                 // If the person it's already present it assign it to the Mission, otherwise it create a new one
                 // lastName and academicTitle are not yet implemented
