@@ -234,6 +234,12 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
      */
     @Override
     public void onClick(View view) {
+        //Action after activate the request to add a Person
+        if (view.getId()== newPersonButton.getId()){
+            Intent callAddPersonActivity = new Intent(this,AddPerson.class);
+            startActivity(callAddPersonActivity);
+        }
+
         // Action after activate the request to Save the Mission
         if (view.getId() == saveMissionButton.getId()) {
             //Log.d(DEBUG_TAG, "EDIT TEXT:" + addPersonaEditText.getText() + ".");
