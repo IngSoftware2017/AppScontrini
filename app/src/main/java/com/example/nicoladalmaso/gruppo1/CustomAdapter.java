@@ -101,10 +101,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             public void onClick(View v) {
 
                 pos =  Integer.parseInt(v.getTag().toString());
-                Log.d("Pos", ""+pos);
-                for(int i = 0; i < t.size(); i++){
-                    Log.d("ID", ""+t.get(i).getID());
-                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(context.getString(R.string.deleteTicketToast))
                         .setTitle(context.getString(R.string.deleteTitle));
@@ -118,7 +114,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TicketID", ""+pos);
                         if(DB.deleteTicket(pos) && ticketDelete.delete()){
-                            ticketDelete.delete();
                             Log.d("ELIMINATO", "OK");
                             ((BillActivity)context).clearAllImages();
                             ((BillActivity)context).printAllImages();
@@ -146,7 +141,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         });
 
         //Dal Maso
-        //
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 pos = Integer.parseInt(v.getTag().toString());

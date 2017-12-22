@@ -165,15 +165,9 @@ public class BillActivity extends AppCompatActivity {
 
     /** Dal Maso
      * Add new ticket to the list
-     * @param fileUri ticket uri
-     * @param amount ticket amount
-     * @param shop shop name
-     * @param date ticket date
-     * @param title name of the file
-     * @param missionID ticket's mission id
      */
-    public void addToList(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID){
-        list.add(new TicketEntity(fileUri, amount, shop, date, title, missionID));
+    public void addToList(TicketEntity t){
+        list.add(t);
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, DB);
         listView.setAdapter(adapter);
@@ -413,8 +407,8 @@ public class BillActivity extends AppCompatActivity {
         TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
-            t = ticketList.get(i);
-            addToList(t.getFileUri(), t.getAmount(), t.getShop(), t.getDate(), t.getTitle(), t.getMissionID());
+            Log.d("Ticket_ID", ""+ticketList.get(i).getID());
+            addToList(ticketList.get(i));
             count++;
         }
         //If there aren't tickets show message

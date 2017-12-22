@@ -1,6 +1,7 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.DatePickerDialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
@@ -10,10 +11,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +28,7 @@ public class AddNewMission extends AppCompatActivity{
 
     Context context;
     public DataManager DB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,8 +36,9 @@ public class AddNewMission extends AppCompatActivity{
         context = this.getApplicationContext();
         setTitle(context.getString(R.string.newMission));
         setContentView(R.layout.activity_add_new_mission);
-
     }
+
+
 
     /** Dal Maso
      * Setting toolbar buttons and style from /res/menu
