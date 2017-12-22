@@ -9,17 +9,21 @@
     <string name="name">Nome</string>
     <string name="description">Descrizione</string>
     <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
-    <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="noBills">Non hai scontrini\nClicca sul pulsante + per aggiungerne uno</string>
     <string name="emptyMission_string">Nessun missione presente.\nAggiungi una missione con il tasto +</string>
     <string name="nameMission_string">Nome Missione</string>
     <string name="startMission_string">Data Inizio Missione</string>
     <string name="endMission_string">Data Fine Missione</string>
     <string name="select_person_label">Seleziona o inserisci la persona della missione:</string>
-    <string name="add_person_surname_label">Cognome nuova persona</string>
-
+    <string name="add_person_surname_label">Cognome:</string>
+    <string name="add_person_name_label">Nome:</string>
+    <string name="add_person_academicTitle_label">Titolo accademico:</string>
     <string name="missionErrorMessage">Inserire un valore corretto di Missione</string>
     <string name="startErrorMessage">Inserire un valore corretto di data di inizio Missione</string>
     <string name="endErrorMessage">Inserire un valore corretto di data di fine Missione</string>
     <string name="personErrorMessage">Inserire o selezionare una persona</string>
+    <string name="name_hint">Mario</string>
+    <string name="surname_hint">Rossi</string>
+    <string name="academicTitle_hint">Professore</string>
 
 </resources>
