@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,8 +13,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -28,17 +34,39 @@ public class AddNewMission extends AppCompatActivity{
 
     Context context;
     public DataManager DB;
+    TextView missionStart;
+    TextView missionFinish;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setElevation(0);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
         setTitle(context.getString(R.string.newMission));
         setContentView(R.layout.activity_add_new_mission);
+        initializeComponents();
     }
 
+    private void initializeComponents(){
+        missionStart = (TextView)findViewById(R.id.input_missionStart);
+        missionFinish = (TextView)findViewById(R.id.input_missionFinish);
+        LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionStart);
+        LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionFinish);
+        bntMissionStart.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
+                newFragment.show(getFragmentManager(), "datePicker");
+            }
+        });
 
+        bntMissionFinish.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
+                newFragment.show(getFragmentManager(), "datePicker");
+            }
+        });
+    }
 
     /** Dal Maso
      * Setting toolbar buttons and style from /res/menu
@@ -82,6 +110,8 @@ public class AddNewMission extends AppCompatActivity{
                 }
                 MissionEntity miss = new MissionEntity();
                 miss.setPersonID(1);
+                miss.setStartMission((Date)missionStart.getText());
+                miss.setEndMission((Date)missionFinish.getText());
                 miss.setName(name);
                 long missionID = DB.addMission(miss);
                 Log.d("New mission id", ""+missionID);

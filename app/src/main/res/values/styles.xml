@@ -7,6 +7,14 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="TextLabel" parent="TextAppearance.AppCompat">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">#a00035</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">#FFF</item>
+        <item name="colorControlNormal">#a00035</item>
+        <item name="colorControlActivated">#FFF</item>
+    </style>
     <style name="AppTheme.ActionBar.Transparent" parent="AppTheme">
         <item name="android:windowContentOverlay">@null</item>
         <item name="windowActionBarOverlay">true</item>
@@ -22,7 +30,6 @@
         <item name="contentPaddingRight">16dp</item>
         <item name="cardBackgroundColor">#fff</item>
     </style>
-
     <style name="CropTheme" parent="@style/Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="titleTextColor">#FFF</item>

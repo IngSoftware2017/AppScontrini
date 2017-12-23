@@ -3,9 +3,15 @@ package com.example.nicoladalmaso.gruppo1;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
+import android.util.Log;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
 
+import java.time.Year;
 import java.util.Calendar;
 
 /**
@@ -14,6 +20,21 @@ import java.util.Calendar;
 
 public class  DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
+
+    int id;
+
+    public static DatePickerFragment newInstance(TextView textView) {
+        DatePickerFragment f = new DatePickerFragment();
+        Bundle args = new Bundle();
+        args.putInt("textView", textView.getId());
+        f.setArguments(args);
+        return f;
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        id = getArguments().getInt("textView");
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -28,6 +49,8 @@ public class  DatePickerFragment extends DialogFragment
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        // Do something with the date chosen by the user
+        Log.d("TextInputEditTextID", "ID: "+id+", R.id: "+R.id.input_missionStart);
+        TextView textView = (TextView) getActivity().findViewById(id);
+        textView.setText(day + "/" + month + "/" + year);
     }
 }
