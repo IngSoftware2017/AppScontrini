@@ -1,6 +1,6 @@
-| Gruppo2_master  | Gruppo2_dev | Gruppo2-modular | K_gruppo2 | K_gruppo2-modular | K_gruppo2-modular-complete |
-| ------------- | ------------- | ------------- | -------------| ------------- | ------------- |
-| [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_master)](https://travis-ci.org/IngSoftware2017/AppScontrini)  | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_dev)](https://travis-ci.org/IngSoftware2017/AppScontrini)  | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular-complete)](https://travis-ci.org/Kraktun/AppScontrini) |
+| Gruppo2_master  | Gruppo2-modular | K_gruppo2-modular | K_gruppo2-modular-complete |
+| ------------- | ------------- | -------------| ------------- |
+| [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_master)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular-complete)](https://travis-ci.org/Kraktun/AppScontrini) |
 
  
 ## BRANCH DI TEST

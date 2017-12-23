@@ -54,7 +54,7 @@ public class DatabaseTest {
         personEntity.setID((int) ticketDAO.addPerson(personEntity));
 
         missionEntity = new MissionEntity();
-        missionEntity.setPersonID(personEntity.getID());
+        missionEntity.setPersonID((int) (long)personEntity.getID());
         missionEntity.setID((int) ticketDAO.addMission(missionEntity));
 
         testTicketEntity1 = new TicketEntity();
@@ -62,7 +62,7 @@ public class DatabaseTest {
         testTicketEntity1.setDate(new Date(1996,10,12));
         testTicketEntity1.setShop("Decathlon");
         testTicketEntity1.setTitle("Football shoes");
-        testTicketEntity1.setMissionID(missionEntity.getID());
+        testTicketEntity1.setMissionID((int) (long)missionEntity.getID());
 
         /*testTicket2 = new TicketEntity();
         testTicket2.setAmount(new BigDecimal(12));
@@ -123,7 +123,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteExistingTicketTest(){
-        Assert.assertTrue(ticketDAO.deleteTicket(testTicketEntity1.getID())==1);
+        Assert.assertTrue(ticketDAO.deleteTicket((int) (long)testTicketEntity1.getID())==1);
     }
     //TODO test with invalid ID, test with null ID (deleteTicket pre-conditions accept null)
 

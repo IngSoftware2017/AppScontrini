@@ -9,7 +9,12 @@ import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
 import com.annimon.stream.function.Consumer;
 
 import static com.ing.software.ocr.AmountComparator.*;
@@ -86,6 +91,7 @@ public class OcrManager {
         List<RawGridResult> dateList = result.getDateList();
         List<RawText> prices = OcrSchemer.getPricesTexts(result.getProducts());
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
+        ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
         return ticket;
     }
 
@@ -120,5 +126,24 @@ public class OcrManager {
             amount = amountComparator.getBestAmount();
         }
         return amount;
+    }
+
+    /**
+     * Try to decode date. Temporary method.
+     * Subtract distance from date format from percentage
+     * and rearrange the list
+     */
+    private static Date getDateFromList(List<RawGridResult> dateList) {
+        for (RawGridResult gridResult : dateList) {
+            String possibleDate = gridResult.getText().getDetection();
+            if (DataAnalyzer.getDate(possibleDate) != null) {
+                try {
+                    //Convert string to date
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 }
