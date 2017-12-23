@@ -134,6 +134,7 @@ public class AddNewMission extends AppCompatActivity{
                 startImageView.putExtra("missionID", (int) missionID);
                 startImageView.putExtra("missionName", miss.getName());
                 context.startActivity(startImageView);
+                finish();
                 return true;
 
             default:

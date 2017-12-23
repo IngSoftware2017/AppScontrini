@@ -53,7 +53,7 @@
                 android:layout_height="60dp"
                 android:textSize="22dp"
                 android:textColor="#FFF"
-                android:hint="@string/description" />
+                android:hint="@string/shop" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -99,13 +99,8 @@
                 android:id="@+id/button_missionFinish"
                 android:layout_marginTop="35dp"
                 android:layout_width="match_parent"
-<<<<<<< HEAD
-                android:layout_height="120dp"
-                android:hint="@string/shop" />
-=======
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
->>>>>>> f8a5f8eee23da82baf23baa67555b22c5afbf839
 
                 <ImageView
                     android:layout_width="wrap_content"

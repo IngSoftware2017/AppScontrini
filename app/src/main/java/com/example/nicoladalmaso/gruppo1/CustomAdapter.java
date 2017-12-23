@@ -157,11 +157,11 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                         SimpleDateFormat simpleDateFormat =
                                 new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
                         String date = simpleDateFormat.format(photo.lastModified());
-                        startImageView.putExtra("imgLastMod", date);
+                        startImageView.putExtra("imgDate", date);
                         startImageView.putExtra("imgPrice", thisPhoto.getAmount()+"€");
 
                         //Start new activity
-                        context.startActivity(startImageView);
+                        ((BillActivity)context).startActivityForResult(startImageView, 4);
                         return;
                     }
                 }

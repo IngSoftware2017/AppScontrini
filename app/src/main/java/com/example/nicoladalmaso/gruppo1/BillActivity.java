@@ -289,8 +289,8 @@ public class BillActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
-
             switch (requestCode) {
                 /**lazzarin
                  * Saves definitely the photo without losing quality, deletes the temporary file and shows
@@ -327,6 +327,12 @@ public class BillActivity extends AppCompatActivity {
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     Log.d("Crop", "OK");
                     waitDB();
+                    clearAllImages();
+                    printAllImages();
+                    break;
+
+                case(4):
+                    Log.d("DELETE", "OK");
                     clearAllImages();
                     printAllImages();
                     break;
