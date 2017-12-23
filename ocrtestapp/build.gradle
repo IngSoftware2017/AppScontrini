@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
-        versionName "0.1.1_Zainin"
+        versionName "1.0 Aoi Tori"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
