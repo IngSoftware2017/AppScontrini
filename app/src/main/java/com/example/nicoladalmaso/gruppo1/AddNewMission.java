@@ -21,6 +21,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -81,7 +83,6 @@ public class AddNewMission extends AppCompatActivity{
     }
 
     /** Dal Maso
-     * Edit by Lazzarin
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
@@ -100,27 +101,38 @@ public class AddNewMission extends AppCompatActivity{
                 String description = editDescription.getText().toString();
                 Log.d("verify null",name);
                 String checkName= name.replaceAll(" ","");
+
                 if((name==null)||checkName.equals("")) {
                     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
                     name = timeStamp;
                 }
-
                 if((description==null)||description.equals("")){
                     description = context.getString(R.string.defaultDescription);
                 }
+
                 MissionEntity miss = new MissionEntity();
-                miss.setPersonID(1);
-                miss.setStartMission((Date)missionStart.getText());
-                miss.setEndMission((Date)missionFinish.getText());
                 miss.setName(name);
+                miss.setPersonID(1);
+
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                try {
+                    miss.setStartMission(format.parse((String)missionStart.getText()));
+                    miss.setEndMission(format.parse((String)missionFinish.getText()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+
                 long missionID = DB.addMission(miss);
                 Log.d("New mission id", ""+missionID);
                 //create new directory with input text
                 //Start billActivity
+                Bundle bundle = new Bundle();
+
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startImageView.putExtra("missionName", name);
-                startImageView.putExtra("missionID", missionID);
+                startImageView.putExtra("missionID", (int) missionID);
+                startImageView.putExtra("missionName", miss.getName());
                 context.startActivity(startImageView);
                 return true;
 

@@ -53,7 +53,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         title.setText(c.getName());
         description.setText("Descrizione momentanea");
         convertView.setTag(c.getID());
-        Log.d("MID", ""+c.getID());
+        Log.d("Mission", ""+c.getStartMission());
 
         //Dal Maso
         //Sets a default background color for the mission's card

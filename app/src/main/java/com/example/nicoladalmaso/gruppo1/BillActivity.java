@@ -54,23 +54,24 @@ public class BillActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
     String tempPhotoPath;
-    Integer pos;
+    Integer missionID;
     Context context;
     String root;
     public DataManager DB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        Intent intent = getIntent();
-        String missionName = intent.getExtras().getString("missionName");
-        pos = intent.getExtras().getInt("missionID");
-        Log.d("MissionID", ""+pos);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+        Intent intent = getIntent();
+
+        String missionName = intent.getExtras().getString("missionName");
+        missionID = intent.getExtras().getInt("missionID");
+        Log.d("MissionID", "" + missionID);
+
         setTitle(missionName);
         initializeComponents();
     }
@@ -169,7 +170,7 @@ public class BillActivity extends AppCompatActivity {
     public void addToList(TicketEntity t){
         list.add(t);
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, DB);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         listView.setAdapter(adapter);
     }
 
@@ -187,11 +188,11 @@ public class BillActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                List<TicketEntity> list = DB.getTicketsForMission(pos);
+                List<TicketEntity> list = DB.getTicketsForMission(missionID);
                 for(int i = 0; i < list.size(); i++){
                     DB.deleteTicket((int) list.get(i).getID());
                 }
-                DB.deleteMission(pos);
+                DB.deleteMission(missionID);
                 context.startActivity(startMissionView);
             }
         });
@@ -362,7 +363,7 @@ public class BillActivity extends AppCompatActivity {
 
             //TODO: HardCode example, implement ocr here
 
-            DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, pos));
+            DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, missionID));
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
@@ -376,7 +377,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, DB);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
@@ -406,7 +407,7 @@ public class BillActivity extends AppCompatActivity {
      *  Print all tickets, get it from DB
      */
     public void printAllImages(){
-        List<TicketEntity> ticketList = DB.getTicketsForMission(pos);
+        List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
         Log.d("Tickets", ticketList.toString());
         TicketEntity t;
         int count = 0;
