@@ -360,7 +360,7 @@ class DataAnalyzer {
      * @return the absolute value of the minimum distance found between all combinations,
      * if the distance is >= 10 or the inserted text is empty returns -1
      */
-    private static int findDate(String text) {
+    static int findDate(String text) {
         if (text.length() == 0)
             return -1;
 
