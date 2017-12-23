@@ -4,13 +4,12 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.ing.software.common.Ticket;
+import static com.ing.software.common.Reflect.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.ing.software.common.Reflect.*;
 import static com.ing.software.ocr.TestUtils.*;
 import static com.ing.software.ocr.ImagePreprocessor.*;
 import static org.opencv.core.CvType.CV_32SC2;
@@ -33,7 +32,7 @@ public class ImagePreprocessorTests {
     public void findBiggestContourTest() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
         ImagePreprocessor ip = new ImagePreprocessor(getBitmap(0));
-        Mat img = fieldVal(ip, "srcImg");
+        Mat img = getField(ip, "srcImg");
         //invoke(IP_CLASS, "findBiggestContours", img);
     }
 }

@@ -86,7 +86,7 @@ class OcrAnalyzer {
         if (IS_DEBUG_ENABLED)
             for (RawText text : texts) {
                 OcrUtils.log(2, "FULL LIST: ", text.getDetection());
-                OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
+                //OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
             }
     }
 

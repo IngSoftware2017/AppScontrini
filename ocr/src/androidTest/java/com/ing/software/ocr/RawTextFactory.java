@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * Class to create RawTexts
  */
-
 public class RawTextFactory {
 
     private static Rect defaultRect = new Rect(10,10,30,50);
