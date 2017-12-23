@@ -4,18 +4,13 @@
     <modules>
       <module fileurl="file://C:\Users\Cristian\Desktop\AppScontriniNo\AcquisizioneFoto.iml" filepath="C:\Users\Cristian\Desktop\AppScontriniNo\AcquisizioneFoto.iml" />
       <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
-      <module fileurl="file://C:\Users\Nicola\Desktop\AppScontrini\AppScontrini.iml" filepath="C:\Users\Nicola\Desktop\AppScontrini\AppScontrini.iml" />
       <module fileurl="file://C:\Users\Cristian\Desktop\AppScontriniNo\AppScontrini.iml" filepath="C:\Users\Cristian\Desktop\AppScontriniNo\AppScontrini.iml" />
       <module fileurl="file://S:\Users\Francesco\AndroidStudioProjects\AppScontrini\AppScontriniNo.iml" filepath="S:\Users\Francesco\AndroidStudioProjects\AppScontrini\AppScontriniNo.iml" />
       <module fileurl="file://C:\Users\Nicola\Desktop\AppScontrini\AppScontriniNo.iml" filepath="C:\Users\Nicola\Desktop\AppScontrini\AppScontriniNo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\Nicola\Desktop\AppScontrini\app\app.iml" filepath="C:\Users\Nicola\Desktop\AppScontrini\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
-      <module fileurl="file://C:\Users\Nicola\Desktop\AppScontrini\common\common.iml" filepath="C:\Users\Nicola\Desktop\AppScontrini\common\common.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
-      <module fileurl="file://C:\Users\Nicola\Desktop\AppScontrini\database\database.iml" filepath="C:\Users\Nicola\Desktop\AppScontrini\database\database.iml" />
       <module fileurl="file://$PROJECT_DIR$/ocr/ocr.iml" filepath="$PROJECT_DIR$/ocr/ocr.iml" />
-      <module fileurl="file://C:\Users\Nicola\Desktop\AppScontrini\ocr\ocr.iml" filepath="C:\Users\Nicola\Desktop\AppScontrini\ocr\ocr.iml" />
     </modules>
   </component>
 </project>

@@ -1,6 +1,9 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
