@@ -7,28 +7,15 @@ import java.util.List;
 /**
  * Created by Federico Taschin on 07/11/2017.
  * Modified by Marco Olivieri on 14/11/2017
- *
- * Modify: improve methods and complete documentation
- * @author Matteo Mascotto
  */
 
 public class DataManager {
-    private static DataManager dataManager;
     private Database database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 
-    private DataManager(Context context){
+    public DataManager(Context context){
         //receives the instance of the database
         database = Database.getAppDatabase(context);
-    }
-
-    public static DataManager getInstance(Context context){
-        if(dataManager ==null){
-            dataManager = new DataManager(context);
-            return dataManager;
-        }else{
-            return dataManager;
-        }
     }
 
     /** Adds a ticketEntity into the database
@@ -37,8 +24,8 @@ public class DataManager {
      *               ticketEntity.getMissionId() not null
      * @return ID of the created record, -1 if the method fails
      */
-    public int addTicket(TicketEntity ticketEntity){
-        ticketEntity.setID((int) database.ticketDao().addTicket(ticketEntity));
+    public long addTicket(TicketEntity ticketEntity){
+        ticketEntity.setID(database.ticketDao().addTicket(ticketEntity));
         return ticketEntity.getID();
     }
 
@@ -47,8 +34,8 @@ public class DataManager {
      *                missionEntity.personID not null, must be an existing code
      * @return the id of the inserted missionEntity
      */
-    public int addMission(MissionEntity missionEntity){
-        missionEntity.setID((int) database.ticketDao().addMission(missionEntity));
+    public long addMission(MissionEntity missionEntity){
+        missionEntity.setID(database.ticketDao().addMission(missionEntity));
         return missionEntity.getID();
     }
 
@@ -56,8 +43,8 @@ public class DataManager {
      * @param personEntity PersonEntity not null, the entity to be inserted
      * @return the id of the inserted personEntity
      */
-    public int addPerson(PersonEntity personEntity){
-        personEntity.setID((int) database.ticketDao().addPerson(personEntity));
+    public long addPerson(PersonEntity personEntity){
+        personEntity.setID(database.ticketDao().addPerson(personEntity));
         return personEntity.getID();
     }
 
@@ -121,49 +108,22 @@ public class DataManager {
     public List<TicketEntity> getAllTickets(){
         return database.ticketDao().getAllTickets();
     }
+    
+    public List<MissionEntity> getAllMission(){
+        return database.ticketDao().getAllMission();
+    }
 
-    /**
-     * Return a list of the all Persons
-     *
-     * @return List<MissionEntity>
-     */
-    public List<MissionEntity> getAllMission(){return database.ticketDao().getAllMission(); }
+    public List<PersonEntity> getAllPerson(){
+        return database.ticketDao().getAllPerson();
+    }
 
-    /**
-     * Return a list of the all Persons
-     *
-     * @return List<PersonEntity>
-     */
-    public List<PersonEntity> getAllPerson(){return database.ticketDao().getAllPerson(); }
-
-    /**
-     * Return a list of the tickets associate to a specific Mission
-     *
-     * @param id identifier of the Mission
-     * @return List<TicketEntity>
-     */
     public List<TicketEntity> getTicketsForMission(int id){
         return database.ticketDao().getTicketsForMission(id);
     }
 
-    /**
-     * Return a specific Ticket from a given ID
-     *
-     * @param id identifier of the Ticket
-     * @return TicketEntity
-     */
+
     public TicketEntity getTicket(int id){
         return database.ticketDao().getTicket(id);
-    }
-
-    /**
-     * Return a specific Person from a given ID
-     *
-     * @param id identifier of the Person
-     * @return PersonEntity
-     */
-    public PersonEntity getPerson(int id){
-        return database.ticketDao().getPerson(id);
     }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity

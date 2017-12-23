@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -17,10 +19,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.ing.software.common.Ticket;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.math.RoundingMode;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,21 +46,23 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
     String path = "";
     int pos = 0;
     int missionID;
-    DataManager dataManager;
+    DataManager DB;
     List<TicketEntity> t = new ArrayList<TicketEntity>();
 
+    //Dal Maso, adapter declare
     public CustomAdapter(Context context, int textViewResourceId,
                          List<TicketEntity> objects, int missionID, DataManager DB) {
         super(context, textViewResourceId, objects);
         this.context = context;
         this.missionID = missionID;
-        this.dataManager = DataManager.getInstance(context);
+        this.DB = new DataManager(context);
         this.t = objects;
         Log.d("MISSION", ""+missionID);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.cardview, null);
@@ -63,54 +71,57 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         TextView tot = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
+
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
         title.setText(photo.getName());
+
+        //Amount text fixes
         String amount = "";
         if(c.getAmount() == null){
             amount = "Prezzo non rilevato";
+            tot.setText(amount);
         }
         else {
-            amount = c.getAmount().toString();
+            amount = c.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
+            tot.setText("Totale: "+amount+"€");
         }
-        tot.setText("Totale: "+amount+"€");
 
+        //Ticket image bitmap set
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        options.inSampleSize = 8;
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
         img.setImageBitmap(bitmap);
-        Log.d("LocalID", ""+c.toString());
+
+        //For next ticket manages
         fabDelete.setTag(c.getID());
         convertView.setTag(c.getID());
 
-        //Dal Maso
+        //Dal Maso, delete ticket
         fabDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
                 pos =  Integer.parseInt(v.getTag().toString());
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(text.deleteTicketToast)
-                        .setTitle("Cancellazione");
+                builder.setMessage(context.getString(R.string.deleteTicketToast))
+                        .setTitle(context.getString(R.string.deleteTitle));
+                TicketEntity thisTicket = DB.getTicket(pos);
                 String toDelete = "";
-                for(int i = 0; i < t.size(); i++){
-                    if(t.get(i).getID() == pos){
-                        toDelete = t.get(i).getFileUri().toString().substring(7);
-                    }
-                }
+                //Get the ticket to delete
+                toDelete = thisTicket.getFileUri().toString().substring(7);
                 final File ticketDelete = new File(toDelete);
                 // Add the buttons
-                builder.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TicketID", ""+pos);
-                        if(dataManager.deleteTicket(pos) && ticketDelete.delete()){
-                            ticketDelete.delete();
+                        if(DB.deleteTicket(pos) && ticketDelete.delete()){
                             Log.d("ELIMINATO", "OK");
                             ((BillActivity)context).clearAllImages();
                             ((BillActivity)context).printAllImages();
                         }
                     }
                 });
-                builder.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
                     }
@@ -139,16 +150,18 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                         TicketEntity thisPhoto = t.get(i);
                         Intent startImageView = new Intent(context, BillViewer.class);
                         File photo = new File(thisPhoto.getFileUri().toString().substring(7));
+
+                        //Put data to next activity
+                        startImageView.putExtra("ID",thisPhoto.getID());
                         startImageView.putExtra("imagePath", thisPhoto.getFileUri().toString().substring(7));
                         startImageView.putExtra("imageName", photo.getName());
                         SimpleDateFormat simpleDateFormat =
                                 new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
                         String date = simpleDateFormat.format(photo.lastModified());
                         startImageView.putExtra("imgLastMod", date);
-                        String amount = getContext().getString(R.string.no_import);
-                        if (thisPhoto.getAmount()!=null)
-                            amount = thisPhoto.getAmount().toString();
-                        startImageView.putExtra("imgPrice", amount+"€");
+                        startImageView.putExtra("imgPrice", thisPhoto.getAmount()+"€");
+
+                        //Start new activity
                         context.startActivity(startImageView);
                         return;
                     }
@@ -165,15 +178,11 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
     public void cropFile(int toCrop){
         Log.d("Crop", "Start crop activity");
         boolean result = false;
-        for(int i = 0; i < t.size(); i++){
-            if(t.get(i).getID() == pos){
-                Uri toCropUri = t.get(i).getFileUri();
-                CropImage.activity(toCropUri)
-                        .setOutputUri(toCropUri)
-                        .start(((BillActivity)context));
-                return;
-            }
-        }
+        TicketEntity ticket = DB.getTicket(pos);
+        Uri toCropUri = ticket.getFileUri();
+        CropImage.activity(toCropUri)
+                .setOutputUri(toCropUri)
+                .start(((BillActivity)context));
     }
 
 }

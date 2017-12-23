@@ -26,14 +26,16 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.common.Ticket;
+import com.ing.software.common.TicketError;
+import com.ing.software.ocr.ImagePreprocessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
-import com.ing.software.ocr.OnTicketReadyListener;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -44,6 +46,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,28 +68,33 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     static final int REQUEST_TAKE_PHOTO = 1;
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
     String tempPhotoPath;
-    Integer pos;
+    Integer missionID;
     Context context;
     String root;
-    public DataManager dataManager;
+    public DataManager DB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+        DB = new DataManager(this.getApplicationContext());
+        context = this.getApplicationContext();
         Intent intent = getIntent();
+
         String missionName = intent.getExtras().getString("missionName");
-        pos = intent.getExtras().getInt("missionID");
-        Log.d("MissionID", "" + pos);
-        dataManager = DataManager.getInstance(this.getApplicationContext());
+        missionID = intent.getExtras().getInt("missionID");
+        Log.d("MissionID", "" + missionID);
         context = this.getApplicationContext();
         setTitle(missionName);
         initializeComponents();
     }
 
-    //Dal Maso (adding menu delete option)
+    /** Dal Maso
+     * Setting toolbar delete button and style from /res/menu
+     * @param menu
+     * @return success flag
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -94,11 +102,9 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         return true;
     }
 
-    /**
-     * Dal Maso
+    /** Dal Maso
      * Edit by Lazzarin
      * Catch events on toolbar
-     *
      * @param item object on the toolbar
      * @return flag of success
      */
@@ -113,19 +119,18 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         }
     }
 
-    /**
-     * Dal Maso
-     * Gestione delle animazioni e visualizzazione delle foto salvate precedentemente
+    /** Dal Maso
+     *  Manage all animations and catch onclick events about FloatingActionButtons
      */
-    public void initializeComponents() {
+    public void initializeComponents(){
         printAllImages();
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab1 = (FloatingActionButton) findViewById(R.id.fab1);
-        fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab1 = (FloatingActionButton)findViewById(R.id.fab1);
+        fab2 = (FloatingActionButton)findViewById(R.id.fab2);
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
-        rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
-        rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_backward);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_forward);
+        rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 animateFAB();
@@ -145,13 +150,12 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         });
     }
 
-    /**
-     * Dal Maso
-     * Animazioni per il Floating Action Button (FAB)
+    /** Dal Maso
+     *  Animations for Floating Action Button (FAB)
      */
-    public void animateFAB() {
+    public void animateFAB(){
 
-        if (isFabOpen) {
+        if(isFabOpen){
 
             fab.startAnimation(rotate_backward);
             fab1.startAnimation(fab_close);
@@ -169,70 +173,57 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             fab1.setClickable(true);
             fab2.setClickable(true);
             isFabOpen = true;
-            Log.d("Raj", "open");
+            Log.d("Raj","open");
 
         }
     }
 
-    /**
-     * Dal Maso
-     * Aggiunge una card alla lista
-     *
-     * @param fileUri
-     * @param amount
-     * @param shop
-     * @param date
-     * @param title
-     * @param missionID
+    /** Dal Maso
+     * Add new ticket to the list
      */
-    public void addToList(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
-        list.add(new TicketEntity(fileUri, amount, shop, date, title, missionID));
-        ListView listView = (ListView) findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, dataManager);
+    public void addToList(TicketEntity t){
+        list.add(t);
+        ListView listView = (ListView)findViewById(R.id.list1);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         listView.setAdapter(adapter);
     }
 
-    /**
-     * Dal Maso (Using Lazzarin code)
-     * Delete the mission from the bills viewer (inside the mission)
+    /** Dal Maso (Using Lazzarin code)
+     * Delete the mission from the bill viewer (inside the mission)
      */
-    public void deleteMission() {
+    public void deleteMission(){
         //Lazzarin
-        Log.d("tagMission", "" + pos);
         AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
-
-        toast.setMessage(text.deleteMissionToast)
-                .setTitle("Cancellazione");
-
-        toast.setPositiveButton(text.buttonDelete, new DialogInterface.OnClickListener() {
+        //Dialog
+        toast.setMessage(context.getString(R.string.deleteMissionToast))
+                .setTitle(context.getString(R.string.deleteTitle));
+        //Positive button
+        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Intent startMissionView = new Intent(context, MainActivity.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).getMissionID() == pos) {
-                        dataManager.deleteTicket(list.get(i).getID());
-                    }
+                List<TicketEntity> list = DB.getTicketsForMission(missionID);
+                for(int i = 0; i < list.size(); i++){
+                    DB.deleteTicket((int) list.get(i).getID());
                 }
-                dataManager.deleteMission(pos);
+                DB.deleteMission(missionID);
                 context.startActivity(startMissionView);
             }
         });
-
-        toast.setNegativeButton(text.cancel, new DialogInterface.OnClickListener() {
+        //Negative button
+        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //Nothing to do
             }
         });
-
+        //Show toast
         AlertDialog alert = toast.show();
         Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 
-    /**
-     * Lazzarin
+    /**Lazzarin
      * It Opens the camera,takes the photo and puts as Extra Uri created by createImageFile method.
-     *
      * @Framing Camera, directory modified by createImageFile
      */
     private void takePhotoIntent() {
@@ -241,7 +232,9 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
+             Log.d("IOException","error using createImageFile method");
             }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
@@ -254,12 +247,11 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     }
 
 
-    /**
-     * Lazzarin
+    /**Lazzarin
      * It creates a temporary file where to save the photo on.
-     *
      * @Framing Directory Pictures
      * @Return the temporary file
+     *
      */
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -275,14 +267,14 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     }
 
 
-    /**
-     * Dal Maso
-     * Cancella i file temporanei utilizzati per il salvataggio delle foto da fotocamera
+    /** Dal Maso
+     *  Delete all temp files used for saving camera's images
      */
     public void deleteTempFiles() {
         File[] files = readAllImages();
         String filename = "";
-        for (int i = 0; i < files.length; i++) {
+        for (int i = 0; i < files.length; i++)
+        {
             filename = files[i].getName();
             Log.d("Sub", filename.substring(0, 4));
             if (filename.substring(0, 4).equals("temp")) {
@@ -292,9 +284,8 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     }
 
 
-    /**
-     * Dal Maso
-     * Selezione foto da galleria
+    /** Dal Maso
+     *  Pick up photo from gallery
      */
     public void pickImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -303,13 +294,11 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     }
 
 
-    /**
-     * Dal Maso
-     * Cattura risultato degli intent
-     *
-     * @param requestCode ritorna il numero di azione compiuta
-     * @param resultCode  indica se l'operazione è andata a buon fine
-     * @param data        Risultato dell'operazione
+    /** Dal Maso
+     * Catch intent results
+     * @param requestCode action number
+     * @param resultCode intent result code
+     * @param data intent data
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -322,9 +311,9 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                  * the new photo.
                  * @Framing Add the photo on the directory using savePickedFile()
                  */
-                case (REQUEST_TAKE_PHOTO):
+                case(REQUEST_TAKE_PHOTO):
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath, bmOptions);
+                    Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
                     deleteTempFiles();
                     waitDB();
@@ -333,7 +322,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     break;
 
                 //Dal Maso
-                //Foto presa da galleria
+                //Gallery photo
                 case (PICK_PHOTO_FOR_AVATAR):
                     photoURI = data.getData();
                     try {
@@ -343,12 +332,12 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                         clearAllImages();
                         printAllImages();
                         Log.d("Foto da galleria", "OK");
-                    } catch (Exception e) {
+                    }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
                     }
                     break;
                 //Dal Maso
-                //Gestisco il risultato del Resize
+                //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     Log.d("Crop", "OK");
                     waitDB();
@@ -359,8 +348,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         }
     }
 
-
-    public void waitDB() {
+    /** Dal Maso
+     * Thread sleep for 1 second for right tickets real-time vision
+     */
+    public void waitDB(){
         try {
             Log.i("Waiting db", "Going to sleep");
             Thread.sleep(1000);
@@ -369,22 +360,24 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         }
     }
 
-    /**
-     * Dal Maso
-     * Salva il bitmap passato nell'apposita cartella
-     *
-     * @param imageToSave bitmap da salvare come jpeg
+    /** Dal Maso
+     * Save the bitmap passed
+     * @param imageToSave bitmap to save
      */
     private void savePickedFile(Bitmap imageToSave) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        String fname = imageFileName + ".jpg";
+        String fname = imageFileName+".jpg";
         File file = new File(root, fname);
-        final Uri uri = Uri.fromFile(file);
+        final Uri uri=Uri.fromFile(file);
         if (file.exists())
             file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
+
+            //TODO: HardCode example, implement ocr here
+
+            //DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, missionID));
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
@@ -403,177 +396,72 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             intent.putExtra("image", fname);
             intent.putExtra("root", root);
             startService(intent);
-            /*
-            ocr.getTicket(imageToSave, new OnTicketReadyListener() {
-                /**
-                 * Get a Ticket. In the argument "ticket", fields corresponding to unextracted information are null.
-                 * ID and fileURI fields are uninitialized.
-                 * @param ticket new Ticket. Never null.
-                 */
-            /*
-                @Override
-                public void onTicketReady(com.ing.software.common.Ticket ticket) {
-                    //TODO:CHECK THE DATA EXTRACTED FROM THE IMAGE
-                    Log.d("OCRTicket", ticket.toString());
-                    dataManager.addTicket(new TicketEntity(uri, ticket.amount, null, ticket.date, ticket.title, pos));
-                }
-            }); */
-
-            //PICCOLO_OLD
-            // aggiungo il file al db
-            //DatabaseManager helper = DatabaseManager.getInstance(getApplicationContext());
-            //helper.addPhoto(root+fname); DB ALTERNATIVO
-            //DbManager db = new DbManager(getApplicationContext());
-            //db.addRecord(root+fname,"","","");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * NOT USED
-     * Lazzarin
-     *
-     * @param imageToCrop is the photo we want to resize. It has to be a Bitmap object.
-     * @return an Uri object taken to the file allocated in "documents",so it isn't show on the gallery
-     */
-    private Uri savePhotoForCrop(Bitmap imageToCrop) {
-        File allocation = temporaryFile();
-        try {
-            FileOutputStream out = new FileOutputStream(allocation);
-            imageToCrop.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Uri uri = Uri.fromFile(allocation);
-        return uri;
-
-    }
-
-    /**
-     * NOT USED
-     * Lazzarin
-     *
-     * @return temporary allocation with a File object.
-     */
-    private File temporaryFile() {
-        File myDir = new File(root);
-        String imageFileName = "photoToCrop.jpg";
-        File file = new File(myDir, imageFileName);
-        if (file.exists())
-            file.delete();
-        return file;
-    }
-
-
-    /**
-     * PICCOLO
+    /**PICCOLO
      * Metodo che "ripulisce" lo schermo dalle immagini
      */
-    public void clearAllImages() {
-        ListView listView = (ListView) findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, pos, dataManager);
+    public void clearAllImages(){
+        ListView listView = (ListView)findViewById(R.id.list1);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
     }//clearAllImages
 
 
-    /**
-     * Dal Maso
-     * Legge tutte le immagini
-     *
-     * @return ritorna tutti i file letti nella cartella
+    /** Dal Maso
+     * read all images
+     * @return all read files in the folder
      */
-    private File[] readAllImages() {
+    private File[] readAllImages(){
         String path = root;
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
-        File[] files = null;
-        if (directory.listFiles() == null) {
+        File[] files=null;
+        if(directory.listFiles()==null) {
             Log.d("Files", "hai trovato l'errore");
-        } else
-            files = directory.listFiles();
-        Log.d("Files", "Size: " + files.length);
+        }
+         else
+         files = directory.listFiles();
+        Log.d("Files", "Size: "+ files.length);
         return files;
     }
 
 
-    /**
-     * Dal Maso
-     * Stampa tutte le immagini
+    /** Dal Maso
+     *  Print all tickets, get it from DB
      */
-    public void printAllImages() {
-        List<TicketEntity> ticketList = dataManager.getAllTickets();
+    public void printAllImages(){
+        List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
         Log.d("Tickets", ticketList.toString());
         TicketEntity t;
         int count = 0;
-        for (int i = 0; i < ticketList.size(); i++) {
-            t = ticketList.get(i);
-            if (t.getMissionID() == (pos)) {
-                count++;
-                addToList(t.getFileUri(), t.getAmount(), t.getShop(), t.getDate(), t.getTitle(), t.getID());
-            }
+        for(int i = 0; i < ticketList.size(); i++){
+            Log.d("Ticket_ID", ""+ticketList.get(i).getID());
+            addToList(ticketList.get(i));
+            count++;
         }
-        TextView noBills = (TextView) findViewById(R.id.noBills);
-        if (count == 0) {
+        //If there aren't tickets show message
+        TextView noBills = (TextView)findViewById(R.id.noBills);
+        if(count == 0){
             noBills.setVisibility(View.VISIBLE);
-        } else {
+        }
+        else{
             noBills.setVisibility(View.INVISIBLE);
         }
     }
 
-
-    /**
-     * Dal Maso (NOT USED)
-     * Stampa l'ultima foto
-     */
-    private void printLastImage() {
-        File[] files = readAllImages();
-        Bitmap myBitmap = BitmapFactory.decodeFile(files[files.length - 1].getAbsolutePath());
-        //addToList(files[files.length-1].getName(), "Descrizione della foto", myBitmap);
-    }
-
-
-    /**
-     * NOT USED
-     * Dal Maso
-     * Stampa il bitmap passato (Solo per testing)
-     *
-     * @param myBitmap bitmap da stampare
-     */
-    private void printThisBitmap(Bitmap myBitmap) {
-        //addToList("Print this bitmap", "Descrizione della foto", myBitmap);
-    }
-
-
-    /**
-     * NOT USED
-     * PICCOLO_Edit by Dal Maso
-     * Metodo che cancella l'i-esimo file in una directory
-     *
-     * @param toDelete l'indice del file da cancellare
-     * @param path     percorso del file da cancellare
-     * @return se l'operazione è andata a buon fine
-     */
-    public boolean deleteFile(int toDelete, String path) {
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        return files[toDelete].delete();
-    }//deleteFile
-
-
-    /**
-     * PICCOLO_Edit by Dal Maso
+    /**PICCOLO_Edit by Dal Maso
      * Metodo che cancella permette all'utente di ridimensionare la foto
-     *
      * @param toCrop l'indice della foto di cui fire il resize
-     * @param path   percorso della foto
+     * @param path percorso della foto
      */
-    public void cropFile(int toCrop, String path) {
-        Log.d("Crop", "Success");
+    public void cropFile(int toCrop, String path){
+        Log.d("Crop","Success");
         boolean result = false;
         File directory = new File(path);
         File[] files = directory.listFiles();
@@ -595,7 +483,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 } catch (NumberFormatException e) {
                     //No valid amount
                 }
-                dataManager.addTicket(new TicketEntity(uri, amount, null, null, null, pos));
+                DB.addTicket(new TicketEntity(uri, amount, null, null, null, missionID));
                 clearAllImages();
                 printAllImages();
                 break;
@@ -635,9 +523,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Bitmap testBmp = getBitmapFromFile(file);
             receiver.send(STATUS_RUNNING, bundle);
             ocrManager.initialize(this);
-            ocrManager.getTicket(testBmp, new OnTicketReadyListener() {
-                @Override
-                public void onTicketReady(Ticket result) {
+            ImagePreprocessor preproc = new ImagePreprocessor(testBmp);
+            preproc.findTicket(false, err -> {
+                    String rectString = (err == TicketError.NONE ? "found" : "not found");
+                    ocrManager.getTicket(preproc, result -> {
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     if (result.amount != null) {
                         OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
@@ -648,7 +537,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                         bundle.putString(AMOUNT_RECEIVED, "Not found.");
                         receiver.send(STATUS_FINISHED, bundle);
                     }
-                }
+                });
             });
             receiver.send(STATUS_AVERAGE, bundle);
             this.stopSelf();

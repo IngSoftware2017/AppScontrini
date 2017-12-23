@@ -833,5 +833,411 @@
     <Shop>LIDL</Shop>
     <Features>Ruotato a sinistra di 90° e piegato sulla parte superiore sinistra</Features>
   </Ticket>
+
+  <Ticket>
+    <ID>83</ID>
+    <Date>04/12/17</Date>
+    <PositionDate>(719, 3401)</PositionDate>
+    <Amount>4,85</Amount>
+    <PositionAmount>(1867, 1569)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features>Sfuocato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>84</ID>
+    <Date>30-11-17</Date>
+    <PositionDate>(615, 2559)</PositionDate>
+    <Amount>5,50</Amount>
+    <PositionAmount>(1889, 2177)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Scontrino a onde</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>85</ID>
+    <Date>30-11-17</Date>
+    <PositionDate>(353, 2953)</PositionDate>
+    <Amount>17,30</Amount>
+    <PositionAmount>(1681, 3005)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato leggermente a destra e ondulato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>86</ID>
+    <Date>30-11-17</Date>
+    <PositionDate>(459, 2909)</PositionDate>
+    <Amount>2,30</Amount>
+    <PositionAmount>(1895, 2585)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Stropicciato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>87</ID>
+    <Date>30-11-17</Date>
+    <PositionDate>(2693, 1859)</PositionDate>
+    <Amount>14,90</Amount>
+    <PositionAmount>(2263, 317)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>
+          Ruotato a sinistra di 90°, ondulato e 
+          con ombra sulla parte inferiore destra dello scontrino
+    </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>88</ID>
+    <Date>21/11/17</Date>
+    <PositionDate>(465, 2939)</PositionDate>
+    <Amount>8,30</Amount>
+    <PositionAmount>(1983, 2634)</PositionAmount>
+    <Shop>STEFANY E VALE</Shop>
+    <Features>Piegato sugli angoli</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>89</ID>
+    <Date>22-11-17</Date>
+    <PositionDate>(1059, 441)</PositionDate>
+    <Amount>7,20</Amount>
+    <PositionAmount>(1453, 1985)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a destra di 90°, rovinato, stropicciato e piegato sugli angoli</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>90</ID>
+    <Date>17/11/17</Date>
+    <PositionDate>(369, 3371)</PositionDate>
+    <Amount>4,80</Amount>
+    <PositionAmount>(1665, 2099)</PositionAmount>
+    <Shop>AUTOGRILL</Shop>
+    <Features>Ruotato a destra di 90°, rovinato, stropicciato e piegato sul lato sinistro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>91</ID>
+    <Date>20/11/17</Date>
+    <PositionDate>(661, 2967)</PositionDate>
+    <Amount>6,00</Amount>
+    <PositionAmount>(1717, 2437)</PositionAmount>
+    <Shop>RUGGI</Shop>
+    <Features>Sfondo trasparente sulla parte superiore dello scontrino</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>92</ID>
+    <Date>29-11-17</Date>
+    <PositionDate>(1821, 821)</PositionDate>
+    <Amount>11,30</Amount>
+    <PositionAmount>(515, 1233)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Sottosopra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>93</ID>
+    <Date>29-11-17</Date>
+    <PositionDate>(603, 2867)</PositionDate>
+    <Amount>13,30</Amount>
+    <PositionAmount>(1915, 2447)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ombreggiato sulla parte inferiore</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>94</ID>
+    <Date>26/11/17</Date>
+    <PositionDate>(631, 2263)</PositionDate>
+    <Amount>4,00</Amount>
+    <PositionAmount>(1625, 2199)</PositionAmount>
+    <Shop>PASTICCERIA CAFFETTERIA di CATTELAN SAS</Shop>
+    <Features>Legermente ruotat verso destra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>95</ID>
+    <Date>26/11/17</Date>
+    <PositionDate>(217, 1381)</PositionDate>
+    <Amount>4,20</Amount>
+    <PositionAmount>(825, 2515)</PositionAmount>
+    <Shop>TOWERS s.r.l.</Shop>
+    <Features>
+        Ruotato di 90° verso destra e con la 
+        parte inferiore dello scontrino rialzata e di difficile lettura 
+        causa prospettiva
+    </Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>96</ID>
+    <Date>03/12/17</Date>
+    <PositionDate>(2024, 905)</PositionDate>
+    <Amount>8,69</Amount>
+    <PositionAmount>(1171, 363)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features>Foto panoramica orizzontale fatta male causa fotocamera non stabilizzata</Features>
+  </Ticket>
   
+  <Ticket>
+    <ID>97</ID>
+    <Date>30-11-17</Date>
+    <PositionDate>(2159, 1295)</PositionDate>
+    <Amount>0,80</Amount>
+    <PositionAmount>(1759, 363)</PositionAmount>
+    <Shop>CARTOLERIA ALTINO</Shop>
+    <Features>Ruotat a sinistra di 90°, orecchio in fondo a destra dello scontrino</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>98</ID>
+    <Date>04/12/17</Date>
+    <PositionDate>(2163, 705)</PositionDate>
+    <Amount>33,00</Amount>
+    <PositionAmount>(2027, 465)</PositionAmount>
+    <Shop>AL SOLITO POSTO</Shop>
+    <Features>Ruotato a sinistra di circa 70°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>99</ID>
+    <Date>05-12-17</Date>
+    <PositionDate>(2211, 1277)</PositionDate>
+    <Amount>12,30</Amount>
+    <PositionAmount>(1949, 233)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a sinistra di 90° e leggermente ondulato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>100</ID>
+    <Date>05-12-17</Date>
+    <PositionDate>(2017, 1529)</PositionDate>
+    <Amount>2,30</Amount>
+    <PositionAmount>(2087, 515)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a sinistra di circa 70°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>101</ID>
+    <Date>05-12-17</Date>
+    <PositionDate>(2373, 1139)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(1703, 323)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato a sinistra di 120°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>102</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(583, 2285)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1355, 1988)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Doppia data perchè strappato male alla cassa e inchistro sbiadito</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>103</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(755, 2219)</PositionDate>
+    <Amount>1,00</Amount>
+    <PositionAmount>(1465, 1961)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>104</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(631, 2273)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1349, 1959)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>105</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(703, 1961)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1423, 1643)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, piegato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>106</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(721, 1997)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1505, 1683)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>107</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(599, 2107)</PositionDate>
+    <Amount>3,30</Amount>
+    <PositionAmount>(1215, 1859)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Molto sfuocato, inchiostro sbiatito</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>108</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(789, 2377)</PositionDate>
+    <Amount>4,00</Amount>
+    <PositionAmount>(1433, 2021)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, piegato su di un ancolo</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>109</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(735, 2247)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1519, 1879)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, scritta TOTALE parzialmente coperta</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>110</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(641, 1955)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1465, 1561)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, strappato male dal registratore di cassa</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>111</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(621, 2133)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1443, 1755)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, strappato male dal registratore di cassa con nome del negozio parziale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>112</ID>
+    <Date>05-11-2017</Date>
+    <PositionDate>(951, 1413)</PositionDate>
+    <Amount>20,88</Amount>
+    <PositionAmount>(1518, 2397)</PositionAmount>
+    <Shop>LA TORTELLINI EXPRESS</Shop>
+    <Features>Scritta TOT. che indica il totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>113</ID>
+    <Date>30-11-2017</Date>
+    <PositionDate>(1305, 1031)</PositionDate>
+    <Amount>0,80</Amount>
+    <PositionAmount>(475, 1375)</PositionAmount>
+    <Shop>CARTOLERIA ALTINO</Shop>
+    <Features>Stropicciato e ruotato di 180°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>114</ID>
+    <Date>05-12-2017</Date>
+    <PositionDate>(483, 2153)</PositionDate>
+    <Amount>1,30</Amount>
+    <PositionAmount>(1273, 1853)</PositionAmount>
+    <Shop>CARTOLERIA ALTINO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>115</ID>
+    <Date>05.12.2017</Date>
+    <PositionDate>(901, 1279)</PositionDate>
+    <Amount>7,45</Amount>
+    <PositionAmount>(1209, 1071)</PositionAmount>
+    <Shop>INTERSPAR</Shop>
+    <Features>Leggermente ruotato a sinistra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>116</ID>
+    <Date>05-12-2017</Date>
+    <PositionDate>(361, 1943)</PositionDate>
+    <Amount>12,30</Amount>
+    <PositionAmount>(1217, 1975)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Leggermente ruotato a destra e sfuocato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>117</ID>
+    <Date>05-12-2017</Date>
+    <PositionDate>(483, 2175)</PositionDate>
+    <Amount>2,30</Amount>
+    <PositionAmount>(1465, 1973)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Piegato in alto a sinistra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>118</ID>
+    <Date>05-12-17</Date>
+    <PositionDate>(2047, 397)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(1187, 585)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato di 180°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>119</ID>
+    <Date>06/12/17</Date>
+    <PositionDate>(2551, 365)</PositionDate>
+    <Amount>2,10</Amount>
+    <PositionAmount>(2279, 65)</PositionAmount>
+    <Shop>THE COFFEE BOX S.R.L.</Shop>
+    <Features>Ruotato a sinistra di 90° e immagine tagliata sulla destra dello scontrino</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>120</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(313, 2435)</PositionDate>
+    <Amount>4,50</Amount>
+    <PositionAmount>(1601, 2153)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>121</ID>
+    <Date>07/12/17</Date>
+    <PositionDate>(473, 2715)</PositionDate>
+    <Amount>8,51</Amount>
+    <PositionAmount>(1565, 2404)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>122</ID>
+    <Date>07-12-17</Date>
+    <PositionDate>(577, 2739)</PositionDate>
+    <Amount>375,00</Amount>
+    <PositionAmount>(1263, 2525)</PositionAmount>
+    <Shop>201 SRL SSD</Shop>
+    <Features>Piegato nel centro</Features>
+  </Ticket>
 </DataSet>

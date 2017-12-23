@@ -23,5 +23,6 @@ public final class Constants {
     public static final String MISSION_PRIMARY_KEY_NAME = "ID";
     public static final String PERSON_PRIMARY_KEY_NAME = "ID";
 
+    static final int DATABASE_VERSION = 1;
 
 }

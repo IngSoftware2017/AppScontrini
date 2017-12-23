@@ -77,9 +77,8 @@ class OcrSchemer {
     static boolean isPossibleCash(RawText amount, RawText cash) {
         int extendHeight = 400;
         int extendWidth = 50;
-        RectF extendedRect = OcrUtils.partialExtendWidthRect(amount.getRect(), extendWidth);
-        extendedRect = OcrUtils.partialExtendHeightRect(extendedRect, extendHeight);
-        extendedRect = new RectF(extendedRect.left, amount.getRect().top, extendedRect.right, extendedRect.bottom);
+        RectF extendedRect = OcrUtils.extendRect(amount.getRect(), extendHeight, extendWidth);
+        extendedRect.set(extendedRect.left, amount.getRect().top, extendedRect.right, extendedRect.bottom);
         return extendedRect.contains(cash.getRect());
     }
 }

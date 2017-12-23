@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-
+    buildToolsVersion "26.0.2"
 
 
     defaultConfig {
@@ -32,6 +32,18 @@ android {
         exclude '**/libav*.so'
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'x86', 'armeabi-v7a'
+            universalApk true
+        }
+    }
 }
 
 dependencies {
@@ -47,11 +59,13 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile project (':common')
+    implementation 'com.ing.software:opencv-android:1.0.0'
     compile 'com.android.support:design:26.1.0'
-    compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.5.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.android.support:recyclerview-v7:26.1.0'
-    testCompile "org.mockito:mockito-core:2.+"
+    testCompile "org.mockito:mockito-core:2.13.0"
 
 }

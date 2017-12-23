@@ -16,6 +16,7 @@ import static com.ing.software.ocr.OcrUtils.log;
 /**
  * Class to store texts detected.
  * Contains useful methods and variables that Text does not provide.
+ * todo: make it extend Text
  * @author Michelon
  */
 

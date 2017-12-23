@@ -10,13 +10,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.ing.software.ocr.DataAnalyzer.analyzeAmount;
 
 /**
- * Class to analyze amount and compare it with list of prices, subtotal, cash paid, change
+ * Class to analyze amount and compare it with list of prices, subtotal, cash paid, change.
+ * Get methods are not private 'cause I want them to be accessible from outside for future implementations.
  * todo: handle tips and taxes
  */
 
@@ -80,9 +80,10 @@ class AmountComparator {
      * @param subTotal subtotal found. Not null.
      */
     private void flagHasSubtotal(@NonNull BigDecimal subTotal) {
+        if (!hasSubtotal)
+            addPrecision();
         hasSubtotal = true;
         this.subTotal = subTotal;
-        addPrecision();
     }
 
     /**
@@ -92,9 +93,10 @@ class AmountComparator {
      * @param priceList sum of prices found. Not null.
      */
     private void flagHasPriceList(@NonNull BigDecimal priceList) {
+        if (!hasPriceList)
+            addPrecision();
         hasPriceList = true;
         this.priceList = priceList;
-        addPrecision();
     }
 
     /**
@@ -104,9 +106,10 @@ class AmountComparator {
      * @param cash cash. Not null.
      */
     private void flagHasCash(@NonNull BigDecimal cash) {
+        if (!hasCash)
+            addPrecision();
         hasCash = true;
         this.cash = cash;
-        addPrecision();
     }
 
     /**
@@ -116,9 +119,10 @@ class AmountComparator {
      * @param change change. Not null.
      */
     private void flagHasChange(@NonNull BigDecimal change) {
+        if (!hasChange)
+            addPrecision();
         hasChange = true;
         this.change = change;
-        addPrecision();
     }
 
     /**
@@ -128,21 +132,6 @@ class AmountComparator {
      */
     private int getPrecision() {
         return precision;
-    }
-
-    /**
-     * @author Michelon
-     * @date 9-12-17
-     * Get a list of flags for this object
-     * @return list of hit
-     */
-    HashMap<String, Boolean> getFlags() {
-        HashMap<String, Boolean> flags = new HashMap<>();
-        flags.put("hasSubtotal", hasSubtotal);
-        flags.put("hasPriceList", hasPriceList);
-        flags.put("hasCash", hasCash);
-        flags.put("hasChange", hasChange);
-        return flags;
     }
 
     /**
@@ -183,11 +172,46 @@ class AmountComparator {
 
     /**
      * @author Michelon
-     * @date 10-12-17
+     * @date 17-12-17
+     * @return true if subtotal is not null
+     */
+    boolean hasSubtotal() {
+        return hasSubtotal;
+    }
+
+    /**
+     * @author Michelon
+     * @date 17-12-17
+     * @return true if priceList is not null
+     */
+    boolean hasPriceList() {
+        return hasPriceList;
+    }
+
+    /**
+     * @author Michelon
+     * @date 17-12-17
+     * @return true if cash is not null
+     */
+    boolean hasCash() {
+        return hasCash;
+    }
+
+    /**
+     * @author Michelon
+     * @date 17-12-17
+     * @return true if change is not null
+     */
+    boolean hasChange() {
+        return hasChange;
+    }
+
+    /**
+     * @author Michelon
+     * @date 14-12-17
      * Analyze a list of possible prices and sum them. Then try to find subtotal, if present.
      * If found update this object accordingly
      * todo: handle tips and explicit taxes
-     * todo: rather than divide, use *2 on total and if equals use total as new value for subtotal\pricelist
      * @param possiblePrices list of ordered (top to bottom) possible prices. Not null.
      */
     void analyzePrices(@NonNull List<RawGridResult> possiblePrices) {
@@ -201,19 +225,19 @@ class AmountComparator {
         int index = 0;
         //Search for first parsable product price
         while (productsSum == null && index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
-            String s = possiblePrices.get(index).getText().getDetection();
-            if (OcrUtils.isPossibleNumber(s))
-                productsSum = analyzeAmount(s);
+            String productPrice = possiblePrices.get(index).getText().getDetection();
+            if (OcrUtils.isPossibleNumber(productPrice))
+                productsSum = analyzeAmount(productPrice);
             ++index;
         }
         if (productsSum != null)
             OcrUtils.log(3, "analyzePrices", "List of prices, first value is: " + productsSum.toString());
-        while (index < possiblePrices.size()) {
-            if (possiblePrices.get(index).getPercentage() <= 0)
-                break;
-            String s = possiblePrices.get(index).getText().getDetection();
-            if (OcrUtils.isPossibleNumber(s)) {
-                BigDecimal adder = analyzeAmount(s);
+        else
+            OcrUtils.log(3, "analyzePrices", "List of prices, no value found");
+        while (index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
+            String productPrice = possiblePrices.get(index).getText().getDetection();
+            if (OcrUtils.isPossibleNumber(productPrice)) {
+                BigDecimal adder = analyzeAmount(productPrice);
                 if (adder != null) {
                     productsSum = productsSum.add(adder);
                     possibleSubTotal = adder; //this way when i exit the while i'll have in possibleSubTotal last value analyzed
@@ -223,6 +247,7 @@ class AmountComparator {
             ++index;
         }
         if (productsSum != null) {
+            BigDecimal halfProductSum = productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP);
             //Check if my subtotal is the same as total
             if (possibleSubTotal != null && decodedAmount.compareTo(possibleSubTotal) == 0) {
                 //Accept the value
@@ -232,16 +257,16 @@ class AmountComparator {
             if (decodedAmount.compareTo(productsSum) == 0) {
                 OcrUtils.log(3, "analyzePrices", "List of prices equals decoded amount");
                 flagHasPriceList(productsSum);
-            } else if (decodedAmount.compareTo(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP)) == 0) {
+            } else if (decodedAmount.compareTo(halfProductSum) == 0) {
                 OcrUtils.log(3, "analyzePrices", "List of prices/2 equals decoded amount");
-                flagHasPriceList(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP));
+                flagHasPriceList(halfProductSum);
             } else if (OcrUtils.findSubstring(productsSum.toString(), decodedAmount.toString()) <= maxDistance) {
                 //It's acceptable a distance of maxDistance from target
                 flagHasPriceList(productsSum);
                 OcrUtils.log(3, "analyzePrices", "List of prices diffs from decoded amount by at most " + maxDistance);
-            } else if (OcrUtils.findSubstring(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP).toString(), decodedAmount.toString()) <= maxDistance) {
+            } else if (OcrUtils.findSubstring(halfProductSum.toString(), decodedAmount.toString()) <= maxDistance) {
                 OcrUtils.log(3, "analyzePrices", "List of prices/2 diffs from decoded amount by at most " + maxDistance);
-                flagHasPriceList(productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP));
+                flagHasPriceList(halfProductSum);
             } else {
                 OcrUtils.log(3, "analyzePrices", "List of prices is not a valid input");
             }
@@ -266,24 +291,25 @@ class AmountComparator {
         int index = 0;
         //Search for first parsable product price
         while (cash == null && index < possiblePrices.size()) {
-            if (possiblePrices.get(index).getPercentage() < 0) //must be below total
+            if (possiblePrices.get(index).getPercentage() < 0) {//must be below total
                 if (OcrSchemer.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
-                    String s = possiblePrices.get(index).getText().getDetection();
-                    if (OcrUtils.isPossibleNumber(s)) {
-                        cash = analyzeAmount(s);
+                    String possibleCash = possiblePrices.get(index).getText().getDetection();
+                    if (OcrUtils.isPossibleNumber(possibleCash)) {
+                        cash = analyzeAmount(possibleCash);
                         cashText = possiblePrices.get(index).getText();
                     }
                 }
+            }
             ++index;
         }
         if (cash != null) {
             OcrUtils.log(3, "analyzeTotals", "Cash is: " + cash.toString());
             while (index < possiblePrices.size() && change == null) {
-                //change must be below cash, here i use the same method above, but parsing cash as rawtext
+                //change must be below cash, here i use the same method as above, but parsing cash as rawtext
                 if (OcrSchemer.isPossibleCash(cashText, possiblePrices.get(index).getText())) {
-                    String s = possiblePrices.get(index).getText().getDetection();
-                    if (OcrUtils.isPossibleNumber(s))
-                        change = analyzeAmount(s);
+                    String possibleChange = possiblePrices.get(index).getText().getDetection();
+                    if (OcrUtils.isPossibleNumber(possibleChange))
+                        change = analyzeAmount(possibleChange);
                 }
                 ++index;
             }
@@ -298,20 +324,21 @@ class AmountComparator {
                 //It's acceptable a distance of maxDistance from target
                 flagHasCash(cash);
                 OcrUtils.log(3, "analyzeTotals", "Cash diffs from decoded amount by at most " + maxDistance);
-            } else if (change != null) {
+            }
+            if (change != null) {
+                BigDecimal cashSubChange = cash.subtract(change);
                 //Check if cash - change = decoded amount
-                if (cash.subtract(change).compareTo(decodedAmount) == 0) {
+                if (cashSubChange.compareTo(decodedAmount) == 0) {
                     flagHasCash(cash);
                     flagHasChange(change);
                     OcrUtils.log(3, "analyzeTotals", "decoded amount is cash - change");
-                } else if (OcrUtils.findSubstring(cash.subtract(change).toString(), decodedAmount.toString()) <= maxDistance) {
+                } else if (OcrUtils.findSubstring(cashSubChange.toString(), decodedAmount.toString()) <= maxDistance) {
                     flagHasCash(cash);
                     flagHasChange(change);
                     OcrUtils.log(3, "analyzeTotals", "decoded amount diffs from cash - change by at most " + maxDistance);
                 }
             }
         }
-
     }
 
     /**
@@ -323,62 +350,20 @@ class AmountComparator {
      */
     BigDecimal getBestAmount() {
         if (getPrecision() > 0) {
-            int distanceFromSubtotal = -1;
-            int distanceFromPriceList = -1;
-            int distanceFromCash = -1;
-            if (hasSubtotal)
-                distanceFromSubtotal = OcrUtils.findSubstring(getSubTotal().toString(), getAmount().toString());
-            if (hasPriceList)
-                distanceFromPriceList = OcrUtils.findSubstring(getPriceList().toString(), getAmount().toString());
-            if (hasCash)
-                distanceFromCash = OcrUtils.findSubstring(getCash().toString(), getAmount().toString());
-            if (hasChange)
-                distanceFromCash = OcrUtils.findSubstring(getCash().subtract(getChange()).toString(), getAmount().toString());
             //analyze all possible cases
             BigDecimal subtotal = null;
             BigDecimal cash = null;
             BigDecimal prices = null;
             BigDecimal amount = getAmount();
-            if (distanceFromCash > -1 && !hasChange)
+            if (hasCash() && !hasChange())
                 cash = getCash();
-            else if (distanceFromCash > -1)
+            else if (hasCash())
                 cash = getCash().subtract(getChange());
-            if (distanceFromPriceList > -1)
+            if (hasPriceList())
                 prices = getPriceList();
-            if (distanceFromSubtotal > -1)
+            if (hasSubtotal())
                 subtotal = getSubTotal();
-            /* //Already analyzed below
-            if (distanceFromSubtotal > -1 && distanceFromPriceList > -1 && distanceFromCash > -1) {
-                boolean cashSubtotal = cash.compareTo(subtotal)==0;
-                boolean cashPrices = cash.compareTo(prices)==0;
-                boolean cashAmount = cash.compareTo(amount)==0;
-                boolean subtotalPrices = subtotal.compareTo(prices)==0;
-                boolean subtotalAmount = subtotal.compareTo(amount)==0;
-                //i have all three values + amount, if three of them are equals use that value
-                if ((cashSubtotal && cashAmount) || (cashPrices && cashSubtotal) || (cashPrices && cashAmount)) {
-                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                    return cash;
-                } else if (subtotalPrices && subtotalAmount) {
-                    OcrUtils.log(2, "getBestAmount", "Three equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                    return subtotal;
-                }
-                //Here i don't have three equal values.
-                if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
-                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                    return subtotal;
-                } else if (cashPrices) {//same as above
-                    OcrUtils.log(2, "getBestAmount", "Two equal values found");
-                    OcrUtils.log(2, "getBestAmount", "Screw you, you useless amount");
-                    OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                    return cash;
-                }
-            } else */ if (distanceFromPriceList > -1 && distanceFromCash > -1) {
+            if (hasPriceList() && hasCash()) {
                 boolean cashPrices = cash.compareTo(prices)==0;
                 boolean cashAmount = cash.compareTo(amount)==0;
                 if (cashPrices) {//Probably if both pricelist and cash are the same amount is wrong
@@ -389,7 +374,7 @@ class AmountComparator {
                     OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
                     return cash;
                 }
-            } else if (distanceFromSubtotal > -1 && distanceFromPriceList > -1) {
+            } else if (hasSubtotal() && hasPriceList()) {
                 boolean subtotalPrices = subtotal.compareTo(prices)==0;
                 boolean subtotalAmount = subtotal.compareTo(amount)==0;
                 if (subtotalPrices) { //Probably if both subtotal and cash are the same amount is wrong
@@ -400,7 +385,7 @@ class AmountComparator {
                     OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
                     return subtotal;
                 }
-            } else if (distanceFromSubtotal > -1 && distanceFromCash > -1) {
+            } else if (hasSubtotal() && hasCash()) {
                 boolean cashSubtotal = cash.compareTo(subtotal)==0;
                 boolean cashAmount = cash.compareTo(amount)==0;
                 if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
@@ -423,7 +408,7 @@ class AmountComparator {
      * Retrieves all texts from products on the same 'column' as amount
      * @param amountText RawText containing possible amount. Not null.
      * @param products   List of RawTexts containing products (both name and price). Not null.
-     * @return List of texts above or under amount with distance from amount (positive = above)
+     * @return Ordered list of texts above or under amount with distance from amount (positive = above)
      */
     static List<RawGridResult> getPricesList(@NonNull RawText amountText, @NonNull List<RawText> products) {
         List<RawGridResult> possiblePrices = new ArrayList<>();
@@ -448,9 +433,9 @@ class AmountComparator {
      */
     private static boolean isProductPrice(@NonNull RawText amount, @NonNull RawText product) {
         int percentage = 50;
-        RectF extendedRect = OcrUtils.partialExtendWidthRect(amount.getRect(), percentage);
+        RectF extendedRect = OcrUtils.extendRect(amount.getRect(), 0, percentage);
         RectF productRect = product.getRect();
-        return extendedRect.left < productRect.left && extendedRect.right > productRect.right;
+        return (extendedRect.left < productRect.left) && (extendedRect.right > productRect.right);
     }
 
     /**

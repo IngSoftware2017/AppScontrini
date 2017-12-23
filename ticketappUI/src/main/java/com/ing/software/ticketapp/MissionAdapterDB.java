@@ -1,18 +1,24 @@
 package com.ing.software.ticketapp;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.List;
-
 import database.MissionEntity;
 
 /**
@@ -45,9 +51,9 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         //missionDelete.setTag(position);
         MissionEntity c = getItem(position);
         title.setText(c.getName());
-        //description.setText(c.getDescription());
+        description.setText("Descrizione momentanea");
         convertView.setTag(c.getID());
-        Log.d("MID", ""+c.getID());
+        Log.d("Mission", ""+c.getStartMission());
 
         //Dal Maso
         //Sets a default background color for the mission's card
@@ -87,45 +93,6 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
             }//onClick
         });
 
-        //lazzarin
-        /*
-            missionDelete.setOnClickListener(new View.OnClickListener(){
-                  public void onClick(View v){
-                      pos=  Integer.parseInt(v.getTag().toString());
-                      //check if position is right
-                      Log.d("tagMission", ""+pos);
-                      //path = Variables.getInstance().getCurrentMissionDir();
-                      path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-
-                      //check if directory is right
-                      Log.d("Dir", path);
-
-                      AlertDialog.Builder toast = new AlertDialog.Builder(context);
-                      toast.setMessage("Sei sicuro di voler eliminare la missione?Tutti gli scontrini verranno eliminati")
-                              .setTitle("Cancellazione");
-
-                      toast.setPositiveButton("Elimina", new DialogInterface.OnClickListener() {
-                          public void onClick(DialogInterface dialog, int id) {
-                              File directory = new File(path);
-                              File[] files = directory.listFiles();
-                              if(files[pos].delete()){
-                                  ((MainActivity)context).clearAllMissions();
-                                  ((MainActivity)context).printAllMissions();
-                              }
-                          }
-                      });
-                      toast.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
-                          public void onClick(DialogInterface dialog, int id) {
-                              //Nothing to do
-                          }
-                      });
-                      AlertDialog alert = toast.show();
-                      Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
-                      nbutton.setTextColor(Color.parseColor("#2196F3"));
-
-                  }
-            });
-        */
         return convertView;
     }
 }

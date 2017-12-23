@@ -1,60 +1,63 @@
 package com.ing.software.ticketapp;
 
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import database.Constants;
+import database.DAO;
 import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 
 
 public class MainActivity extends AppCompatActivity {
-    public List<Missione> list = new LinkedList<Missione>();
-    public DataManager dataManager;
+    public DataManager DB;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataManager = DataManager.getInstance(this.getApplicationContext());
-        setTitle("Missioni");
-        Variables.getInstance().setCurrentMissionDir(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
+        DB = new DataManager(this.getApplicationContext());
+        setTitle(getString(R.string.titleMission));
         setContentView(R.layout.activity_main);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        /*/PICCOLO Aggiungo delle missioni di prova
-        Date data1= new Date();
-        data1.setTime(2041920531);
-        Person p1=new Person("aaaa","AAAAAAA","Dottore");
-        Person p2=new Person("bbbb","BBBBBBB","Laureando");
-        DB.addPerson(p1);
-        DB.addPerson(p2);
-        DB.addMission(new Mission(new Date(2000,03,02),new Date(2001,03,15),"New York",p1.getID()));
-        DB.addMission(new Mission(new Date(2010,07,02),new Date(2011,01,15),"Berlino",p2.getID()));
-        DB.addMission(new Mission(new Date(2005,03,02),new Date(2005,03,25),"Londra",p1.getID()));
-        List<Mission> missionList = db.getAllMissions();
-        for(int i=0; i<=missionList.size()-1; i++) {
-            Log.d("mission", "mission " + i + ": " + missionList.get(i).getStartMission() + "," + missionList.get(i).getEndMission() + ","
-                    + missionList.get(i).getLocation() + "," + missionList.get(i).getPersonID());
-        }*/
-        /*File f = new File(path);
-        File[] files = f.listFiles();
-        for (File inFile : files) {
-            if (inFile.isDirectory()) {
-                Log.d("Dir", inFile.toString());
-            }
-        }*/
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(addMission);
             }
         });
-        //printAllMissions();
         printAllMissionsDB();
     }
 
@@ -77,75 +79,32 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
-    /** Dal Maso
-     * Aggiunge alla lista la nuova missione
-     * @param title Tilolo missione
-     * @param desc descrizione missione
-     */
-    public void addToList(String title, String desc){
-        list.add(new Missione(title, desc));
-        ListView listView = (ListView)findViewById(R.id.listMission);
-        MissionAdapter adapter = new MissionAdapter(this, R.layout.mission_card, list);
-        listView.setAdapter(adapter);
-    }
-
-    /** Dal Maso (NOT USED)
-     * Legge tutte le missioni disponibili
-     * @return ritorna array di missioni
-     */
-    private File[] readAllMissions(){
-        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        Log.d("Files", "Path: " + path);
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        Log.d("Files", "Size: "+ files.length);
-        return files;
-    }
-
     /**Lazzarin
      * clear the view after I've eliminated a mission(before to call printAllMissions)
-     *
      */
-    public void clearAllMissions(){
+    public void clearAllMissions()
+    {
         ListView listView = (ListView)findViewById(R.id.listMission);
-        MissionAdapter emptyAdapter = new MissionAdapter(this, R.layout.mission_card, list);
+        MissionAdapterDB emptyAdapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
         emptyAdapter.clear();
         emptyAdapter.notifyDataSetChanged();
-        listView.setAdapter(emptyAdapter);}
-
-    /** Dal Maso (NOT USED)
-     *  Stampa tutte le immagini
-     */
-    public void printAllMissions(){
-        File[] files = readAllMissions();
-        TextView noMissions = (TextView)findViewById(R.id.noMissions);
-        if(files.length == 0){
-            noMissions.setVisibility(View.VISIBLE);
-        }
-        else{
-            noMissions.setVisibility(View.INVISIBLE);
-        }
-        for (int i = 0; i < files.length; i++)
-        {
-            SimpleDateFormat simpleDateFormat =
-                    new SimpleDateFormat("HH:mm'\n'dd/MM/yyyy");
-            if(files[i].isDirectory())
-                addToList(files[i].getName(), simpleDateFormat.format(files[i].lastModified()));
-        }
+        listView.setAdapter(emptyAdapter);
     }
 
-    //Dal Maso
+    /** Dal Maso
+     * get all missions from the DB and print
+     */
     public void printAllMissionsDB(){
-        List<MissionEntity> missions = dataManager.getAllMission();
-        List<PersonEntity> persons = dataManager.getAllPerson();
+        List<MissionEntity> missions = DB.getAllMission();
+        List<PersonEntity> persons = DB.getAllPerson();
         //Crea una persona fake per non creare problemi di FOREING KEY
         if(persons.size()==0){
             PersonEntity person = new PersonEntity();
             person.setName("Nicola");
             person.setAcademicTitle("Studente");
             person.setLastName("Dal Maso");
-            dataManager.addPerson(person);
-            persons = dataManager.getAllPerson();
+            DB.addPerson(person);
+            persons = DB.getAllPerson();
         }
 
         Log.d("Lista Persone", ""+persons.get(0).getID());

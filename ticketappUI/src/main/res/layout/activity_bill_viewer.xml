@@ -21,98 +21,145 @@
             android:scaleType="centerCrop" />
 
         <android.support.design.widget.FloatingActionButton
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:id="@+id/fabEdit"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_gravity="end"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="128dp"
             android:layout_marginRight="16dp"
-            app:srcCompat="@drawable/ic_done_white" />
+            android:clickable="true"
+            app:backgroundTint="#D81B60"
+            android:visibility="visible"
+            app:srcCompat="@drawable/googleg_standard_color_18"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabConfirmEdit"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="128dp"
+            android:layout_marginRight="16dp"
+            android:clickable="true"
+            app:backgroundTint="#D81B60"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/ic_done_white"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabCrop"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="80dp"
+            android:layout_marginRight="72dp"
+            android:clickable="true"
+            app:backgroundTint="#8E24AA"
+            app:srcCompat="@drawable/ic_content_cut_white_24px" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabDelete"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="80dp"
+            android:layout_marginRight="16dp"
+            android:clickable="true"
+            app:backgroundTint="#D81B60"
+            app:srcCompat="@drawable/ic_clear_white_24px" />
     </RelativeLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/billTitle"
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:text="@string/billTitle"
-            android:textSize="26dp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/nameTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/name" />
+            <TextView
+                android:id="@+id/billTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:text="@string/billTitle"
+                android:textSize="26dp" />
 
-        <TextView
-            android:id="@+id/billName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="..." />
+            <TextView
+                android:id="@+id/nameTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/name"
+                android:textSize="20dp" />
 
-        <TextView
-            android:id="@+id/descTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/description" />
+            <EditText
+                android:id="@+id/billName"
+                android:editable="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="..." />
 
-        <TextView
-            android:id="@+id/billDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="Cena al ristorante" />
+            <TextView
+                android:id="@+id/shopTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/shop"
+                android:textSize="20dp" />
 
-        <TextView
-            android:id="@+id/totalTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/total" />
+            <EditText
+                android:editable="false"
+                android:id="@+id/billShop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="Ristorante xyz" />
 
-        <TextView
-            android:id="@+id/billTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="22.50€" />
+            <TextView
+                android:id="@+id/Amounttxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/total"
+                android:textSize="20dp" />
 
-        <TextView
-            android:id="@+id/lastModTxt"
-            android:layout_marginTop="22dp"
-            android:layout_marginLeft="32dp"
-            android:textSize="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/lastMod" />
+            <EditText
+                android:editable="false"
+                android:id="@+id/billAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="22.50€" />
 
-        <TextView
-            android:id="@+id/billLastMod"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:text="..." />
+            <TextView
+                android:id="@+id/dateTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/date"
+                android:textSize="20dp" />
 
-    </LinearLayout>
+            <EditText
+                android:editable="false"
+                android:id="@+id/billDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="..." />
 
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

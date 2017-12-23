@@ -7,11 +7,18 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import static database.Constants.DATABASE_VERSION;
+
 /**
  * Created by Taschin Federico on 08/11/2017.
+ * Singleton pattern for a single instantiation of the Database
+ * This abstract class is the only access to the DAO object, that performs the input output operations of the database.
+ * This class is annotated with @android.arch.persistence.room.Database and a list of the entities of the database.
+ * The DAO interface is accessible with the ticketDao() method. This method is not implemented in any subclass of Database, since
+ * the Room library takes care of creating the DAO object and returning it when ticketDao() is called.
  */
 
-@android.arch.persistence.room.Database(entities = {TicketEntity.class, MissionEntity.class, PersonEntity.class}, version = 1)
+@android.arch.persistence.room.Database(entities = {TicketEntity.class, MissionEntity.class, PersonEntity.class}, version = DATABASE_VERSION)
 public abstract class Database extends RoomDatabase {
 
     private static Database INSTANCE; //Unique instance of the Database object
@@ -28,6 +35,7 @@ public abstract class Database extends RoomDatabase {
         }
         return INSTANCE;
     }
+    
     /**Destroys the Database instance (by setting it to null). getAppDatabase(context) must be called before using the saved instance of Database again
     **/
     public static void destroyInstance() {

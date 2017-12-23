@@ -1,8 +1,6 @@
 package database;
 
-import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -14,18 +12,22 @@ import android.net.Uri;
 
 /**
  * Represents one mission and its associated information
- * @author Marco Olivieri on 26/11/2017 (Team 3)
+ * @author Marco Olivieri(Team 3)
  */
 
-@Entity(tableName = Constants.MISSION_TABLE_NAME,
-        foreignKeys = @ForeignKey(entity = PersonEntity.class, parentColumns = Constants.PERSON_PRIMARY_KEY_NAME, childColumns = Constants.PERSON_CHILD_COLUMNS))
-@TypeConverters(Converters.class)
 
-public class MissionEntity implements Serializable{
+@Entity(tableName = Constants.MISSION_TABLE_NAME,
+        foreignKeys = @ForeignKey(entity = PersonEntity.class,
+                parentColumns = Constants.PERSON_PRIMARY_KEY_NAME,
+                childColumns = Constants.PERSON_CHILD_COLUMNS,
+                onDelete = ForeignKey.CASCADE))
+@TypeConverters(Converters.class) // automatic converters for database correct type
+
+public class MissionEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
-    private int ID;
+    private long ID;
     private Date startMission;
     private Date endMission;
     private String location;
@@ -38,7 +40,7 @@ public class MissionEntity implements Serializable{
 
     @Ignore
     /**
-     * Non parametric constructor
+     * Non parametric constructor to use when you don't want set all fields
      */
     public MissionEntity() {
     }
@@ -65,7 +67,7 @@ public class MissionEntity implements Serializable{
      * Returns the mission ID
      * @return  ID
      */
-    public int getID() {
+    public long getID() {
         return ID;
     }
 
@@ -74,7 +76,7 @@ public class MissionEntity implements Serializable{
      * Set mission id
      * @param ID not null
      */
-    public void setID(int ID) {
+    public void setID(long ID) {
         this.ID = ID;
     }
 
@@ -174,14 +176,21 @@ public class MissionEntity implements Serializable{
         this.personID = personID;
     }
 
+    /**
+     * Returns the name of this mission
+     * @return name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of this mission
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
-//TODO override toString
 }
 

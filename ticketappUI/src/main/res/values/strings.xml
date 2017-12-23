@@ -1,5 +1,7 @@
+
+
 <resources>
-    <string name="app_name">TicketApp</string>
+    <string name="app_name">TicketManager</string>
 
     <string name="title_activity_collapse">Collapse</string>
     <string name="dummy_button">Dummy Button</string>
@@ -8,12 +10,21 @@
     <string name="action_deleteMission">Elimina Missione</string>
     <string name="billTitle">Il tuo scontrino</string>
     <string name="name">Nome</string>
-    <string name="description">Descrizione</string>
+    <string name="shop">Negozio</string>
     <string name="total">Totale</string>
-    <string name="lastMod">Ultima modifica</string>
+    <string name="date">Data</string>
     <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
-    <string name="no_import">Nessun importo rilevato</string>
+    <!--lazzarin-->
+    <string name="newMission">Nuova missione</string>
+    <string name="deleteMissionToast">Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati</string>
+    <string name="buttonDelete">Elimina</string>
+    <string name="cancel">Annulla</string>
+    <string name="deleteTicketToast">Sei sicuro di voler eliminare lo scontrino?</string>
+    <string name="titleMission">Missioni</string>
+    <string name="defaultDescription">Nessuna descrizione</string>
+    <string name="deleteTitle">Cancellazione</string>
+    <string name="description">Description</string>
 </resources>
