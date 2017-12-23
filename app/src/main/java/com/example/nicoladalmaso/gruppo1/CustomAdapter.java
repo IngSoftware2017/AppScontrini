@@ -151,6 +151,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                         File photo = new File(thisPhoto.getFileUri().toString().substring(7));
 
                         //Put data to next activity
+                        startImageView.putExtra("ID",thisPhoto.getID());
                         startImageView.putExtra("imagePath", thisPhoto.getFileUri().toString().substring(7));
                         startImageView.putExtra("imageName", photo.getName());
                         SimpleDateFormat simpleDateFormat =

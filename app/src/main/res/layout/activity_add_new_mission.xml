@@ -74,7 +74,7 @@
                 android:id="@+id/input_missionDescription"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
-                android:hint="@string/description" />
+                android:hint="@string/shop" />
 
         </android.support.design.widget.TextInputLayout>
 
