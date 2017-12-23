@@ -238,7 +238,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.ing.software.ticketapp.fileprovider",
+                        context.getString(R.string.authority),
                         photoFile);
                 takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
@@ -511,7 +511,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
 
         @Override
         protected void onHandleIntent(final Intent workIntent) {
-            Log.d("WWWWWWWWWWWWWW", "PARTE STO COSO?");
             OcrUtils.log(1, "TestService", "Entering service");
             final ResultReceiver receiver = workIntent.getParcelableExtra("receiver");
             final Bundle bundle = new Bundle();

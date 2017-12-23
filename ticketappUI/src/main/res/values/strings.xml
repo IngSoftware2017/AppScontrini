@@ -27,4 +27,5 @@
     <string name="defaultDescription">Nessuna descrizione</string>
     <string name="deleteTitle">Cancellazione</string>
     <string name="description">Description</string>
+    <string name="authority">com.ing.software.ticketapp.fileprovider</string>
 </resources>
