@@ -70,6 +70,7 @@ class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 23-12-17
      * Tries to find a BigDecimal from string
      * @param amountString string containing possible amount. Length > 0.
      * @return BigDecimal containing the amount, null if no number was found
@@ -77,9 +78,6 @@ class DataAnalyzer {
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
         if (OcrUtils.isPossibleNumber(amountString)) {
-            try {
-                amount = new BigDecimal(amountString);
-            } catch (NumberFormatException e) {
                 try {
                     String decoded = deepAnalyzeAmountChars(amountString);
                     if (!decoded.equals(""))
@@ -87,9 +85,6 @@ class DataAnalyzer {
                 } catch (Exception e1) {
                     amount = null;
                 }
-            } catch (Exception e2) {
-                amount = null;
-            }
             if (amount != null)
                 amount = amount.setScale(2, RoundingMode.HALF_UP);
         }
