@@ -31,7 +31,7 @@ class DataAnalyzer {
      * probability to contain the amount calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
      * If no amount was found in first result iterate through all results following previous order.
      * @param amountResults list of RawStringResult from amount search. Not null.
-     * @return BigDecimal containing the amount found. Null if nothing found
+     * @return List of ordered possible amounts as RawGridResults.
      */
     static List<RawGridResult> getPossibleAmounts(@NonNull List<RawStringResult> amountResults) {
         int distanceMultiplier = 15;
@@ -78,13 +78,13 @@ class DataAnalyzer {
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
         if (OcrUtils.isPossibleNumber(amountString)) {
-                try {
-                    String decoded = deepAnalyzeAmountChars(amountString);
-                    if (!decoded.equals(""))
-                        amount = new BigDecimal(decoded);
-                } catch (Exception e1) {
-                    amount = null;
-                }
+            try {
+                String decoded = deepAnalyzeAmountChars(amountString);
+                if (!decoded.equals(""))
+                    amount = new BigDecimal(decoded);
+            } catch (Exception e1) {
+                amount = null;
+            }
             if (amount != null)
                 amount = amount.setScale(2, RoundingMode.HALF_UP);
         }
@@ -360,7 +360,7 @@ class DataAnalyzer {
      * @return the absolute value of the minimum distance found between all combinations,
      * if the distance is >= 10 or the inserted text is empty returns -1
      */
-    static int findDate(String text) {
+    private static int findDate(String text) {
         if (text.length() == 0)
             return -1;
 
@@ -456,5 +456,37 @@ class DataAnalyzer {
         else
             return dataSearch;
 
+    }
+
+    /**
+     * @author Michelon
+     * Search through results from the research of date string and retrieves the text with highest
+     * probability to contain the date calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
+     * If no date was found in first result iterate through all results following previous order.
+     * @param dateResults list of RawGridResult from date search. Not null.
+     * @return List of possible dates ordered
+     */
+    static List<RawGridResult> getPossibleDates(@NonNull List<RawGridResult> dateResults) {
+        int distanceMultiplier = 15;
+        List<RawGridResult> possibleResults = new ArrayList<>();
+        Collections.sort(dateResults);
+        for (RawGridResult gridResult : dateResults) {
+            //Ignore text with invalid distance (-1) according to findSubstring() documentation
+            int distanceFromDate = findDate(gridResult.getText().getDetection());
+            if (distanceFromDate > -1) {
+                int singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
+                possibleResults.add(new RawGridResult(gridResult.getText(), singleCatch));
+            } else {
+                OcrUtils.log(3, "getPossibleDate", "Ignoring text: " + gridResult.getText().getDetection());
+            }
+        }
+        if (possibleResults.size() > 0) {
+            /* Here we order considering their final probability to contain the amount:
+            If the probability is the same, the fallback is their previous order, so based on when
+            they are inserted (=their distance (position) from source rect).
+            */
+            Collections.sort(possibleResults);
+        }
+        return possibleResults;
     }
 }
