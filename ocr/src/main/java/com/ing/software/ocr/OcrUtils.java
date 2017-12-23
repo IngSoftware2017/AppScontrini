@@ -332,7 +332,7 @@ public class OcrUtils {
     /**
      * @author Michelon
      * @date 9-12-17
-     * Check if a string may be a number. Removes spaces, 's', 'S', '.' before analysis.
+     * Check if a string may be a number. Removes spaces, 'S', '.' before analysis.
      * @param s string to analyze
      * @return true if more than half (included) of the chars in the string are numbers
      */
