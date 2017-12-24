@@ -10,9 +10,9 @@ import java.util.PriorityQueue;
 /**
  * Sorted data structure (descending order) used to select best k elements.
  * @author Riccardo Zaglia
- *
  */
-public class Podium<T extends Comparable<T>> {
+public class Podium<T extends Comparable<?>> { // T is incompatible with partially specialized classes,
+                                               // I have to use Comparable<?> instead of Comparable<T>
     private int tgtSize = 0;
     private PriorityQueue<T> pq = null;
     // NB: the first element is the lowest/worst one
@@ -38,11 +38,19 @@ public class Podium<T extends Comparable<T>> {
     }
 
     /**
+     * Try add all elements in objList to podium.
+     * @param objList elements to add. Not null. Each element must not be null
+     */
+    public void tryAddAll(@NonNull List<T> objList) {
+        for (T obj : objList)
+            tryAdd(obj);
+    }
+
+    /**
      * Get all elements in podium (descending order).
      * @return array of all elements
      */
-    @SuppressWarnings("unchecked")
-    public List<T> getAll() { //with generics I cannot instantiate arrays.
+    public List<T> getAll() {
         List<T> l = new ArrayList<>();
         while (!pq.isEmpty())
             l.add(0, pq.poll());

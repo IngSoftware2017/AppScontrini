@@ -75,10 +75,12 @@ public class Reflect {
      * Get value of a static or non static field (with any access level).
      * @param clazz A class instance or class type. Not null
      * @param fieldName Field name. Not null
-     * @param <T> type of the field.
-     * @return value of the field.
+     * @param <T> Type of the field.
+     * @return Value of the field.
      *
-     * @throws Exception exception
+     * @throws Exception:
+     *  NullPointerException: Trying to get an instance field passing a class type.
+     *  ClassCastException: Field type mismatch.
      */
     @SuppressWarnings("unchecked")
     public static <T> T getField(@NonNull Object clazz, @NonNull String fieldName) throws Exception {
@@ -93,9 +95,10 @@ public class Reflect {
      * Set value of a static or non static field (with any access level).
      * @param clazz A class instance or class type. Not null
      * @param fieldName Field name. Not null
-     * @param newVal new value of the field.
+     * @param newVal New value of the field.
      *
-     * @throws Exception exception
+     * @throws Exception:
+     *  NullPointerException: Trying to set an instance field passing a class type.
      */
     public static void setField(@NonNull Object clazz, @NonNull String fieldName, Object newVal) throws Exception {
         boolean isType = clazz instanceof Class<?>;
