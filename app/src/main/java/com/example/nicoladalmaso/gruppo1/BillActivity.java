@@ -29,7 +29,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ing.software.common.Ref;
+import com.ing.software.common.Ticket;
+import com.ing.software.common.TicketError;
 import com.ing.software.ocr.DataAnalyzer;
+import com.ing.software.ocr.ImagePreprocessor;
+import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -41,6 +46,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import database.DataManager;
 import database.TicketEntity;
@@ -58,6 +64,8 @@ public class BillActivity extends AppCompatActivity {
     Context context;
     String root;
     public DataManager DB;
+    OcrManager ocrManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +82,25 @@ public class BillActivity extends AppCompatActivity {
 
         setTitle(missionName);
         initializeComponents();
+
+        //tento di inizializzare l'ocr
+        ocrManager = new OcrManager();
+        Consumer<TicketError> err;
+        //to delete----------------------
+        int a=ocrManager.initialize(this);
+        Log.d("prova",a+"");
+        //---------------------------------------
+        while (ocrManager.initialize(this) != 0) { // 'this' is the context
+            try {
+                //On first run vision library will be downloaded
+                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    Log.d("componenti ","inizializzati");
     }
 
     /** Dal Maso
@@ -362,20 +389,38 @@ public class BillActivity extends AppCompatActivity {
         String fname = imageFileName+".jpg";
         File file = new File(root, fname);
         final Uri uri=Uri.fromFile(file);
+        BigDecimal tot;
         if (file.exists())
             file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
-
+            Log.d("ecco2","trovato2");
             //TODO: HardCode example, implement ocr here
+            ImagePreprocessor imgToAnalyze = new ImagePreprocessor(imageToSave);
+            Log.d("ecco1","trovato1");
+            imgToAnalyze.findTicket(true,err->{
+                if( err==TicketError.NONE) Log.d("ecco","trovato");
+                if( err==TicketError.RECT_NOT_FOUND) Log.d("ecco","trovato");
+                if( err==TicketError.INVALID_POINTS) Log.d("ecco","trovato");
 
-            DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, missionID));
+            });
+            Ref<BigDecimal> amountRef=new Ref<>();
+            ocrManager.getTicket(imgToAnalyze,result -> {amountRef.value=result.amount;  });
+            tot=amountRef.value;
+            ocrManager.release();
+
+
+            DB.addTicket(new TicketEntity(uri, tot, null, Calendar.getInstance().getTime(), fname, missionID));
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
-        } catch (Exception e) {
+        }
+
+        catch (Exception e) {
+            Log.d("err","troia");
             e.printStackTrace();
         }
+
     }
 
     /**PICCOLO
@@ -444,4 +489,6 @@ public class BillActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
+
+
 }
