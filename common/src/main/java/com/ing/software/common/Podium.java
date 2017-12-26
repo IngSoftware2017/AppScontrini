@@ -11,8 +11,9 @@ import java.util.PriorityQueue;
  * Sorted data structure (descending order) used to select best k elements.
  * @author Riccardo Zaglia
  */
-public class Podium<T extends Comparable<T>> {
-    private int k = 0;
+public class Podium<T extends Comparable<?>> { // T is incompatible with partially specialized classes,
+                                               // I have to use Comparable<?> instead of Comparable<T>
+    private int tgtSize = 0;
     private PriorityQueue<T> pq = null;
     // NB: the first element is the lowest/worst one
 
@@ -21,8 +22,8 @@ public class Podium<T extends Comparable<T>> {
      * @param k > 0. Size of podium.
      */
     public Podium(@Size(min = 1) int k) {
-        this.k = k;
-        pq = new PriorityQueue<>(k + 1);
+        tgtSize = k;
+        pq = new PriorityQueue<>(tgtSize + 1);
     }
 
     /**
@@ -33,15 +34,23 @@ public class Podium<T extends Comparable<T>> {
      */
     public boolean tryAdd(@NonNull T obj) {
         pq.offer(obj);
-        return pq.size() <= k || pq.poll() != obj; // if lowest is obj -> add failed
+        return pq.size() <= tgtSize || pq.poll() != obj; // if lowest is obj -> add failed
+    }
+
+    /**
+     * Try add all elements in objList to podium.
+     * @param objList elements to add. Not null. Each element must not be null
+     */
+    public void tryAddAll(@NonNull List<T> objList) {
+        for (T obj : objList)
+            tryAdd(obj);
     }
 
     /**
      * Get all elements in podium (descending order).
      * @return array of all elements
      */
-    @SuppressWarnings("unchecked")
-    public List<T> getAll() { //with generics I cannot instantiate arrays.
+    public List<T> getAll() {
         List<T> l = new ArrayList<>();
         while (!pq.isEmpty())
             l.add(0, pq.poll());
