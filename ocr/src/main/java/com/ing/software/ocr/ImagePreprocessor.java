@@ -1,8 +1,8 @@
 package com.ing.software.ocr;
 
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
+import android.graphics.*;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
@@ -13,82 +13,49 @@ import org.opencv.android.Utils;
 import org.opencv.core.*;
 import org.opencv.core.Size; // resolve conflict
 import org.opencv.core.Point; // resolve conflict
+import org.opencv.core.Rect; // resolve conflict
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
+import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.*;
 import static org.opencv.core.CvType.*;
 import static org.opencv.imgproc.Imgproc.*;
 import static com.annimon.stream.Stream.*;
-
-
-/*
-USAGE CASES:
-
-Real time visual feedback when framing a ticket:
- 1) Create new ImagePreprocessor passing a the bitmap of the preview frame.
- 2) Call findTicket(true);
- 3) If findTicket returns NONE, call getCorners to get the rectangle corners to overlay on top of preview.
- 4) Call getCorners to get a rectangle (if findTicket returns NONE) or a polygon (if findTicket returns RECT_NOT_FOUND).
-
-User shoots a photo:
- 1) Use ImageProcessor instance of last frame when rectangle was found.
- 2) Call findTicket(false);
- 3) If findTicket returns NONE proceed to step 5)
- 4) If findTicket returns RECT_NOT_FOUND, let user drag the rectangle corners into position,
-    then proceed to call setCorners().
- 5) Call OcrManager.getTicket passing this ImagePreprocessor instance.
-    Call undistort to get the photo of the ticket unwarped.
-
-New photo loaded from storage:
- Same as when user shot a photo, but ImagePreprocessor must be created with loaded photo.
-
-Load and show photo already processed:
- 1) Create new ImagePreprocessor passing the photo and the corners.
- 2) Call undistort().
- 
- */
-
-import static org.opencv.core.Core.*;
-import static org.opencv.core.CvType.*;
-import static org.opencv.imgproc.Imgproc.*;
-import static com.annimon.stream.Stream.*;
-
-
-/*
-USAGE CASES:
-
-Real time visual feedback when framing a ticket:
- 1) Create new ImagePreprocessor passing a the bitmap of the preview frame.
- 2) Call findTicket(true);
- 3) If findTicket returns NONE, call getCorners to get the rectangle corners to overlay on top of preview.
- 4) Call getCorners to get a rectangle (if findTicket returns NONE) or a polygon (if findTicket returns RECT_NOT_FOUND).
-
-User shoots a photo:
- 1) Use ImageProcessor instance of last frame when rectangle was found.
- 2) Call findTicket(false);
- 3) If findTicket returns NONE proceed to step 5)
- 4) If findTicket returns RECT_NOT_FOUND, let user drag the rectangle corners into position,
-    then proceed to call setCorners().
- 5) Call OcrManager.getTicket passing this ImagePreprocessor instance.
-    Call undistort to get the photo of the ticket unwarped.
-
-New photo loaded from storage:
- Same as when user shot a photo, but ImagePreprocessor must be created with loaded photo.
-
-Load and show photo already processed:
- 1) Create new ImagePreprocessor passing the photo and the corners.
- 2) Call undistort().
- 
- */
+import static java.lang.Math.*;
 
 /**
  * Class used to process an image of a ticket.
- * This class is thread safe.
+ * <p> This class is thread safe. </p>
+ *
+ * <p> USAGE CASES: </p>
+ *
+ * <p> Real time visual feedback when framing a ticket: </p>
+ * <ol> Create new ImagePreprocessor passing a the bitmap of the preview frame.</ol>
+ * <ol> Call findTicket(true) </ol>
+ * <ol> If findTicket callback has an empty error list, call getCorners() to get the rectangle corners
+ *       to overlay on top of the preview. </ol>
+ * <ol> If the callback list contains CROOKED_TICKET, alert user that the ticket is framed sideways </ol>
+ *
+ * <p> User shoots a photo: </p>
+ * <ol> Use ImagePreprocessor instance of last frame when rectangle was found. </ol>
+ * <ol> Call findTicket(false); </ol>
+ * <ol> If findTicket callback has an empty error list, proceed to step 5) </ol>
+ * <ol> If the callback list contains RECT_NOT_FOUND, let user drag the rectangle corners into position,
+ *     then proceed to call setCorners(). </ol>
+ * <ol> Call OcrManager.getTicket passing this ImagePreprocessor instance.
+ *       Call undistort() to get the photo of the ticket unwarped. </ol>
+ *
+ * <p> New photo imported from storage: </p>
+ * <ol> Same as when user shot a photo, but ImagePreprocessor must be created with imported photo. </ol>
+ *
+ * <p> Load and show photo already processed: </p>
+ * <ol> Create new ImagePreprocessor passing the photo and the corners. </ol>
+ * <ol> Call undistort().</ol>
+ *
  * @author Riccardo Zaglia
  */
 /*
@@ -103,13 +70,20 @@ public class ImagePreprocessor {
 
     //Bilateral filter:
     private static final int BF_KER_SZ = 9; // kernel size, must be odd
-    private static final int BF_SIGMA = 20; // space/color variance
+    private static final int BF_SIGMA = 30; // space/color variance
 
     //Erode/Dilate iterations
     private static final int E_D_ITERS = 4;
 
     //Erode for hugh lines
-    private static final int ERODE_ITERS = 2;
+    private static int[][] ERODE_KER_DATA = new int [][] {
+            new int[] {   0,   0, 255, 255, 255, 255, 255,   0,   0},
+            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
+            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
+            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
+            new int[] {   0,   0, 255, 255, 255, 255, 255,   0,   0},
+            };
+    private static Mat ERODE_KER; // assigned in the static block
 
     //Median kernel size
     private static final int MED_SZ = 7; // must be odd
@@ -119,25 +93,75 @@ public class ImagePreprocessor {
 
     //Adaptive threshold:
     private static final int THR_WIN_SZ = 75; // window size. must be odd
-    private static final int THR_OFFSET = 2; //
+    private static final int THR_OFFSET = 1; //
+
+    //Hough lines
+    private static final int SECTORS = 101; // accumulator resolution, should be odd
+    private static final double DIST_RES = 1; // rho, resolution in hough space
+    private static final double ANGLE_RES = PI / SECTORS; // theta, resolution in hough space
+    private static final int HOUGH_THRESH = 50; // threshold
+    private static final int HOUGH_MIN_LEN = 40;
+    private static final int HOUGH_MAX_GAP = 5;
+
+    // Maximum number of contours to analyze
+    private static final int MAX_CONTOURS = 2;
 
     // factor that determines maximum distance of detected contour from rectangle
     //private static final double polyMaxErrMul = 0.02;
     private static final int POLY_MAX_ERR = 50;
 
+    // Score values
+    private static final double SCORE_AREA_MUL = 0.001;
+    private static final double SCORE_RECT_FOUND = 1;
+
+
+    // Anything inside here is run once per app execution and before any other code.
     static {
-        if (!OpenCVLoader.initDebug()) {
+        if (OpenCVLoader.initDebug()) {
+            // assign ERODE_KER kernel from ERODE_KER_DATA.
+            ERODE_KER = new Mat(ERODE_KER_DATA.length, ERODE_KER_DATA[0].length, CV_8UC1);
+            for (int y = 0; y < ERODE_KER_DATA.length; y++) {
+                for (int x = 0; x < ERODE_KER_DATA[0].length; x++) {
+                    ERODE_KER.put(y, x, ERODE_KER_DATA[y][x]);
+                }
+            }
+        }
+        else {
             OcrUtils.log(0, "OpenCV", "OpenCV failed to initialize");
         }
     }
 
-    class MatPool {
-        //todo
+    /**
+     * Convert a list of Android points to a list of OpenCV points.
+     * @param points List of Android points.
+     * @return List of OpenCV points.
+     */
+    private static List<Point> androidPtsToCV(List<PointF> points) {
+        return Stream.of(points).map(p -> new Point(p.x, p.y)).toList();
     }
 
     /**
-     * Convert a Mat to a Bitmap
-     * @param img Mat of any color. Not null.
+     * Convert a list of OpenCV points to a list of Android points.
+     * @param points List of OpenCV points.
+     * @return List of Android points.
+     */
+    private static List<PointF> cvPtsToAndroid(List<Point> points) {
+        return Stream.of(points).map(p -> new PointF((int)p.x, (int)p.y)).toList();
+    }
+
+    /**
+     * Convert a list of OpenCV points to MatOfPoints2f.
+     * @param pts List of points
+     * @return MatOfPoints2f
+     */
+    @NonNull
+    private static MatOfPoint2f ptsToMat(List<Point> pts) {
+        return new MatOfPoint2f(pts.toArray(new Point[pts.size()]));
+    }
+
+    /**
+     * Convert a Mat to a Bitmap.
+     * @param img Mat of any color format. Not null.
      * @return Bitmap
      */
     private static Bitmap matToBitmap(Mat img) {
@@ -148,11 +172,12 @@ public class ImagePreprocessor {
 
     /**
      * Downscale image.
-     * This method ensures that any image at any resolution or orientation is processed at the same level of detail.
+     * This method ensures that any image at any resolution or orientation is processed at the same level of detail,
+     * but it preserves aspect ratio.
      * @param img RGBA Mat. Not null.
      * @return RGBA Mat.
      */
-    private static Mat downScaleRGBA(Mat img) {
+    private static Mat downScaleRgba(Mat img) {
         float aspectRatio = (float)img.rows() / img.cols();
         Size size = aspectRatio > 1 ? new Size(SHORT_SIDE, (int)(SHORT_SIDE * aspectRatio))
                 : new Size((int)(SHORT_SIDE / aspectRatio), SHORT_SIDE);
@@ -162,193 +187,271 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Convert Mat from RGBA to gray
-     * @param imgRef in-out ref to Mat (in: RGBA, out: gray). Original mat is not modified. Not null.
+     * Convert Mat from RGBA to gray.
+     * @param graySwap output swap of gray Mat. Not null.
+     * @param rgba input RGBA Mat.
      */
-    private static void RGBA2Gray(Ref<Mat> imgRef) {
-        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
-        cvtColor(imgRef.value, img2, COLOR_RGBA2GRAY);
-        imgRef.value = img2;
+    private static void rgba2Gray(Swap<Mat> graySwap, Mat rgba) {
+        cvtColor(rgba, graySwap.first, COLOR_RGBA2GRAY);
     }
 
     /**
-     * Bilateral filter
-     * @param imgRef in-out ref to gray Mat. Original mat is not modified. Not null.
+     * Bilateral filter.
+     * @param imgSwap in-out swap of gray Mat. Not null.
      */
-    private static void bilateralFilter(Ref<Mat> imgRef) {
-        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
-        Imgproc.bilateralFilter(imgRef.value, img2, BF_KER_SZ, BF_SIGMA, BF_SIGMA);
-        imgRef.value = img2;
+    private static void bilateralFilter(Swap<Mat> imgSwap) {
+        Imgproc.bilateralFilter(imgSwap.first, imgSwap.swap(), BF_KER_SZ, BF_SIGMA, BF_SIGMA);
     }
 
     /**
-     * Transform a gray image into a mask using an adaptive threshold
-     * @param imgRef in-out ref to Mat (in: gray, out: black & white). Original mat is not modified. Not null.
+     * Transform a gray image into a mask using an adaptive threshold.
+     * @param imgSwap in-out swap of Mat (in: gray, out: black & white). Not null.
      */
-    private static void threshold(Ref<Mat> imgRef) {
-        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
-        adaptiveThreshold(imgRef.value, img2, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, THR_WIN_SZ, THR_OFFSET);
-        imgRef.value = img2;
+    private static void threshold(Swap<Mat> imgSwap) {
+        adaptiveThreshold(imgSwap.first, imgSwap.swap(), 255,
+                ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, THR_WIN_SZ, THR_OFFSET);
     }
 
     /**
-     * Shrink mask.
-     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
+     * Erode a mask with a 3x3 kernel.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
+     * @param iters number of iterations
      */
-    private static void erode(Ref<Mat> imgRef, int iters) {
-        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
-        Imgproc.erode(imgRef.value, img2, new Mat(), new Point(-1, -1), iters);
-        imgRef.value = img2;
+    private static void erode(Swap<Mat> imgSwap, int iters) {
+        Imgproc.erode(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters);
     }
 
     /**
-     * Grow mask.
-     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
+     * Dilate a mask with a 3x3 kernel.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
+     * @param iters number of iterations
      */
-    private static void dilate(Ref<Mat> imgRef, int iters) {
-        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
-        Imgproc.dilate(imgRef.value, img2, new Mat(), new Point(-1, -1), iters);
-        imgRef.value = img2;
-    }
-
-    /**
-     * Shrink + grow mask.
-     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
-     */
-    private static void erodeDilate(Ref<Mat> imgRef) {
-        erode(imgRef, E_D_ITERS);
-        dilate(imgRef, E_D_ITERS);
+    private static void dilate(Swap<Mat> imgSwap, int iters) {
+        Imgproc.dilate(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters);
     }
 
     /**
      * Smooth mask contours.
-     * @param imgRef in-out ref to B&W Mat. Original mat is not modified. Not null.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
      */
     // unused
-    private static void median(Ref<Mat> imgRef) {
-        Mat img2 = new Mat(imgRef.value.size(), CV_8UC1);
-        medianBlur(imgRef.value, img2, MED_SZ);
-        imgRef.value = img2;
+    private static void median(Swap<Mat> imgSwap) {
+        medianBlur(imgSwap.first, imgSwap.swap(), MED_SZ);
     }
 
     /**
      * Make sure that the mask is not touching image edges.
-     * @param imgRef in-out ref to B&W Mat. Original mat IS modified. Not null.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
      */
-    private static void enclose(Ref<Mat> imgRef) {
-        copyMakeBorder(imgRef.value, imgRef.value, BORD_THICK, BORD_THICK, BORD_THICK, BORD_THICK, BORDER_CONSTANT);
+    private static void enclose(Swap<Mat> imgSwap) {
+        copyMakeBorder(imgSwap.first, imgSwap.swap(),
+                BORD_THICK, BORD_THICK, BORD_THICK, BORD_THICK, BORDER_CONSTANT);
     }
 
     /**
      * Downscale + convert to gray + bilateral filter + adaptive threshold + enclose, in this order.
-     * @param img RGBA Mat. Not null.
-     * @return B&W Mat.
+     * @param imgSwap output swap of gray Mat. Not null.
+     * @param rgba input RGBA Mat.
      */
-    private static Mat prepareBinaryImg(Mat img) {
-        Ref<Mat> imgRef = new Ref<>(img);
-        // I used Ref parameters to enable me to easily reorder the methods
+    private static void prepareBinaryImg(Swap<Mat> imgSwap, Mat rgba) {
+        // I used swap in-out parameters to enable me to easily reorder the methods
         // and experiment with the image processing pipeline
-        RGBA2Gray(imgRef);
-        bilateralFilter(imgRef);
-        threshold(imgRef);
-        enclose(imgRef);
-        return imgRef.value;
+        rgba2Gray(imgSwap, rgba);
+        bilateralFilter(imgSwap);
+        threshold(imgSwap);
+        enclose(imgSwap);
     }
 
     /**
      * Find k biggest outer contours in a RGBA image, sorted by area (descending).
-     * @param img RGBA Mat. Not null.
+     * @param imgSwap Swap of gray Mat. This parameter is modified by the function. Not null.
      * @param k number of contours to return.
-     * @return Contour with biggest area. Never null.
+     * @return Contour-area pairs with biggest area. Never null.
      */
-    private static List<MatOfPoint> findBiggestContours(Mat img, int k) {
-        Ref<Mat> imgRef = new Ref<>(img);
-        erodeDilate(imgRef);
+    private static List<Scored<MatOfPoint>> findBiggestContours(Swap<Mat> imgSwap, int k) {
+        erode(imgSwap, E_D_ITERS);
+        dilate(imgSwap, E_D_ITERS);
         //median(imgRef);
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
-        findContours(imgRef.value, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
+        findContours(imgSwap.first, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
-        Podium<CompPair<Double, MatOfPoint>> podium = new Podium<>(k);
+        Podium<Scored<MatOfPoint>> podium = new Podium<>(k);
         for (int i = 0; i < hierarchy.cols(); i++) {
             // select outer contours, i.e. contours that have no parent (hierarchy-1)
             // to know more, go to the link below, look for "RETR_CCOMP":
             // https://docs.opencv.org/3.1.0/d9/d8b/tutorial_py_contours_hierarchy.html
             if (hierarchy.get(0, i)[3] == -1) {
                 MatOfPoint ctr = contours.get(i);
-                podium.tryAdd(new CompPair<>(contourArea(ctr), ctr));
+                podium.tryAdd(new Scored<>(contourArea(ctr), ctr));
             }
         }
-        return Stream.of(podium.getAll()).map(cp -> cp.obj).toList();
+        return podium.getAll();
+        //return Stream.of(podium.getAll()).map(cp -> cp.obj).toList();
     }
 
     /**
-     * Find all edges of thresholded image inside contour.
-     * @param img B&W Mat. Not null.
-     * @param contour MatOfPoint not null.
-     * @return Mat with white edges and black background.
+     * Find edges of thresholded image. Output: Mat with white edges and black background.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
      */
-    private static Mat findEdges(Mat img, MatOfPoint contour) {
-        List<MatOfPoint> ctrList = new ArrayList<>(1);
-        ctrList.add(contour);
-        Mat mask = new Mat(img.rows(), img.cols(), CV_8UC1, new Scalar(255));
-        fillPoly(mask, ctrList, new Scalar(0));
-        Ref<Mat> maskRef = new Ref<>(mask);
-        dilate(maskRef, ERODE_ITERS + 1);
-        bitwise_or(img, img, maskRef.value);
-        Canny(img, img, 1, 1);
-        return img;
-    }
-
-    private static void findHoughLines() {
-        //todo
+    private static void toEdges(Swap<Mat> imgSwap) {
+        Imgproc.erode(imgSwap.first, imgSwap.swap(), ERODE_KER);
+        Canny(imgSwap.first, imgSwap.swap(), 1, 1);
     }
 
     /**
-     * Get Size in pixels of a rectangle in perspective
-     * @param perspRect ordered corners of a rectangle in perspective
-     * @return Size in pixels proportional to the real ticket
+     * Set to white everything outside contour.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
+     * @param contour MatOfPoint containing a contour. Not null.
+     */
+    private static void removeBackground(Swap<Mat> imgSwap, MatOfPoint contour) {
+        Mat binary = imgSwap.first.clone();
+        imgSwap.first.setTo(new Scalar(0));
+        fillPoly(imgSwap.first, Collections.singletonList(contour), new Scalar(255));
+        erode(imgSwap, ERODE_KER_DATA[0].length + 1);
+        bitwise_and(binary, imgSwap.first, imgSwap.swap());
+    }
+
+    /**
+     * Find Hough lines (segments).
+     * @param imgSwap Swap of B&W Mat. Not modified by this function. Not null.
+     * @return MatOfInt4 containing hough lines.
+     */
+    private static MatOfInt4 houghLines(Swap<Mat> imgSwap) {
+        MatOfInt4 lines = new MatOfInt4();
+        HoughLinesP(imgSwap.first, lines, DIST_RES, ANGLE_RES, HOUGH_THRESH, HOUGH_MIN_LEN, HOUGH_MAX_GAP);
+        return lines;
+    }
+
+    /**
+     * Get size of a rectangle in perspective.
+     * @param perspRect ordered corners of a rectangle in perspective. Not null.
+     * @return Size in pixels proportional to the real ticket.
      */
     @NonNull
-    private static Size getRectSizeSimple(MatOfPoint2f perspRect) {
-        Mat[] v = new Mat[4];
-        double w = 1, h = 1;
-        if (perspRect.rows() == 4) {
-            for (int i = 0; i < 4; i++)
-                v[i] = perspRect.row(i);
-            // The width is calculated summing the distance between the two upper and two lowe corners
-            // then dividing by tho to get the average.
-            // Similarly the height is calculated finding the distance between the leftmost
+    private static Size getRectSizeSimple(List<Point> perspRect) {
+        double width = 1, height = 1; // non 0 initial values (should be overwritten)
+        if (perspRect.size() == 4) {
+            List<MatOfPoint> pts = Stream.of(perspRect).map(MatOfPoint::new).toList();
+            // The width is calculated summing the distance between the two upper and two lower corners
+            // then dividing by two to get the average.
+            // Similarly the height is calculated using the distance between the leftmost
             // and rightmost corners.
-            w = (norm(v[1], v[2]) + norm(v[3], v[0])) / 2;
-            h = (norm(v[0], v[1]) + norm(v[2], v[3])) / 2;
+            width = (norm(pts.get(1), pts.get(2)) + norm(pts.get(3), pts.get(0))) / 2;
+            height = (norm(pts.get(0), pts.get(1)) + norm(pts.get(2), pts.get(3))) / 2;
         }
-        return new Size(w, h);
+        return new Size(width, height);
     }
     //todo: use a better approach:
     // http://andrewkay.name/blog/post/aspect-ratio-of-a-rectangle-in-perspective/
 
     /**
-     * Find the polygon from a contour.
-     * @param contour MatOfPoint containing a contour.
+     * Approximate a contour into a polygon.
+     * @param contour MatOfPoint containing a contour. Not null.
      * @return MatOfPoint2f polygon corners.
      */
-    private static MatOfPoint2f findRectangle(MatOfPoint contour) {
+    private static MatOfPoint2f findPolySimple(MatOfPoint contour) {
         MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
-        MatOfPoint2f corns = new MatOfPoint2f();
+        MatOfPoint2f verts = new MatOfPoint2f();
         //double perimeter = arcLength(contour, true);
-        approxPolyDP(contour2f, corns, POLY_MAX_ERR/*polyMaxErrMul * perimeter*/, true);
-        return corns;
+        approxPolyDP(contour2f, verts, POLY_MAX_ERR/*polyMaxErrMul * perimeter*/, true);
+        return verts;
     }
-    //todo tests: is corners input non empty?
+
+    /**
+     * Find predominant angle of Hough lines using an accumulator.
+     * @param lines MatOfInt4 containing the hough lines. Not null.
+     * @return predominant angle in degrees.
+     */
+    private static double predominantAngle(MatOfInt4 lines) {
+        double[] accumulator = new double[SECTORS];
+        for (int i = 0; i < lines.rows(); i++) {
+            double[] line = lines.get(i, 0);
+            double xDiff = line[0] - line[2], yDiff = line[1] - line[3];
+            double angle = atan(yDiff / xDiff);
+            double length = sqrt(xDiff * xDiff + yDiff * yDiff);
+            accumulator[min((int)((angle + PI / 2) * SECTORS / PI), SECTORS - 1)] += length;
+        }
+
+        return ((double)Collections.max(range(0, SECTORS).map(i ->
+                new Scored<>(accumulator[i], i)).toList()).obj + 0.5) * 180 / SECTORS - 90;
+    }
+
+    /**
+     * Order rectangle corners as the first is the top-leftmost.
+     * @param srcRect MatOfPoint2f containing rect corners.
+     * @param angle to rotate the corners before ordering.
+     * @param imgSize image size to get the center of image.
+     * @return ordered corners, not rotated.
+     */
+    @NonNull
+    private static MatOfPoint2f orderRectCorners(MatOfPoint2f srcRect, double angle, Size imgSize) {
+        // I should create the rotation matrix from the center of the contour,
+        // but for now it's good enough
+        Mat rotationMatrix = getRotationMatrix2D(
+                new Point(imgSize.width / 2, imgSize.height / 2), angle, 1);
+        MatOfPoint2f newRect = new MatOfPoint2f();
+        Core.transform(srcRect, newRect, rotationMatrix);
+
+        //find index of point closer to top-left corner of image (using taxicab distance).
+        int topLeftIdx = Collections.min(Stream.of(newRect.toList()).indexed().map(ip ->
+                new Scored<>(ip.getSecond().x + ip.getSecond().y, ip.getFirst())).toList()).obj;
+
+        //shift verts by topLeftIdx
+        //NB: sublist creates a view, not a copy.
+        List<Point> newVerts = new ArrayList<>(srcRect.toList()); // Mat.toList() is immutable
+        newVerts.addAll(newVerts.subList(0, topLeftIdx));
+        newVerts.subList(0, topLeftIdx).clear();
+        return ptsToMat(newVerts);
+    }
+
+    /**
+     * Find the the bounding box of the a contour rotated by "angle".
+     * @param ctr contour. Not modified.
+     * @param angle to rotate the contour.
+     * @param imgSize image size to get the center of image.
+     * @return rotated bounding box.
+     */
+    private static MatOfPoint2f rotatedBoundingBox(MatOfPoint ctr, double angle, Size imgSize) {
+        Point center = new Point(imgSize.width / 2, imgSize.height / 2);
+        Mat rotationMatrix = getRotationMatrix2D(center, angle, 1);
+        MatOfPoint newCtr = new MatOfPoint();
+        Core.transform(ctr, newCtr, rotationMatrix);
+        Rect box = boundingRect(newCtr);
+        MatOfPoint2f newRect = new MatOfPoint2f(
+                box.tl(),
+                new Point(box.tl().x, box.br().y),
+                box.br(),
+                new Point(box.br().x, box.tl().y));
+        Mat inverseRotation = getRotationMatrix2D(center, -angle, 1);
+        Core.transform(newRect, newRect, inverseRotation);
+        return newRect;
+    }
+
+    /**
+     * Scale points from srcSize space to dstSize space
+     * @param points in-out Mat of points to scale. Not null.
+     * @param srcSize Size of source image. Not null.
+     * @param dstSize Size of destination image. Not null.
+     */
+    private static void scale(Mat points, Size srcSize, Size dstSize) {
+        multiply(points, new Scalar(srcSize.width / dstSize.width,
+                srcSize.height / dstSize.height), points);
+    }
+
+//    private static Mat rotateMat(Mat rgba, double angle) {
+//        Mat m = getRotationMatrix2D(new Point(rgba.cols() / 2, rgba.rows() / 2), angle, 1);
+//        Mat img = new Mat(rgba.size(), CV_8UC4);
+//        warpAffine(rgba, img, m, rgba.size());
+//        return img;
+//    }
+
 
     //INSTANCE FIELDS:
 
     private Mat srcImg;
-    private List<MatOfPoint> contours;
-    private MatOfPoint2f corners;
-
+    private List<Point> corners;
 
 
     //PUBLIC:
@@ -360,138 +463,139 @@ public class ImagePreprocessor {
 
     /**
      * No need to call setBitmap().
-     * @param bm ticket bitmap
+     * @param bm ticket bitmap. Not null.
      */
-    public ImagePreprocessor(Bitmap bm) {
+    public ImagePreprocessor(@NonNull Bitmap bm) {
         setImage(bm);
     }
 
     /**
      * Set content of internal image buffers.
      * Always call this method before any other image manipulation method.
-     * @param bm ticket bitmap
+     * @param bm ticket bitmap. Not null.
      */
-    public void setImage(Bitmap bm) {
+    public void setImage(@NonNull Bitmap bm) {
         srcImg = new Mat();
-        Utils.bitmapToMat(bm, srcImg);
+        bitmapToMat(bm, srcImg);
     }
-
 
     /**
      * Find the 4 corners of a ticket, ordered counter-clockwise from the top-left corner of the ticket.
      * The corners are ordered to get a straight ticket (but could be upside down).
-     * To obtain the corners, call getCorners().
-     * @param quick true: faster but more inaccurate: good for real time visual feedback. No orientation detection.
-     *              false: slower but more accurate: good for recalculating the rectangle after the shot
-     *                                               or for analyzing an imported image.
-     * @param callback callback with TicketError argument called when computation is finished.
-     *                 The error can be NONE or RECT_NOT_FOUND.
+     * @param quick <ul> true: faster but more inaccurate, good for real time visual feedback.
+     *                                                     No orientation detection. </ul>
+     *              <ul> false: slower but more accurate, good for recalculating the rectangle after the shot
+     *                                                    or for analyzing an imported image. </ul>
+     * @param callback callback with a list of TicketError argument, called when computation is finished
+     *                 or an error ha occurred. The list parameter can contain.
+     *                 <ul> RECT_NOT_FOUND: the rectangle is not found; </ul>
+     *                 <ul> CROOKED_TICKET: The ticket is framed sideways; </ul>
+     *                 <ul> INVALID_STATE: the bitmap image has not been set for this I.P. instance </ul>
+     *                 <p> if there are no errors, the rectangle is found and the corners
+     *                      can be obtained with getCorners(); </p>
      */
-    public void findTicket(boolean quick, Consumer<TicketError> callback) {
+    public void findTicket(boolean quick, @NonNull Consumer<List<TicketError>> callback) {
         new Thread(() -> {
             synchronized (this) { // make sure this code is not executed concurrently when findTicket
                                   // is called more than once consecutively
-                if (srcImg == null)
+                if (srcImg == null) {
+                    callback.accept(Collections.singletonList(TicketError.INVALID_STATE));
                     return;
-                contours = new ArrayList<>();
-                Mat resized = downScaleRGBA(srcImg);
-                Mat binary = prepareBinaryImg(resized);
-                contours = findBiggestContours(binary, quick ? 1 : 3);
+                }
+                Mat resized = downScaleRgba(srcImg);
+                Swap<Mat> graySwap = new Swap<>(() -> new Mat(resized.size(), CV_8UC1));
+                prepareBinaryImg(graySwap, resized);
+                Mat binary = graySwap.first.clone();
+                toEdges(graySwap);
+                Mat edges = graySwap.first.clone();
+                graySwap.first = binary; // not cloning the image, it will be overwritten by using the swap
 
-                List<CompPair<Double, MatOfPoint2f>> candidates = new ArrayList<>();
-                for (MatOfPoint ctr : contours) {
+                List<Scored<Pair<MatOfPoint2f, Double>>> candidates = new ArrayList<>();
+                for (Scored<MatOfPoint> ctrPair :
+                        findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS)) {
+                    double angle = 0;
+
+                    MatOfPoint2f rect = findPolySimple(ctrPair.obj);
                     if (!quick) {
                         // find Hough lines of ticket text
-                        Ref<Mat> binRef = new Ref<>(binary);
-                        //NB: original "binary" is not modified
-                        erode(binRef, ERODE_ITERS);
-                        Mat houghReady = findEdges(binRef.value, ctr);
-                        //todo find Hough lines + RANSAC to find undistort transform matrix
+                        graySwap.first = edges.clone();
+                        removeBackground(graySwap, ctrPair.obj);
+                        angle = predominantAngle(houghLines(graySwap));
+
+                        if (rect.rows() == 4)// fix orientation of already found rectangle
+                            rect = orderRectCorners(rect, angle, resized.size());
+                        else { // find rotated bounding box of contour
+                            rect = rotatedBoundingBox(ctrPair.obj, angle, resized.size());
+                        }
+                        //todo use RANSAC to find undistort transform matrix
                     }
-                    MatOfPoint2f rect = findRectangle(ctr);
-                    candidates.add(new CompPair<>(0.0, rect));
+                    candidates.add(new Scored<>(0.0, new Pair<>(rect, angle)));
                 }
                 //todo assign score and use Collections.max
-                corners = candidates.get(0).obj;
+                Pair<MatOfPoint2f, Double> winner = candidates.get(0).obj;
 
                 //scale up the the corners to match the scale of the original image
-                double scaleMul = (double)srcImg.cols() / resized.cols();
-                multiply(corners.clone(), new Scalar(scaleMul, scaleMul), corners);
+                scale(winner.first, srcImg.size(), resized.size());
 
-                if (corners.rows() != 4) {
-                    callback.accept(TicketError.RECT_NOT_FOUND);
-                    return;
-                }
+                corners = winner.first.toList();
 
-                if (!quick) {
-                    List<Point> corns = new ArrayList<>(corners.toList()); // corners.toList() is immutable
-                    //find index of point closer to top-left corner of image (using taxicab distance).
-                    int topLeftIdx = Collections.min(range(0, 4)
-                            .map(i -> new CompPair<>(corns.get(i).x + corns.get(i).y, i)).toList()).obj;
+                List<TicketError> errors = new ArrayList<>();
+                if (corners.size() != 4)
+                    errors.add(TicketError.RECT_NOT_FOUND);
+                if (winner.second < -60 || winner.second > 60)
+                    errors.add(TicketError.CROOKED_TICKET);
 
-                    //shift corns by topLeftIdx
-                    //NB: sublist creates a view, not a copy.
-                    corns.addAll(corns.subList(0, topLeftIdx));
-                    corns.subList(0, topLeftIdx).clear();
-                    corners = new MatOfPoint2f(corns.toArray(new Point[4]));
-                }
-                // Although this thread is synchronized, calling another synchronized method of
-                // this class instance from this thread is not gonna hang the thread
-                // because no other method uses synchronized inside a new Thread().
-                callback.accept(TicketError.NONE);
+                // As long as I use a new thread in only this method, calling this method or any other method
+                // of this class instance inside the callback, is not gonna create a double lock condition.
+                callback.accept(errors);
             }
         }).start();
     }
 
     /**
      * Set rectangle corners.
-     * @param corners must be 4, ordered counter-clockwise, first is top-left of ticket.
-     * @return TicketError. NONE: corners are valid.
-     *                      INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
+     * @param corners must be 4, ordered counter-clockwise, first is top-left of ticket. Not null.
+     * @return TicketError. - NONE: corners are valid.
+     *                      - INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
      */
-    public synchronized TicketError setCorners(List<android.graphics.Point> corners) {
-        this.corners = new MatOfPoint2f(Stream.of(corners)
-                .map(p -> new Point(p.x, p.y)).toArray(v -> new Point[corners.size()]));
+    public synchronized TicketError setCorners(@NonNull List<PointF> corners) {
+        this.corners = androidPtsToCV(corners);
         //todo check if corners are ordered correctly
         return corners.size() == 4 ? TicketError.NONE : TicketError.INVALID_POINTS;
     }
 
     /**
      * Get rectangle corners.
-     * @return List of points in bitmap space (range from (0,0) to (width, height) ).
-     *         The corners might be more or less than 4. Never null.
+     * @return List of corners in bitmap space (range from (0,0) to (width, height) ).
+     *         The corners should always be 4. Never null.
      */
-    public synchronized List<android.graphics.Point> getCorners() {
-        return corners == null ? new ArrayList<>() : Stream.of(corners.toList())
-                .map(p -> new android.graphics.Point((int)p.x, (int)p.y)).toList();
+    public synchronized List<PointF> getCorners() {
+        return corners == null ? new ArrayList<>() : cvPtsToAndroid(corners);
     }
 
     /**
      * Get a Bitmap of a ticket with a perspective correction applied, with a margin.
-     * @param marginMul fraction of length of shortest side of the rectangle of the ticket.
-     *                  A good value is 0.02
+     * @param marginMul Fraction of length of shortest side of the rectangle of the ticket.
+     *                  A good value is 0.02.
      * @return Bitmap of ticket with perspective distortion removed. Null if error.
      */
     public synchronized Bitmap undistort(double marginMul) {
-        if (corners == null)
+        if (corners == null || srcImg == null)
             return null;
 
-        MatOfPoint2f dstRect;
         Mat dstImg = srcImg.clone();
-        if (corners.rows() != 4) // at this point "corners" should have always 4 points.
-            return matToBitmap(dstImg);
+        if (corners.size() == 4) { // at this point "corners" should have always 4 points.
+            Size sz = getRectSizeSimple(corners);
+            double m = marginMul * min(sz.width, sz.height);
 
-        Size sz = getRectSizeSimple(corners);
-        double m = marginMul * Math.min(sz.width, sz.height);
-
-        dstRect = new MatOfPoint2f( // counter-clockwise
-                new Point(m, m),
-                new Point(m, sz.height + m),
-                new Point(sz.width + m, sz.height + m),
-                new Point(sz.width + m, m));
-        Mat mtx = getPerspectiveTransform(corners, dstRect);
-        warpPerspective(srcImg, dstImg, mtx, new Size(sz.width + 2 * m,sz.height + 2 * m));
-
+            MatOfPoint2f dstRect = new MatOfPoint2f( // counter-clockwise
+                    new Point(m, m),
+                    new Point(m, sz.height + m),
+                    new Point(sz.width + m, sz.height + m),
+                    new Point(sz.width + m, m));
+            Mat mtx = getPerspectiveTransform(new MatOfPoint2f(corners.toArray(new Point[4])), dstRect);
+            warpPerspective(srcImg, dstImg, mtx, new Size(sz.width + 2 * m, sz.height + 2 * m));
+        }
         return matToBitmap(dstImg);
     }
 
@@ -499,14 +603,35 @@ public class ImagePreprocessor {
     //UTILITY FUNCTIONS:
 
     /**
-     * Rotate a bitmap
-     * @param src Source bitmap
-     * @param angle Rotation angle (degrees)
-     * @return Rotated bitmap
+     * Rotate a bitmap.
+     * @param src Source bitmap. Not null.
+     * @param angle Rotation angle (degrees).
+     * @return Rotated bitmap.
      */
-    public static Bitmap rotate(Bitmap src, float angle) {
+    public static Bitmap rotate(@NonNull Bitmap src, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
+    }
+
+    /**
+     * Apply perspective transform to a collection of points.
+     * @param srcPoints Points to be transformed.
+     * @param srcRect Reference rectangle.
+     * @param dstRect Distorted reference rectangle.
+     * @return Output distorted points. Empty if error.
+     */
+    public static List<PointF> transform(
+            List<PointF> srcPoints,
+            List<PointF> srcRect,
+            List<PointF> dstRect) {
+        if (srcRect.size() != 4 || dstRect.size() != 4)
+            return new ArrayList<>();
+        MatOfPoint2f pts = ptsToMat(androidPtsToCV(srcPoints));
+        MatOfPoint2f rect1 = ptsToMat(androidPtsToCV(srcRect));
+        MatOfPoint2f rect2 = ptsToMat(androidPtsToCV(dstRect));
+        MatOfPoint2f dstPts = new MatOfPoint2f();
+        perspectiveTransform(pts, dstPts, getPerspectiveTransform(rect1, rect2));
+        return cvPtsToAndroid(dstPts.toList());
     }
 }

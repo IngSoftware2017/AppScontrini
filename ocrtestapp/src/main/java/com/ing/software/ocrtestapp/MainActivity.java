@@ -230,9 +230,9 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
 
                     ImagePreprocessor preproc = new ImagePreprocessor(testBmp);
                     preproc.findTicket(false, err -> {
-                        String rectString = (err == TicketError.NONE ? "found" : "not found");
-                        OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);
-                        bundle.putString(RECTANGLE_RECEIVED, rectString);
+                        //String rectString = (err.isEmpty() ? "found" : "not found");
+                        //OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);
+                        //bundle.putString(RECTANGLE_RECEIVED, rectString);
                         ocrAnalyzer.getTicket(preproc, result -> {
                             OcrUtils.log(1, "OcrHandler", "Detection complete");
                             long endTime = System.nanoTime();

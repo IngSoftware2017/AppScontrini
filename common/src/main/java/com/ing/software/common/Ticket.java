@@ -39,7 +39,7 @@ public class Ticket {
     public BigDecimal amount;
 
     /**
-     * List of vertices of rectangle
+     * Ordered list of vertices of rectangle (first top-left, counter-clockwise)
      */
     public List<Point> rectangle;
 
