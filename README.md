@@ -4,7 +4,7 @@
 
 
 ## Latest release: 
-[![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)]()
+[![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest)
  
 ## BRANCH DI TEST
 « Per me si va ne la città dolente,  
