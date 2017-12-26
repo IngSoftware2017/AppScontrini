@@ -524,7 +524,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             ocrManager.initialize(this);
             ImagePreprocessor preproc = new ImagePreprocessor(testBmp);
             preproc.findTicket(false, err -> {
-                    String rectString = (err == TicketError.NONE ? "found" : "not found");
                     ocrManager.getTicket(preproc, result -> {
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     if (result.amount != null) {
