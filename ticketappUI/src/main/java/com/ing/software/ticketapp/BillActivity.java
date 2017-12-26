@@ -85,6 +85,22 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         context = this.getApplicationContext();
         setTitle(missionName);
         initializeComponents();
+        mReceiver.setReceiver(this);
+        ocrManager = new OcrManager();
+        while (ocrManager.initialize(this) != 0) {
+            try {
+                Toast.makeText(this, "Downloading library...", Toast.LENGTH_SHORT).show();
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ocrManager.release();
     }
 
     /** Dal Maso
@@ -375,16 +391,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
-            mReceiver.setReceiver(this);
-            ocrManager = new OcrManager();
-            while (ocrManager.initialize(this) != 0) {
-                try {
-                    Toast.makeText(this, "Downloading library...", Toast.LENGTH_SHORT).show();
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
             Intent intent = new Intent(BillActivity.this, TestService.class);
             intent.putExtra("receiver", mReceiver);
             intent.putExtra("image", fname);
