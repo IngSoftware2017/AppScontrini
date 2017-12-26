@@ -19,6 +19,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.Serializable;
@@ -100,6 +101,12 @@ public class AddNewMission extends AppCompatActivity{
                 String location = editLocation.getText().toString();
 
                 if((name == null) || name.replaceAll(" ","").equals("") || (location==null) || location.replaceAll(" ","").equals("")) {
+                    String errors="";
+                    if ((name == null) || name.replaceAll(" ","").equals(""))
+                        errors+=getResources().getString(R.string.toast_missionNoName)+"\n" ;
+                    if((location==null) || location.replaceAll(" ","").equals(""))
+                        errors+=getResources().getString(R.string.toast_missionNoLocation)+"\n";
+                    Toast.makeText(context,errors, Toast.LENGTH_SHORT).show();
                     return false;
                 }
 

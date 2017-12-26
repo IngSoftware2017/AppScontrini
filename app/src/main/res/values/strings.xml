@@ -26,4 +26,6 @@
     <string name="titleMission">Missioni</string>
     <string name="defaultDescription">Nessuna descrizione</string>
     <string name="deleteTitle">Cancellazione</string>
+    <string name="toast_missionNoName">Per favore, inserisci un nome per la missione</string>
+    <string name="toast_missionNoLocation">Per favore, inserisci il luogo dove si è svolta la missione</string>
 </resources>
