@@ -368,9 +368,17 @@ public class BillActivity extends AppCompatActivity {
             FileOutputStream out = new FileOutputStream(file);
 
             //TODO: HardCode example, implement ocr here
+            TicketEntity t = new TicketEntity();
+            t.setDate(Calendar.getInstance().getTime());
+            t.setFileUri(uri);
+            t.setAmount(BigDecimal.valueOf(10000).movePointLeft(2));
+            t.setShop("Pam Padova");
+            t.setTitle("Scontrino ");
+            t.setMissionID(missionID);
 
-            DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, missionID));
+            DB.addTicket(t);
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
+
             out.flush();
             out.close();
         } catch (Exception e) {

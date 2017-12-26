@@ -89,12 +89,11 @@
                 android:text="@string/shop" />
 
             <TextView
-                android:id="@+id/billDesc"
+                android:id="@+id/billShop"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dp"
-                android:layout_marginTop="8dp"
-                android:text="Pam Padova" />
+                android:layout_marginTop="8dp" />
 
             <TextView
                 android:id="@+id/totalTxt"
@@ -110,8 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dp"
-                android:layout_marginTop="8dp"
-                android:text="22.50€" />
+                android:layout_marginTop="8dp" />
 
             <TextView
                 android:id="@+id/ticketDate"

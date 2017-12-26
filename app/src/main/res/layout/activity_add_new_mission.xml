@@ -48,12 +48,12 @@
             android:theme="@style/TextLabel">
 
             <EditText
-                android:id="@+id/input_missionDescription"
+                android:id="@+id/input_missionLocation"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:textSize="22dp"
+                android:hint="@string/location"
                 android:textColor="#FFF"
-                android:hint="@string/shop" />
+                android:textSize="22dp" />
 
         </android.support.design.widget.TextInputLayout>
 

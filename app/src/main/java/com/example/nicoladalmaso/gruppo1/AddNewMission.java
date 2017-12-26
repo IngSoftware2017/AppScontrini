@@ -95,24 +95,18 @@ public class AddNewMission extends AppCompatActivity{
             case R.id.action_addMission:
                 //read input text
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
-                EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
-
+                EditText editLocation = (EditText)findViewById(R.id.input_missionLocation);
                 String name = editName.getText().toString();
-                String description = editDescription.getText().toString();
-                Log.d("verify null",name);
-                String checkName= name.replaceAll(" ","");
+                String location = editLocation.getText().toString();
 
-                if((name==null)||checkName.equals("")) {
-                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-                    name = timeStamp;
-                }
-                if((description==null)||description.equals("")){
-                    description = context.getString(R.string.defaultDescription);
+                if((name == null) || name.replaceAll(" ","").equals("") || (location==null) || location.replaceAll(" ","").equals("")) {
+                    return false;
                 }
 
                 MissionEntity miss = new MissionEntity();
                 miss.setName(name);
                 miss.setPersonID(1);
+                miss.setLocation(location);
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {

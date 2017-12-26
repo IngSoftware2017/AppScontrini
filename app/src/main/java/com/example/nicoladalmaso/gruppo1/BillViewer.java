@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -45,6 +47,9 @@ public class BillViewer extends AppCompatActivity {
     public DataManager DB;
     int ticketId;
     Context context;
+    final int TICKET_MOD = 1;
+    TicketEntity thisTicket;
+    String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
 
     //Dal Maso
     @Override
@@ -58,32 +63,7 @@ public class BillViewer extends AppCompatActivity {
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
 
-        //Get data from parent view
-        Intent intent = getIntent();
-        ticketId = (int) intent.getExtras().getLong("ID");
-        String imgPath = intent.getExtras().getString("imagePath");
-        String imgName = intent.getExtras().getString("imageName");
-        String imgLastMod = intent.getExtras().getString("imgDate");
-        String imgPrice = intent.getExtras().getString("imgPrice");
-
-        //Title
-        setTitle(imgName);
-        TextView billLastMod = (TextView)findViewById(R.id.billDate);
-        billLastMod.setText(imgLastMod);
-
-        //ImageName
-        TextView billName = (TextView)findViewById(R.id.billName);
-        billName.setText(imgName);
-
-        //Total price
-        TextView billPrice = (TextView)findViewById(R.id.billTotal);
-        billPrice.setText(imgPrice);
-
-        //Full image view
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(imgPath,bmOptions);
-        imgView.setImageBitmap(bitmap);
+        initialize();
 
         fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
         fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
@@ -107,6 +87,41 @@ public class BillViewer extends AppCompatActivity {
                 deleteTicket(ticketId);
             }//onClick
         });
+    }
+
+    public void initialize(){
+        //Get data from parent view
+        Intent intent = getIntent();
+        ticketId = (int) intent.getExtras().getLong("ID");
+        thisTicket = DB.getTicket(ticketId);
+        ticketPath = thisTicket.getFileUri().toString().substring(7);
+        ticketTitle = thisTicket.getTitle();
+        ticketDate = thisTicket.getDate().toString();
+        ticketShop = thisTicket.getShop();
+        ticketAmount = thisTicket.getAmount().toString();
+
+        //Title
+        setTitle(ticketTitle);
+        TextView billLastMod = (TextView)findViewById(R.id.billDate);
+        billLastMod.setText(ticketDate);
+
+        //ImageName
+        TextView billName = (TextView)findViewById(R.id.billName);
+        billName.setText(ticketTitle);
+
+        //Total price
+        TextView billPrice = (TextView)findViewById(R.id.billTotal);
+        billPrice.setText(ticketAmount+" €");
+
+        //Shop
+        TextView billShop = (TextView)findViewById(R.id.billShop);
+        billShop.setText(ticketShop);
+
+        //Full image view
+        ImageView imgView = (ImageView)findViewById(R.id.billImage);
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
+        imgView.setImageBitmap(bitmap);
     }
 
     /** Dal Maso
@@ -133,9 +148,33 @@ public class BillViewer extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_editTicket:
                 //Open Edit Ticket Activity
+                Intent editTicket = new Intent(context, com.example.nicoladalmaso.gruppo1.EditTicket.class);
+                editTicket.putExtra("ticketID", thisTicket.getID());
+                Log.d("TicketID", "Ticket viewer "+thisTicket.getID());
+                startActivityForResult(editTicket, TICKET_MOD);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /** Dal Maso
+     * Catch intent results
+     * @param requestCode action number
+     * @param resultCode intent result code
+     * @param data intent data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Result", ""+requestCode);
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case(TICKET_MOD):
+                    Log.d("OK", "OKOK");
+                    initialize();
+                    break;
+            }
         }
     }
 
@@ -157,7 +196,6 @@ public class BillViewer extends AppCompatActivity {
                 final File ticketDelete = new File(toDelete);
                 Log.d("TicketID", ""+ticketId);
                 if(DB.deleteTicket(ticketId) && ticketDelete.delete()){
-                    Log.d("ELIMINATO", "OK");
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
@@ -195,6 +233,13 @@ public class BillViewer extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
 

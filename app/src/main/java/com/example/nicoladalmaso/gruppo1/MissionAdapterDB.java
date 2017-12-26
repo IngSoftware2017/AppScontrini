@@ -46,12 +46,12 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         convertView = inflater.inflate(R.layout.mission_card, null);
         CardView card = (CardView) convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
-        TextView description = (TextView)convertView.findViewById(R.id.missionDescription);
+        TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
         //FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
         //missionDelete.setTag(position);
         MissionEntity c = getItem(position);
         title.setText(c.getName());
-        description.setText("Descrizione momentanea");
+        location.setText(c.getLocation());
         convertView.setTag(c.getID());
         Log.d("Mission", ""+c.getStartMission());
 

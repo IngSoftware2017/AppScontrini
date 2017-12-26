@@ -43,7 +43,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
     Context context;
     String path = "";
-    int pos = 0;
+    int ticketID = 0;
     int missionID;
     DataManager DB;
     List<TicketEntity> t = new ArrayList<TicketEntity>();
@@ -65,15 +65,16 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.cardview, null);
+
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
-        TextView title = (TextView)convertView.findViewById(R.id.title);
+        TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
         FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
 
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
-        title.setText(photo.getName());
+        ticketTitle.setText(c.getTitle());
 
         //Amount text fixes
         String amount = "";
@@ -99,21 +100,20 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         //Dal Maso, delete ticket
         fabDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                pos =  Integer.parseInt(v.getTag().toString());
+                ticketID =  Integer.parseInt(v.getTag().toString());
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(context.getString(R.string.deleteTicketToast))
                         .setTitle(context.getString(R.string.deleteTitle));
-                TicketEntity thisTicket = DB.getTicket(pos);
+                TicketEntity thisTicket = DB.getTicket(ticketID);
                 String toDelete = "";
                 //Get the ticket to delete
                 toDelete = thisTicket.getFileUri().toString().substring(7);
                 final File ticketDelete = new File(toDelete);
+
                 // Add the buttons
                 builder.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Log.d("TicketID", ""+pos);
-                        if(DB.deleteTicket(pos) && ticketDelete.delete()){
+                        if(DB.deleteTicket(ticketID) && ticketDelete.delete()){
                             Log.d("ELIMINATO", "OK");
                             ((BillActivity)context).clearAllImages();
                             ((BillActivity)context).printAllImages();
@@ -125,6 +125,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                         //Nothing
                     }
                 });
+
                 AlertDialog alert = builder.show();
                 Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
                 nbutton.setTextColor(Color.parseColor("#2196F3"));
@@ -135,30 +136,23 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         fabCrop.setTag(position);
         fabCrop.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                pos = Integer.parseInt(v.getTag().toString());
-                cropFile(pos);
+                ticketID = Integer.parseInt(v.getTag().toString());
+                cropFile(ticketID);
             }
         });
 
         //Dal Maso
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                pos = Integer.parseInt(v.getTag().toString());
+                ticketID = Integer.parseInt(v.getTag().toString());
                 for(int i = 0; i < t.size(); i++){
-                    if(t.get(i).getID() == pos){
-                        TicketEntity thisPhoto = t.get(i);
+                    if(t.get(i).getID() == ticketID){
+                        TicketEntity thisTicket = t.get(i);
                         Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
-                        File photo = new File(thisPhoto.getFileUri().toString().substring(7));
+                        File photo = new File(thisTicket.getFileUri().toString().substring(7));
 
                         //Put data to next activity
-                        startImageView.putExtra("ID",thisPhoto.getID());
-                        startImageView.putExtra("imagePath", thisPhoto.getFileUri().toString().substring(7));
-                        startImageView.putExtra("imageName", photo.getName());
-                        SimpleDateFormat simpleDateFormat =
-                                new SimpleDateFormat("HH:mm'   'dd/MM/yyyy");
-                        String date = simpleDateFormat.format(photo.lastModified());
-                        startImageView.putExtra("imgDate", date);
-                        startImageView.putExtra("imgPrice", thisPhoto.getAmount()+"€");
+                        startImageView.putExtra("ID",thisTicket.getID());
 
                         //Start new activity
                         ((BillActivity)context).startActivityForResult(startImageView, 4);
@@ -177,7 +171,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
     public void cropFile(int toCrop){
         Log.d("Crop", "Start crop activity");
         boolean result = false;
-        TicketEntity ticket = DB.getTicket(pos);
+        TicketEntity ticket = DB.getTicket(toCrop);
         Uri toCropUri = ticket.getFileUri();
         CropImage.activity(toCropUri)
                 .setOutputUri(toCropUri)
