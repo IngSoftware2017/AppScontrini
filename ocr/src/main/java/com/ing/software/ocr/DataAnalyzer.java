@@ -471,7 +471,7 @@ class DataAnalyzer {
         List<RawGridResult> possibleResults = new ArrayList<>();
         Collections.sort(dateResults);
         for (RawGridResult gridResult : dateResults) {
-            //Ignore text with invalid distance (-1) according to findSubstring() documentation
+            //Ignore text with invalid distance (-1) according to findDate() documentation
             int distanceFromDate = findDate(gridResult.getText().getDetection());
             if (distanceFromDate > -1) {
                 int singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
@@ -481,10 +481,6 @@ class DataAnalyzer {
             }
         }
         if (possibleResults.size() > 0) {
-            /* Here we order considering their final probability to contain the amount:
-            If the probability is the same, the fallback is their previous order, so based on when
-            they are inserted (=their distance (position) from source rect).
-            */
             Collections.sort(possibleResults);
         }
         return possibleResults;

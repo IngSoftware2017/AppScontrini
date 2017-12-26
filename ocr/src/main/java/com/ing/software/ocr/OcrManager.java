@@ -9,11 +9,8 @@ import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import com.annimon.stream.function.Consumer;
 
