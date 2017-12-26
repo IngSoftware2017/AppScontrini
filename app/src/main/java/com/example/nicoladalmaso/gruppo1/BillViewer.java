@@ -67,14 +67,6 @@ public class BillViewer extends AppCompatActivity {
 
         fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
         fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
-
-        //Edit Ticket Info button
-        /**fabEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editTicketInfo(id);
-            }//onClick
-        });*/
         fabCrop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -150,7 +142,6 @@ public class BillViewer extends AppCompatActivity {
                 //Open Edit Ticket Activity
                 Intent editTicket = new Intent(context, com.example.nicoladalmaso.gruppo1.EditTicket.class);
                 editTicket.putExtra("ticketID", thisTicket.getID());
-                Log.d("TicketID", "Ticket viewer "+thisTicket.getID());
                 startActivityForResult(editTicket, TICKET_MOD);
                 return true;
             default:
@@ -158,7 +149,6 @@ public class BillViewer extends AppCompatActivity {
         }
     }
 
-<<<<<<< HEAD
     /** Dal Maso
      * Catch intent results
      * @param requestCode action number
@@ -172,7 +162,6 @@ public class BillViewer extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case(TICKET_MOD):
-                    Log.d("OK", "OKOK");
                     initialize();
                     break;
             }
@@ -239,7 +228,6 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
-        //TODO: rebuild the listview?
         return true;
     }
 

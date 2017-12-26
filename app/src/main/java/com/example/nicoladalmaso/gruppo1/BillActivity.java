@@ -70,7 +70,6 @@ public class BillActivity extends AppCompatActivity {
 
         String missionName = intent.getExtras().getString("missionName");
         missionID = intent.getExtras().getInt("missionID");
-        Log.d("MissionID", "" + missionID);
 
         setTitle(missionName);
         initializeComponents();
@@ -149,8 +148,6 @@ public class BillActivity extends AppCompatActivity {
             fab1.setClickable(false);
             fab2.setClickable(false);
             isFabOpen = false;
-            Log.d("Raj", "close");
-
         } else {
 
             fab.startAnimation(rotate_forward);
@@ -159,8 +156,6 @@ public class BillActivity extends AppCompatActivity {
             fab1.setClickable(true);
             fab2.setClickable(true);
             isFabOpen = true;
-            Log.d("Raj","open");
-
         }
     }
 
@@ -262,7 +257,6 @@ public class BillActivity extends AppCompatActivity {
         for (int i = 0; i < files.length; i++)
         {
             filename = files[i].getName();
-            Log.d("Sub", filename.substring(0,4));
             if(filename.substring(0,4).equals("temp")){
                 files[i].delete();
             }
@@ -317,7 +311,6 @@ public class BillActivity extends AppCompatActivity {
                         waitDB();
                         clearAllImages();
                         printAllImages();
-                        Log.d("Foto da galleria", "OK");
                     }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
                     }
@@ -325,14 +318,12 @@ public class BillActivity extends AppCompatActivity {
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                    Log.d("Crop", "OK");
                     waitDB();
                     clearAllImages();
                     printAllImages();
                     break;
 
                 case(4):
-                    Log.d("DELETE", "OK");
                     clearAllImages();
                     printAllImages();
                     break;
