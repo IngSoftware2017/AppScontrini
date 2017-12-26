@@ -2,6 +2,9 @@
 | ------------- | ------------- | -------------| ------------- |
 | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_master)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular-complete)](https://travis-ci.org/Kraktun/AppScontrini) |
 
+
+## Latest release: 
+[![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)]()
  
 ## BRANCH DI TEST
 « Per me si va ne la città dolente,  
