@@ -43,12 +43,9 @@ import static java.lang.Math.*;
  * <p> User shoots a photo: </p>
  * <ol> Use ImageProcessor instance of last frame when rectangle was found. </ol>
  * <ol> Call findTicket(false); </ol>
- * <ol> If findTicket callback has an empty error list, proceed to step 6) </ol>
+ * <ol> If findTicket callback has an empty error list, proceed to step 5) </ol>
  * <ol> If the callback list contains RECT_NOT_FOUND, let user drag the rectangle corners into position,
  *     then proceed to call setCorners(). </ol>
- * <ol> If the callback list contains CROOKED_TICKET, let user drag the rectangle corners into position,
- *     then proceed to call setCorners(). </ol>
- *
  * <ol> Call OcrManager.getTicket passing this ImagePreprocessor instance.
  *       Call undistort() to get the photo of the ticket unwarped. </ol>
  *
@@ -118,8 +115,10 @@ public class ImagePreprocessor {
     private static final double SCORE_RECT_FOUND = 1;
 
 
+    // Anything inside here is run once per app execution and before any other code.
     static {
         if (OpenCVLoader.initDebug()) {
+            // assign ERODE_KER kernel from ERODE_KER_DATA.
             ERODE_KER = new Mat(ERODE_KER_DATA.length, ERODE_KER_DATA[0].length, CV_8UC1);
             for (int y = 0; y < ERODE_KER_DATA.length; y++) {
                 for (int x = 0; x < ERODE_KER_DATA[0].length; x++) {
@@ -133,25 +132,25 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Convert a list of Android points to a list of OpenCV points
-     * @param points List of Android points
-     * @return List of OpenCV points
+     * Convert a list of Android points to a list of OpenCV points.
+     * @param points List of Android points.
+     * @return List of OpenCV points.
      */
     private static List<Point> androidPtsToCV(List<PointF> points) {
         return Stream.of(points).map(p -> new Point(p.x, p.y)).toList();
     }
 
     /**
-     * Convert a list of Android points to a list of OpenCV points
-     * @param points List of OpenCV points
-     * @return List of Android points
+     * Convert a list of Android points to a list of OpenCV points.
+     * @param points List of OpenCV points.
+     * @return List of Android points.
      */
     private static List<PointF> cvPtsToAndroid(List<Point> points) {
         return Stream.of(points).map(p -> new PointF((int)p.x, (int)p.y)).toList();
     }
 
     /**
-     * Convert a list of OpenCV points to MatOfPoints2f
+     * Convert a list of OpenCV points to MatOfPoints2f.
      * @param pts List of points
      * @return MatOfPoints2f
      */
@@ -161,8 +160,8 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Convert a Mat to a Bitmap
-     * @param img Mat of any color. Not null.
+     * Convert a Mat to a Bitmap.
+     * @param img Mat of any color format. Not null.
      * @return Bitmap
      */
     private static Bitmap matToBitmap(Mat img) {
@@ -173,7 +172,8 @@ public class ImagePreprocessor {
 
     /**
      * Downscale image.
-     * This method ensures that any image at any resolution or orientation is processed at the same level of detail.
+     * This method ensures that any image at any resolution or orientation is processed at the same level of detail,
+     * but it preserves aspect ratio.
      * @param img RGBA Mat. Not null.
      * @return RGBA Mat.
      */
@@ -187,15 +187,16 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Convert Mat from RGBA to gray
-     * @param graySwap in-out swap of Mat (in: RGBA, out: gray). Not null.
+     * Convert Mat from RGBA to gray.
+     * @param graySwap out swap of gray Mat. Not null.
+     * @param rgba in RGBA Mat
      */
     private static void rgba2Gray(Swap<Mat> graySwap, Mat rgba) {
         cvtColor(rgba, graySwap.first, COLOR_RGBA2GRAY);
     }
 
     /**
-     * Bilateral filter
+     * Bilateral filter.
      * @param imgSwap in-out swap of gray Mat. Not null.
      */
     private static void bilateralFilter(Swap<Mat> imgSwap) {
@@ -203,7 +204,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Transform a gray image into a mask using an adaptive threshold
+     * Transform a gray image into a mask using an adaptive threshold.
      * @param imgSwap in-out swap of Mat (in: gray, out: black & white). Not null.
      */
     private static void threshold(Swap<Mat> imgSwap) {
@@ -212,7 +213,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Erode a mask.
+     * Erode a mask with a 3x3 kernel.
      * @param imgSwap in-out swap of B&W Mat. Not null.
      * @param iters number of iterations
      */
@@ -221,7 +222,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Dilate a mask.
+     * Dilate a mask with a 3x3 kernel.
      * @param imgSwap in-out swap of B&W Mat. Not null.
      * @param iters number of iterations
      */
@@ -249,11 +250,10 @@ public class ImagePreprocessor {
 
     /**
      * Downscale + convert to gray + bilateral filter + adaptive threshold + enclose, in this order.
-     * @param imgSwap Swap of RGBA Mat. Not null.
-     * @return B&W Mat.
+     * @param imgSwap Swap of gray Mat. Not null.
      */
     private static void prepareBinaryImg(Swap<Mat> imgSwap, Mat rgba) {
-        // I used Ref parameters to enable me to easily reorder the methods
+        // I used swap in-out parameters to enable me to easily reorder the methods
         // and experiment with the image processing pipeline
         rgba2Gray(imgSwap, rgba);
         bilateralFilter(imgSwap);
@@ -263,9 +263,9 @@ public class ImagePreprocessor {
 
     /**
      * Find k biggest outer contours in a RGBA image, sorted by area (descending).
-     * @param imgSwap Swap of RGBA Mat. Not null.
+     * @param imgSwap Swap of gray Mat. This parameter is modified by the function. Not null.
      * @param k number of contours to return.
-     * @return Contour with biggest area. Never null.
+     * @return Contour-area pairs with biggest area. Never null.
      */
     private static List<Scored<MatOfPoint>> findBiggestContours(Swap<Mat> imgSwap, int k) {
         erode(imgSwap, E_D_ITERS);
@@ -291,9 +291,8 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Find all edges of thresholded image.
-     * @param imgSwap Swap of B&W Mat. Not null.
-     * @return Mat with white edges and black background.
+     * Find edges of thresholded image. Output: Mat with white edges and black background.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
      */
     private static void toEdges(Swap<Mat> imgSwap) {
         Imgproc.erode(imgSwap.first, imgSwap.swap(), ERODE_KER);
@@ -302,9 +301,8 @@ public class ImagePreprocessor {
 
     /**
      * Set to white everything outside contour.
-     * @param imgSwap Swap of B&W Mat. Not null.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
      * @param contour MatOfPoint containing a contour. Not null.
-     * @return Mat with white edges and black background.
      */
     private static void removeBackground(Swap<Mat> imgSwap, MatOfPoint contour) {
         Mat binary = imgSwap.first.clone();
@@ -316,8 +314,8 @@ public class ImagePreprocessor {
 
     /**
      * Find Hough lines (segments).
-     * @param imgSwap Swap of B&W Mat. Not null.
-     * @return contour.
+     * @param imgSwap Swap of B&W Mat. Not modified by this function. Not null.
+     * @return MatOfInt4 containing hough lines.
      */
     private static MatOfInt4 houghLines(Swap<Mat> imgSwap) {
         MatOfInt4 lines = new MatOfInt4();
@@ -328,7 +326,7 @@ public class ImagePreprocessor {
     /**
      * Get size of a rectangle in perspective.
      * @param perspRect ordered corners of a rectangle in perspective. Not null.
-     * @return Size in pixels proportional to the real ticket
+     * @return Size in pixels proportional to the real ticket.
      */
     @NonNull
     private static Size getRectSizeSimple(List<Point> perspRect) {
@@ -361,7 +359,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Find predominant angle of Hough lines using an accumulator
+     * Find predominant angle of Hough lines using an accumulator.
      * @param lines MatOfInt4 containing the hough lines. Not null.
      * @return predominant angle in degrees.
      */
@@ -381,7 +379,7 @@ public class ImagePreprocessor {
 
     /**
      * Order rectangle corners as the first is the top-leftmost.
-     * @param srcRect MatOfPoint2f containing rect corners
+     * @param srcRect MatOfPoint2f containing rect corners.
      * @param angle to rotate the corners before ordering.
      * @param imgSize image size to get the center of image.
      * @return ordered corners, not rotated.
@@ -408,11 +406,11 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Find the the bounding box of the a contour rotated by "angle"
+     * Find the the bounding box of the a contour rotated by "angle".
      * @param ctr contour. Not modified.
      * @param angle to rotate the contour.
      * @param imgSize image size to get the center of image.
-     * @return rotated bounding box
+     * @return rotated bounding box.
      */
     private static MatOfPoint2f rotatedBoundingBox(MatOfPoint ctr, double angle, Size imgSize) {
         Point center = new Point(imgSize.width / 2, imgSize.height / 2);
@@ -604,10 +602,10 @@ public class ImagePreprocessor {
     //UTILITY FUNCTIONS:
 
     /**
-     * Rotate a bitmap
+     * Rotate a bitmap.
      * @param src Source bitmap. Not null.
-     * @param angle Rotation angle (degrees)
-     * @return Rotated bitmap
+     * @param angle Rotation angle (degrees).
+     * @return Rotated bitmap.
      */
     public static Bitmap rotate(@NonNull Bitmap src, float angle) {
         Matrix matrix = new Matrix();
@@ -616,11 +614,11 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Apply perspective transform to a collection of points
-     * @param srcPoints Points to be transformed
-     * @param srcRect Reference rectangle
-     * @param dstRect Distorted reference rectangle
-     * @return Output points. Empty if error.
+     * Apply perspective transform to a collection of points.
+     * @param srcPoints Points to be transformed.
+     * @param srcRect Reference rectangle.
+     * @param dstRect Distorted reference rectangle.
+     * @return Output distorted points. Empty if error.
      */
     public static List<PointF> transform(
             List<PointF> srcPoints,

@@ -19,7 +19,7 @@ public class Swap<T> {
     }
 
     /**
-     * Assign two already created objects.
+     * Pass two already created objects.
      * @param first object
      * @param second object
      */
