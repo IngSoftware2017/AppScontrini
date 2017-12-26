@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Debug;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -188,8 +189,9 @@ public class BillViewer extends AppCompatActivity {
                 //Get the ticket to delete
                 toDelete = thisTicket.getFileUri().toString().substring(7);
                 final File ticketDelete = new File(toDelete);
+                final File ticketDeleteOriginal = new File (toDelete+"orig");
                 Log.d("TicketID", ""+ticketId);
-                if(DB.deleteTicket(ticketId) && ticketDelete.delete()){
+                if(DB.deleteTicket(ticketId) && ticketDelete.delete() && ticketDeleteOriginal.delete()){
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
@@ -207,22 +209,25 @@ public class BillViewer extends AppCompatActivity {
     }//deleteTicket
 
     /**PICCOLO
-     * Method that lets the user crop and/or rotate the photo
+     * Method that lets the user crop and/or rotate the original photo
      * @param id the id of the TicketEntity in the db
      */
     private void cropPhoto(long id) {
         DB=new DataManager(getApplicationContext());
         TicketEntity ticket = DB.getTicket((int) id);
         Uri toCropUri = ticket.getFileUri();
-        CropImage.activity(toCropUri)
+        File originalFile =new File(toCropUri.toString().substring(7)+"orig");
+        Log.d("toCropUri",toCropUri.toString());
+        Uri originalUri=Uri.fromFile(originalFile);
+        Log.d("originalUri",originalUri.toString());
+        CropImage.activity(originalUri)
                 .setOutputUri(toCropUri).start(this);
         ticket.setFileUri(toCropUri);
-        //TODO: manage the refresh of the ticket
+
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
         imgView.setImageBitmap(bitmap);
-       //TODO: implement the method using the origial file instead
     }//cropPhoto
 
     //Dal Maso, manage back button

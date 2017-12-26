@@ -352,9 +352,12 @@ public class BillActivity extends AppCompatActivity {
         String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";
         File file = new File(root, fname);
+        File originalPhoto = new File(root,fname+"orig");
         final Uri uri=Uri.fromFile(file);
         if (file.exists())
             file.delete();
+        if(originalPhoto.exists())
+            originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
 
@@ -369,9 +372,12 @@ public class BillActivity extends AppCompatActivity {
 
             DB.addTicket(t);
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
-
             out.flush();
             out.close();
+            FileOutputStream outOriginal = new FileOutputStream(originalPhoto);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
+            outOriginal.flush();
+            outOriginal.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
