@@ -5,9 +5,9 @@
 | IngSoftware2017  |  Kraktun  |
 | ------------- | ------------- |
 | [![GitHub release](https://img.shields.io/github/release/IngSoftware2017/AppScontrini.svg?)](https://github.com/IngSoftware2017/AppScontrini/releases/latest) | [![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest) |      
-| [![Github All Releases](https://img.shields.io/github/downloads/IngSoftware2017/AppScontrini/total.svg?)]() | [![Github All Releases](https://img.shields.io/github/downloads/Kraktun/AppScontrini/total.svg?)]() |      
-| [![GitHub pull requests](https://img.shields.io/github/issues-pr/IngSoftware2017/AppScontrini.svg)]() | [![GitHub pull requests](https://img.shields.io/github/issues-pr/Kraktun/AppScontrini.svg)]() |    
-| [![GitHub issues](https://img.shields.io/github/issues/IngSoftware2017/AppScontrini.svg)]() | [![GitHub issues](https://img.shields.io/github/issues/Kraktun/AppScontrini.svg)]() |     
+| [![Github All Releases](https://img.shields.io/github/downloads/IngSoftware2017/AppScontrini/total.svg?)](https://github.com/IngSoftware2017/AppScontrini/releases) | [![Github All Releases](https://img.shields.io/github/downloads/Kraktun/AppScontrini/total.svg?)](https://github.com/Kraktun/AppScontrini/releases) |      
+| [![GitHub pull requests](https://img.shields.io/github/issues-pr/IngSoftware2017/AppScontrini.svg)](https://github.com/IngSoftware2017/AppScontrini/pulls) | [![GitHub pull requests](https://img.shields.io/github/issues-pr/Kraktun/AppScontrini.svg)](https://github.com/Kraktun/AppScontrini/pulls) |    
+| [![GitHub issues](https://img.shields.io/github/issues/IngSoftware2017/AppScontrini.svg)](https://github.com/IngSoftware2017/AppScontrini/issues) | [![GitHub issues](https://img.shields.io/github/issues/Kraktun/AppScontrini.svg)](https://github.com/Kraktun/AppScontrini/issues) |     
 
 
  
