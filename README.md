@@ -4,8 +4,8 @@
 
 
 ## Latest release: 
-[![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest)
-[![Github All Releases](https://img.shields.io/github/downloads/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest)
+[![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest) 
+[![Github All Releases](https://img.shields.io/github/downloads/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest) 
  
  
 ## BRANCH DI TEST
