@@ -70,10 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
     /** PICCOLO
      * Adds in the database the new mission
-     * @param toAdd mission to be added
+     * @param mission the mission to be added
      */
-    public void addToListDB(MissionEntity toAdd){
-        listMission.add(toAdd);
+    public void addToListDB(MissionEntity mission){
+        listMission.add(mission);
         ListView listView = (ListView)findViewById(R.id.listMission);
         MissionAdapterDB adapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
         listView.setAdapter(adapter);

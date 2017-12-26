@@ -384,7 +384,7 @@ public class BillActivity extends AppCompatActivity {
     }
 
     /**PICCOLO
-     * Metodo che "ripulisce" lo schermo dalle immagini
+     * Method that clears the screen from the images
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
@@ -438,13 +438,12 @@ public class BillActivity extends AppCompatActivity {
     }
 
     /**PICCOLO_Edit by Dal Maso
-     * Metodo che cancella permette all'utente di ridimensionare la foto
-     * @param toCrop l'indice della foto di cui fire il resize
-     * @param path percorso della foto
+     * Method that lets the user crop the photo
+     * @param toCrop photo's index
+     * @param path path of the photo
      */
     public void cropFile(int toCrop, String path){
         Log.d("Crop","Success");
-        boolean result = false;
         File directory = new File(path);
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
