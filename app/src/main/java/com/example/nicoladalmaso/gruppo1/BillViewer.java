@@ -164,14 +164,15 @@ public class BillViewer extends AppCompatActivity {
                 case(TICKET_MOD):
                     initialize();
                     break;
+                case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
+                    initialize();
+                    break;
             }
         }
     }
 
-    /**PICCOLO
-=======
+
     /**PICCOLO, DAL MASO
->>>>>>> ce6633b5df7ac2d5a0de1a52d9376a279f93ee92
      * Method that deletes a ticket from the db
      * @param id the id of the TicketEntity in the db
      */
