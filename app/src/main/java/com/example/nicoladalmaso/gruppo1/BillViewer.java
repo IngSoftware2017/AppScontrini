@@ -158,6 +158,7 @@ public class BillViewer extends AppCompatActivity {
         }
     }
 
+<<<<<<< HEAD
     /** Dal Maso
      * Catch intent results
      * @param requestCode action number
@@ -179,6 +180,9 @@ public class BillViewer extends AppCompatActivity {
     }
 
     /**PICCOLO
+=======
+    /**PICCOLO, DAL MASO
+>>>>>>> ce6633b5df7ac2d5a0de1a52d9376a279f93ee92
      * Method that deletes a ticket from the db
      * @param id the id of the TicketEntity in the db
      */
@@ -223,8 +227,11 @@ public class BillViewer extends AppCompatActivity {
         CropImage.activity(toCropUri)
                 .setOutputUri(toCropUri).start(this);
         ticket.setFileUri(toCropUri);
-        DB.deleteTicket((int)id);
-        DB.addTicket(ticket);
+        //TODO: manage the refresh of the ticket
+        ImageView imgView = (ImageView)findViewById(R.id.billImage);
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
+        imgView.setImageBitmap(bitmap);
        //TODO: implement the method using the origial file instead
     }//cropPhoto
 
@@ -232,6 +239,7 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
+        //TODO: rebuild the listview?
         return true;
     }
 
