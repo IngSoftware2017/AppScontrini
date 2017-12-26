@@ -3,9 +3,12 @@
 | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_master)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular-complete)](https://travis-ci.org/Kraktun/AppScontrini) |
 
 
-## Latest release: 
 [![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest)    
-[![Github All Releases](https://img.shields.io/github/downloads/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest)    
+[![Github All Releases](https://img.shields.io/github/downloads/Kraktun/AppScontrini/total.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest)    
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/Kraktun/AppScontrini.svg)]()   
+[![GitHub issues](https://img.shields.io/github/issues/Kraktun/AppScontrini.svg)]()   
+
+
  
  
 ## BRANCH DI TEST
