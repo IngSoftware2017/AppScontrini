@@ -331,19 +331,24 @@ public class OcrUtils {
 
     /**
      * @author Michelon
-     * @date 9-12-17
-     * Check if a string may be a number. Removes spaces, 'S', '.' before analysis.
+     * @date 26-12-17
+     * Check if a string may be a number.
+     * Removes spaces, 'S', '.', ',' before analysis.
+     * If string is longer than maxlength default is false (allowed numbers up to nn.nnn,nn)
      * @param s string to analyze
-     * @return true if more than half (included) of the chars in the string are numbers
+     * @return true if more than 3/4 (rounded) of the chars in the string are numbers
      */
     static boolean isPossibleNumber(String s) {
         int counter = 0;
-        s = s.replaceAll(" ", "").replaceAll("\\.", "")
-                .replaceAll("S", ""); //sometimes '5' are recognized as 'S'
+        int maxLength = 8; //Assume we can't have prices longer than 8 chars (so nn.nnn,nn)
+        s = s.replaceAll(",", "").replaceAll(" ", "")
+                .replaceAll("\\.", "").replaceAll("S", ""); //sometimes '5' are recognized as 'S'
+        if (s.length() >= maxLength)
+            return false;
         for (int i = 0; i < s.length(); ++i) {
             if (Character.isDigit(s.charAt(i)))
                 ++counter;
         }
-        return counter >= s.length()/2;
+        return counter >= Math.round((double)s.length()*3/4);
     }
 }
