@@ -47,11 +47,11 @@ public class DataAnalyzerTest {
     @Test
     public void analyzeAmountSingleCharLett() throws Exception {
         String amount = "5c";
-        BigDecimal expected = new BigDecimal(5).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal expected = null; //less than 3/4 of length
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
         method.setAccessible(true);
         BigDecimal result = (BigDecimal)method.invoke(null,amount);
-        assertEquals(0, expected.compareTo(result));
+        assertEquals(expected, result);
     }
 
     @Test
