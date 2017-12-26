@@ -1,29 +1,18 @@
 package com.ing.software.ticketapp;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.List;
 import database.MissionEntity;
-
-/**
- * Created by nicoladalmaso on 30/11/17.
- */
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
@@ -46,12 +35,12 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         convertView = inflater.inflate(R.layout.mission_card, null);
         CardView card = (CardView) convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
-        TextView description = (TextView)convertView.findViewById(R.id.missionDescription);
+        TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
         //FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
         //missionDelete.setTag(position);
         MissionEntity c = getItem(position);
         title.setText(c.getName());
-        description.setText("Descrizione momentanea");
+        location.setText(c.getLocation());
         convertView.setTag(c.getID());
         Log.d("Mission", ""+c.getStartMission());
 

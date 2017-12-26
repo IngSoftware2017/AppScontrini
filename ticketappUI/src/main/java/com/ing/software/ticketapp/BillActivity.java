@@ -26,12 +26,10 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.common.Ticket;
 import com.ing.software.common.TicketError;
 import com.ing.software.ocr.ImagePreprocessor;
 import com.ing.software.ocr.OcrManager;
@@ -84,7 +82,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
 
         String missionName = intent.getExtras().getString("missionName");
         missionID = intent.getExtras().getInt("missionID");
-        Log.d("MissionID", "" + missionID);
         context = this.getApplicationContext();
         setTitle(missionName);
         initializeComponents();
@@ -163,8 +160,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             fab1.setClickable(false);
             fab2.setClickable(false);
             isFabOpen = false;
-            Log.d("Raj", "close");
-
         } else {
 
             fab.startAnimation(rotate_forward);
@@ -173,8 +168,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             fab1.setClickable(true);
             fab2.setClickable(true);
             isFabOpen = true;
-            Log.d("Raj","open");
-
         }
     }
 
@@ -276,7 +269,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         for (int i = 0; i < files.length; i++)
         {
             filename = files[i].getName();
-            Log.d("Sub", filename.substring(0, 4));
             if (filename.substring(0, 4).equals("temp")) {
                 files[i].delete();
             }
@@ -303,8 +295,8 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
-
             switch (requestCode) {
                 /**lazzarin
                  * Saves definitely the photo without losing quality, deletes the temporary file and shows
@@ -331,7 +323,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                         waitDB();
                         clearAllImages();
                         printAllImages();
-                        Log.d("Foto da galleria", "OK");
                     }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
                     }
@@ -339,8 +330,11 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                    Log.d("Crop", "OK");
                     waitDB();
+                    clearAllImages();
+                    printAllImages();
+                    break;
+                case(4):
                     clearAllImages();
                     printAllImages();
                     break;
@@ -483,7 +477,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 } catch (NumberFormatException e) {
                     //No valid amount
                 }
-                DB.addTicket(new TicketEntity(uri, amount, null, null, null, missionID));
+                DB.addTicket(new TicketEntity(uri, amount, null, Calendar.getInstance().getTime(), null, missionID));
                 clearAllImages();
                 printAllImages();
                 break;

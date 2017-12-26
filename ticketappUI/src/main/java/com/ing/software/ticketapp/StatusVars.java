@@ -1,8 +1,5 @@
 package com.ing.software.ticketapp;
 
-/**
- *
- */
 
 public class StatusVars {
 

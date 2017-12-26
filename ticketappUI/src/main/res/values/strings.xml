@@ -6,13 +6,15 @@
     <string name="title_activity_collapse">Collapse</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="action_addMission">Aggiungi Missione</string>
-    <string name="action_deleteMission">Elimina Missione</string>
+    <string name="action_addMission">Aggiungi missione</string>
+    <string name="action_editTicket">Modifica scontrino</string>
+    <string name="action_deleteMission">Elimina missione</string>
     <string name="billTitle">Il tuo scontrino</string>
     <string name="name">Nome</string>
     <string name="shop">Negozio</string>
     <string name="total">Totale</string>
     <string name="date">Data</string>
+    <string name="location">Luogo</string>
     <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
     <string name="dateStart">Data inizio</string>
@@ -27,5 +29,8 @@
     <string name="defaultDescription">Nessuna descrizione</string>
     <string name="deleteTitle">Cancellazione</string>
     <string name="description">Description</string>
+    <string name="edit_ticket">Edit ticket</string>
+    <string name="alert_invalid_amount_title">Error</string>
+    <string name="alert_invalid_amount_mess">Invalid amount</string>
     <string name="authority">com.ing.software.ticketapp.fileprovider</string>
 </resources>

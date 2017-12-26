@@ -1,11 +1,8 @@
 package com.ing.software.ticketapp;
 
-import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Environment;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,21 +10,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 import database.DataManager;
 import database.MissionEntity;
@@ -95,24 +83,18 @@ public class AddNewMission extends AppCompatActivity{
             case R.id.action_addMission:
                 //read input text
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
-                EditText editDescription = (EditText)findViewById(R.id.input_missionDescription);
-
+                EditText editLocation = (EditText)findViewById(R.id.input_missionLocation);
                 String name = editName.getText().toString();
-                String description = editDescription.getText().toString();
-                Log.d("verify null",name);
-                String checkName= name.replaceAll(" ","");
+                String location = editLocation.getText().toString();
 
-                if((name==null)||checkName.equals("")) {
-                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-                    name = timeStamp;
-                }
-                if((description==null)||description.equals("")){
-                    description = context.getString(R.string.defaultDescription);
+                if((name == null) || name.replaceAll(" ","").equals("") || (location==null) || location.replaceAll(" ","").equals("")) {
+                    return false;
                 }
 
                 MissionEntity miss = new MissionEntity();
                 miss.setName(name);
                 miss.setPersonID(1);
+                miss.setLocation(location);
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
@@ -134,6 +116,7 @@ public class AddNewMission extends AppCompatActivity{
                 startImageView.putExtra("missionID", (int) missionID);
                 startImageView.putExtra("missionName", miss.getName());
                 context.startActivity(startImageView);
+                finish();
                 return true;
 
             default:

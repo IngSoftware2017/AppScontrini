@@ -48,7 +48,8 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".AddNewMission"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".EditTicket" />
         <service
             android:name=".BillActivity$TestService"
             android:exported="false"/>

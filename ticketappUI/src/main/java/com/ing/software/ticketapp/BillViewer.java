@@ -1,29 +1,31 @@
 package com.ing.software.ticketapp;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.math.RoundingMode;
 
 import database.DataManager;
 import database.TicketEntity;
@@ -31,6 +33,11 @@ import database.TicketEntity;
 public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
+    int ticketId;
+    Context context;
+    final int TICKET_MOD = 1;
+    TicketEntity thisTicket;
+    String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
 
     //Dal Maso
     @Override
@@ -41,69 +48,150 @@ public class BillViewer extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_bill_viewer);
-        Intent intent = getIntent();
-        //Get data from parent view
-        long id = intent.getExtras().getLong("ID");
-        String imgPath = intent.getExtras().getString("imagePath");
-        String imgName = intent.getExtras().getString("imageName");
-        String imgLastMod = intent.getExtras().getString("imgLastMod");
-        String imgPrice = intent.getExtras().getString("imgPrice");
-        setTitle(imgName);
-        //Title
-        TextView billLastMod = (TextView)findViewById(R.id.billDate);
-        billLastMod.setText(imgLastMod);
-        //ImageName
-        TextView billName = (TextView)findViewById(R.id.billName);
-        billName.setText(imgName);
-        //Total price
-        TextView billPrice = (TextView)findViewById(R.id.billAmount);
-        billPrice.setText(imgPrice);
-        //Full image view
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(imgPath,bmOptions);
-        imgView.setImageBitmap(bitmap);
-        fabEdit=(FloatingActionButton)findViewById(R.id.fabEdit);
+        DB = new DataManager(this.getApplicationContext());
+        context = this.getApplicationContext();
+
+        initialize();
+
         fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
         fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
-        fabConfirmEdit= (FloatingActionButton)findViewById(R.id.fabConfirmEdit);
-        //Edit Ticket Info button
-        fabEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editTicketInfo(id);
-            }//onClick
-        });
         fabCrop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                cropPhoto(id);
+                cropPhoto(ticketId);
            }//onClick
         });
         fabDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteTicket(id);
+                deleteTicket(ticketId);
             }//onClick
         });
     }
 
-    /**PICCOLO
+    public void initialize(){
+        //Get data from parent view
+        Intent intent = getIntent();
+        ticketId = (int) intent.getExtras().getLong("ID");
+        thisTicket = DB.getTicket(ticketId);
+        ticketPath = thisTicket.getFileUri().toString().substring(7);
+        ticketTitle = thisTicket.getTitle();
+        ticketDate = thisTicket.getDate().toString();
+        ticketShop = thisTicket.getShop();
+        ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
+
+        //Title
+        setTitle(ticketTitle);
+        TextView billLastMod = (TextView)findViewById(R.id.billDate);
+        billLastMod.setText(ticketDate);
+
+        //ImageName
+        TextView billName = (TextView)findViewById(R.id.billName);
+        billName.setText(ticketTitle);
+
+        //Total price
+        TextView billPrice = (TextView)findViewById(R.id.billTotal);
+        billPrice.setText(ticketAmount+" €");
+
+        //Shop
+        TextView billShop = (TextView)findViewById(R.id.billShop);
+        billShop.setText(ticketShop);
+
+        //Full image view
+        ImageView imgView = (ImageView)findViewById(R.id.billImage);
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
+        imgView.setImageBitmap(bitmap);
+    }
+
+    /** Dal Maso
+     * Setting toolbar buttons and style from /res/menu
+     * @param menu
+     * @return success flag
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.editticket_menu, menu);
+        return true;
+    }
+
+    /** Dal Maso
+     * Catch events on toolbar
+     * @param item object on the toolbar
+     * @return flag of success
+     *
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_editTicket:
+                //Open Edit Ticket Activity
+                Intent editTicket = new Intent(context, EditTicket.class);
+                editTicket.putExtra("ticketID", thisTicket.getID());
+                startActivityForResult(editTicket, TICKET_MOD);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /** Dal Maso
+     * Catch intent results
+     * @param requestCode action number
+     * @param resultCode intent result code
+     * @param data intent data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Result", ""+requestCode);
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case(TICKET_MOD):
+                    initialize();
+                    break;
+                case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
+                    initialize();
+                    break;
+            }
+        }
+    }
+
+
+    /**PICCOLO, DAL MASO
      * Method that deletes a ticket from the db
      * @param id the id of the TicketEntity in the db
      */
     private void deleteTicket(long id) {
-        DB = new DataManager(this.getApplicationContext());
-        TicketEntity ticketToDelete=DB.getTicket((int)id);
-        Log.d("FileUri",ticketToDelete.getFileUri().getPath());
-        //Delete the photo from the phone
-        File photoToDelete=new File(ticketToDelete.getFileUri().getPath());
-        photoToDelete.delete();
-        DB.deleteTicket((int) id);
-        //ClearAllImages
-        //BillActivity.clearAllImages();
-        //BillActivity.printAllImages();
-        //TODO: Rebuild the listview
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(this.getString(R.string.deleteTicketToast))
+                .setTitle(this.getString(R.string.deleteTitle));
+        // Add the buttons
+        builder.setPositiveButton(this.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                TicketEntity thisTicket = DB.getTicket(ticketId);
+                String toDelete = "";
+                //Get the ticket to delete
+                toDelete = thisTicket.getFileUri().toString().substring(7);
+                final File ticketDelete = new File(toDelete);
+                Log.d("TicketID", ""+ticketId);
+                if(DB.deleteTicket(ticketId) && ticketDelete.delete()){
+                    Intent intent = new Intent();
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            }
+        });
+        builder.setNegativeButton(this.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Nothing
+            }
+        });
+        AlertDialog alert = builder.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        nbutton.setTextColor(Color.parseColor("#2196F3"));
     }//deleteTicket
 
     /**PICCOLO
@@ -117,42 +205,26 @@ public class BillViewer extends AppCompatActivity {
         CropImage.activity(toCropUri)
                 .setOutputUri(toCropUri).start(this);
         ticket.setFileUri(toCropUri);
-        DB.deleteTicket((int)id);
-        DB.addTicket(ticket);
+        //TODO: manage the refresh of the ticket
+        ImageView imgView = (ImageView)findViewById(R.id.billImage);
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
+        imgView.setImageBitmap(bitmap);
        //TODO: implement the method using the origial file instead
     }//cropPhoto
-
-    /**PICCOLO
-     * Method that lets the user edit the infos of the ticket, useful when the ocr fails
-     * @param id the id of the TicketEntity in the db
-     */
-    private void editTicketInfo(long id) {
-        EditText name = (EditText) findViewById(R.id.billName);
-        EditText shop = (EditText) findViewById(R.id.billShop);
-        EditText date = (EditText) findViewById(R.id.billDate);
-        EditText amount = (EditText) findViewById(R.id.billAmount);
-        fabEdit.setVisibility(View.INVISIBLE);
-        fabConfirmEdit.setVisibility(View.VISIBLE);
-        name.setEnabled(true);
-        name.setClickable(true);
-        shop.setEnabled(true);
-        date.setEnabled(true);
-        amount.setEnabled(true);
-        fabConfirmEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO: SAVE THE NEW VALUES
-                fabEdit.setVisibility(View.VISIBLE);
-                fabConfirmEdit.setVisibility(View.INVISIBLE);
-            }//onClick
-        });
-    }//editTicketInfo
 
     //Dal Maso, manage back button
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
 
