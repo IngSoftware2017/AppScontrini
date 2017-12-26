@@ -41,7 +41,7 @@ import static java.lang.Math.*;
  * <ol> If the callback list contains CROOKED_TICKET, alert user that the ticket is framed sideways </ol>
  *
  * <p> User shoots a photo: </p>
- * <ol> Use ImageProcessor instance of last frame when rectangle was found. </ol>
+ * <ol> Use ImagePreprocessor instance of last frame when rectangle was found. </ol>
  * <ol> Call findTicket(false); </ol>
  * <ol> If findTicket callback has an empty error list, proceed to step 5) </ol>
  * <ol> If the callback list contains RECT_NOT_FOUND, let user drag the rectangle corners into position,
@@ -141,7 +141,7 @@ public class ImagePreprocessor {
     }
 
     /**
-     * Convert a list of Android points to a list of OpenCV points.
+     * Convert a list of OpenCV points to a list of Android points.
      * @param points List of OpenCV points.
      * @return List of Android points.
      */
@@ -188,8 +188,8 @@ public class ImagePreprocessor {
 
     /**
      * Convert Mat from RGBA to gray.
-     * @param graySwap out swap of gray Mat. Not null.
-     * @param rgba in RGBA Mat
+     * @param graySwap output swap of gray Mat. Not null.
+     * @param rgba input RGBA Mat.
      */
     private static void rgba2Gray(Swap<Mat> graySwap, Mat rgba) {
         cvtColor(rgba, graySwap.first, COLOR_RGBA2GRAY);
@@ -250,7 +250,8 @@ public class ImagePreprocessor {
 
     /**
      * Downscale + convert to gray + bilateral filter + adaptive threshold + enclose, in this order.
-     * @param imgSwap Swap of gray Mat. Not null.
+     * @param imgSwap output swap of gray Mat. Not null.
+     * @param rgba input RGBA Mat.
      */
     private static void prepareBinaryImg(Swap<Mat> imgSwap, Mat rgba) {
         // I used swap in-out parameters to enable me to easily reorder the methods
