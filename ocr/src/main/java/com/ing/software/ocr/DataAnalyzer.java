@@ -496,11 +496,12 @@ public class DataAnalyzer {
     public static Date parseDate(String dateString, String[] formats)
     {
         Date date = null;
+        Locale locale = new Locale("it");
 
         for (int i = 0; i < formats.length; i++)
         {
             String format = formats[i];
-            SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format,locale);
             try
             {
                 // parse() will throw an exception if the given dateString doesn't match
