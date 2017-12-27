@@ -170,7 +170,11 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         //personsList.setAdapter(adapter);
         //checkInitialization();
 
-        // Botton SAVE
+        // Add person button
+        newPersonButton = findViewById(R.id.newPersonButton);
+        newPersonButton.setOnClickListener(this);
+
+        // Button SAVE
         saveMissionButton = findViewById(R.id.saveButton);
         saveMissionButton.setOnClickListener(this);
     }

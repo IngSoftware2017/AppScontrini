@@ -53,6 +53,8 @@
         <activity
             android:name="com.unipd.ingsw.gruppo3.AddMission"
             android:parentActivityName=".MainActivityGruppo1"></activity>
+        <activity android:name=".AddPerson"
+            android:parentActivityName=".AddMission"></activity>
     </application>
 
 </manifest>
