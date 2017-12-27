@@ -496,7 +496,7 @@ public class DataAnalyzer {
     public static Date parseDate(String dateString, String[] formats)
     {
         Date date = null;
-        Locale locale = new Locale("it");
+        Locale locale = new Locale("US");
 
         for (int i = 0; i < formats.length; i++)
         {
