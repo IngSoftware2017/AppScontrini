@@ -95,8 +95,12 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         setContentView(R.layout.activity_add_mission);
 
+        //TODO solve this
+        //Add a user who own every unassociated mission, must be initialized in the main activity
+        //or every call of the activity will add one user to the db
         DataManager.getInstance(this).addPerson(user);
         missionEntity.setPersonID(user.getID());
+
         // Nome Missione
         nameMissionText = findViewById(R.id.nameText);
         nameMissionText.setOnClickListener(this);
@@ -175,7 +179,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
         //for every person in the database get their last name in the spinner list
         for(int i=0;i<personEntities.size();i++){
-            lastNameList.add(personEntities.get(i).getLastName().toString());
+            lastNameList.add(personEntities.get(i).getLastName().toString() +" "+ personEntities.get(i).getName().toString());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lastNameList);

@@ -63,7 +63,7 @@ public class AddPerson extends AppCompatActivity implements View.OnClickListener
             person.setAcademicTitle(academicTitle.getText().toString());
 
             DataManager.getInstance(this).addPerson(person);
-
+            //TODO settare lo spinner al nuovo valore aggiunto aggiornando la lista
             finish();
         }
     }
