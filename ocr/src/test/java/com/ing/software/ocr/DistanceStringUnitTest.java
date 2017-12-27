@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 import static org.junit.Assert.assertEquals;

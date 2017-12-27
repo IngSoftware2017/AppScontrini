@@ -3,6 +3,7 @@ package com.ing.software.ocr;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -21,18 +22,8 @@ import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
 
-import java.util.Date;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
-
-/*
-USAGE:
-1) Instantiate DataAnalyzer;
-2) Call initialize() until it returns 0;
-3) Call getTicket ad libitum to extract information (Ticket object) from a photo of a ticket.
-4) Call release() to release internal resources.
- */
 
 
 /**
@@ -485,7 +476,7 @@ public class DataAnalyzer {
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
         if(minDistance<10)
         {
-            String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy"};
+            String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy","MM/dd/yyyy","MM-dd-yyyy","MM.dd.yyyy"};
             date = parseDate(dataSearch,expectedPattern);
 
         }
@@ -495,6 +486,8 @@ public class DataAnalyzer {
     }
 
     /**
+     * @author Salvagno
+     *
      * @param dateString An input date string.
      * @param formats An array of date formats that we have allowed for.
      * @return A Date (java.util.Date) reference. The reference will be null if
@@ -503,26 +496,21 @@ public class DataAnalyzer {
     public static Date parseDate(String dateString, String[] formats)
     {
         Date date = null;
-        boolean success = false;
 
         for (int i = 0; i < formats.length; i++)
         {
             String format = formats[i];
             SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-
             try
             {
                 // parse() will throw an exception if the given dateString doesn't match
                 // the current format
                 date = dateFormat.parse(dateString);
-                success = true;
                 break;
             }
             catch(ParseException e)
             {
                 // don't do anything. just let the loop continue.
-                // we may miss on 99 format attempts, but match on one format,
-                // but that's all we need.
             }
         }
 
