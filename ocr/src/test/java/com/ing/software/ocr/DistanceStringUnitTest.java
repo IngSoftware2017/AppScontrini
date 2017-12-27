@@ -6,7 +6,11 @@ import org.junit.Test;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 import static org.junit.Assert.assertEquals;
@@ -434,9 +438,12 @@ public class DistanceStringUnitTest {
         String a = "la data è 23-06-1995";
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
-        String r = (String) method.invoke(null,a);
+        Date r = (Date) method.invoke(null,a);
 
-        assertEquals("23-06-1995", r);
+        String stringToFind = "23-06-1995";
+        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
     }
 
     @Test
@@ -445,7 +452,7 @@ public class DistanceStringUnitTest {
         String a = "il questo testo la data non è presenteuytr";
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
-        String r = (String) method.invoke(null,a);
+        Date r = (Date) method.invoke(null,a);
 
         assertEquals(null, r);
     }
@@ -453,34 +460,43 @@ public class DistanceStringUnitTest {
     @Test
     public void GetDateTest3() throws Exception {
 
-        String a = "il questo testo la data non è 10- dsad 2376-06-95";
+        String a = "il questo testo la data non è 10- dsad 01-05-2017";
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
-        String r = (String) method.invoke(null,a);
+        Date r = (Date) method.invoke(null,a);
 
-        assertEquals("2376-06-95", r);
+        String stringToFind = "01-05-2017";
+        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
     }
 
     @Test
     public void GetDateTest4() throws Exception {
 
-        String a = "in questo testo la data non è dsad 2jk hjh3-16-19";
+        String a = "in questo testo la data non è dsad 2jk hjh3-10-17";
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
-        String r = (String) method.invoke(null,a);
+        Date r = (Date) method.invoke(null,a);
 
-        assertEquals("3-16-19", r);
+        String stringToFind = "3-10-17";
+        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
     }
 
     @Test
     public void GetDateTest5() throws Exception {
 
-        String a = "il questo test 33-20-29 od la data non è dsad 2jk";
+        String a = "il questo test 10/09/2017 od la data non è dsad 2jk";
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
-        String r = (String) method.invoke(null,a);
+        Date r = (Date) method.invoke(null,a);
 
-        assertEquals("33-20-29", r);
+        String stringToFind = "10/09/2017";
+        Date date = new SimpleDateFormat("dd/MM/yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
     }
 
     @Test
@@ -489,9 +505,68 @@ public class DistanceStringUnitTest {
         String a = "il questo è presente s.r.l";
         Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
         method.setAccessible(true);
-        String r = (String) method.invoke(null,a);
+        Date r = (Date) method.invoke(null,a);
 
         assertEquals(null, r);
+    }
+
+    @Test
+    public void GetDateTest7() throws Exception {
+
+        String a = "il questo test 10-9-2017 od la data non è dsad 2jk";
+        Method method = DataAnalyzer.class.getDeclaredMethod("getDate", String.class);
+        method.setAccessible(true);
+        Date r = (Date) method.invoke(null,a);
+
+        String stringToFind = "10-9-2017";
+        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
+    }
+
+    @Test
+    public void GetFormatDateTest1() throws Exception {
+
+        String a = "10-9-2017";
+        String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy"};
+        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class, String[].class);
+        method.setAccessible(true);
+        Date r = (Date) method.invoke(null,a,expectedPattern);
+
+        String stringToFind = "10-9-2017";
+        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
+    }
+
+    @Test
+    public void GetFormatDateTest2() throws Exception {
+
+        String a = "10/9/2017";
+        String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy"};
+        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class, String[].class);
+        method.setAccessible(true);
+        Date r = (Date) method.invoke(null,a,expectedPattern);
+
+        String stringToFind = "10/9/2017";
+        Date date = new SimpleDateFormat("dd/MM/yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
+    }
+
+    @Test
+    public void GetFormatDateTest3() throws Exception {
+
+        String a = "10.09.2017";
+        String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy"};
+        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class, String[].class);
+        method.setAccessible(true);
+        Date r = (Date) method.invoke(null,a,expectedPattern);
+
+        String stringToFind = "10.9.2017";
+        Date date = new SimpleDateFormat("dd.MM.yyyy").parse(stringToFind);
+
+        assertEquals(date, r);
     }
 
 
