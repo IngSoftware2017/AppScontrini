@@ -5,8 +5,15 @@ package com.ing.software.ocr;
  */
 class OcrVars {
 
-    static final boolean IS_DEBUG_ENABLED = false;
-    static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
+    static final boolean IS_DEBUG_ENABLED = true;
+    static final int LOG_LEVEL = 1; //A Higher level, means more things are logged
     static final String[] AMOUNT_STRINGS = {"TOTAL", "IMPORTO"};
     static final int MAX_STRING_DISTANCE = 3;
+    static final String LEFT_TAG = "left";
+    static final String CENTER_TAG = "center";
+    static final String RIGHT_TAG = "right";
+    static final String INTRODUCTION = "introduction";
+    static final String PRODUCTS = "products";
+    static final String PRICES = "prices";
+    static final String CONCLUSION = "conclusion";
 }

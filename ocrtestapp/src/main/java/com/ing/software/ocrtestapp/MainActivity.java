@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             case STATUS_FINISHED:
                 //Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                 //        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
-                s = "\nRectangle: " + resultData.getString(RECTANGLE_RECEIVED) +
+                s = //"\nRectangle: " + resultData.getString(RECTANGLE_RECEIVED) +
                         "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                         "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds";
                 break;

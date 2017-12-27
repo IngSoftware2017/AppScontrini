@@ -2,6 +2,8 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.ing.software.common.Ticket;
@@ -68,6 +70,7 @@ public class OcrManager {
                     return;
                 long startTime = System.nanoTime();
                 Bitmap bm = preprocessor.undistort(0.05);
+                bm = scaleBitmap(bm); //for tests
                 OcrResult result = analyzer.analyze(bm);
                 ticketCb.accept(getTicketFromResult(result));
                 long endTime = System.nanoTime();
@@ -77,6 +80,14 @@ public class OcrManager {
         }).start();
     }
 
+    private Bitmap scaleBitmap(Bitmap b) {
+        int reqWidth = b.getWidth()/2;
+        int reqHeight = b.getHeight()/2;
+        Matrix m = new Matrix();
+        m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, reqWidth, reqHeight), Matrix.ScaleToFit.CENTER);
+        return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+    }
+
     /**
      * @author Michelon
      * Coverts an OcrResult into a Ticket analyzing its data
@@ -84,12 +95,16 @@ public class OcrManager {
      * @return Ticket. Some fields can be null;
      */
     private static Ticket getTicketFromResult(OcrResult result) {
+        long startTime = System.nanoTime();
         Ticket ticket = new Ticket();
         OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
         List<RawText> prices = OcrSchemer.getPricesTexts(result.getProducts());
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
         ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
+        long endTime = System.nanoTime();
+        double duration = ((double) (endTime - startTime)) / 1000000000;
+        OcrUtils.log(1, "getTicketFromResult", "EXECUTION TIME: " + duration + " sec");
         return ticket;
     }
 

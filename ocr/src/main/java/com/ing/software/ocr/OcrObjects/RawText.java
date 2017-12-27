@@ -25,6 +25,7 @@ public class RawText implements Comparable<RawText> {
     private RectF rectText;
     private String detection;
     private RawImage rawImage;
+    private RawTag tag = new RawTag();
 
     /**
      * Constructor
@@ -57,6 +58,14 @@ public class RawText implements Comparable<RawText> {
      */
     public RawImage getRawImage() {
         return rawImage;
+    }
+
+    public RawTag getTag() {
+        return tag;
+    }
+
+    public void addTag(String tag) {
+        this.tag.addTag(tag);
     }
 
     /**

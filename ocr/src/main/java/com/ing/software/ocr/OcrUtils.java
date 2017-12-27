@@ -1,6 +1,7 @@
 package com.ing.software.ocr;
 
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
 import static com.ing.software.ocr.OcrVars.LOG_LEVEL;
 
@@ -109,6 +111,23 @@ public class OcrUtils {
 
     /**
      * @author Michelon
+     * @date 27-12-17
+     * Find box of the grid containing the center of the text rect
+     * @return coordinates of the grid, where int[0] = column, int[1] = row
+     */
+    public static PointF getGridBox(RawImage image) {
+        Scanner gridder = new Scanner(image.getGrid());
+        gridder.useDelimiter("x");
+        int rows = Integer.parseInt(gridder.next());
+        int columns = Integer.parseInt(gridder.next());
+        gridder.close();
+        float rowsHeight = image.getHeight()/rows;
+        float columnsWidth = image.getWidth()/columns;
+        return new PointF();
+    }
+
+    /**
+     * @author Michelon
      * Order a list of TextBlock from top to bottom, left to right
      * @param textBlocks original list. Not null.
      * @return ordered list
@@ -166,10 +185,10 @@ public class OcrUtils {
      * @author Michelon
      * Extends the width of a rect to the max allowed for chosen photo
      * @param rect source rect. Not null.
-     * @param photo source photo (to get max width). Not null.
+     * @param photo source rawImage (to get max width). Not null.
      * @return rect with max width
      */
-    static RectF getExtendedRect(@NonNull RectF rect, @NonNull RawImage photo) {
+    static RectF extendWidthFromPhoto(@NonNull RectF rect, @NonNull RawImage photo) {
         float top = rect.top;
         float bottom = rect.bottom;
         float left = 0;
@@ -308,24 +327,39 @@ public class OcrUtils {
     /**
      * @author Michelon
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
+     * Or extending of chosen pixels on both sides (if param is negative)
      * Note: Min value for top and left is 0
      * @param rect source rect. Not null
-     * @param percentHeight chosen percentage for height. Int >= 0
-     * @param percentWidth chosen percentage for width. Int >= 0
+     * @param percentHeight chosen percentage for height. \pixels if negative
+     * @param percentWidth chosen percentage for width. \pixels if negative
      * @return new extended rectangle
      */
-    static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percentHeight, @IntRange(from = 0) int percentWidth) {
-        float extendedHeight = rect.height()*percentHeight/100;
-        float extendedWidth = rect.width()*percentWidth/100;
-        float left = rect.left - extendedWidth/2;
+    static RectF extendRect(@NonNull RectF rect, int percentHeight, int percentWidth) {
+        float top;
+        float bottom;
+        float right;
+        float left;
+        if (percentHeight > 0) {
+            float extendedHeight = rect.height() * percentHeight / 100;
+            top = rect.top - extendedHeight / 2;
+            bottom = rect.bottom + extendedHeight/2;
+        } else {
+            top = rect.top - (float)Math.abs(percentHeight);
+            bottom = rect.bottom + (float)Math.abs(percentHeight);
+        }
+        if (percentWidth > 0) {
+            float extendedWidth = rect.width() * percentWidth / 100;
+            left = rect.left - extendedWidth / 2;
+            right = rect.right + extendedWidth/2;
+        } else {
+            left = rect.left - (float)Math.abs(percentWidth);
+            right = rect.right + (float)Math.abs(percentWidth);
+        }
         if (left<0)
             left = 0;
-        float top = rect.top - extendedHeight/2;
         if (top < 0)
             top = 0;
         //Doesn't matter if bottom and right are outside the photo
-        float right = rect.right + extendedWidth/2;
-        float bottom = rect.bottom + extendedHeight/2;
         return new RectF(left, top, right, bottom);
     }
 
@@ -333,7 +367,7 @@ public class OcrUtils {
      * @author Michelon
      * @date 26-12-17
      * Check if a string may be a number.
-     * Removes spaces, 'S', '.', ',' before analysis.
+     * Removes spaces, 'S', 'O','o', '.', ',' before analysis.
      * If string is longer than maxlength default is false (allowed numbers up to nn.nnn,nn)
      * @param s string to analyze
      * @return true if more than 3/4 (rounded) of the chars in the string are numbers
@@ -341,8 +375,8 @@ public class OcrUtils {
     static boolean isPossibleNumber(String s) {
         int counter = 0;
         int maxLength = 8; //Assume we can't have prices longer than 8 chars (so nn.nnn,nn)
-        s = s.replaceAll(",", "").replaceAll(" ", "")
-                .replaceAll("\\.", "").replaceAll("S", ""); //sometimes '5' are recognized as 'S'
+        s = s.replaceAll(",", "").replaceAll(" ", "").replaceAll("O", "") //sometimes '0' are recognized as 'O'
+                .replaceAll("o", "").replaceAll("\\.", "").replaceAll("S", ""); //sometimes '5' are recognized as 'S'
         if (s.length() >= maxLength)
             return false;
         for (int i = 0; i < s.length(); ++i) {
@@ -350,5 +384,32 @@ public class OcrUtils {
                 ++counter;
         }
         return counter >= Math.round((double)s.length()*3/4);
+    }
+
+    /**
+     * @author Michelon
+     * Get rect containing all rawTexts detected
+     * @param rawTexts texts detected. Not null.
+     * @return array of PointF where PointF[0]=point on top-left, PointF[1] = point on bottom-right
+     */
+    static PointF[] getMaxRectBorders(@NonNull List<RawText> rawTexts) {
+        //Extreme borders for chosen photo (will be overwritten in foreach)
+        if (rawTexts.size() == 0)
+            return null;
+        float left = rawTexts.get(0).getRawImage().getWidth();
+        float right = 0;
+        float top = rawTexts.get(0).getRawImage().getHeight();
+        float bottom = 0;
+        for (RawText rawText : rawTexts) {
+            if (rawText.getRect().left<left)
+                left = rawText.getRect().left;
+            if (rawText.getRect().right>right)
+                right = rawText.getRect().right;
+            if (rawText.getRect().bottom>bottom)
+                bottom = rawText.getRect().bottom;
+            if (rawText.getRect().top<top)
+                top = rawText.getRect().top;
+        }
+        return new PointF[] {new PointF(left, top),  new PointF(right, bottom)};
     }
 }

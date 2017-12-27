@@ -477,7 +477,7 @@ class DataAnalyzer {
                 int singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
                 possibleResults.add(new RawGridResult(gridResult.getText(), singleCatch));
             } else {
-                OcrUtils.log(3, "getPossibleDate", "Ignoring text: " + gridResult.getText().getDetection());
+                OcrUtils.log(5, "getPossibleDate", "Ignoring text: " + gridResult.getText().getDetection());
             }
         }
         if (possibleResults.size() > 0) {

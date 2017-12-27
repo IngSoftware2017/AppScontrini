@@ -28,7 +28,6 @@ import static com.ing.software.ocr.OcrVars.*;
 class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
-    private RawImage mainImage;
     private final int targetPrecision = 130; //Should be passed with image. todo
 
 
@@ -60,21 +59,27 @@ class OcrAnalyzer {
      * @return OcrResult containing raw data to be further analyzed.
      */
     OcrResult analyze(@NonNull Bitmap frame){
-        //cropping must be used somewhere else (if used with textRecognizer). Can be used here if using opencv
-        //frame = getCroppedPhoto(frame, context);
-        mainImage = new RawImage(frame);
+        RawImage mainImage = new RawImage(frame);
 
         //ocrEngine analysis
+        long startTime = System.nanoTime();
         SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(frame).build());
-
+        long endTime = System.nanoTime();
+        double duration = ((double) (endTime - startTime)) / 1000000000;
+        OcrUtils.log(1, "DETECTOR: ", "EXECUTION TIME: "+ duration + " seconds");
+        long startTime2 = System.nanoTime();
         List<RawText> rawOrigTexts = orderBlocks(mainImage, tempArray);
         listEverything(rawOrigTexts);
+        OcrSchemer.prepareScheme(rawOrigTexts);
         List<RawStringResult> valuedTexts = new ArrayList<>();
         for (String amountString : AMOUNT_STRINGS) {
         	valuedTexts.addAll(searchContinuousString(rawOrigTexts, amountString));
         }
         valuedTexts = searchContinuousStringExtended(rawOrigTexts, valuedTexts, targetPrecision);
         List<RawGridResult> dateList = getDateList(rawOrigTexts);
+        long endTime2 = System.nanoTime();
+        double duration2 = ((double) (endTime2 - startTime2)) / 1000000000;
+        OcrUtils.log(1, "OCR ANALYZER: ", "EXECUTION TIME: "+ duration2 + " seconds");
         return new OcrResult(valuedTexts, dateList, getProductPrices(rawOrigTexts));
     }
 
@@ -168,7 +173,7 @@ class OcrAnalyzer {
     /**
      * @author Michelon
      * From a list of RawTexts, retrieves also RawTexts with similar distance from top and bottom of the photo.
-     * 'Similar' is defined by precision. See {@link OcrUtils getExtendedRect()} for details.
+     * 'Similar' is defined by precision. See {@link OcrUtils extendWidthFromPhoto()} for details.
      * @param rawTexts list of RawBlocks from original photo. Not null.
      * @param targetStringList list of target RawTexts. Not null.
      * @param precision precision to extend rect. See OcrUtils.extendRect()
@@ -189,7 +194,7 @@ class OcrAnalyzer {
             for (RawStringResult singleResult : results) {
                 RawText rawTextSource = singleResult.getSourceText();
                 log(4,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getDetection());
-                RectF newRect = OcrUtils.extendRect(OcrUtils.getExtendedRect(rawTextSource.getRect(), rawTextSource.getRawImage()), precision, precision);
+                RectF newRect = OcrUtils.extendRect(rawTextSource.getRect(), precision, -rawTextSource.getRawImage().getWidth()); //negative width to use pixels
                 if (rawText.isInside(newRect)) {
                     singleResult.addDetectedTexts(rawText);
                     log(3,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getDetection());
