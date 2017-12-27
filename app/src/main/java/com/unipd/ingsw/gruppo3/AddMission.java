@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -69,6 +71,7 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
     Spinner personsSpinner;
     //ListView personsList;
     List<PersonEntity> personEntities;
+    List<String> lastNameList = new ArrayList<String>();
     TextView noticeEmptyText;
 
     int personID;
@@ -169,6 +172,17 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         //PersonAdapter adapter = new PersonAdapter(this, R.layout.persona_row_item, personEntities);
         //personsList.setAdapter(adapter);
         //checkInitialization();
+
+        //for every person in the database get their last name in the spinner list
+        for(int i=0;i<personEntities.size();i++){
+            lastNameList.add(personEntities.get(i).getLastName().toString());
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lastNameList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        personsSpinner = findViewById(R.id.personsSpinner);
+        personsSpinner.setAdapter(adapter);
+
 
         // Add person button
         newPersonButton = findViewById(R.id.newPersonButton);
