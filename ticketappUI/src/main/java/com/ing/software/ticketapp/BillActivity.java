@@ -30,7 +30,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.common.TicketError;
 import com.ing.software.ocr.ImagePreprocessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
@@ -43,11 +42,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import database.DataManager;
 import database.TicketEntity;
@@ -475,15 +477,25 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 Toast.makeText(this, "Starting img ", Toast.LENGTH_SHORT).show();
                 break;
             case STATUS_FINISHED:
-                Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED), Toast.LENGTH_LONG).show();
-                Uri uri = Uri.fromFile(new File(resultData.getString("root"), resultData.getString("image")));
+                Toast.makeText(this, "Amount is: " + resultData.getString(AMOUNT_RECEIVED) + "\nDate is: "
+                        + resultData.getString(DATE_RECEIVED), Toast.LENGTH_LONG).show();
+                Uri uri = Uri.fromFile(new File(resultData.getString(ROOT_RECEIVED), resultData.getString(IMAGE_RECEIVED)));
                 BigDecimal amount = null;
                 try {
                     amount = new BigDecimal(resultData.getString(AMOUNT_RECEIVED)).setScale(2, RoundingMode.HALF_UP);
                 } catch (NumberFormatException e) {
                     //No valid amount
                 }
-                DB.addTicket(new TicketEntity(uri, amount, null, Calendar.getInstance().getTime(), null, missionID));
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                Date date = null;
+                try {
+                    date = dateFormat.parse(resultData.getString(DATE_RECEIVED));
+                } catch (ParseException e) {
+                    //Nada
+                }
+                if (date == null)
+                    date = Calendar.getInstance().getTime();
+                DB.addTicket(new TicketEntity(uri, amount, null, date, null, missionID));
                 clearAllImages();
                 printAllImages();
                 break;
@@ -516,8 +528,8 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             final Bundle bundle = new Bundle();
             String root = workIntent.getStringExtra("root");
             String name = workIntent.getStringExtra("image");
-            bundle.putString("root", root);
-            bundle.putString("image", name);
+            bundle.putString(ROOT_RECEIVED, root);
+            bundle.putString(IMAGE_RECEIVED, name);
             File file = new File(root, name);
             Bitmap testBmp = getBitmapFromFile(file);
             receiver.send(STATUS_RUNNING, bundle);
@@ -529,12 +541,21 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     if (result.amount != null) {
                         OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
                         bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
-                        receiver.send(STATUS_FINISHED, bundle);
                     } else {
                         OcrUtils.log(1, "OcrHandler", "No amount found");
                         bundle.putString(AMOUNT_RECEIVED, "Not found.");
-                        receiver.send(STATUS_FINISHED, bundle);
                     }
+                    if (result.date != null) {
+                        DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                        String formattedDate = df.format(result.date);
+                        OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
+                        OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
+                        bundle.putString(DATE_RECEIVED, formattedDate);
+                    } else {
+                        OcrUtils.log(1, "OcrHandler", "No date found");
+                        bundle.putString(DATE_RECEIVED, "Not found.");
+                    }
+                        receiver.send(STATUS_FINISHED, bundle);
                 });
             });
             receiver.send(STATUS_AVERAGE, bundle);

@@ -128,19 +128,18 @@ public class OcrManager {
     }
 
     /**
-     * Try to decode date. Temporary method.
-     * Subtract distance from date format from percentage
-     * and rearrange the list
+     * Extracts first not null date from list of ordered dates
+     * @param dateList list of ordered RawGridResults containing possible dates. Not null
+     * @return First possible date. Null if nothing found
      */
-    private static Date getDateFromList(List<RawGridResult> dateList) {
+    private static Date getDateFromList(@NonNull List<RawGridResult> dateList) {
         for (RawGridResult gridResult : dateList) {
             String possibleDate = gridResult.getText().getDetection();
-            if (DataAnalyzer.getDate(possibleDate) != null) {
-                try {
-                    //Convert string to date
-                } catch (Exception e) {
-                    return null;
-                }
+            OcrUtils.log(2, "getDateFromList", "Possible date is: " + possibleDate);
+            Date evaluatedDate = DataAnalyzer.getDate(possibleDate);
+            if (evaluatedDate != null) {
+                OcrUtils.log(2, "getDateFromList", "Possible amount is: " + evaluatedDate.toString());
+                return evaluatedDate;
             }
         }
         return null;

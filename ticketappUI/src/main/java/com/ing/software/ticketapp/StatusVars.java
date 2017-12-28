@@ -11,4 +11,6 @@ public class StatusVars {
     public static final String DURATION_RECEIVED = "duration";
     public static final String ERROR_RECEIVED = "error";
     public static final String IMAGE_RECEIVED = "image";
+    public static final String DATE_RECEIVED = "date_received";
+    public static final String ROOT_RECEIVED = "root";
 }
