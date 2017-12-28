@@ -1,12 +1,17 @@
 package com.ing.software.ocr;
 
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
@@ -16,6 +21,9 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
+
+import java.text.ParseException;
+
 
 
 /**
@@ -393,6 +401,7 @@ public class DataAnalyzer {
         else
             //Returns the absolute value of the distance by subtracting the minimum character
             return Math.abs(minCharaterDate-minDistance);
+
     }
 
 
@@ -403,12 +412,15 @@ public class DataAnalyzer {
      * @param text The text to find the date
      * @return date or null if the date is not there
      */
-    static String getDate(String text) {
+    static Date getDate(String text) {
         if (text.length() == 0)
             return null;
 
+        Date date = null;
+
         //Possible date formats
         String[] formatDate = {"xx/xxxx/xx", "xxxx/xx/xx","xx/xx/xxxx", "xx-xxxx-xx", "xxxx-xx-xx","xx-xx-xxxx","xx.xxxx.xx","xxxx.xx.xx" ,"xx.xx.xxxx"};
+
 
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
@@ -456,10 +468,47 @@ public class DataAnalyzer {
         }
 
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
-        if(minDistance>=10)
-            return null;
-        else
-            return dataSearch;
+        if(minDistance<10)
+        {
+            String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy","MM/dd/yyyy","MM-dd-yyyy","MM.dd.yyyy"};
+            date = parseDate(dataSearch,expectedPattern);
 
+        }
+        return date;
+
+
+    }
+
+    /**
+     * @author Salvagno
+     *
+     * @param dateString An input date string.
+     * @param formats An array of date formats that we have allowed for.
+     * @return A Date (java.util.Date) reference. The reference will be null if
+     *         we could not match any of the known formats.
+     */
+    public static Date parseDate(String dateString, String[] formats)
+    {
+        Date date = null;
+        Locale locale = new Locale("US");
+
+        for (int i = 0; i < formats.length; i++)
+        {
+            String format = formats[i];
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format,locale);
+            try
+            {
+                // parse() will throw an exception if the given dateString doesn't match
+                // the current format
+                date = dateFormat.parse(dateString);
+                break;
+            }
+            catch(ParseException e)
+            {
+                // don't do anything. just let the loop continue.
+            }
+        }
+
+        return date;
     }
 }
