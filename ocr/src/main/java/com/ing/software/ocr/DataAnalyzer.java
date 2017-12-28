@@ -463,7 +463,7 @@ class DataAnalyzer {
         }
 
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
-        if(minDistance<10)
+        if(dataSearch != null && minDistance<10)
         {
             String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy","MM/dd/yyyy","MM-dd-yyyy","MM.dd.yyyy"};
             date = parseDate(dataSearch,expectedPattern);
@@ -516,7 +516,7 @@ class DataAnalyzer {
      * @return List of possible dates ordered
      */
     static List<RawGridResult> getPossibleDates(@NonNull List<RawGridResult> dateResults) {
-        int distanceMultiplier = 15;
+        int distanceMultiplier = 20;
         List<RawGridResult> possibleResults = new ArrayList<>();
         Collections.sort(dateResults);
         for (RawGridResult gridResult : dateResults) {

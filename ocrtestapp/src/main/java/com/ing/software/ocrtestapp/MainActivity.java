@@ -29,10 +29,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 
 import static com.ing.software.ocrtestapp.StatusVars.*;
@@ -143,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 //        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
                 s = //"\nRectangle: " + resultData.getString(RECTANGLE_RECEIVED) +
                         "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
+                                "\nDate is: " + resultData.getString(DATE_RECEIVED) +
                         "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds";
                 break;
             case STATUS_ERROR:
@@ -165,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
      */
     private String getDate() {
         Calendar cal = Calendar.getInstance();
-        return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(cal.getTime());
+        return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.US).format(cal.getTime());
     }
 
     /**
@@ -242,13 +247,22 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                                 OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
                                 bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
                                 bundle.putString(DURATION_RECEIVED, duration + "");
-                                receiver.send(STATUS_FINISHED, bundle);
                             } else {
                                 OcrUtils.log(1, "OcrHandler", "No amount found");
                                 bundle.putString(AMOUNT_RECEIVED, "Not found.");
                                 bundle.putString(DURATION_RECEIVED, duration + "");
-                                receiver.send(STATUS_FINISHED, bundle);
                             }
+                            if (result.date != null) {
+                                OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
+                                DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                                String formattedDate = df.format(result.date);
+                                OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
+                                bundle.putString(DATE_RECEIVED, formattedDate);
+                            } else {
+                                OcrUtils.log(1, "OcrHandler", "No date found");
+                                bundle.putString(DATE_RECEIVED, "Not found.");
+                            }
+                            receiver.send(STATUS_FINISHED, bundle);
                             sem.release();
                         });
                     });
