@@ -6,16 +6,27 @@ import java.util.List;
 
 /**
  * Created by Federico Taschin on 07/11/2017.
- * Modified by Marco Olivieri on 14/11/2017
+ * Modified by Marco Olivieri
+ * Modify by Matteo Mascotto: improve methods and complete documentation
  */
 
 public class DataManager {
+    private static DataManager dataManager;
     private Database database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 
     public DataManager(Context context){
         //receives the instance of the database
         database = Database.getAppDatabase(context);
+    }
+
+    public static DataManager getInstance(Context context){
+        if(dataManager ==null){
+            dataManager = new DataManager(context);
+            return dataManager;
+        }else{
+            return dataManager;
+        }
     }
 
     /** Adds a ticketEntity into the database
@@ -53,7 +64,7 @@ public class DataManager {
      * @param id the id of the ticket to be deleted
      * @return true if the ticket is deleted, false otherwise
      */
-    public boolean deleteTicket(int id){
+    public boolean deleteTicket(long id){
         return database.ticketDao().deleteTicket(id)>0;
     }
 
@@ -62,7 +73,7 @@ public class DataManager {
      * @param id the id of the mission to be deleted
      * @return true if the mission is deleted, false otherwise
      */
-    public boolean deleteMission(int id){
+    public boolean deleteMission(long id){
         return database.ticketDao().deleteMission(id)>0;
     }
 
@@ -71,7 +82,7 @@ public class DataManager {
      * @param id the id of the person to be deleted
      * @return true if the person is deleted, false otherwise
      */
-    public boolean deletePerson(int id){
+    public boolean deletePerson(long id){
         return database.ticketDao().deletePerson(id)>0;
     }
 
@@ -108,23 +119,55 @@ public class DataManager {
     public List<TicketEntity> getAllTickets(){
         return database.ticketDao().getAllTickets();
     }
-    
+
+    /**
+     * Return a list of the all Persons
+     *
+     * @return List<MissionEntity>
+     */
     public List<MissionEntity> getAllMission(){
         return database.ticketDao().getAllMission();
     }
 
+    /**
+     * Return a list of the all Persons
+     *
+     * @return List<PersonEntity>
+     */
     public List<PersonEntity> getAllPerson(){
         return database.ticketDao().getAllPerson();
     }
 
-    public List<TicketEntity> getTicketsForMission(int id){
+    /**
+     * Return a list of the tickets associate to a specific Mission
+     *
+     * @param id identifier of the Mission
+     * @return List<TicketEntity>
+     */
+    public List<TicketEntity> getTicketsForMission(long id){
         return database.ticketDao().getTicketsForMission(id);
     }
 
-
-    public TicketEntity getTicket(int id){
+    /**
+     * Return a specific Ticket from a given ID
+     *
+     * @param id identifier of the Ticket
+     * @return TicketEntity
+     */
+    public TicketEntity getTicket(long id){
         return database.ticketDao().getTicket(id);
     }
+
+    /**
+     * Return a specific Person from a given ID
+     *
+     * @param id identifier of the Person
+     * @return PersonEntity
+     */
+    public PersonEntity getPerson(long id){
+        return database.ticketDao().getPerson(id);
+    }
+
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null

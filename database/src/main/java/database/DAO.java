@@ -11,7 +11,8 @@ import java.util.List;
 
 /**
  * Created by Federico Taschin on 08/11/2017.
- * Modified by Marco Olivieri on 28/11/2017
+ * Modified by Marco Olivieri
+ * Modify by Matteo Mascotto: improve getPerson from id and complete methods documentation
  */
 
 /*Data Access Objects Interface. Defines the queries using Room libraries
@@ -55,25 +56,25 @@ public interface DAO {
     //DELETE
 
     /**Deletes a MissionEntity from the database
-     * @param id int the ID of the MissionEntity to be deleted
+     * @param id long the ID of the MissionEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.MISSION_TABLE_NAME+" WHERE "+ Constants.MISSION_PRIMARY_KEY_NAME+" = :id")
-    int deleteMission(int id);
+    long deleteMission(long id);
 
     /**Deletes a PersonEntity from the database
-     * @param id int the ID of the PersonEntity to be deleted
+     * @param id long the ID of the PersonEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.PERSON_TABLE_NAME+" WHERE "+ Constants.PERSON_PRIMARY_KEY_NAME+" = :id")
-    int deletePerson(int id);
+    long deletePerson(long id);
 
     /**Deletes a TicketEntity from the database
      * @param id int the ID of the TicketEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.TICKET_TABLE_NAME+" WHERE "+ Constants.TICKET_PRIMARY_KEY_NAME+" = :id")
-    int deleteTicket(int id);
+    long deleteTicket(long id);
 
     //UPDATE
 
@@ -85,7 +86,7 @@ public interface DAO {
      * @return the number of updated entities
      */
     @Update
-    int updateTicket(TicketEntity ticketEntity);
+    long updateTicket(TicketEntity ticketEntity);
 
     /**Updates the given MissionEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param missionEntity MissionEntity not null, the entity to be inserted
@@ -93,7 +94,7 @@ public interface DAO {
      * @return the number of updated entities
      */
     @Update
-    int updateMission(MissionEntity missionEntity);
+    long updateMission(MissionEntity missionEntity);
 
     /**Updates the given PersonEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param personEntity PersonEntity not null, the entity to be inserted
@@ -101,7 +102,7 @@ public interface DAO {
      * @return the number of updated entities
      */
     @Update
-    int updatePerson(PersonEntity personEntity);
+    long updatePerson(PersonEntity personEntity);
 
     //SELECT ALL
 
@@ -126,19 +127,30 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
+    //SELECT FROM ID
+
     /**
     *Gets all the TicketEnt of a MissionEntity
-    *@param int id, the id of the MissionEntity 
+    *@param id long, the id of the MissionEntity
     *@return List<MissionEntity> not null (at least of 0 size) which contains all the tickets for the given mission id 
     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
-    public List<TicketEntity> getTicketsForMission(int id);
+    public List<TicketEntity> getTicketsForMission(long id);
 
     /**
     *Executes a SELECT query for a specified TicketEntity id
-    *@param int id, the id of the TicketEntity 
+    *@param id long, the id of the TicketEntity
     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY_NAME+" =:id")
-    public TicketEntity getTicket(int id);
+    public TicketEntity getTicket(long id);
+
+    /**
+     * Executes a SELECT of a specific person from id
+     *
+     * @param id long, identifier of the person
+     * @return PersonEntity
+     */
+    @Query("SELECT * FROM " + Constants.PERSON_TABLE_NAME + " WHERE " + Constants.PERSON_PRIMARY_KEY_NAME + " =:id")
+    PersonEntity getPerson(long id);
 }
