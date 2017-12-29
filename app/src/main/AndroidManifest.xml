@@ -45,11 +45,20 @@
             android:theme="@style/AppTheme.ActionBar.Transparent" />
         <activity
             android:name=".BillActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MissionActivity" />
         <activity
             android:name=".AddNewMission"
+            android:parentActivityName=".MissionActivity" />
+        <activity
+            android:name=".EditTicket"
+            android:parentActivityName=".BillViewer" />
+        <activity
+            android:name=".MissionActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".EditTicket"></activity>
+        <activity
+            android:name=".AddNewPerson"
+            android:parentActivityName=".MainActivity" />
+
     </application>
 
 </manifest>

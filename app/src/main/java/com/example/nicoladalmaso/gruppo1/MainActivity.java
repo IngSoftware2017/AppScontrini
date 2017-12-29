@@ -49,43 +49,47 @@ import database.PersonEntity;
 
 public class MainActivity extends AppCompatActivity {
     public DataManager DB;
-    public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
+    public List<PersonEntity> listPeople = new LinkedList<PersonEntity>();
+
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DB = new DataManager(this.getApplicationContext());
-        setTitle(getString(R.string.titleMission));
+        setTitle(getString(R.string.titlePeople));
         setContentView(R.layout.activity_main);
-        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
+        initialize();
+        printAllPeople();
+    }
+
+    private void initialize(){
+        DB = new DataManager(this.getApplicationContext());
+        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
-                startActivity(addMission);
+                Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
+                startActivity(addPerson);
             }
         });
-        printAllMissionsDB();
     }
 
     /** PICCOLO
      * Adds in the database the new mission
-     * @param mission the mission to be added
+     * @param person the person to be added
      */
-    public void addToListDB(MissionEntity mission){
-        listMission.add(mission);
-        ListView listView = (ListView)findViewById(R.id.listMission);
-        MissionAdapterDB adapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
+    public void addToList(PersonEntity person){
+        listPeople.add(person);
+        ListView listView = (ListView)findViewById(R.id.listPeople);
+        PeopleAdapter adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
         listView.setAdapter(adapter);
     }
 
     /**Lazzarin
      * clear the view after I've eliminated a mission(before to call printAllMissions)
      */
-    public void clearAllMissions()
+    public void clearAllPeople()
     {
-        ListView listView = (ListView)findViewById(R.id.listMission);
-        MissionAdapterDB emptyAdapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
+        ListView listView = (ListView)findViewById(R.id.listPeople);
+        PeopleAdapter emptyAdapter = new PeopleAdapter(this, R.layout.mission_card, listPeople);
         emptyAdapter.clear();
         emptyAdapter.notifyDataSetChanged();
         listView.setAdapter(emptyAdapter);
@@ -94,33 +98,19 @@ public class MainActivity extends AppCompatActivity {
     /** Dal Maso
      * get all missions from the DB and print
      */
-    public void printAllMissionsDB(){
-        List<MissionEntity> missions = DB.getAllMission();
-        List<PersonEntity> persons = DB.getAllPerson();
-        //Crea una persona fake per non creare problemi di FOREING KEY
-        if(persons.size()==0){
-            PersonEntity person = new PersonEntity();
-            person.setName("Nicola");
-            person.setAcademicTitle("Studente");
-            person.setLastName("Dal Maso");
-            DB.addPerson(person);
-            persons = DB.getAllPerson();
-        }
-
-        Log.d("Lista Persone", ""+persons.get(0).getID());
-        Log.d("Persons", ""+persons.size());
-        Log.d("Missions", ""+missions.size());
-
-        TextView noMissions = (TextView)findViewById(R.id.noMissions);
-        if(missions.size() == 0){
-            noMissions.setVisibility(View.VISIBLE);
+    public void printAllPeople(){
+        List<PersonEntity> people = DB.getAllPerson();
+        TextView noPeople = (TextView)findViewById(R.id.noPeople);
+        if(people.size() == 0){
+            noPeople.setVisibility(View.VISIBLE);
         }
         else{
-            noMissions.setVisibility(View.INVISIBLE);
+            noPeople.setVisibility(View.INVISIBLE);
         }
-        for (int i = 0; i < missions.size(); i++)
+        for (int i = 0; i < people.size(); i++)
         {
-            addToListDB(missions.get(i));
+            Log.d("Persone", ""+people.get(i).getName());
+            addToList(people.get(i));
         }
     }
 }

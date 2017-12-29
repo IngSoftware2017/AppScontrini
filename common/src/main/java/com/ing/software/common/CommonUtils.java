@@ -10,13 +10,14 @@ public class CommonUtils {
 
     /**
      * Zip two lists into a list of CompPair
+     * DEPRECATED: use Stream.zip().toList()
      * @param compList list of comparable objects.
      * @param objList list of objects. Must be the same length of compList.
      * @param <C> Comparable
      * @param <T> Object
      * @return List of CompPair
      */
-    @Deprecated //use Stream.zip().toList()
+    @Deprecated
     public static <C extends Comparable<C>, T>
     List<CompPair<C, T>> zipComp(List<C> compList, List<T> objList) {
         List<CompPair<C, T>> zipped = new ArrayList<>();
@@ -27,11 +28,12 @@ public class CommonUtils {
 
     /**
      * Unzip a lists of CompPair into a list of obj of CompPair.
+     * DEPRECATED: use Stream.of().map(()->{}).toList()
      * @param compPairList list of CompPair.
      * @param <T> Object
      * @return List of T objects
      */
-    @Deprecated //use Stream.of().map(()->{}).toList()
+    @Deprecated
     public static <C extends Comparable<C>, T>
     List<T> unzipComp(List<CompPair<C, T>> compPairList) {
         List<T> unzipped = new ArrayList<>();

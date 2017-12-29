@@ -30,6 +30,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.ocr.DataAnalyzer;
+import com.ing.software.ocr.ImagePreprocessor;
+import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -58,6 +60,7 @@ public class BillActivity extends AppCompatActivity {
     Context context;
     String root;
     public DataManager DB;
+    OcrManager ocrManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,17 @@ public class BillActivity extends AppCompatActivity {
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
         Intent intent = getIntent();
+
+        ocrManager = new OcrManager();
+        while (ocrManager.initialize(this) != 0) { // 'this' is the context
+            try {
+                //On first run vision library will be downloaded
+                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         String missionName = intent.getExtras().getString("missionName");
         missionID = intent.getExtras().getInt("missionID");
@@ -97,11 +111,17 @@ public class BillActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_deleteMission:
+            case (R.id.action_deleteMission):
                 deleteMission();
+                break;
+
             default:
-                return super.onOptionsItemSelected(item);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+                break;
         }
+        return true;
     }
 
     /** Dal Maso
@@ -181,14 +201,14 @@ public class BillActivity extends AppCompatActivity {
         //Positive button
         toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MainActivity.class);
-                startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 List<TicketEntity> list = DB.getTicketsForMission(missionID);
                 for(int i = 0; i < list.size(); i++){
                     DB.deleteTicket((int) list.get(i).getID());
                 }
                 DB.deleteMission(missionID);
-                context.startActivity(startMissionView);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
         //Negative button
@@ -361,16 +381,15 @@ public class BillActivity extends AppCompatActivity {
         try {
             FileOutputStream out = new FileOutputStream(file);
 
-            //TODO: HardCode example, implement ocr here
-            TicketEntity t = new TicketEntity();
-            t.setDate(Calendar.getInstance().getTime());
-            t.setFileUri(uri);
-            t.setAmount(BigDecimal.valueOf(10000).movePointLeft(2));
-            t.setShop("Pam Padova");
-            t.setTitle("Scontrino ");
-            t.setMissionID(missionID);
+            TicketEntity ticket = new TicketEntity();
+            ticket.setDate(Calendar.getInstance().getTime());
+            ticket.setFileUri(uri);
+            ticket.setAmount(BigDecimal.valueOf(10000).movePointLeft(2));
+            ticket.setShop("Pam Padova");
+            ticket.setTitle("Scontrino ");
+            ticket.setMissionID(missionID);
+            DB.addTicket(ticket);
 
-            DB.addTicket(t);
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();

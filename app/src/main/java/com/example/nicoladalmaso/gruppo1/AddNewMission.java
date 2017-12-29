@@ -32,6 +32,7 @@ import java.util.Locale;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
 
 public class AddNewMission extends AppCompatActivity{
 
@@ -39,6 +40,7 @@ public class AddNewMission extends AppCompatActivity{
     public DataManager DB;
     TextView missionStart;
     TextView missionFinish;
+    int personID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,9 @@ public class AddNewMission extends AppCompatActivity{
         context = this.getApplicationContext();
         setTitle(context.getString(R.string.newMission));
         setContentView(R.layout.activity_add_new_mission);
+        Intent intent = getIntent();
+        personID = intent.getExtras().getInt("person");
+        Log.d("PersonIDAddMission", ""+personID);
         initializeComponents();
     }
 
@@ -92,6 +97,7 @@ public class AddNewMission extends AppCompatActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        Intent intent = new Intent();
         switch (item.getItemId()) {
             case R.id.action_addMission:
                 //read input text
@@ -112,7 +118,7 @@ public class AddNewMission extends AppCompatActivity{
 
                 MissionEntity miss = new MissionEntity();
                 miss.setName(name);
-                miss.setPersonID(1);
+                miss.setPersonID(personID);
                 miss.setLocation(location);
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
@@ -135,11 +141,15 @@ public class AddNewMission extends AppCompatActivity{
                 startImageView.putExtra("missionID", (int) missionID);
                 startImageView.putExtra("missionName", miss.getName());
                 context.startActivity(startImageView);
+                setResult(RESULT_OK, intent);
                 finish();
-                return true;
+                break;
 
             default:
-                return super.onOptionsItemSelected(item);
+                setResult(RESULT_OK, intent);
+                finish();
+                break;
         }
+        return true;
     }
 }

@@ -44,11 +44,10 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.mission_card, null);
-        CardView card = (CardView) convertView.findViewById(R.id.missionCard);
+        CardView card = (CardView)convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
-        //FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
-        //missionDelete.setTag(position);
+
         MissionEntity c = getItem(position);
         title.setText(c.getName());
         location.setText(c.getLocation());
@@ -89,7 +88,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 Log.d("MissionName", name);
                 startMissionView.putExtra("missionName", name);
                 startMissionView.putExtra("missionID", pos);
-                context.startActivity(startMissionView);
+                ((MissionActivity)context).startActivityForResult(startMissionView, 1);
             }//onClick
         });
 

@@ -17,16 +17,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    //for javacv
-    lintOptions {
-        warning 'InvalidPackage'
-    }
-
-    packagingOptions {
-        exclude 'org/bytedeco/javacpp/**'
-        exclude '**/libav*.so'
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -50,6 +40,7 @@ dependencies {
     compile project(':database')
     compile project(':common')
     compile project(':ocr')
+    compile 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.ing.software:opencv-android:1.0.0'
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support:design:26.1.0'

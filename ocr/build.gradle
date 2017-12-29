@@ -18,8 +18,7 @@ android {
     }
 
     packagingOptions {
-        exclude 'org/bytedeco/javacpp/**'
-        exclude '**/libav*.so'
+        pickFirst 'protobuf.meta'
     }
 
     compileOptions {
@@ -37,7 +36,7 @@ dependencies {
 
     api project(':common')
     implementation 'com.ing.software:opencv-android:1.0.0'
-    implementation 'com.google.android.gms:play-services-vision:11.6.2'
+    implementation 'com.google.android.gms:play-services-vision:11.8.0'
 }
 
 task copyDataset(type: Copy){

@@ -82,6 +82,9 @@ public class BillViewer extends AppCompatActivity {
         });
     }
 
+    /** Dal Maso
+     * Initialize components
+     */
     public void initialize(){
         //Get data from parent view
         Intent intent = getIntent();
@@ -139,15 +142,19 @@ public class BillViewer extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
+
             case R.id.action_editTicket:
                 //Open Edit Ticket Activity
                 Intent editTicket = new Intent(context, com.example.nicoladalmaso.gruppo1.EditTicket.class);
                 editTicket.putExtra("ticketID", thisTicket.getID());
                 startActivityForResult(editTicket, TICKET_MOD);
-                return true;
+                break;
+
             default:
-                return super.onOptionsItemSelected(item);
+                finish();
+                break;
         }
+        return true;
     }
 
     /** Dal Maso
@@ -213,13 +220,10 @@ public class BillViewer extends AppCompatActivity {
      * @param id the id of the TicketEntity in the db
      */
     private void cropPhoto(long id) {
-        DB=new DataManager(getApplicationContext());
         TicketEntity ticket = DB.getTicket((int) id);
         Uri toCropUri = ticket.getFileUri();
-        File originalFile =new File(toCropUri.toString().substring(7)+"orig");
-        Log.d("toCropUri",toCropUri.toString());
+        File originalFile = new File(toCropUri.toString().substring(7)+"orig");
         Uri originalUri=Uri.fromFile(originalFile);
-        Log.d("originalUri",originalUri.toString());
         CropImage.activity(originalUri)
                 .setOutputUri(toCropUri).start(this);
         ticket.setFileUri(toCropUri);
