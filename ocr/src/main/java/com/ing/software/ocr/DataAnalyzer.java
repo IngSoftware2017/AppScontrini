@@ -1,13 +1,17 @@
 package com.ing.software.ocr;
 
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
 
 import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
+import com.ing.software.common.Ref;
+import com.ing.software.ocr.OcrObjects.Block;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
 import com.ing.software.ocr.OcrObjects.RawText;
@@ -462,4 +466,32 @@ public class DataAnalyzer {
             return dataSearch;
 
     }
+
+    /**
+     * Get the most likely language of ticket.
+     * @param blockList all the Blocks of ticket.
+     * @return language.
+     *
+     * @author Riccardo Zaglia
+     */
+    static String getTicketLanguage(List<Block> blockList) {
+        Map<String, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
+        String bestLang = "";
+        double bestScore = 0;
+        for (Block b : blockList) {
+            String lang = b.lang();
+            double area = b.area();
+            Ref<Double> score = accumulator.get(lang);
+            if (score != null)
+                score.value += area;
+            else
+                score = accumulator.put(lang, new Ref<>(area));
+            if (score.value > bestScore) {
+                bestScore = score.value;
+                bestLang = lang;
+            }
+        }
+        return bestLang;
+    }
+
 }

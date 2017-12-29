@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.ing.software.test.opencvtestapp"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -34,13 +34,14 @@ dependencies {
 
     implementation project(':ocr')
     implementation 'com.ing.software:opencv-android:1.0.0'
+    implementation 'com.google.android.gms:play-services-vision:11.8.0'
 }
 
-task copyDataset(type: Copy){
-    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
-        exclude '**/desktop.ini' //desktop.ini files break AssetManager
-    }
-    into "${projectDir}/src/main/assets"
-}
-
-tasks.preBuild.dependsOn('copyDataset')
+//task copyDataset(type: Copy){
+//    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
+//        exclude '**/desktop.ini' //desktop.ini files break AssetManager
+//    }
+//    into "${projectDir}/src/main/assets"
+//}
+//
+//tasks.preBuild.dependsOn('copyDataset')

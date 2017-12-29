@@ -30,9 +30,9 @@ public class ImagePreprocessorTests {
 
     @Test
     public void findBiggestContourTest() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        ImagePreprocessor ip = new ImagePreprocessor(getBitmap(0));
-        Mat img = getField(ip, "srcImg");
+        //Context appContext = InstrumentationRegistry.getTargetContext();
+        //ImagePreprocessor ip = new ImagePreprocessor(getBitmap(0));
+        //Mat img = getField(ip, "srcImg");
         //invoke(IP_CLASS, "findBiggestContours", img);
     }
 }

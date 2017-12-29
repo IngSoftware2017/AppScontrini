@@ -26,39 +26,39 @@ public class OcrInstrumentedTests {
 
     @Test
     public void ocrMainTest() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        final Semaphore sem = new Semaphore(0);
-        int imgsTot = getTotImgs();
-
-        OcrManager analyzer = new OcrManager();
-
-        int c = 0;
-        int TIMEOUT = 60; // 1 min
-        while (analyzer.initialize(appContext) != 0 && c < TIMEOUT) {
-            Thread.sleep(1000); // 1 sec
-            c++;
-        }
-
-        if (c < TIMEOUT) {
-            for (int i = 0; i < imgsTot; i++) {
-                final int idx = i;
-                final Ticket target = null; //todo: initialize
-                Bitmap photo = getBitmap(i);
-                if (photo != null) {
-                    ImagePreprocessor preproc = new ImagePreprocessor(photo);
-                    preproc.findTicket(false, err -> {
-                        analyzer.getTicket(preproc, ticket -> {
-
-                            //todo: compare Ticket to dataset
-                            //assertEquals(target, ticket);
-
-                            sem.release();
-                            System.out.println("Done img " + String.valueOf(idx));
-                        });
-                    });
-                }
-                sem.acquire();
-            }
-        }
+//        Context appContext = InstrumentationRegistry.getTargetContext();
+//        final Semaphore sem = new Semaphore(0);
+//        int imgsTot = getTotImgs();
+//
+//        OcrManager analyzer = new OcrManager();
+//
+//        int c = 0;
+//        int TIMEOUT = 60; // 1 min
+//        while (analyzer.initialize(appContext) != 0 && c < TIMEOUT) {
+//            Thread.sleep(1000); // 1 sec
+//            c++;
+//        }
+//
+//        if (c < TIMEOUT) {
+//            for (int i = 0; i < imgsTot; i++) {
+//                final int idx = i;
+//                final Ticket target = null; //todo: initialize
+//                Bitmap photo = getBitmap(i);
+//                if (photo != null) {
+//                    ImagePreprocessor preproc = new ImagePreprocessor(photo);
+//                    preproc.findTicket(false, err -> {
+//                        analyzer.getTicket(preproc, ticket -> {
+//
+//                            //todo: compare Ticket to dataset
+//                            //assertEquals(target, ticket);
+//
+//                            sem.release();
+//                            System.out.println("Done img " + String.valueOf(idx));
+//                        });
+//                    });
+//                }
+//                sem.acquire();
+//            }
+//        }
     }
 }

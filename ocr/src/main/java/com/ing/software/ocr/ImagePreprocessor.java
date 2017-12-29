@@ -89,7 +89,7 @@ public class ImagePreprocessor {
     private static final int MED_SZ = 7; // must be odd
 
     //Enclose border thickness
-    private static final int BORD_THICK = 2;
+    private static final int MRG_THICK = 2;
 
     //Adaptive threshold:
     private static final int THR_WIN_SZ = 75; // window size. must be odd
@@ -109,6 +109,9 @@ public class ImagePreprocessor {
     // factor that determines maximum distance of detected contour from rectangle
     //private static final double polyMaxErrMul = 0.02;
     private static final int POLY_MAX_ERR = 50;
+
+    // margin for OCR analysis
+    private static final double MARGIN_MUL_OCR = 0.05;
 
     // Score values
     private static final double SCORE_AREA_MUL = 0.001;
@@ -181,7 +184,7 @@ public class ImagePreprocessor {
         float aspectRatio = (float)img.rows() / img.cols();
         Size size = aspectRatio > 1 ? new Size(SHORT_SIDE, (int)(SHORT_SIDE * aspectRatio))
                 : new Size((int)(SHORT_SIDE / aspectRatio), SHORT_SIDE);
-        Mat bgrResized = new Mat(size, CV_8UC4);
+        Mat bgrResized = new Mat();
         resize(img, bgrResized, size);
         return bgrResized;
     }
@@ -244,8 +247,7 @@ public class ImagePreprocessor {
      * @param imgSwap in-out swap of B&W Mat. Not null.
      */
     private static void enclose(Swap<Mat> imgSwap) {
-        copyMakeBorder(imgSwap.first, imgSwap.swap(),
-                BORD_THICK, BORD_THICK, BORD_THICK, BORD_THICK, BORDER_CONSTANT);
+        copyMakeBorder(imgSwap.first, imgSwap.swap(), MRG_THICK, MRG_THICK, MRG_THICK, MRG_THICK, BORDER_CONSTANT);
     }
 
     /**
@@ -375,7 +377,7 @@ public class ImagePreprocessor {
         }
 
         return ((double)Collections.max(range(0, SECTORS).map(i ->
-                new Scored<>(accumulator[i], i)).toList()).obj + 0.5) * 180 / SECTORS - 90;
+                new Scored<>(accumulator[i], i)).toList()).obj() + 0.5) * 180. / SECTORS - 90.;
     }
 
     /**
@@ -396,7 +398,7 @@ public class ImagePreprocessor {
 
         //find index of point closer to top-left corner of image (using taxicab distance).
         int topLeftIdx = Collections.min(Stream.of(newRect.toList()).indexed().map(ip ->
-                new Scored<>(ip.getSecond().x + ip.getSecond().y, ip.getFirst())).toList()).obj;
+                new Scored<>(ip.getSecond().x + ip.getSecond().y, ip.getFirst())).toList()).obj();
 
         //shift verts by topLeftIdx
         //NB: sublist creates a view, not a copy.
@@ -434,10 +436,13 @@ public class ImagePreprocessor {
      * @param points in-out Mat of points to scale. Not null.
      * @param srcSize Size of source image. Not null.
      * @param dstSize Size of destination image. Not null.
+     * @return scaled Mat of points.
      */
-    private static void scale(Mat points, Size srcSize, Size dstSize) {
-        multiply(points, new Scalar(srcSize.width / dstSize.width,
-                srcSize.height / dstSize.height), points);
+    private static MatOfPoint2f scale(MatOfPoint2f points, Size srcSize, Size dstSize) {
+        MatOfPoint2f newPts = new MatOfPoint2f();
+        multiply(points, new Scalar(dstSize.width / srcSize.width,
+                dstSize.height / srcSize.height), newPts);
+        return newPts;
     }
 
 //    private static Mat rotateMat(Mat rgba, double angle) {
@@ -447,11 +452,39 @@ public class ImagePreprocessor {
 //        return img;
 //    }
 
+    private static Mat undistort(Mat img, MatOfPoint2f corners, double marginMul) {
+        Mat dstImg = new Mat();
+        if (corners.rows() == 4) { // at this point "corners" should have always 4 points.
+            Size sz = getRectSizeSimple(corners.toList());
+            double m = marginMul * min(sz.width, sz.height);
+
+            MatOfPoint2f dstRect = new MatOfPoint2f( // counter-clockwise
+                    new Point(m, m),
+                    new Point(m, sz.height + m),
+                    new Point(sz.width + m, sz.height + m),
+                    new Point(sz.width + m, m));
+            Mat mtx = getPerspectiveTransform(corners, dstRect);
+            warpPerspective(img, dstImg, mtx, new Size(sz.width + 2 * m, sz.height + 2 * m));
+        }
+        return dstImg;
+    }
+
 
     //INSTANCE FIELDS:
 
     private Mat srcImg;
+    private Mat resized;
     private List<Point> corners;
+
+
+    //PACKAGE PRIVATE:
+
+    synchronized Bitmap undistortForOCR() {
+        if (corners == null || srcImg == null || resized == null)
+            return null;
+        return matToBitmap(undistort(resized, scale(new MatOfPoint2f(corners.toArray(new Point[4])),
+                srcImg.size(), resized.size()), MARGIN_MUL_OCR));
+    }
 
 
     //PUBLIC:
@@ -502,7 +535,7 @@ public class ImagePreprocessor {
                     callback.accept(Collections.singletonList(TicketError.INVALID_STATE));
                     return;
                 }
-                Mat resized = downScaleRgba(srcImg);
+                resized = downScaleRgba(srcImg);
                 Swap<Mat> graySwap = new Swap<>(() -> new Mat(resized.size(), CV_8UC1));
                 prepareBinaryImg(graySwap, resized);
                 Mat binary = graySwap.first.clone();
@@ -515,29 +548,27 @@ public class ImagePreprocessor {
                         findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS)) {
                     double angle = 0;
 
-                    MatOfPoint2f rect = findPolySimple(ctrPair.obj);
+                    MatOfPoint2f rect = findPolySimple(ctrPair.obj());
                     if (!quick) {
                         // find Hough lines of ticket text
                         graySwap.first = edges.clone();
-                        removeBackground(graySwap, ctrPair.obj);
+                        removeBackground(graySwap, ctrPair.obj());
                         angle = predominantAngle(houghLines(graySwap));
 
                         if (rect.rows() == 4)// fix orientation of already found rectangle
                             rect = orderRectCorners(rect, angle, resized.size());
                         else { // find rotated bounding box of contour
-                            rect = rotatedBoundingBox(ctrPair.obj, angle, resized.size());
+                            rect = rotatedBoundingBox(ctrPair.obj(), angle, resized.size());
                         }
                         //todo use RANSAC to find undistort transform matrix
                     }
-                    candidates.add(new Scored<>(0.0, new Pair<>(rect, angle)));
+                    candidates.add(new Scored<>(0., new Pair<>(rect, angle)));
                 }
                 //todo assign score and use Collections.max
-                Pair<MatOfPoint2f, Double> winner = candidates.get(0).obj;
+                Pair<MatOfPoint2f, Double> winner = candidates.get(0).obj();
 
                 //scale up the the corners to match the scale of the original image
-                scale(winner.first, srcImg.size(), resized.size());
-
-                corners = winner.first.toList();
+                corners = scale(winner.first, resized.size(), srcImg.size()).toList();
 
                 List<TicketError> errors = new ArrayList<>();
                 if (corners.size() != 4)
@@ -582,21 +613,7 @@ public class ImagePreprocessor {
     public synchronized Bitmap undistort(double marginMul) {
         if (corners == null || srcImg == null)
             return null;
-
-        Mat dstImg = srcImg.clone();
-        if (corners.size() == 4) { // at this point "corners" should have always 4 points.
-            Size sz = getRectSizeSimple(corners);
-            double m = marginMul * min(sz.width, sz.height);
-
-            MatOfPoint2f dstRect = new MatOfPoint2f( // counter-clockwise
-                    new Point(m, m),
-                    new Point(m, sz.height + m),
-                    new Point(sz.width + m, sz.height + m),
-                    new Point(sz.width + m, m));
-            Mat mtx = getPerspectiveTransform(new MatOfPoint2f(corners.toArray(new Point[4])), dstRect);
-            warpPerspective(srcImg, dstImg, mtx, new Size(sz.width + 2 * m, sz.height + 2 * m));
-        }
-        return matToBitmap(dstImg);
+        return matToBitmap(undistort(srcImg, new MatOfPoint2f(corners.toArray(new Point[4])), marginMul));
     }
 
 

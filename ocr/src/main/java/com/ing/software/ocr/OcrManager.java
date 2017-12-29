@@ -15,8 +15,6 @@ import com.annimon.stream.function.Consumer;
 import static com.ing.software.ocr.AmountComparator.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
 
-/*
-*/
 /**
  * Class to control ocr analysis
  * <p> This class is thread-safe. </p>
@@ -66,7 +64,7 @@ public class OcrManager {
                 if (!operative)
                     return;
                 long startTime = System.nanoTime();
-                Bitmap bm = preprocessor.undistort(0.05);
+                Bitmap bm = preprocessor.undistortForOCR();
                 OcrResult result = analyzer.analyze(bm);
                 ticketCb.accept(getTicketFromResult(result));
                 long endTime = System.nanoTime();
