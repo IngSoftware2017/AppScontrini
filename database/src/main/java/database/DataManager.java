@@ -161,6 +161,17 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
+     * Return a list of the missions done by a specific Person
+     *
+     * @param id identifier of the Person
+     * @return List<MissionEntity>
+     */
+    public List<MissionEntity> getMissionsForPerson(long id){
+        return database.ticketDao().getMissionsForPerson(id);
+    }
+
+    /**
+     * @author Marco Olivieri
      * Return a specific Ticket from a given ID
      *
      * @param id identifier of the Ticket

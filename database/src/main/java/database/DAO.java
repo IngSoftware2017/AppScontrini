@@ -62,7 +62,7 @@ public interface DAO {
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.MISSION_TABLE_NAME+" WHERE "+ Constants.MISSION_PRIMARY_KEY_NAME+" = :id")
-    long deleteMission(long id);
+    int deleteMission(long id);
 
     /**
      * @author Marco Olivieri
@@ -71,14 +71,14 @@ public interface DAO {
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.PERSON_TABLE_NAME+" WHERE "+ Constants.PERSON_PRIMARY_KEY_NAME+" = :id")
-    long deletePerson(long id);
+    int deletePerson(long id);
 
     /**Deletes a TicketEntity from the database
      * @param id int the ID of the TicketEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.TICKET_TABLE_NAME+" WHERE "+ Constants.TICKET_PRIMARY_KEY_NAME+" = :id")
-    long deleteTicket(long id);
+    int deleteTicket(long id);
 
     //UPDATE
 
@@ -90,7 +90,7 @@ public interface DAO {
      * @return the number of updated entities
      */
     @Update
-    long updateTicket(TicketEntity ticketEntity);
+    int updateTicket(TicketEntity ticketEntity);
 
     /**
      * @author Marco Olivieri
@@ -100,7 +100,7 @@ public interface DAO {
      * @return the number of updated entities
      */
     @Update
-    long updateMission(MissionEntity missionEntity);
+    int updateMission(MissionEntity missionEntity);
 
     /**
      * @author Marco Olivieri
@@ -110,7 +110,7 @@ public interface DAO {
      * @return the number of updated entities
      */
     @Update
-    long updatePerson(PersonEntity personEntity);
+    int updatePerson(PersonEntity personEntity);
 
     //SELECT ALL
 
@@ -140,10 +140,19 @@ public interface DAO {
     /**
     *Gets all the TicketEnt of a MissionEntity
     *@param id long, the id of the MissionEntity
-    *@return List<MissionEntity> not null (at least of 0 size) which contains all the tickets for the given mission id 
+    *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets for the given mission id
     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
     public List<TicketEntity> getTicketsForMission(long id);
+
+    /**
+     * @author Marco Olivieri
+     * Gets all the Missions done by a specific Person
+     * @param id long, the id of the Person
+     * @return List<MissionEntity> not null (at least of 0 size) which contains all the missions for the given person id
+     */
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+" = :id")
+    public List<MissionEntity> getMissionsForPerson(long id);
 
     /**
     *Executes a SELECT query for a specified TicketEntity id
