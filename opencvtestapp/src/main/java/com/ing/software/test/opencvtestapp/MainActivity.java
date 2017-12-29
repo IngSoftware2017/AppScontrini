@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
                 Semaphore sem = new Semaphore(0);
                 ip.findTicket(false, e -> sem.release());
                 sem.acquire();
-                Bitmap finalBm = invoke(ip, "undistortResized");
+                Bitmap finalBm = invoke(ip, "undistortForOCR");
                 //Bitmap finalBm = ip.undistort(0.05);
                 SparseArray<TextBlock> sparse = ocrEngine
                         .detect(new Frame.Builder().setBitmap(finalBm).build());

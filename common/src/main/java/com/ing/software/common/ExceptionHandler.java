@@ -11,7 +11,7 @@ import com.annimon.stream.function.Consumer;
 public class ExceptionHandler {
 
     @FunctionalInterface
-    public interface CheckedRunnable {
+    public interface ThrowableRunnable {
         void run() throws Exception;
     }
 
@@ -22,7 +22,15 @@ public class ExceptionHandler {
         this.handler = handler;
     }
 
-    public ExceptionHandler tryRun(CheckedRunnable runnable) {
+    /**
+     * Use as try or finally block.
+     * @param runnable code to be handled
+     * @return ExceptionHandler, to allow concatenation
+     */
+    public ExceptionHandler tryRun(ThrowableRunnable runnable) {
+        //I create a new disposable instance of ExceptionHandler so the information that an exception happened
+        // is limited to a single session of try-finally concatenation.
+        // The field "exceptionOccurred" of the original instance is never modified.
         ExceptionHandler excHdlr = new ExceptionHandler(handler);
         if (!exceptionOccurred) {
             try {

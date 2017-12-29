@@ -1,50 +1,61 @@
 package com.ing.software.ocr.OcrObjects;
 
-
-import android.graphics.Point;
+import com.ing.software.common.Lazy;
 import android.graphics.PointF;
-
 import com.annimon.stream.Stream;
 import com.google.android.gms.vision.text.Element;
 import com.google.android.gms.vision.text.Line;
-import com.google.android.gms.vision.text.Text;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class TextLine {
+import static com.ing.software.common.CommonUtils.*;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
 
-    private Line line;
-    private List<Word> childs;
+public class TextLine {
+    //private Line line;
+    private Lazy<List<Word>> words;
+    private Lazy<List<PointF>> corners;
+    private Lazy<String> textNoSpaces;
+    private Lazy<Double> height, width;
+    private Lazy<Double> density;
 
     public TextLine(Line line) {
-        this.line = line;
-        childs = new ArrayList<>();
-        for (Text txt : line.getComponents()) {
-            childs.add(new Word((Element)txt));
-        }
+        //this.line = line;
+        words = new Lazy<>(() -> Stream.of(line.getComponents())
+                .select(Element.class).map(Word::new).toList());
+        corners = new Lazy<>(() -> ptsToPtsF(asList(line.getCornerPoints())));
+        width =  new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(1)),
+                                             dist(corners().get(2), corners().get(3)))));
+        height = new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(3)),
+                                             dist(corners().get(1), corners().get(2)))));
+        //todo use 4 corners rectangle area
+        density = new Lazy<>(() -> (double)line.getValue().length() / width() / height());
+        textNoSpaces = new Lazy<>(() -> Stream.of(words()).reduce("", (str, w) -> str + w.text()));
     }
 
     public List<Word> words() {
-        return childs;
+        return words.get();
     }
 
-    public String textNoSpaces() {
-        StringBuilder sb = new StringBuilder();
-        for (Word w : childs) {
-            sb.append(w.text());
-        }
-        return sb.toString();
+    // for OpenCVTestApp
+    public List<PointF> corners() {
+        return corners.get();
+    }
+
+    public double width() {
+        return width.get();
+    }
+
+    public double height() {
+        return height.get();
     }
 
     public double density() {
-        return 0; //todo stub
+        return density.get();
     }
 
-    public List<PointF> corners() {
-        return Stream.of(line.getCornerPoints()).map(p -> new PointF(p.x, p.y)).toList();
+    public String textNoSpaces() {
+        return textNoSpaces.get();
     }
 
 }

@@ -17,7 +17,6 @@ import org.opencv.core.Rect; // resolve conflict
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.opencv.android.Utils.bitmapToMat;
@@ -26,6 +25,7 @@ import static org.opencv.core.CvType.*;
 import static org.opencv.imgproc.Imgproc.*;
 import static com.annimon.stream.Stream.*;
 import static java.lang.Math.*;
+import static java.util.Collections.*;
 
 /**
  * Class used to process an image of a ticket.
@@ -310,7 +310,7 @@ public class ImagePreprocessor {
     private static void removeBackground(Swap<Mat> imgSwap, MatOfPoint contour) {
         Mat binary = imgSwap.first.clone();
         imgSwap.first.setTo(new Scalar(0));
-        fillPoly(imgSwap.first, Collections.singletonList(contour), new Scalar(255));
+        fillPoly(imgSwap.first, singletonList(contour), new Scalar(255));
         erode(imgSwap, ERODE_KER_DATA[0].length + 1);
         bitwise_and(binary, imgSwap.first, imgSwap.swap());
     }
@@ -376,8 +376,8 @@ public class ImagePreprocessor {
             accumulator[min((int)((angle + PI / 2) * SECTORS / PI), SECTORS - 1)] += length;
         }
 
-        return ((double)Collections.max(range(0, SECTORS).map(i ->
-                new Scored<>(accumulator[i], i)).toList()).obj() + 0.5) * 180. / SECTORS - 90.;
+        return ((double)max(range(0, SECTORS).map(i -> new Scored<>(accumulator[i], i)).toList()).obj()
+                + 0.5) * 180. / SECTORS - 90.;
     }
 
     /**
@@ -397,8 +397,8 @@ public class ImagePreprocessor {
         Core.transform(srcRect, newRect, rotationMatrix);
 
         //find index of point closer to top-left corner of image (using taxicab distance).
-        int topLeftIdx = Collections.min(Stream.of(newRect.toList()).indexed().map(ip ->
-                new Scored<>(ip.getSecond().x + ip.getSecond().y, ip.getFirst())).toList()).obj();
+        int topLeftIdx = min(Stream.of(newRect.toList()).mapIndexed((i, p) ->
+                new Scored<>(p.x + p.y, i)).toList()).obj();
 
         //shift verts by topLeftIdx
         //NB: sublist creates a view, not a copy.
@@ -532,11 +532,11 @@ public class ImagePreprocessor {
             synchronized (this) { // make sure this code is not executed concurrently when findTicket
                                   // is called more than once consecutively
                 if (srcImg == null) {
-                    callback.accept(Collections.singletonList(TicketError.INVALID_STATE));
+                    callback.accept(singletonList(TicketError.INVALID_STATE));
                     return;
                 }
                 resized = downScaleRgba(srcImg);
-                Swap<Mat> graySwap = new Swap<>(() -> new Mat(resized.size(), CV_8UC1));
+                Swap<Mat> graySwap = new Swap<>(Mat::new);
                 prepareBinaryImg(graySwap, resized);
                 Mat binary = graySwap.first.clone();
                 toEdges(graySwap);

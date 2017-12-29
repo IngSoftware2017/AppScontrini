@@ -1,26 +1,31 @@
 package com.ing.software.ocr.OcrObjects;
 
-import android.graphics.Point;
 import android.graphics.PointF;
 
 import com.annimon.stream.Stream;
 import com.google.android.gms.vision.text.Element;
+import com.ing.software.common.Lazy;
 
-import java.util.Arrays;
 import java.util.List;
 
+import static com.ing.software.common.CommonUtils.ptsToPtsF;
+import static java.util.Arrays.asList;
+
 public class Word {
-    Element elem;
+    private Element elem;
+    private Lazy<List<PointF>> corners;
 
     public Word(Element element) {
         elem = element;
+        corners = new Lazy<>(() -> ptsToPtsF(asList(elem.getCornerPoints())));
     }
 
     public String text() {
         return elem.getValue();
     }
 
+    // for OpenCVTestApp
     public List<PointF> corners() {
-        return Stream.of(elem.getCornerPoints()).map(p -> new PointF(p.x, p.y)).toList();
+        return corners.get();
     }
 }
