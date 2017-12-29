@@ -2,6 +2,7 @@ package database;
 
 import android.content.Context;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -40,7 +41,9 @@ public class DataManager {
         return ticketEntity.getID();
     }
 
-    /** Adds a missionEntity into the database
+    /**
+     * @author Marco Olivieri
+     * Adds a missionEntity into the database
      * @param missionEntity MissionEntity not null, the entity to be inserted
      *                missionEntity.personID not null, must be an existing code
      * @return the id of the inserted missionEntity
@@ -50,7 +53,9 @@ public class DataManager {
         return missionEntity.getID();
     }
 
-    /** Executes the insert query.
+    /**
+     * @author Marco Olivieri
+     * Executes the insert query.
      * @param personEntity PersonEntity not null, the entity to be inserted
      * @return the id of the inserted personEntity
      */
@@ -69,6 +74,7 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
      * Deletes a mission from the database
      * @param id the id of the mission to be deleted
      * @return true if the mission is deleted, false otherwise
@@ -78,6 +84,7 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
      * Deletes a person from the db
      * @param id the id of the person to be deleted
      * @return true if the person is deleted, false otherwise
@@ -96,7 +103,9 @@ public class DataManager {
          return database.ticketDao().updateTicket(ticketEntity)>0; //true if at least a ticketEntity is updated
     }
 
-    /**Updates values of the missionEntity with the same id in the database. All fields (except ID) are updated
+    /**
+     * @author Marco Olivieri
+     * Updates values of the missionEntity with the same id in the database. All fields (except ID) are updated
      * @param missionEntity MissionEntity not null
      *                missionEntity.getPersonID() must be a valid PersonEntity ID
      * @return true if the update is executed, false otherwise (i.e. invalid ID)
@@ -105,7 +114,9 @@ public class DataManager {
          return database.ticketDao().updateMission(missionEntity)>0;
     }
 
-    /**Updates values of the PersonEntity with the same id in the database. All fields (except ID) are updated
+    /**
+     * @author Marco Olivieri
+     * Updates values of the PersonEntity with the same id in the database. All fields (except ID) are updated
      * @param personEntity PersonEntity not null
      * @return true if the update is executed, false otherwise (i.e. invalid ID)
      */
@@ -149,6 +160,7 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
      * Return a specific Ticket from a given ID
      *
      * @param id identifier of the Ticket
@@ -166,6 +178,30 @@ public class DataManager {
      */
     public PersonEntity getPerson(long id){
         return database.ticketDao().getPerson(id);
+    }
+
+    /**
+     * Return a specific Mission from a given ID
+     *
+     * @param id identifier of the Mission
+     * @return MissionEntity
+     */
+    public MissionEntity getMission(long id){
+        return database.ticketDao().getMission(id);
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Gets the total amount of all tickets associate to a specific Mission
+     * @param id
+     * @return
+     */
+    public BigDecimal getTotalAmountForMission(long id){
+        List<TicketEntity> tickets = getTicketsForMission(id);
+        BigDecimal totAmount = BigDecimal.ZERO;
+        for(int i=0; i<tickets.size(); i++)
+            totAmount = totAmount.add(tickets.get(i).getAmount());
+        return totAmount;
     }
 
 //    /**

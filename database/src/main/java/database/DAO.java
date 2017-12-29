@@ -55,14 +55,18 @@ public interface DAO {
 
     //DELETE
 
-    /**Deletes a MissionEntity from the database
+    /**
+     * @author Marco Olivieri
+     * Deletes a MissionEntity from the database
      * @param id long the ID of the MissionEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.MISSION_TABLE_NAME+" WHERE "+ Constants.MISSION_PRIMARY_KEY_NAME+" = :id")
     long deleteMission(long id);
 
-    /**Deletes a PersonEntity from the database
+    /**
+     * @author Marco Olivieri
+     * Deletes a PersonEntity from the database
      * @param id long the ID of the PersonEntity to be deleted
      * @return the number of deleted entities.
      */
@@ -88,7 +92,9 @@ public interface DAO {
     @Update
     long updateTicket(TicketEntity ticketEntity);
 
-    /**Updates the given MissionEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+    /**
+     * @author Marco Olivieri
+     * Updates the given MissionEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param missionEntity MissionEntity not null, the entity to be inserted
      *               missionEntity.personID not null, must be an existing code
      * @return the number of updated entities
@@ -96,7 +102,9 @@ public interface DAO {
     @Update
     long updateMission(MissionEntity missionEntity);
 
-    /**Updates the given PersonEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+    /**
+     * @author Marco Olivieri
+     * Updates the given PersonEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param personEntity PersonEntity not null, the entity to be inserted
      *               personEntity.name not null
      * @return the number of updated entities
@@ -144,6 +152,16 @@ public interface DAO {
     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY_NAME+" =:id")
     public TicketEntity getTicket(long id);
+
+    /**
+     * @author Marco Olivieri
+     * Executes a SELECT of a specific mission from id
+     *
+     * @param id long, identifier of the mission
+     * @return MissionEntity
+     */
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME +" WHERE "+Constants.MISSION_PRIMARY_KEY_NAME+" =:id")
+    public MissionEntity getMission(long id);
 
     /**
      * Executes a SELECT of a specific person from id
