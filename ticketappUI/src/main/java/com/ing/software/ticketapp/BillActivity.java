@@ -129,9 +129,14 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         switch (item.getItemId()) {
             case R.id.action_deleteMission:
                 deleteMission();
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+                break;
         }
+        return true;
     }
 
     /** Dal Maso
@@ -211,14 +216,14 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         //Positive button
         toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Intent startMissionView = new Intent(context, MainActivity.class);
-                startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 List<TicketEntity> list = DB.getTicketsForMission(missionID);
                 for(int i = 0; i < list.size(); i++){
                     DB.deleteTicket((int) list.get(i).getID());
                 }
                 DB.deleteMission(missionID);
-                context.startActivity(startMissionView);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
         //Negative button
@@ -381,9 +386,12 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";
         File file = new File(root, fname);
+        File originalPhoto = new File(root,fname+"orig");
         final Uri uri=Uri.fromFile(file);
         if (file.exists())
             file.delete();
+        if(originalPhoto.exists())
+            originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
 
@@ -393,6 +401,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
+            FileOutputStream outOriginal = new FileOutputStream(originalPhoto);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
+            outOriginal.flush();
+            outOriginal.close();
             Intent intent = new Intent(BillActivity.this, TestService.class);
             intent.putExtra("receiver", mReceiver);
             intent.putExtra("image", fname);
@@ -404,7 +416,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     }
 
     /**PICCOLO
-     * Metodo che "ripulisce" lo schermo dalle immagini
+     * Method that clears the screen from the images
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
@@ -458,13 +470,12 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     }
 
     /**PICCOLO_Edit by Dal Maso
-     * Metodo che cancella permette all'utente di ridimensionare la foto
-     * @param toCrop l'indice della foto di cui fire il resize
-     * @param path percorso della foto
+     * Method that lets the user crop the photo
+     * @param toCrop photo's index
+     * @param path path of the photo
      */
     public void cropFile(int toCrop, String path){
         Log.d("Crop","Success");
-        boolean result = false;
         File directory = new File(path);
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);

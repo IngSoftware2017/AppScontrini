@@ -78,7 +78,10 @@ public class BillViewer extends AppCompatActivity {
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
         ticketShop = thisTicket.getShop();
-        ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
+        if (thisTicket.getAmount() != null)
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
+        else
+            ticketAmount = getString(R.string.no_amount);
 
         //Title
         setTitle(ticketTitle);
@@ -126,15 +129,19 @@ public class BillViewer extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
+
             case R.id.action_editTicket:
                 //Open Edit Ticket Activity
                 Intent editTicket = new Intent(context, EditTicket.class);
                 editTicket.putExtra("ticketID", thisTicket.getID());
                 startActivityForResult(editTicket, TICKET_MOD);
-                return true;
+                break;
+
             default:
-                return super.onOptionsItemSelected(item);
+                finish();
+                break;
         }
+        return true;
     }
 
     /** Dal Maso
@@ -176,8 +183,9 @@ public class BillViewer extends AppCompatActivity {
                 //Get the ticket to delete
                 toDelete = thisTicket.getFileUri().toString().substring(7);
                 final File ticketDelete = new File(toDelete);
+                final File ticketDeleteOriginal = new File (toDelete+"orig");
                 Log.d("TicketID", ""+ticketId);
-                if(DB.deleteTicket(ticketId) && ticketDelete.delete()){
+                if(DB.deleteTicket(ticketId) && ticketDelete.delete() && ticketDeleteOriginal.delete()){
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
@@ -195,22 +203,22 @@ public class BillViewer extends AppCompatActivity {
     }//deleteTicket
 
     /**PICCOLO
-     * Method that lets the user crop and/or rotate the photo
+     * Method that lets the user crop and/or rotate the original photo
      * @param id the id of the TicketEntity in the db
      */
     private void cropPhoto(long id) {
-        DB=new DataManager(getApplicationContext());
         TicketEntity ticket = DB.getTicket((int) id);
         Uri toCropUri = ticket.getFileUri();
-        CropImage.activity(toCropUri)
+        File originalFile = new File(toCropUri.toString().substring(7)+"orig");
+        Uri originalUri=Uri.fromFile(originalFile);
+        CropImage.activity(originalUri)
                 .setOutputUri(toCropUri).start(this);
         ticket.setFileUri(toCropUri);
-        //TODO: manage the refresh of the ticket
+
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
         imgView.setImageBitmap(bitmap);
-       //TODO: implement the method using the origial file instead
     }//cropPhoto
 
     //Dal Maso, manage back button

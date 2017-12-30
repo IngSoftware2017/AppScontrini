@@ -99,11 +99,13 @@ public class EditTicket extends AppCompatActivity {
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 //finish();
-                return true;
+                break;
 
             default:
-                return super.onOptionsItemSelected(item);
+                finish();
+                break;
         }
+        return true;
     }
 
     private void setTicketValues(){

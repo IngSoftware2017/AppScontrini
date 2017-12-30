@@ -23,19 +23,11 @@ android {
         }
     }
 
-    lintOptions {
-        warning 'InvalidPackage'
-    }
-
-    packagingOptions {
-        exclude 'org/bytedeco/javacpp/**'
-        exclude '**/libav*.so'
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     splits {
         abi {
             enable true
@@ -61,6 +53,7 @@ dependencies {
     })
     implementation project (':common')
     implementation 'com.ing.software:opencv-android:1.0.0'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.5.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'

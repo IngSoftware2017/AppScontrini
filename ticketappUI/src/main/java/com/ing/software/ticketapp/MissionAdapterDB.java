@@ -78,7 +78,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 Log.d("MissionName", name);
                 startMissionView.putExtra("missionName", name);
                 startMissionView.putExtra("missionID", pos);
-                context.startActivity(startMissionView);
+                ((MissionActivity)context).startActivityForResult(startMissionView, 1);
             }//onClick
         });
 

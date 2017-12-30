@@ -33,4 +33,12 @@
     <string name="alert_invalid_amount_title">Error</string>
     <string name="alert_invalid_amount_mess">Invalid amount</string>
     <string name="authority">com.ing.software.ticketapp.fileprovider</string>
+    <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + iniziare</string>
+    <string name="newPerson">Nuova persona</string>
+    <string name="titlePeople">Persone</string>
+    <string name="toast_missionNoName">Nome missione mancante</string>
+    <string name="toast_personNoName">Nome missione mancante</string>
+    <string name="toast_missionNoLocation">Nome persona mancante</string>
+    <string name="toast_personNoLastName">Cognome persona mancante</string>
+    <string name="no_amount">No amount found</string>
 </resources>
