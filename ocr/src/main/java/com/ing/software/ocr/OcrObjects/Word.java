@@ -2,7 +2,6 @@ package com.ing.software.ocr.OcrObjects;
 
 import android.graphics.PointF;
 
-import com.annimon.stream.Stream;
 import com.google.android.gms.vision.text.Element;
 import com.ing.software.common.Lazy;
 
@@ -14,14 +13,21 @@ import static java.util.Arrays.asList;
 public class Word {
     private Element elem;
     private Lazy<List<PointF>> corners;
+    private Lazy<String> textOnlyAlpha;
 
     public Word(Element element) {
         elem = element;
         corners = new Lazy<>(() -> ptsToPtsF(asList(elem.getCornerPoints())));
+        textOnlyAlpha = new Lazy<>(() -> text().replaceAll("[^A-Z]", ""));
     }
 
     public String text() {
-        return elem.getValue();
+        return elem.getValue().toUpperCase();
+    }
+
+
+    public String textOnlyAlpha() {
+        return textOnlyAlpha.get();
     }
 
     // for OpenCVTestApp

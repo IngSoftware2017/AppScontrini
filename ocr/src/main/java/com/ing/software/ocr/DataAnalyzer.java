@@ -493,5 +493,4 @@ public class DataAnalyzer {
         }
         return bestLang;
     }
-
 }

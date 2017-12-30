@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int DEF_THICK = 20;
     private static final int BLOCK_THICK = 7;
     private static final int LINE_THICK = 4;
-    private static final double FONT_SIZE = 0.5;
+    private static final double FONT_SIZE = 0.6;
 
     private static final Scalar BLUE = new Scalar(0,0,255, 255);
     private static final Scalar PURPLE = new Scalar(255,0,255, 255);
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
             for (TextLine l : b.lines()) {
                 for (Word w : l.words()) {
                     PointF blPt = w.corners().get(3); // bottom-right point (clockwise from top-left)
-                    putText(img, w.text(), new Point(blPt.x + 2, blPt.y - 2),
+                    putText(img, w.text().toUpperCase(), new Point(blPt.x + 2, blPt.y - 2),
                             FONT_HERSHEY_SIMPLEX, FONT_SIZE, WHITE);
                 }
             }
