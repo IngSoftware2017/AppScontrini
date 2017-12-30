@@ -21,17 +21,16 @@ public class Word {
         textOnlyAlpha = new Lazy<>(() -> text().replaceAll("[^A-Z]", ""));
     }
 
+    // for OpenCVTestApp
+    public List<PointF> corners() {
+        return corners.get();
+    }
+
     public String text() {
         return elem.getValue().toUpperCase();
     }
 
-
     public String textOnlyAlpha() {
         return textOnlyAlpha.get();
-    }
-
-    // for OpenCVTestApp
-    public List<PointF> corners() {
-        return corners.get();
     }
 }

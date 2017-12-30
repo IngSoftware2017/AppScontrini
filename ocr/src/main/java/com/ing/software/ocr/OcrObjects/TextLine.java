@@ -12,7 +12,7 @@ import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
 public class TextLine {
-    //private Line line;
+    private Line line;
     private Lazy<List<Word>> words;
     private Lazy<List<PointF>> corners;
     private Lazy<Double> height, width;
@@ -20,7 +20,7 @@ public class TextLine {
     private Lazy<String> textNoSpaces, textOnlyAlpha;
 
     public TextLine(Line line) {
-        //this.line = line;
+        this.line = line;
         words = new Lazy<>(() -> Stream.of(line.getComponents())
                 .select(Element.class).map(Word::new).toList());
         corners = new Lazy<>(() -> ptsToPtsF(asList(line.getCornerPoints())));
@@ -64,5 +64,4 @@ public class TextLine {
     public String textOnlyAlpha() {
         return textOnlyAlpha.get();
     }
-
 }

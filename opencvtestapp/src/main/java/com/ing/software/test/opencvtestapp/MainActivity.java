@@ -19,6 +19,7 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.ing.software.common.*;
+import com.ing.software.ocr.DataAnalyzer;
 import com.ing.software.ocr.ImagePreprocessor;
 import com.ing.software.ocr.OcrObjects.Block;
 import com.ing.software.ocr.OcrObjects.TextLine;
@@ -334,7 +335,10 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < sparse.size(); i++) {
                     blocks.add(new Block(sparse.valueAt(i)));
                 }
+                //String lang = invoke(DataAnalyzer.class, "getTicketLanguage", blocks);
+                //asyncSetTitle(String.valueOf(imageIdx) + " - " + lang);
                 showMat(drawOcrResult(finalBm, blocks));
+
 
                 imageIdx++;
             }

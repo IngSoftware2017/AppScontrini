@@ -30,10 +30,6 @@ public class Block {
         return corners.get();
     }
 
-    public String lang() {
-        return tb.getLanguage();
-    }
-
     public Rect box() {
         return tb.getBoundingBox();
     }
