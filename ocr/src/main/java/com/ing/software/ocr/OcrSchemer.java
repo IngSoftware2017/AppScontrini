@@ -88,7 +88,7 @@ class OcrSchemer {
     }
 
     /**
-     * Analizza una lista di RawTexts e associa a ognuno un tag per indicare se è intestazione,
+     * Organize a list of rawTexts adding tags according to its position
      * lista prodotti, lista prezzi, conclusione. Associa un double che rappresenta la sua posizione (in n/10)
      * all'interno del proprio blocco. Ad esempio se ho k prodotti, il primo inizia (media) in y=10, l'ultimo finisce in
      * y = 50, un prodotto con media 20 avrà posizione 20*10/(50-10)=5.
@@ -118,11 +118,18 @@ class OcrSchemer {
         missTagger(textList);
         Collections.sort(textList);
         int endingIntroduction = densitySnake(textList, INTRODUCTION_TAG);
-        intervalTagger(textList, INTRODUCTION_TAG, 0, endingIntroduction);
+        if (endingIntroduction != -1)
+            intervalTagger(textList, INTRODUCTION_TAG, 0, endingIntroduction);
+        else
+            endingIntroduction = 0;
         List<RawText> reversedTextList = new ArrayList<>(textList);
         Collections.reverse(reversedTextList);
-        int startingConclusion = textList.size() - densitySnake(textList, CONCLUSION_TAG);
-        intervalTagger(textList, CONCLUSION_TAG, startingConclusion, textList.size()-1);
+        int startingConclusion = densitySnake(reversedTextList, CONCLUSION_TAG);
+        if (startingConclusion != -1) {
+            startingConclusion = textList.size() - startingConclusion - 1;
+            intervalTagger(textList, CONCLUSION_TAG, startingConclusion, textList.size() - 1);
+        } else
+            startingConclusion = textList.size() - 1;
         intervalTagger(textList, PRODUCTS_TAG, PRODUCTS_TAG, PRICES_TAG, endingIntroduction + 1, startingConclusion -1);
     }
 
@@ -133,7 +140,7 @@ class OcrSchemer {
      */
     static private int getPosition(RawText text) {
         int width = text.getRawImage().getWidth();
-        return (int)(double)text.getRect().centerX()*3/width;
+        return Math.round(text.getRect().centerX())*3/width;
     }
 
     /**
@@ -248,8 +255,13 @@ class OcrSchemer {
         if (end < start)
             return;
         for (int i = start; i <= end; ++i) {
-            removeOldTags(textList.get(i));
-            textList.get(i).addTag(tag);
+            RawText text = textList.get(i);
+            removeOldTags(text);
+            text.addTag(tag);
+            text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
+            OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
+                    "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+                    + "\nwith tag: " + tag);
         }
     }
 
@@ -260,13 +272,27 @@ class OcrSchemer {
         if (end < start)
             return;
         for (int i = start; i <= end; ++i) {
-            removeOldTags(textList.get(i));
-            if (textList.get(i).getTags().contains(LEFT_TAG))
-                textList.get(i).addTag(tagLeft);
-            else if (textList.get(i).getTags().contains(RIGHT_TAG))
-                textList.get(i).addTag(tagRight);
-            else
-                textList.get(i).addTag(tagCenter);
+            RawText text = textList.get(i);
+            removeOldTags(text);
+            if (text.getTags().contains(LEFT_TAG)) {
+                text.addTag(tagLeft);
+                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
+                OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
+                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+                        + "\nwith tag: " + tagLeft);
+            } else if (text.getTags().contains(RIGHT_TAG)) {
+                text.addTag(tagRight);
+                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
+                OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
+                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+                        + "\nwith tag: " + tagRight);
+            } else {
+                text.addTag(tagCenter);
+                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
+                OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
+                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+                        + "\nwith tag: " + tagCenter);
+            }
         }
     }
 
@@ -275,5 +301,16 @@ class OcrSchemer {
         text.removeTag(CONCLUSION_TAG);
         text.removeTag(PRODUCTS_TAG);
         text.removeTag(PRICES_TAG);
+    }
+
+    /**
+     * Trova posizione del text con formula: (text.centerY-start)/(end-start)
+     * @param text
+     * @param startPosition
+     * @param endPosition
+     * @return
+     */
+    private static double getTextBlockPosition(RawText text, float startPosition, float endPosition) {
+        return ((double)(text.getRect().centerY() - startPosition))/(endPosition - startPosition);
     }
 }

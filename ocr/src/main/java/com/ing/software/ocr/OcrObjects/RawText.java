@@ -73,6 +73,10 @@ public class RawText implements Comparable<RawText> {
         this.tag.removeTag(tag);
     }
 
+    public void setTagPosition(double position) {
+        tag.setPosition(position);
+    }
+
     /**
      * Retrieves probability that date is present in current text
      * @return probability that date is present
