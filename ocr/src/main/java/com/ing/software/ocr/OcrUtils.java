@@ -274,7 +274,7 @@ public class OcrUtils {
      * @param max maximum distance accepted
      * @return distance between two strings or the maximum value if it has been exceeded
      */
-    static int levDistanceWithMax(String S, String T, Integer max)
+    static int levDistance(String S, String T, Integer max)
     {
         if(S == null || T == null)
             return -1;
@@ -362,7 +362,7 @@ public class OcrUtils {
      * @param max maximum distance accepted
      * @return the slightest difference between strings and text
      */
-    public static int findSubstringWithMax(String text, String substring, Integer max)
+    public static int findSubstring(String text, String substring, Integer max)
     {
         if(text == null || substring == null || text.length() == 0)
             return -1;
@@ -384,7 +384,7 @@ public class OcrUtils {
         int start=0;
         for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
             String token = text_w_o_space.substring( start, finish);
-            int distanceNow = levDistanceWithMax(token.toUpperCase(), substring.toUpperCase(), max);
+            int distanceNow = levDistance(token.toUpperCase(), substring.toUpperCase(), max);
             if (distanceNow < minDistance)
                 minDistance = distanceNow;
             //Lucky case

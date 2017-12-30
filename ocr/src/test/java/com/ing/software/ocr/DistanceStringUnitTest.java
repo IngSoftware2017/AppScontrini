@@ -122,7 +122,7 @@ public class DistanceStringUnitTest {
         String b = "Totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("levDistanceWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b,max);
 
@@ -136,7 +136,7 @@ public class DistanceStringUnitTest {
         String b = "Totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("levDistanceWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b,max);
 
@@ -150,7 +150,7 @@ public class DistanceStringUnitTest {
         String b = "Totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("levDistanceWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b,max);
 
@@ -164,7 +164,7 @@ public class DistanceStringUnitTest {
         String b = "Totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("levDistanceWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,a,b,max);
 
@@ -392,7 +392,7 @@ public class DistanceStringUnitTest {
         String substring = "totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("findSubstringWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,text,substring,max);
 
@@ -407,7 +407,7 @@ public class DistanceStringUnitTest {
         String substring = "totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("findSubstringWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,text,substring,max);
 
@@ -422,7 +422,7 @@ public class DistanceStringUnitTest {
         String substring = "totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("findSubstringWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,text,substring,max);
 
@@ -437,7 +437,7 @@ public class DistanceStringUnitTest {
         String substring = "totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("findSubstringWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,text,substring,max);
 
@@ -452,7 +452,7 @@ public class DistanceStringUnitTest {
         String substring = "totale";
         Integer max = 3;
 
-        Method method = OcrUtils.class.getDeclaredMethod("findSubstringWithMax", String.class, String.class, Integer.class);
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
         method.setAccessible(true);
         int r = (int)method.invoke(null,text,substring,max);
 
