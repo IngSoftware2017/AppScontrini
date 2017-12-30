@@ -671,6 +671,7 @@ public class DistanceStringUnitTest {
     @Test
     public void GetFormatDateTest1() throws Exception {
 
+
         String a = "10-9-17";
         Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class);
         method.setAccessible(true);
@@ -700,6 +701,7 @@ public class DistanceStringUnitTest {
     public void GetFormatDateTest3() throws Exception {
 
         String a = "10.09.2017";
+
         Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class);
         method.setAccessible(true);
         Date r = (Date) method.invoke(null,a);
@@ -709,6 +711,7 @@ public class DistanceStringUnitTest {
 
         assertEquals(date, r);
     }
+
 
     @Test
     public void GetFormatDateTest4() throws Exception {

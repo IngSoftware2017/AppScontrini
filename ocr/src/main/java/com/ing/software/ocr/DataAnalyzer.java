@@ -29,6 +29,7 @@ import java.text.ParseException;
 /**
  * Class used to extract informations from raw data
  * todo: fallback, if no amount is present try to decode a possible pricelist
+ * todo: remove rectangle-probability and use block-specific-probability
  */
 public class DataAnalyzer {
 
@@ -36,7 +37,7 @@ public class DataAnalyzer {
      * @author Michelon
      * Search through results from the research of amount string and retrieves the text with highest
      * probability to contain the amount calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
-     * If no amount was found in first result iterate through all results following previous ordering.
+     * If no amount was found in first result iterate through all results following previous order.
      * @param amountResults list of RawStringResult from amount search. Not null.
      * @return BigDecimal containing the amount found. Null if nothing found
      */
@@ -46,7 +47,7 @@ public class DataAnalyzer {
         Collections.sort(amountResults);
         for (RawStringResult stringResult : amountResults) {
             //Ignore text with invalid distance (-1) according to findSubstring() documentation
-            if (stringResult.getDistanceFromTarget() >= 0) {
+            if (stringResult.getDistanceFromTarget() > -1) {
                 RawText sourceText = stringResult.getSourceText();
                 int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
                 if (stringResult.getDetectedTexts() != null) {
@@ -68,18 +69,10 @@ public class DataAnalyzer {
         if (possibleResults.size() > 0) {
             /* Here we order considering their final probability to contain the amount:
             If the probability is the same, the fallback is their previous order, so based on when
-            they are inserted.
+            they are inserted (=their distance (position) from source rect).
             */
             Collections.sort(possibleResults);
         }
-        /*
-        else {
-            OcrUtils.log(2,"getPossibleAmount", "No parsable result ");
-            return null;
-        }
-        OcrUtils.log(2,"getPossibleAmount", "No parsable amount ");
-        return null;
-        */
         return possibleResults;
     }
 
@@ -156,9 +149,10 @@ public class DataAnalyzer {
     /**
      * @author Michelon
      * @date 8-12-17
-     * Analyze a string looking for a number (with two decimals)
+     * Analyze a string (reversed by this method) looking for a number (with two decimals).
+     * Uses arbitrary decisions.
      * @param targetAmount string containing possible amount. Length > 0.
-     * @return string containing the amount, empty string if nothing found
+     * @return string containing the amount, empty stringBuilder if nothing found
      */
     private static String deepAnalyzeAmountChars(@Size(min = 1) String targetAmount){
         StringBuilder manipulatedAmount;
@@ -175,7 +169,7 @@ public class DataAnalyzer {
      * @date 9-12-17
      * Analyze a string looking for a number (with two decimals)
      * @param source string containing possible amount. Length > 0.
-     * @return stringBuilder containing the amount, empty string if nothing found
+     * @return stringBuilder containing the amount, empty stringBuilder if nothing found
      */
     private static StringBuilder analyzeCharsLong(@Size (min = 1) String source) {
         boolean isNegative = (source.charAt(source.length()-1) == '-');
@@ -189,7 +183,7 @@ public class DataAnalyzer {
             char char3 = source.charAt(3);
             if (char0 == '.' && char1 != '.' && char2 != '.' && char3 != '.')
                 manipulatedAmount.append("00").append(char0).append(char1).append(removeRedundantPoints(source.substring(2)));
-            else if (char0 == '.')
+            else if (char0 == '.') //There is another '.' remove the first one
                 return analyzeCharsLong(source.substring(1));
             else if (char1 == '.' && Character.isDigit(char2) && Character.isDigit(char3)) //now char0 must be digit
                 manipulatedAmount.append("0").append(char0).append(char1).append(removeRedundantPoints(source.substring(2)));
@@ -247,7 +241,7 @@ public class DataAnalyzer {
      * @date 8-12-17
      * Analyze a string looking for a number with two decimals
      * @param source source string @Size(min = 1, max = 3)
-     * @return StringBuilder with decoded number
+     * @return StringBuilder with decoded number (empty if nothing found)
      */
     private static StringBuilder analyzeChars(@Size(min = 1) String source) {
         if (source.length()==3)
@@ -265,7 +259,7 @@ public class DataAnalyzer {
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
      * @param char2 third char. Not null.
-     * @return analysis
+     * @return StringBuilder with decoded number (empty if nothing found)
      */
     private static StringBuilder analyzeChars(char char0, char char1, char char2) {
         StringBuilder result = new StringBuilder();
@@ -293,7 +287,7 @@ public class DataAnalyzer {
      * Analyze two chars, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
-     * @return analysis
+     * @return StringBuilder with decoded number (empty if nothing found)
      */
     private static StringBuilder analyzeChars(char char0, char char1) {
         StringBuilder result = new StringBuilder();
@@ -315,7 +309,7 @@ public class DataAnalyzer {
      * @date 8-12-17
      * Analyze single char, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
-     * @return analysis
+     * @return StringBuilder with decoded number (empty if nothing found)
      */
     private static StringBuilder analyzeChars(char char0) {
         StringBuilder result = new StringBuilder();
@@ -477,7 +471,6 @@ public class DataAnalyzer {
         if(minDistance<10)
         {
             date = parseDate(dataSearch);
-
         }
         return date;
 

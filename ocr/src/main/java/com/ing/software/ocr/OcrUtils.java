@@ -468,7 +468,7 @@ public class OcrUtils {
     static boolean isPossibleNumber(String s) {
         int counter = 0;
         s = s.replaceAll(" ", "").replaceAll("\\.", "")
-                .replaceAll("s", "").replaceAll("S", ""); //sometimes '5' are recognized as 's'
+                .replaceAll("S", ""); //sometimes '5' are recognized as 'S'
         for (int i = 0; i < s.length(); ++i) {
             if (Character.isDigit(s.charAt(i)))
                 ++counter;

@@ -1030,5 +1030,705 @@
     <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
     <Features>Ruotato a sinistra di 120°</Features>
   </Ticket>
+
+  <Ticket>
+    <ID>102</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(583, 2285)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1355, 1988)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Doppia data perchè strappato male alla cassa e inchistro sbiadito</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>103</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(755, 2219)</PositionDate>
+    <Amount>1,00</Amount>
+    <PositionAmount>(1465, 1961)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>104</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(631, 2273)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1349, 1959)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>105</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(703, 1961)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1423, 1643)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, piegato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>106</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(721, 1997)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1505, 1683)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Sfuocato, inchiostro sbiatito e di forma molto rotonda</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>107</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(599, 2107)</PositionDate>
+    <Amount>3,30</Amount>
+    <PositionAmount>(1215, 1859)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Molto sfuocato, inchiostro sbiatito</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>108</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(789, 2377)</PositionDate>
+    <Amount>4,00</Amount>
+    <PositionAmount>(1433, 2021)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, piegato su di un ancolo</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>109</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(735, 2247)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1519, 1879)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, scritta TOTALE parzialmente coperta</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>110</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(641, 1955)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1465, 1561)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, strappato male dal registratore di cassa</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>111</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(621, 2133)</PositionDate>
+    <Amount>2,00</Amount>
+    <PositionAmount>(1443, 1755)</PositionAmount>
+    <Shop>FOCACCERIA</Shop>
+    <Features>Inchiostro sbiadito, strappato male dal registratore di cassa con nome del negozio parziale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>112</ID>
+    <Date>05-11-2017</Date>
+    <PositionDate>(951, 1413)</PositionDate>
+    <Amount>20,88</Amount>
+    <PositionAmount>(1518, 2397)</PositionAmount>
+    <Shop>LA TORTELLINI EXPRESS</Shop>
+    <Features>Scritta TOT. che indica il totale</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>113</ID>
+    <Date>30-11-2017</Date>
+    <PositionDate>(1305, 1031)</PositionDate>
+    <Amount>0,80</Amount>
+    <PositionAmount>(475, 1375)</PositionAmount>
+    <Shop>CARTOLERIA ALTINO</Shop>
+    <Features>Stropicciato e ruotato di 180°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>114</ID>
+    <Date>05-12-2017</Date>
+    <PositionDate>(483, 2153)</PositionDate>
+    <Amount>1,30</Amount>
+    <PositionAmount>(1273, 1853)</PositionAmount>
+    <Shop>CARTOLERIA ALTINO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>115</ID>
+    <Date>05.12.2017</Date>
+    <PositionDate>(901, 1279)</PositionDate>
+    <Amount>7,45</Amount>
+    <PositionAmount>(1209, 1071)</PositionAmount>
+    <Shop>INTERSPAR</Shop>
+    <Features>Leggermente ruotato a sinistra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>116</ID>
+    <Date>05-12-2017</Date>
+    <PositionDate>(361, 1943)</PositionDate>
+    <Amount>12,30</Amount>
+    <PositionAmount>(1217, 1975)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Leggermente ruotato a destra e sfuocato</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>117</ID>
+    <Date>05-12-2017</Date>
+    <PositionDate>(483, 2175)</PositionDate>
+    <Amount>2,30</Amount>
+    <PositionAmount>(1465, 1973)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Piegato in alto a sinistra</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>118</ID>
+    <Date>05-12-17</Date>
+    <PositionDate>(2047, 397)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(1187, 585)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features>Ruotato di 180°</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>119</ID>
+    <Date>06/12/17</Date>
+    <PositionDate>(2551, 365)</PositionDate>
+    <Amount>2,10</Amount>
+    <PositionAmount>(2279, 65)</PositionAmount>
+    <Shop>THE COFFEE BOX S.R.L.</Shop>
+    <Features>Ruotato a sinistra di 90° e immagine tagliata sulla destra dello scontrino</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>120</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(313, 2435)</PositionDate>
+    <Amount>4,50</Amount>
+    <PositionAmount>(1601, 2153)</PositionAmount>
+    <Shop>PANE VINO S.DANIELE E VECCHIATO</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>121</ID>
+    <Date>07/12/17</Date>
+    <PositionDate>(473, 2715)</PositionDate>
+    <Amount>8,51</Amount>
+    <PositionAmount>(1565, 2404)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features></Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>122</ID>
+    <Date>07-12-17</Date>
+    <PositionDate>(577, 2739)</PositionDate>
+    <Amount>375,00</Amount>
+    <PositionAmount>(1263, 2525)</PositionAmount>
+    <Shop>201 SRL SSD</Shop>
+    <Features>Piegato nel centro</Features>
+  </Ticket>
+
+  <Ticket>
+    <ID>123</ID>
+    <Date>12/12/17</Date>
+    <PositionDate>(983, 2003)</PositionDate>
+    <Amount>2,30</Amount>
+    <PositionAmount>(1389, 1677)</PositionAmount>
+    <Shop>AL MURETTO</Shop>
+    <Features></Features>
+  </Ticket>
   
+  <Ticket>
+    <ID>124</ID>
+    <Date>11-12-2017</Date>
+    <PositionDate>(519, 1875)</PositionDate>
+    <Amount>3,30</Amount>
+    <PositionAmount>(1219, 1911)</PositionAmount>
+    <Shop>A e D di GRIGIO DIEGO & C. S.N.C</Shop>
+    <Features>Ruotato di poco a destra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>125</ID>
+    <Date>12-12-2017</Date>
+    <PositionDate>(311, 1791)</PositionDate>
+    <Amount>1,40</Amount>
+    <PositionAmount>(1353, 1507)</PositionAmount>
+    <Shop>A e D di GRIGIO DIEGO & C. S.N.C</Shop>
+    <Features>Foto in prospettiva dal basso</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>126</ID>
+    <Date>09-12-2017</Date>
+    <PositionDate>(1237, 1055)</PositionDate>
+    <Amount>2,20</Amount>
+    <PositionAmount>(1945, 1089)</PositionAmount>
+    <Shop>A e D di GRIGIO DIEGO & C. S.N.C</Shop>
+    <Features>Ruotato un po a destra, foto angolata</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>127</ID>
+    <Date>15/12/2017</Date>
+    <PositionDate>(613, 1659)</PositionDate>
+    <Amount>0,80</Amount>
+    <PositionAmount>(1407, 1479)</PositionAmount>
+    <Shop>PASTICCERIA LE SABLON</Shop>
+    <Features></Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>128</ID>
+    <Date>15/12/17</Date>
+    <PositionDate>(435, 1669)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(1091, 2013)</PositionAmount>
+    <Shop>PASTICCERIA LE SABLON</Shop>
+    <Features>Sfuocato e ruotato a destra di 45°</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>129</ID>
+    <Date>15/12/17</Date>
+    <PositionDate>(753, 2075)</PositionDate>
+    <Amount>4,80</Amount>
+    <PositionAmount>(1451, 1631)</PositionAmount>
+    <Shop>PASTICCERIA LE SABLON</Shop>
+    <Features>Sfuocato e leggermente ruotato a sinistra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>130</ID>
+    <Date>14/12/17</Date>
+    <PositionDate>(237, 1769)</PositionDate>
+    <Amount>1,90</Amount>
+    <PositionAmount>(1589, 1441)</PositionAmount>
+    <Shop>PASTICCERIA LE SABLON</Shop>
+    <Features>Leggermente tagliato a sinistra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>131</ID>
+    <Date>13/12/17</Date>
+    <PositionDate>(1151, 1129)</PositionDate>
+    <Amount>1,90</Amount>
+    <PositionAmount>(2095, 931)</PositionAmount>
+    <Shop>PASTICCERIA LE SABLON</Shop>
+    <Features>Foto scattata in prospettiva dal basso e leggermente tagliata a sinistra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>132</ID>
+    <Date>13/12/2017</Date>
+    <PositionDate>(1411, 595)</PositionDate>
+    <Amount>2,20</Amount>
+    <PositionAmount>(1577, 1354)</PositionAmount>
+    <Shop>13/12/17</Shop>
+    <Features>Scontrino ruotato di 90° a destra e leggermente tagliata sul lato sinistro</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>133</ID>
+    <Date>13/12/2017</Date>
+    <PositionDate>(649, 467)</PositionDate>
+    <Amount>5,90</Amount>
+    <PositionAmount>(1997, 1383)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features>Scontrino ruotato di 90° a destra e immagine molto sfuocata</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>134</ID>
+    <Date>12-12-2017</Date>
+    <PositionDate>(837, 523)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(1059, 1391)</PositionAmount>
+    <Shop>A e D di GRIGIO DIEGO & C. S.N.C</Shop>
+    <Features>Scontrino ruotato di 90° a destra e un po in ombra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>135</ID>
+    <Date>09/12/17</Date>
+    <PositionDate>(1463, 1019)</PositionDate>
+    <Amount>70,00</Amount>
+    <PositionAmount>(1667, 1465)</PositionAmount>
+    <Shop>MESTRINA COMME SNC</Shop>
+    <Features>Ruotato di 90° a destra, leggermente sfuocato e strappato in basso a destra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>136</ID>
+    <Date>11/10/2017</Date>
+    <PositionDate>(1779, 361)</PositionDate>
+    <Amount>10,38</Amount>
+    <PositionAmount>(2007, 1274)</PositionAmount>
+    <Shop>SUPERMERCATO IDEA QUATTRO SNC</Shop>
+    <Features>Ruotato di 90° a destra, sfuocato e in ombra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>137</ID>
+    <Date>12/12/117</Date>
+    <PositionDate>(1331, 1253)</PositionDate>
+    <Amount>27,50</Amount>
+    <PositionAmount>(1575, 1419)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features>Ruotato a destra di 90°, piegato e leggermente in ombra sul basso</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>138</ID>
+    <Date>12/12/17</Date>
+    <PositionDate>(1243, 1355)</PositionDate>
+    <Amount>18,50</Amount>
+    <PositionAmount>(1597, 1565)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features>Ruotato a destra di 90°, piegato e leggermente in ombra sul basso</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>139</ID>
+    <Date>12/12/2017</Date>
+    <PositionDate>(781, 401)</PositionDate>
+    <Amount>130,70</Amount>
+    <PositionAmount>(1003, 1513)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features>Preconto, ruotato a destra di 90°, stropicciato, molto sfuocato e leggermente in ombra sul basso</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>140</ID>
+    <Date>12/12/17</Date>
+    <PositionDate>(811, 1331)</PositionDate>
+    <Amount>43,50</Amount>
+    <PositionAmount>(1073, 2093)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features>Scontrino bancomat</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>141</ID>
+    <Date>12/12/17</Date>
+    <PositionDate>(1359, 2033)</PositionDate>
+    <Amount>43,50</Amount>
+    <PositionAmount>(1577, 1629)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features>In ombra sulla parte inferiore e leggermente stropicciato</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>142</ID>
+    <Date>12/12/17</Date>
+    <PositionDate>(749, 1393)</PositionDate>
+    <Amount>13,50</Amount>
+    <PositionAmount>(1039, 2157)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features>Scontrino bancomat</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>143</ID>
+    <Date>12/12/17</Date>
+    <PositionDate>(1253, 1847)</PositionDate>
+    <Amount>13,50</Amount>
+    <PositionAmount>(1461, 1451)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features></Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>144</ID>
+    <Date>12/12/17</Date>
+    <PositionDate>(1237, 1947)</PositionDate>
+    <Amount>9,00</Amount>
+    <PositionAmount>(1483, 1529)</PositionAmount>
+    <Shop>BUSA DEI BRIGANTI</Shop>
+    <Features>Scontrino sfuocato</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>145</ID>
+    <Date>18/12/17</Date>
+    <PositionDate>(2755, 1405)</PositionDate>
+    <Amount>17,31</Amount>
+    <PositionAmount>(1647, 681)</PositionAmount>
+    <Shop>LIDL</Shop>
+    <Features>Stropicciato e ruotato a sinistra di 90°</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>146</ID>
+    <Date>18/12/17</Date>
+    <PositionDate>(729, 1765)</PositionDate>
+    <Amount>34,64</Amount>
+    <PositionAmount>(1121, 1627)</PositionAmount>
+    <Shop>PRIX</Shop>
+    <Features>Scontrino lungo</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>147</ID>
+    <Date>18/12/17</Date>
+    <PositionDate>(1061, 1727)</PositionDate>
+    <Amount>3,00</Amount>
+    <PositionAmount>(1369, 1467)</PositionAmount>
+    <Shop>GASOLINE</Shop>
+    <Features></Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>148</ID>
+    <Date>21/12/17</Date>
+    <PositionDate>(1925, 815)</PositionDate>
+    <Amount>7,50</Amount>
+    <PositionAmount>(981, 1357)</PositionAmount>
+    <Shop>PISCINA IMP.SPORTIVI</Shop>
+    <Features>Ruotato a destra di 90°, ricevuta bancomat</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>149</ID>
+    <Date>21-12-17</Date>
+    <PositionDate>(391, 1775)</PositionDate>
+    <Amount>7,50</Amount>
+    <PositionAmount>(1499, 1467)</PositionAmount>
+    <Shop>2001 SRL SSD</Shop>
+    <Features>Riflesso sulla parola EURO</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>150</ID>
+    <Date>21/12/17</Date>
+    <PositionDate>(311, 1811)</PositionDate>
+    <Amount>1,90</Amount>
+    <PositionAmount>(1463, 1543)</PositionAmount>
+    <Shop>PASTICCERIA LE SABLON</Shop>
+    <Features>Scontrino tagliato sulla sinistra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>151</ID>
+    <Date>19/12/17</Date>
+    <PositionDate>(489, 1853)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(1363, 1253)</PositionAmount>
+    <Shop>PASTICCERIA LE SABLON</Shop>
+    <Features>Scontrino tagliato sulla sinistra</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>152</ID>
+    <Date>18-12-2017</Date>
+    <PositionDate>(745, 1731)</PositionDate>
+    <Amount>6,30</Amount>
+    <PositionAmount>(1005, 1647)</PositionAmount>
+    <Shop>A e D di GRIGIO DIEGO & C. S.N.C</Shop>
+    <Features>Foto scattata da lontano e con tanto riflesso sullo scontrino</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>153</ID>
+    <Date>18/12/17</Date>
+    <PositionDate>(1075, 1511)</PositionDate>
+    <Amount>8,00</Amount>
+    <PositionAmount>(1343, 1305)</PositionAmount>
+    <Shop>GASOLINE ROAD BAR</Shop>
+    <Features></Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>154</ID>
+    <Date>13/12/17</Date>
+    <PositionDate>(352, 858)</PositionDate>
+    <Amount>1,10</Amount>
+    <PositionAmount>(653, 765)</PositionAmount>
+    <Shop>SERENISSIMA RIST. SPA</Shop>
+    <Features>Scontrino stampato male, inchiostro mancante a righe verticali</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>155</ID>
+    <Date>13/12/17</Date>
+    <PositionDate>(288, 1007)</PositionDate>
+    <Amount>4,20</Amount>
+    <PositionAmount>(609, 904)</PositionAmount>
+    <Shop>SERENISSIMA RIST. SPA</Shop>
+    <Features>Scontrino stampato male, inchiostro mancante a righe verticali</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>156</ID>
+    <Date>30/09/17</Date>
+    <PositionDate>(348, 683)</PositionDate>
+    <Amount>63,00</Amount>
+    <PositionAmount>(661, 1264)</PositionAmount>
+    <Shop>ALGHERO FERTOLTA (SS)</Shop>
+    <Features>Ricevuta bancomat a tratti tanto sbiadita</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>157</ID>
+    <Date>07-10-2017</Date>
+    <PositionDate>(212, 925)</PositionDate>
+    <Amount>29,00</Amount>
+    <PositionAmount>(654, 797)</PositionAmount>
+    <Shop>DE LAZZARI DANILO</Shop>
+    <Features></Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>158</ID>
+    <Date>14-12-2014</Date>
+    <PositionDate>(217, 1033)</PositionDate>
+    <Amount>19,00</Amount>
+    <PositionAmount>(691, 839)</PositionAmount>
+    <Shop>L.& A. S.A.S.</Shop>
+    <Features>Scontrino molto sbiadito dal tempo, quasi illeggibile anche a occhio nudo</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>159</ID>
+    <Date>30/03/16</Date>
+    <PositionDate>(165, 1307)</PositionDate>
+    <Amount>139,00</Amount>
+    <PositionAmount>(652, 1103)</PositionAmount>
+    <Shop>F.LLI POLATO ISSIMO SPORT SRL</Shop>
+    <Features>Scolorito dal tempo, particolarmente sul lato destro</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>160</ID>
+    <Date></Date>
+    <PositionDate>(218, 1278)</PositionDate>
+    <Amount>25,00</Amount>
+    <PositionAmount>(673, 1102)</PositionAmount>
+    <Shop>F.LLI POLATO ISSIMO SPORT SRL</Shop>
+    <Features>Scolorito dal tempo, particolarmente sul lato sinistro. La parola totale è quasi scomparsa e la data non c'è più</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>161</ID>
+    <Date>14-12-2014</Date>
+    <PositionDate>(256, 960)</PositionDate>
+    <Amount>9,80</Amount>
+    <PositionAmount>(721, 771)</PositionAmount>
+    <Shop>SIRA SPA</Shop>
+    <Features>Scontrino quasi completamente scolorito</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>162</ID>
+    <Date>06-12-2017</Date>
+    <PositionDate>(161, 769)</PositionDate>
+    <Amount>16,00</Amount>
+    <PositionAmount>(575, 579)</PositionAmount>
+    <Shop>BETTIN SAS</Shop>
+    <Features>Leggermente sfuocato</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>163</ID>
+    <Date>05/12/17</Date>
+    <PositionDate>(123, 905)</PositionDate>
+    <Amount>87,50</Amount>
+    <PositionAmount>(552, 738)</PositionAmount>
+    <Shop>DE PANNI ARREDA S.r.l.</Shop>
+    <Features>Scontrino sfuocato</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>164</ID>
+    <Date>05-12-2017</Date>
+    <PositionDate>(220, 1066)</PositionDate>
+    <Amount>5,80</Amount>
+    <PositionAmount>(584, 887)</PositionAmount>
+    <Shop>LA FONTESE</Shop>
+    <Features></Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>165</ID>
+    <Date>20-11-2017</Date>
+    <PositionDate>(131, 1031)</PositionDate>
+    <Amount>28,53</Amount>
+    <PositionAmount>(665, 401)</PositionAmount>
+    <Shop>FARMACIA</Shop>
+    <Features></Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>166</ID>
+    <Date>23-10-17</Date>
+    <PositionDate>(99, 832)</PositionDate>
+    <Amount>0,00</Amount>
+    <PositionAmount>(666, 613)</PositionAmount>
+    <Shop>Piazza Italia S.p.A.</Shop>
+    <Features>Scontrino di Reso</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>167</ID>
+    <Date>07/12/17</Date>
+    <PositionDate>(421, 863)</PositionDate>
+    <Amount>78,90</Amount>
+    <PositionAmount>(560, 715)</PositionAmount>
+    <Shop>FARFALLA NERA</Shop>
+    <Features>Scontrino leggermente sfuocato</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>168</ID>
+    <Date>13/11/17</Date>
+    <PositionDate>(418, 902)</PositionDate>
+    <Amount>33,50</Amount>
+    <PositionAmount>(552, 765)</PositionAmount>
+    <Shop>FARFALLA NERA</Shop>
+    <Features>Anche la farfalla di Belen è nera?</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>169</ID>
+    <Date>10/12/17</Date>
+    <PositionDate>(335, 803)</PositionDate>
+    <Amount>15,50</Amount>
+    <PositionAmount>(581, 619)</PositionAmount>
+    <Shop>PIZZA ASTRO</Shop>
+    <Features>Leggermente sfuocato</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>170</ID>
+    <Date>05-12-17</Date>
+    <PositionDate>(127, 880)</PositionDate>
+    <Amount>19,50</Amount>
+    <PositionAmount>(577, 737)</PositionAmount>
+    <Shop>OK L'EMPORIO DI CASA</Shop>
+    <Features>Scontrino sfuocato</Features>
+  </Ticket>
+  
+  <Ticket>
+    <ID>171</ID>
+    <Date>07/12/17</Date>
+    <PositionDate>(365, 763)</PositionDate>
+    <Amount>4,66</Amount>
+    <PositionAmount>(620, 586)</PositionAmount>
+    <Shop>MACELLERIA DA FABIO</Shop>
+    <Features>Scontrino leggermente sfuocato</Features>
+  </Ticket>
+
 </DataSet>
