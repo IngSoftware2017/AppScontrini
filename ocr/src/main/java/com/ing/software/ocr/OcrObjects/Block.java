@@ -9,6 +9,7 @@ import com.ing.software.common.Lazy;
 import static com.ing.software.common.CommonUtils.*;
 import static java.util.Arrays.*;
 
+@Deprecated
 public class Block {
     private TextBlock tb;
     private Lazy<List<TextLine>> lines;

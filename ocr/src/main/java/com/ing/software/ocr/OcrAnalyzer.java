@@ -7,7 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 import android.util.SparseArray;
 
+import com.annimon.stream.Stream;
 import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
@@ -25,7 +27,7 @@ import static com.ing.software.ocr.OcrVars.*;
  * @author Michelon
  * @author Zaglia
  */
-class OcrAnalyzer {
+public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
@@ -77,6 +79,16 @@ class OcrAnalyzer {
         List<RawGridResult> dateList = getDateList(rawOrigTexts);
         return new OcrResult(valuedTexts, dateList, getProductPrices(rawOrigTexts));
     }
+
+    private static List<TextLine> textBlocksToLines(SparseArray<TextBlock> textBlocks) {
+        List<TextLine> lines = new ArrayList<>();
+        for (int i = 0; i < textBlocks.size(); i++) {
+            lines.addAll(Stream.of(textBlocks.valueAt(i).getComponents())
+                    .map(txt -> new TextLine((Line)txt)).toList());
+        }
+        return lines;
+    }
+
 
     /**
      * List in debug log blocks parsed (detection + grid)

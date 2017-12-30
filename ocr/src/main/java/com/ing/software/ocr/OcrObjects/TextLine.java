@@ -16,8 +16,8 @@ public class TextLine {
     private Lazy<List<Word>> words;
     private Lazy<List<PointF>> corners;
     private Lazy<Double> height, width;
-    private Lazy<Double> density;
-    private Lazy<String> textNoSpaces, textOnlyAlpha;
+    private Lazy<Double> densityX, densityY;
+    private Lazy<String> textNoSpaces, textOnlyAlpha, textOnlyNum;
 
     public TextLine(Line line) {
         this.line = line;
@@ -29,7 +29,8 @@ public class TextLine {
         height = new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(3)),
                                              dist(corners().get(1), corners().get(2)))));
         //todo use 4 corners rectangle area
-        density = new Lazy<>(() -> (double)line.getValue().length() / width() / height());
+        densityX = new Lazy<>(() -> (double)line.getValue().length() / width());
+        densityY = new Lazy<>(() -> (double)line.getValue().length() / height());
         textNoSpaces = new Lazy<>(() -> Stream.of(words())
                 .reduce("", (str, w) -> str + w.text()));
         textOnlyAlpha = new Lazy<>(() -> Stream.of(words())
@@ -53,8 +54,16 @@ public class TextLine {
         return height.get();
     }
 
-    public double density() {
-        return density.get();
+    public double area() {
+        return width() * height();
+    }
+
+    public double densityX() {
+        return densityX.get();
+    }
+
+    public double densityY() {
+        return densityY.get();
     }
 
     public String textNoSpaces() {
@@ -62,6 +71,10 @@ public class TextLine {
     }
 
     public String textOnlyAlpha() {
+        return textOnlyAlpha.get();
+    }
+
+    public String textOnlyNum() {
         return textOnlyAlpha.get();
     }
 }

@@ -16,11 +16,14 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.Line;
+import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.ing.software.common.*;
 import com.ing.software.ocr.DataAnalyzer;
 import com.ing.software.ocr.ImagePreprocessor;
+import com.ing.software.ocr.OcrAnalyzer;
 import com.ing.software.ocr.OcrObjects.Block;
 import com.ing.software.ocr.OcrObjects.TextLine;
 import com.ing.software.ocr.OcrObjects.Word;
@@ -31,6 +34,7 @@ import org.opencv.core.Point;
 import static com.ing.software.common.Reflect.*;
 import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
+import static org.opencv.core.Core.invert;
 import static org.opencv.core.CvType.CV_8UC1;
 import static org.opencv.imgproc.Imgproc.*;
 
@@ -40,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import com.annimon.stream.Stream;
 
 /**
  * This app shows in order the pipeline steps to find the ticket rectangle
@@ -49,8 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String folder = "TestOCR";
     private static final Class<?> IP_CLASS = ImagePreprocessor.class; // alias
     private static final int DEF_THICK = 20;
-    private static final int BLOCK_THICK = 7;
-    private static final int LINE_THICK = 4;
+    private static final int LINE_THICK = 6;
     private static final double FONT_SIZE = 0.6;
 
     private static final Scalar BLUE = new Scalar(0,0,255, 255);
@@ -169,26 +173,21 @@ public class MainActivity extends AppCompatActivity {
         MatOfPoint ptsMat = new MatOfPoint(cvPts.toArray(new Point[4]));
         return Collections.singletonList(ptsMat);
     }
-    static Mat drawOcrResult(Bitmap bm, List<Block> blocks) throws Exception {
+    static Mat drawOcrResult(Bitmap bm, List<TextLine> lines) throws Exception {
         Mat img = new Mat();
         bitmapToMat(bm, img);
 
-        for (Block b : blocks) {
-            polylines(img, pts2mat(b.corners()), true, DARK_GREEN, BLOCK_THICK);
-            for (TextLine l : b.lines()) {
-                polylines(img, pts2mat(l.corners()), true, RED, LINE_THICK);
-                for (Word w : l.words()) {
-                    fillPoly(img, pts2mat(w.corners()), BLUE);
-                }
+        for (TextLine l : lines) {
+            polylines(img, pts2mat(l.corners()), true, RED, LINE_THICK);
+            for (Word w : l.words()) {
+                fillPoly(img, pts2mat(w.corners()), BLUE);
             }
         }
-        for (Block b : blocks) {
-            for (TextLine l : b.lines()) {
-                for (Word w : l.words()) {
-                    PointF blPt = w.corners().get(3); // bottom-right point (clockwise from top-left)
-                    putText(img, w.text().toUpperCase(), new Point(blPt.x + 2, blPt.y - 2),
-                            FONT_HERSHEY_SIMPLEX, FONT_SIZE, WHITE);
-                }
+        for (TextLine l : lines) {
+            for (Word w : l.words()) {
+                PointF blPt = w.corners().get(3); // bottom-right point (clockwise from top-left)
+                putText(img, w.text().toUpperCase(), new Point(blPt.x + 2, blPt.y - 2),
+                        FONT_HERSHEY_SIMPLEX, FONT_SIZE, WHITE);
             }
         }
         return img;
@@ -325,13 +324,10 @@ public class MainActivity extends AppCompatActivity {
                 //Bitmap finalBm = ip.undistort(0.05);
                 SparseArray<TextBlock> sparse = ocrEngine
                         .detect(new Frame.Builder().setBitmap(finalBm).build());
-                List<Block> blocks = new ArrayList<>();
-                for (int i = 0; i < sparse.size(); i++) {
-                    blocks.add(new Block(sparse.valueAt(i)));
-                }
-                String lang = invoke(DataAnalyzer.class, "getTicketLanguage", blocks);
+                List<TextLine> lines = invoke(OcrAnalyzer.class, "textBlocksToLines", sparse);
+                String lang = invoke(DataAnalyzer.class, "getTicketLanguage", lines);
                 asyncSetTitle(String.valueOf(imageIdx) + " - " + lang);
-                showMat(drawOcrResult(finalBm, blocks));
+                showMat(drawOcrResult(finalBm, lines));
 
                 imageIdx++;
             }

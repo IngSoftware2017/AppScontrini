@@ -525,34 +525,32 @@ public class DataAnalyzer {
     // does not work
     /**
      * Get the most likely language of ticket.
-     * @param blockList all the Blocks of ticket.
+     * @param lines all the TextLines of ticket.
      * @return language.
      *
      * @author Riccardo Zaglia
      */
-    static String getTicketLanguage(List<Block> blockList) {
+    static String getTicketLanguage(List<TextLine> lines) {
         Map<String, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
         String bestLang = "undefined";
         double bestScore = 0;
-        for (Block b : blockList) {
-            for (TextLine l : b.lines()) {
-                //todo use apache TIKA library
-//                String lang = w.lang();
-//                if (!Objects.equals(lang, "und") && !Objects.equals(lang, "")) { // if lang is not undefined
-//                    double area = b.area();
-//                    Ref<Double> score = accumulator.get(lang);
-//                    if (score != null)
-//                        score.value += area;
-//                    else {
-//                        score = new Ref<>(area);
-//                        accumulator.put(lang, score);
-//                    }
-//                    if (score.value > bestScore) {
-//                        bestScore = score.value;
-//                        bestLang = lang;
-//                    }
+        for (TextLine l : lines) {
+//            todo use apache TIKA library
+//            String lang = w.lang();
+//            if (!Objects.equals(lang, "und") && !Objects.equals(lang, "")) { // if lang is not undefined
+//                double area = b.area();
+//                Ref<Double> score = accumulator.get(lang);
+//                if (score != null)
+//                    score.value += area;
+//                else {
+//                    score = new Ref<>(area);
+//                    accumulator.put(lang, score);
 //                }
-            }
+//                if (score.value > bestScore) {
+//                    bestScore = score.value;
+//                    bestLang = lang;
+//                }
+//            }
         }
         return bestLang;
     }
