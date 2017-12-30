@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Consumer;
 import com.ing.software.common.*;
 
 import org.opencv.android.OpenCVLoader;
@@ -18,8 +17,8 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.annimon.stream.function.*;
 
-import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.*;
 import static org.opencv.core.CvType.*;
 import static org.opencv.imgproc.Imgproc.*;
@@ -469,7 +468,6 @@ public class ImagePreprocessor {
         return dstImg;
     }
 
-
     //INSTANCE FIELDS:
 
     private Mat srcImg;
@@ -509,7 +507,7 @@ public class ImagePreprocessor {
      */
     public void setImage(@NonNull Bitmap bm) {
         srcImg = new Mat();
-        bitmapToMat(bm, srcImg);
+        Utils.bitmapToMat(bm, srcImg);
     }
 
     /**

@@ -32,11 +32,7 @@ import static com.ing.software.common.Reflect.*;
 import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
 import static org.opencv.core.CvType.CV_8UC1;
-import static org.opencv.imgproc.Imgproc.drawContours;
-import static org.opencv.imgproc.Imgproc.fillPoly;
-import static org.opencv.imgproc.Imgproc.line;
-import static org.opencv.imgproc.Imgproc.polylines;
-import static org.opencv.imgproc.Imgproc.putText;
+import static org.opencv.imgproc.Imgproc.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int MSG_IMAGE = 1;
     private static final int MSG_EXCEPTION = 2;
 
-
-    //private AssetManager mgr;
     private Semaphore sem = new Semaphore(0);
     private int imageIdx = 0;
     private boolean resultOnly = false;
@@ -263,13 +257,13 @@ public class MainActivity extends AppCompatActivity {
         });
         ((Switch)findViewById(R.id.result_only))
                 .setOnCheckedChangeListener((v, checked) -> resultOnly = checked);
-        //mgr = getResources().getAssets();
 
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
                     new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
         new Thread(this::backgroundWork).start();
+
     }
 
     /**
@@ -335,10 +329,9 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < sparse.size(); i++) {
                     blocks.add(new Block(sparse.valueAt(i)));
                 }
-                //String lang = invoke(DataAnalyzer.class, "getTicketLanguage", blocks);
-                //asyncSetTitle(String.valueOf(imageIdx) + " - " + lang);
+                String lang = invoke(DataAnalyzer.class, "getTicketLanguage", blocks);
+                asyncSetTitle(String.valueOf(imageIdx) + " - " + lang);
                 showMat(drawOcrResult(finalBm, blocks));
-
 
                 imageIdx++;
             }

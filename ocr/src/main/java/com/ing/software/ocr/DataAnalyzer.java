@@ -3,6 +3,10 @@ package com.ing.software.ocr;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 import android.support.annotation.NonNull;
@@ -11,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Locale;
 
 import com.ing.software.common.Ref;
 import com.ing.software.ocr.OcrObjects.Block;
@@ -25,6 +30,9 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
+
+import java.text.ParseException;
+
 
 
 /**
@@ -402,6 +410,7 @@ public class DataAnalyzer {
         else
             //Returns the absolute value of the distance by subtracting the minimum character
             return Math.abs(minCharaterDate-minDistance);
+
     }
 
 
@@ -412,12 +421,15 @@ public class DataAnalyzer {
      * @param text The text to find the date
      * @return date or null if the date is not there
      */
-    static String getDate(String text) {
+    static Date getDate(String text) {
         if (text.length() == 0)
             return null;
 
+        Date date = null;
+
         //Possible date formats
         String[] formatDate = {"xx/xxxx/xx", "xxxx/xx/xx","xx/xx/xxxx", "xx-xxxx-xx", "xxxx-xx-xx","xx-xx-xxxx","xx.xxxx.xx","xxxx.xx.xx" ,"xx.xx.xxxx"};
+
 
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
@@ -465,50 +477,83 @@ public class DataAnalyzer {
         }
 
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
-        if(minDistance>=10)
-            return null;
-        else
-            return dataSearch;
+        if(minDistance<10)
+        {
+            String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy","MM/dd/yyyy","MM-dd-yyyy","MM.dd.yyyy"};
+            date = parseDate(dataSearch,expectedPattern);
+
+        }
+        return date;
+
 
     }
 
-    static String getTicketLanguage(List<TextMatcher> blockList) {
-        return null; // stub
+    /**
+     * @author Salvagno
+     *
+     * @param dateString An input date string.
+     * @param formats An array of date formats that we have allowed for.
+     * @return A Date (java.util.Date) reference. The reference will be null if
+     *         we could not match any of the known formats.
+     */
+    public static Date parseDate(String dateString, String[] formats)
+    {
+        Date date = null;
+        Locale locale = new Locale("US");
+
+        for (int i = 0; i < formats.length; i++)
+        {
+            String format = formats[i];
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format,locale);
+            try
+            {
+                // parse() will throw an exception if the given dateString doesn't match
+                // the current format
+                date = dateFormat.parse(dateString);
+                break;
+            }
+            catch(ParseException e)
+            {
+                // don't do anything. just let the loop continue.
+            }
+        }
+
+        return date;
     }
+
 
     // does not work
-//    /**
-//     * Get the most likely language of ticket.
-//     * @param blockList all the Blocks of ticket.
-//     * @return language.
-//     *
-//     * @author Riccardo Zaglia
-//     */
-//    static String getTicketLanguage(List<Block> blockList) {
-//        Map<String, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
-//        String bestLang = "undefined";
-//        double bestScore = 0;
-//        for (Block b : blockList) {
-//            for (TextLine l : b.lines()) {
-//                for (Word w : l.words()) {
-//                    String lang = w.lang();
-//                    if (!Objects.equals(lang, "und") && !Objects.equals(lang, "")) { // if lang is not undefined
-//                        double area = b.area();
-//                        Ref<Double> score = accumulator.get(lang);
-//                        if (score != null)
-//                            score.value += area;
-//                        else {
-//                            score = new Ref<>(area);
-//                            accumulator.put(lang, score);
-//                        }
-//                        if (score.value > bestScore) {
-//                            bestScore = score.value;
-//                            bestLang = lang;
-//                        }
+    /**
+     * Get the most likely language of ticket.
+     * @param blockList all the Blocks of ticket.
+     * @return language.
+     *
+     * @author Riccardo Zaglia
+     */
+    static String getTicketLanguage(List<Block> blockList) {
+        Map<String, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
+        String bestLang = "undefined";
+        double bestScore = 0;
+        for (Block b : blockList) {
+            for (TextLine l : b.lines()) {
+                //todo use apache TIKA library
+//                String lang = w.lang();
+//                if (!Objects.equals(lang, "und") && !Objects.equals(lang, "")) { // if lang is not undefined
+//                    double area = b.area();
+//                    Ref<Double> score = accumulator.get(lang);
+//                    if (score != null)
+//                        score.value += area;
+//                    else {
+//                        score = new Ref<>(area);
+//                        accumulator.put(lang, score);
+//                    }
+//                    if (score.value > bestScore) {
+//                        bestScore = score.value;
+//                        bestLang = lang;
 //                    }
 //                }
-//            }
-//        }
-//        return bestLang;
-//    }
+            }
+        }
+        return bestLang;
+    }
 }
