@@ -25,7 +25,8 @@ public class RawTag {
     }
 
     public void addTag(String tag) {
-        this.tag.add(tag);
+        if (!this.tag.contains(tag))
+            this.tag.add(tag);
     }
 
     public void setPosition(double position) {

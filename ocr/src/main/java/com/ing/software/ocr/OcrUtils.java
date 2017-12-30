@@ -400,9 +400,9 @@ public class OcrUtils {
      * @author Michelon
      * Get rect containing all rawTexts detected
      * @param rawTexts texts detected. Not null.
-     * @return array of PointF where PointF[0]=point on top-left, PointF[1] = point on bottom-right
+     * @return Rect containing all rects passed
      */
-    static PointF[] getMaxRectBorders(@NonNull List<RawText> rawTexts) {
+    static RectF getMaxRectBorders(@NonNull List<RawText> rawTexts) {
         //Extreme borders for chosen photo (will be overwritten in foreach)
         if (rawTexts.size() == 0)
             return null;
@@ -420,7 +420,7 @@ public class OcrUtils {
             if (rawText.getRect().top<top)
                 top = rawText.getRect().top;
         }
-        return new PointF[] {new PointF(left, top),  new PointF(right, bottom)};
+        return new RectF(left, top, right, bottom);
     }
 
 }

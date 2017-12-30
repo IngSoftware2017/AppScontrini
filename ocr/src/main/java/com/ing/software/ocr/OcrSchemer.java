@@ -7,7 +7,10 @@ import com.ing.software.ocr.OcrObjects.RawImage;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static com.ing.software.ocr.OcrVars.*;
 
@@ -104,6 +107,7 @@ class OcrSchemer {
                         rawText.addTag(CONCLUSION);
                         OcrUtils.log(2, "prepareScheme", "Text: "+rawText.getDetection() + " is center-conclusion");
                     }
+                    waveTagger(textList, rawText);
                     break;
                 case 2: rawText.addTag(RIGHT_TAG);
                     OcrUtils.log(2, "prepareScheme", "Text: "+rawText.getDetection() + " is right");
@@ -111,7 +115,8 @@ class OcrSchemer {
                 default: OcrUtils.log(1, "prepareScheme", "Could not find position for text: " + rawText.getDetection());
             }
         }
-        waveTagger(textList);
+        missTagger(textList);
+        densityIntroductionSnake(textList);
     }
 
     /**
@@ -134,34 +139,98 @@ class OcrSchemer {
 
     /**
      * Cataloga i text, se sono alla stessa altezza di un introduction o conclusion, taggali
-     * di conseguenza
+     * di conseguenza, altrimenti considerali products\prices
      */
-    private static void waveTagger(List<RawText> texts) {
+    private static void waveTagger(List<RawText> texts, RawText source) {
         int extendHeight = 20;
+        RectF extendedRect = OcrUtils.extendRect(source.getRect(), extendHeight, -source.getRawImage().getWidth());
         for (RawText text : texts) {
-            if (!text.getTag().contains(CENTER_TAG)) {
-                RectF extendedRect = OcrUtils.extendRect(text.getRect(), extendHeight, -text.getRawImage().getWidth());
-                for (RawText text1 : texts) {
-                    if (text1.getTag().contains(CENTER_TAG) && extendedRect.contains(text1.getRect())) {
-                        if (text1.getTag().contains(INTRODUCTION)) {
-                            text.addTag(INTRODUCTION);
-                            OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is introduction");
-                        } else {
-                            text.addTag(CONCLUSION);
-                            OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is conclusion");
-                        }
-                        break;
+            if (!text.getTags().contains(CENTER_TAG)) { //here we are excluding source
+                if (extendedRect.contains(text.getRect())) {
+                    if (source.getTags().contains(INTRODUCTION)) {
+                        text.addTag(INTRODUCTION);
+                        OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is introduction");
+                    } else {
+                        text.addTag(CONCLUSION);
+                        OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is conclusion");
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Tagga i rawtext ancora vuoti
+     * @param texts
+     */
+    private static void missTagger(List<RawText> texts) {
         for (RawText text : texts) {
-            if (text.getTag().getTag().size() < 2 && text.getTag().getTag().get(0).equals(LEFT_TAG)) {
+            if (text.getTags().size() < 2 && text.getTags().get(0).equals(LEFT_TAG)) {
+                text.addTag(PRODUCTS);
                 OcrUtils.log(2, "waveTagger", "Text: "+text.getDetection() + " is possible product");
-            } else if (text.getTag().getTag().size() < 2) {
+            } else if (text.getTags().size() < 2) {
+                text.addTag(PRICES);
                 OcrUtils.log(2, "waveTagger", "Text: "+text.getDetection() + " is possible price");
             }
         }
+
     }
 
+    /**
+     * Get index of rect at witch you want to stop introduction block
+     * @param textList list of rawTexts
+     * @return -1 if list is empty or there is no introduction block (too low density), else index of last block of introduction
+     */
+    private static int densityIntroductionSnake(List<RawText> textList) {
+        if (textList.size() == 0)
+            return -1;
+        Collections.sort(textList);
+        double targetArea = 0;
+        double totalArea = 0;
+        SortedMap<Double, Integer> map = new TreeMap<>(); //Key is the density, Value is the position, the bigger the area for same density, the better it is
+        for (int i = 0; i < textList.size(); ++i) {
+            RawText text = textList.get(i);
+            if (text.getTags().contains(INTRODUCTION)) {
+                targetArea += getRectArea(text.getRect());
+            }
+            totalArea += getRectArea(text.getRect());
+            OcrUtils.log(1, "densityIntrSnake", "Text: " + text.getDetection() + "\ncurrent density is: "
+                + targetArea/totalArea);
+            map.put(targetArea/totalArea, i); // if we have same density but bigger area, let's choose biggest area
+        }
+        //here We have a list of ordered density and area, to choose the best we define a variable (needs to be tuned)
+        // N = {(area of 1 rect)*[(n° of rect)-(n° of rect%15)]/(total area)}
+        int limitText = Math.round(textList.size()/15);
+        if (limitText == 0)
+            limitText = 1;
+        double limit = ((totalArea/textList.size())*(textList.size() - limitText)/totalArea);
+        OcrUtils.log(1, "densityIntrSnake", "Limit density is: " + limit);
+        double targetDensity = -1;
+        for (Double currentDensity : map.keySet()) {
+            OcrUtils.log(1, "densityIntrSnake", "Possible density is: " + currentDensity);
+            if (currentDensity > limit) {
+                targetDensity = currentDensity;
+                break;
+            }
+        }
+        //Now, we may have included some wrong texts (suppose we have all blocks introduction, followed by all products,
+        // here we include also the first few products), so we better reduce area to the first introduction rect
+        if (targetDensity == -1)
+            return -1; //No introduction block found, or density too low
+        int introductionPos = map.get(targetDensity);
+        for (int i = introductionPos; i > 0; --i) {
+            if (textList.get(i).getTags().contains(INTRODUCTION)) {
+                introductionPos = i;
+                break;
+            }
+        }
+        OcrUtils.log(1, "densityIntrSnake", "Final target text is: " + introductionPos
+            + "\nWith text: " + textList.get(introductionPos).getDetection());
+        //Now introductionPos is the value of the last rect for introduction
+        return introductionPos;
+    }
+
+    private static double getRectArea(RectF rect) {
+        return rect.width() * rect.height();
+    }
 }

@@ -9,6 +9,7 @@ import android.support.annotation.Size;
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.ocr.*;
 
+import java.util.List;
 import java.util.Scanner;
 
 import static com.ing.software.ocr.OcrUtils.log;
@@ -60,8 +61,8 @@ public class RawText implements Comparable<RawText> {
         return rawImage;
     }
 
-    public RawTag getTag() {
-        return tag;
+    public List<String> getTags() {
+        return tag.getTag();
     }
 
     public void addTag(String tag) {
