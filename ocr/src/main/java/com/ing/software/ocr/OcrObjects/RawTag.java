@@ -44,4 +44,9 @@ public class RawTag {
     public boolean contains(String s) {
         return tag.contains(s);
     }
+
+    public void removeTag(String tag) {
+        if (this.tag.contains(tag))
+            this.tag.remove(tag);
+    }
 }

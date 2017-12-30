@@ -12,8 +12,8 @@ class OcrVars {
     static final String LEFT_TAG = "left";
     static final String CENTER_TAG = "center";
     static final String RIGHT_TAG = "right";
-    static final String INTRODUCTION = "introduction";
-    static final String PRODUCTS = "products";
-    static final String PRICES = "prices";
-    static final String CONCLUSION = "conclusion";
+    static final String INTRODUCTION_TAG = "introduction";
+    static final String PRODUCTS_TAG = "products";
+    static final String PRICES_TAG = "prices";
+    static final String CONCLUSION_TAG = "conclusion";
 }

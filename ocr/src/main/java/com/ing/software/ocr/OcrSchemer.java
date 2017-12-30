@@ -4,6 +4,7 @@ import android.graphics.RectF;
 
 import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
+import com.ing.software.ocr.OcrObjects.RawTag;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.util.ArrayList;
@@ -80,9 +81,8 @@ class OcrSchemer {
      * @return true if inside
      */
     static boolean isPossibleCash(RawText amount, RawText cash) {
-        int extendHeight = 400;
         int extendWidth = 50;
-        RectF extendedRect = OcrUtils.extendRect(amount.getRect(), extendHeight, extendWidth);
+        RectF extendedRect = OcrUtils.extendRect(amount.getRect(), -amount.getRawImage().getHeight(), extendWidth);
         extendedRect.set(extendedRect.left, amount.getRect().top, extendedRect.right, extendedRect.bottom);
         return extendedRect.contains(cash.getRect());
     }
@@ -101,10 +101,10 @@ class OcrSchemer {
                     break;
                 case 1: rawText.addTag(CENTER_TAG);
                     if (isHalfUp(rawText)) {
-                        rawText.addTag(INTRODUCTION);
+                        rawText.addTag(INTRODUCTION_TAG);
                         OcrUtils.log(2, "prepareScheme", "Text: " + rawText.getDetection() + " is center-introduction");
                     } else {
-                        rawText.addTag(CONCLUSION);
+                        rawText.addTag(CONCLUSION_TAG);
                         OcrUtils.log(2, "prepareScheme", "Text: "+rawText.getDetection() + " is center-conclusion");
                     }
                     waveTagger(textList, rawText);
@@ -116,7 +116,14 @@ class OcrSchemer {
             }
         }
         missTagger(textList);
-        densityIntroductionSnake(textList);
+        Collections.sort(textList);
+        int endingIntroduction = densitySnake(textList, INTRODUCTION_TAG);
+        intervalTagger(textList, INTRODUCTION_TAG, 0, endingIntroduction);
+        List<RawText> reversedTextList = new ArrayList<>(textList);
+        Collections.reverse(reversedTextList);
+        int startingConclusion = textList.size() - densitySnake(textList, CONCLUSION_TAG);
+        intervalTagger(textList, CONCLUSION_TAG, startingConclusion, textList.size()-1);
+        intervalTagger(textList, PRODUCTS_TAG, PRODUCTS_TAG, PRICES_TAG, endingIntroduction + 1, startingConclusion -1);
     }
 
     /**
@@ -134,7 +141,7 @@ class OcrSchemer {
      */
     private static boolean isHalfUp(RawText text) {
         int height = text.getRawImage().getHeight();
-        return text.getRect().centerY() < height;
+        return text.getRect().centerY() < height/2;
     }
 
     /**
@@ -147,11 +154,11 @@ class OcrSchemer {
         for (RawText text : texts) {
             if (!text.getTags().contains(CENTER_TAG)) { //here we are excluding source
                 if (extendedRect.contains(text.getRect())) {
-                    if (source.getTags().contains(INTRODUCTION)) {
-                        text.addTag(INTRODUCTION);
+                    if (source.getTags().contains(INTRODUCTION_TAG)) {
+                        text.addTag(INTRODUCTION_TAG);
                         OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is introduction");
                     } else {
-                        text.addTag(CONCLUSION);
+                        text.addTag(CONCLUSION_TAG);
                         OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is conclusion");
                     }
                 }
@@ -166,10 +173,10 @@ class OcrSchemer {
     private static void missTagger(List<RawText> texts) {
         for (RawText text : texts) {
             if (text.getTags().size() < 2 && text.getTags().get(0).equals(LEFT_TAG)) {
-                text.addTag(PRODUCTS);
+                text.addTag(PRODUCTS_TAG);
                 OcrUtils.log(2, "waveTagger", "Text: "+text.getDetection() + " is possible product");
             } else if (text.getTags().size() < 2) {
-                text.addTag(PRICES);
+                text.addTag(PRICES_TAG);
                 OcrUtils.log(2, "waveTagger", "Text: "+text.getDetection() + " is possible price");
             }
         }
@@ -177,25 +184,25 @@ class OcrSchemer {
     }
 
     /**
-     * Get index of rect at witch you want to stop introduction block
+     * Get index of rect at witch you want to stop tag block
+     * Method comments are an example of introduction tag
      * @param textList list of rawTexts
-     * @return -1 if list is empty or there is no introduction block (too low density), else index of last block of introduction
+     * @return -1 if list is empty or there is no tag block (too low density), else index of last block of tag
      */
-    private static int densityIntroductionSnake(List<RawText> textList) {
+    private static int densitySnake(List<RawText> textList, String tag) {
         if (textList.size() == 0)
             return -1;
-        Collections.sort(textList);
         double targetArea = 0;
         double totalArea = 0;
         SortedMap<Double, Integer> map = new TreeMap<>(); //Key is the density, Value is the position, the bigger the area for same density, the better it is
         for (int i = 0; i < textList.size(); ++i) {
             RawText text = textList.get(i);
-            if (text.getTags().contains(INTRODUCTION)) {
+            if (text.getTags().contains(tag)) {
                 targetArea += getRectArea(text.getRect());
             }
             totalArea += getRectArea(text.getRect());
-            OcrUtils.log(1, "densityIntrSnake", "Text: " + text.getDetection() + "\ncurrent density is: "
-                + targetArea/totalArea);
+            OcrUtils.log(1, "densitySnake", "Text: " + text.getDetection() + "\ncurrent density is: "
+                + targetArea/totalArea + "\nand tag: " + tag);
             map.put(targetArea/totalArea, i); // if we have same density but bigger area, let's choose biggest area
         }
         //here We have a list of ordered density and area, to choose the best we define a variable (needs to be tuned)
@@ -204,10 +211,10 @@ class OcrSchemer {
         if (limitText == 0)
             limitText = 1;
         double limit = ((totalArea/textList.size())*(textList.size() - limitText)/totalArea);
-        OcrUtils.log(1, "densityIntrSnake", "Limit density is: " + limit);
+        OcrUtils.log(1, "densitySnake", "Limit density is: " + limit);
         double targetDensity = -1;
         for (Double currentDensity : map.keySet()) {
-            OcrUtils.log(1, "densityIntrSnake", "Possible density is: " + currentDensity);
+            OcrUtils.log(1, "densitySnake", "Possible density is: " + currentDensity);
             if (currentDensity > limit) {
                 targetDensity = currentDensity;
                 break;
@@ -217,20 +224,56 @@ class OcrSchemer {
         // here we include also the first few products), so we better reduce area to the first introduction rect
         if (targetDensity == -1)
             return -1; //No introduction block found, or density too low
-        int introductionPos = map.get(targetDensity);
-        for (int i = introductionPos; i > 0; --i) {
-            if (textList.get(i).getTags().contains(INTRODUCTION)) {
-                introductionPos = i;
+        int position = map.get(targetDensity);
+        for (int i = position; i > 0; --i) {
+            if (textList.get(i).getTags().contains(tag)) {
+                position = i;
                 break;
             }
         }
-        OcrUtils.log(1, "densityIntrSnake", "Final target text is: " + introductionPos
-            + "\nWith text: " + textList.get(introductionPos).getDetection());
-        //Now introductionPos is the value of the last rect for introduction
-        return introductionPos;
+        OcrUtils.log(1, "densitySnake", "Final target text is: " + position
+            + "\nWith text: " + textList.get(position).getDetection() + "\nand tag: " + tag);
+        //Now position is the value of the last rect for introduction
+        return position;
     }
 
     private static double getRectArea(RectF rect) {
         return rect.width() * rect.height();
+    }
+
+    /**
+     * Tagga tutti i text in un determinato intervallo di posizione (start e end inclusi)
+     */
+    private static void intervalTagger(List<RawText> textList, String tag, int start, int end) {
+        if (end < start)
+            return;
+        for (int i = start; i <= end; ++i) {
+            removeOldTags(textList.get(i));
+            textList.get(i).addTag(tag);
+        }
+    }
+
+    /**
+     * Tagga tutti i text in un determinato intervallo di posizione (start e end inclusi)
+     */
+    private static void intervalTagger(List<RawText> textList, String tagLeft, String tagCenter, String tagRight, int start, int end) {
+        if (end < start)
+            return;
+        for (int i = start; i <= end; ++i) {
+            removeOldTags(textList.get(i));
+            if (textList.get(i).getTags().contains(LEFT_TAG))
+                textList.get(i).addTag(tagLeft);
+            else if (textList.get(i).getTags().contains(RIGHT_TAG))
+                textList.get(i).addTag(tagRight);
+            else
+                textList.get(i).addTag(tagCenter);
+        }
+    }
+
+    private static void removeOldTags(RawText text) {
+        text.removeTag(INTRODUCTION_TAG);
+        text.removeTag(CONCLUSION_TAG);
+        text.removeTag(PRODUCTS_TAG);
+        text.removeTag(PRICES_TAG);
     }
 }
