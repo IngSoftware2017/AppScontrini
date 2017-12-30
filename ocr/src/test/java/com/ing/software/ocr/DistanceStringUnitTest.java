@@ -460,6 +460,21 @@ public class DistanceStringUnitTest {
 
     }
 
+    @Test
+    public void haveSubstringMax6() throws Exception {
+
+        String text = "Tatol";
+        String substring = "totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring,max);
+
+        assertEquals(3, r);
+
+    }
+
 
 
     @Test
