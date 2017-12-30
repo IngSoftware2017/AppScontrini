@@ -1,6 +1,8 @@
 package com.ing.software.ocr;
 
 import android.graphics.RectF;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 
 import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
@@ -88,12 +90,10 @@ class OcrSchemer {
     }
 
     /**
-     * Organize a list of rawTexts adding tags according to its position
-     * lista prodotti, lista prezzi, conclusione. Associa un double che rappresenta la sua posizione (in n/10)
-     * all'interno del proprio blocco. Ad esempio se ho k prodotti, il primo inizia (media) in y=10, l'ultimo finisce in
-     * y = 50, un prodotto con media 20 avrà posizione 20*10/(50-10)=5.
+     * Organize a list of rawTexts adding tags according to their position.
+     * @param textList list of rawTexts to organize. Not null
      */
-    static void prepareScheme(List<RawText> textList) {
+    static void prepareScheme(@NonNull List<RawText> textList) {
         for (RawText rawText : textList) {
             switch (getPosition(rawText)) {
                 case 0: rawText.addTag(LEFT_TAG);
@@ -134,28 +134,31 @@ class OcrSchemer {
     }
 
     /**
-     * Indica dov'è il centro del text in coordinata x, dividendo lo scontrino in 3
-     * @param text target text
+     * Find column where center of rawText is, dividing the image in 3 parts
+     * @param text target text. Not null.
      * @return 0,1,2 according to position
      */
-    static private int getPosition(RawText text) {
+    static private int getPosition(@NonNull RawText text) {
         int width = text.getRawImage().getWidth();
         return Math.round(text.getRect().centerX())*3/width;
     }
 
     /**
-     * True se lo scontrino è nella prima metà
+     * @param text source text. Not null.
+     * @return True if text is in half up of the image (temporary method)
      */
-    private static boolean isHalfUp(RawText text) {
+    private static boolean isHalfUp(@NonNull RawText text) {
         int height = text.getRawImage().getHeight();
         return text.getRect().centerY() < height/2;
     }
 
     /**
-     * Cataloga i text, se sono alla stessa altezza di un introduction o conclusion, taggali
-     * di conseguenza, altrimenti considerali products\prices
+     * Organize texts, if they are on the same level of a introduction\conclusion text, tag them accordingly
+     * else consider them products or prices. (todo: simplify)
+     * @param texts ordered list of RawTexts. Not null.
+     * @param source source RawText. Not null.
      */
-    private static void waveTagger(List<RawText> texts, RawText source) {
+    private static void waveTagger(@NonNull List<RawText> texts, @NonNull RawText source) {
         int extendHeight = 20;
         RectF extendedRect = OcrUtils.extendRect(source.getRect(), extendHeight, -source.getRawImage().getWidth());
         for (RawText text : texts) {
@@ -174,10 +177,10 @@ class OcrSchemer {
     }
 
     /**
-     * Tagga i rawtext ancora vuoti
-     * @param texts
+     * Tag rawTexts without a introduction\conclusion tag, as products\prices
+     * @param texts list of rawTexts. Not null.
      */
-    private static void missTagger(List<RawText> texts) {
+    private static void missTagger(@NonNull List<RawText> texts) {
         for (RawText text : texts) {
             if (text.getTags().size() < 2 && text.getTags().get(0).equals(LEFT_TAG)) {
                 text.addTag(PRODUCTS_TAG);
@@ -191,12 +194,13 @@ class OcrSchemer {
     }
 
     /**
-     * Get index of rect at witch you want to stop tag block
+     * Get index of rect at witch you want to stop tag 'block'
      * Method comments are an example of introduction tag
-     * @param textList list of rawTexts
+     * @param textList list of rawTexts. Not null.
+     * @param tag tag for current block. Not null.
      * @return -1 if list is empty or there is no tag block (too low density), else index of last block of tag
      */
-    private static int densitySnake(List<RawText> textList, String tag) {
+    private static int densitySnake(@NonNull List<RawText> textList, @NonNull String tag) {
         if (textList.size() == 0)
             return -1;
         double targetArea = 0;
@@ -213,7 +217,7 @@ class OcrSchemer {
             map.put(targetArea/totalArea, i); // if we have same density but bigger area, let's choose biggest area
         }
         //here We have a list of ordered density and area, to choose the best we define a variable (needs to be tuned)
-        // N = {(area of 1 rect)*[(n° of rect)-(n° of rect%15)]/(total area)}
+        // N = {(area of 1 rect)*[(n° of rect)-(n° of rect/15)]/(total area)}
         int limitText = Math.round(textList.size()/15);
         if (limitText == 0)
             limitText = 1;
@@ -244,14 +248,23 @@ class OcrSchemer {
         return position;
     }
 
-    private static double getRectArea(RectF rect) {
+    /**
+     * Get area of a rect
+     * @param rect A rect. Not null.
+     * @return Area of the rect.
+     */
+    private static double getRectArea(@NonNull RectF rect) {
         return rect.width() * rect.height();
     }
 
     /**
-     * Tagga tutti i text in un determinato intervallo di posizione (start e end inclusi)
+     * Tag all texts in a interval with the same tag. Starting and ending indexes are included.
+     * @param textList list of rawTexts. Not null.
+     * @param tag new tag for rawTexts. Not null.
+     * @param start index of first element. Int >= 0.
+     * @param end index of last element. Int >= 0.
      */
-    private static void intervalTagger(List<RawText> textList, String tag, int start, int end) {
+    private static void intervalTagger(@NonNull List<RawText> textList, @NonNull String tag, @IntRange(from = 0) int start, @IntRange(from = 0) int end) {
         if (end < start)
             return;
         for (int i = start; i <= end; ++i) {
@@ -266,9 +279,16 @@ class OcrSchemer {
     }
 
     /**
-     * Tagga tutti i text in un determinato intervallo di posizione (start e end inclusi)
+     * Tag all texts in a interval with the same tag. Starting and ending indexes are included.
+     * @param textList list of rawTexts. Not null.
+     * @param tagLeft new tag for rawTexts on left. Not null.
+     * @param tagCenter new tag for rawTexts on center. Not null.
+     * @param tagRight new tag for rawTexts on right. Not null.
+     * @param start index of first element. Int >= 0.
+     * @param end index of last element. Int >= 0.
      */
-    private static void intervalTagger(List<RawText> textList, String tagLeft, String tagCenter, String tagRight, int start, int end) {
+    private static void intervalTagger(@NonNull List<RawText> textList, @NonNull String tagLeft, @NonNull String tagCenter,
+                                       @NonNull String tagRight, @IntRange(from = 0) int start, @IntRange(from = 0) int end) {
         if (end < start)
             return;
         for (int i = start; i <= end; ++i) {
@@ -296,7 +316,11 @@ class OcrSchemer {
         }
     }
 
-    private static void removeOldTags(RawText text) {
+    /**
+     * Remove all tags (excluded left-center-right) from a RawText
+     * @param text source text. Not Null.
+     */
+    private static void removeOldTags(@NonNull RawText text) {
         text.removeTag(INTRODUCTION_TAG);
         text.removeTag(CONCLUSION_TAG);
         text.removeTag(PRODUCTS_TAG);
@@ -304,11 +328,11 @@ class OcrSchemer {
     }
 
     /**
-     * Trova posizione del text con formula: (text.centerY-start)/(end-start)
-     * @param text
-     * @param startPosition
-     * @param endPosition
-     * @return
+     * Find position of a text inside its block with the formula: (text.centerY-start)/(end-start)
+     * @param text source rawText. Not Null. Must be inside the block.
+     * @param startPosition top of rect containing the whole block. >= 0.
+     * @param endPosition bottom of rect containing the whole block. >= startPosition.
+     * @return position as a 0 <= double <= 1.
      */
     private static double getTextBlockPosition(RawText text, float startPosition, float endPosition) {
         return ((double)(text.getRect().centerY() - startPosition))/(endPosition - startPosition);
