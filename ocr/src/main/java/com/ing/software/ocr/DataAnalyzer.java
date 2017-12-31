@@ -479,9 +479,7 @@ public class DataAnalyzer {
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
         if(minDistance<10)
         {
-            String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy","MM/dd/yyyy","MM-dd-yyyy","MM.dd.yyyy"};
-            date = parseDate(dataSearch,expectedPattern);
-
+            date = parseDate(dataSearch);
         }
         return date;
 
@@ -492,14 +490,67 @@ public class DataAnalyzer {
      * @author Salvagno
      *
      * @param dateString An input date string.
-     * @param formats An array of date formats that we have allowed for.
      * @return A Date (java.util.Date) reference. The reference will be null if
      *         we could not match any of the known formats.
      */
-    public static Date parseDate(String dateString, String[] formats)
+    public static Date parseDate(String dateString)
     {
         Date date = null;
         Locale locale = new Locale("US");
+
+        //prendo i tre pezzi della stringa data
+        char[] string = dateString.toCharArray();
+        String token1 = "";
+        String token2 = "";
+        String token3 = "";
+        Integer numberOfSymbols = 0;
+        String finalDate = "";
+        String[] formats;
+
+
+
+        for (char c : string) {
+            if (c == '-' || c == '.' || c == '/')
+            {
+                numberOfSymbols ++;
+                finalDate=finalDate+'-';
+            }
+            else
+            {
+                finalDate=finalDate+c;
+
+                if(numberOfSymbols == 0)
+                    token1 = token1+c;
+                else if(numberOfSymbols == 1)
+                    token2 = token2+c;
+                else if(numberOfSymbols == 2)
+                    token3 = token3+c;
+                else
+                    return null;
+            }
+
+        }
+
+        //convert string to integer and get last two digit
+        int token1Number = ((Integer.parseInt(token1))%100);    //probably is day
+        int token2Number = ((Integer.parseInt(token2))%100);    //probably is month
+        int token3Number; //probably is year
+        if(token3.length()==4) //if this token have 4 character
+        {
+            token3Number = Integer.parseInt(token3);
+            formats = new String[] {"dd-MM-yyyy","MM-dd-yyyy"};
+        }
+        else {
+            token3Number = ((Integer.parseInt(token3)) % 100);
+            formats = new String[] {"dd-MM-yy", "MM-dd-yy"};
+        }
+
+        if((token1Number >= 1 && token1Number <= 12) && (token2Number >= 1 && token2Number <= 12))
+            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
+        else if(token2Number > 12)
+            dateString = String.valueOf(token2Number)+'-'+String.valueOf(token1Number)+'-'+String.valueOf(token3Number);
+        else
+            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
 
         for (int i = 0; i < formats.length; i++)
         {
