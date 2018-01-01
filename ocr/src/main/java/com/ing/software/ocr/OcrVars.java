@@ -3,8 +3,7 @@ package com.ing.software.ocr;
 import android.util.Pair;
 
 
-import com.ing.software.ocr.OcrObjects.TextMatcher;
-import com.mifmif.common.regex.Generex;
+import com.ing.software.ocr.OcrObjects.WordMatcher;
 
 import static java.util.Collections.*;
 import java.util.List;
@@ -26,21 +25,23 @@ class OcrVars {
     static final int LANG_EN = 0;
     static final int LANG_IT = 1;
 
-    // day 1 to 31 with or without decimal 0: (0?[1-9]|[12]\d|3[01])
-    // month 1 to 12 with or without decimal 0: (0?[1-9]|1[012])
-    // year 1960 to 2059 with or without hundreds: ((19)?[6-9]|(20)?[0-5])\d
+    // day 1 to 31 with or without 0 tens.
+    // month 1 to 12 with or without 0 tens.
+    // year 1960 to 2059 with or without hundreds.
+    // go to https://regex101.com/ to check the behaviour of these regular expressions.
     static final int YEAR_CUT = 60; // YY < 60 -> 20YY;  YY >= 60 -> 19YY
     static final Pattern DATE_DMY = compile(
-            "(0?[1-9]|[12]\\d|3[01])[-/.](0?[1-9]|1[012])[-/.]((19)?[6-9]|(20)?[0-5])\\d");
+            "(?<!\\d)(?:0?[1-9]|[12]\\d|3[01])([-/.,])(?:0?[1-9]|1[012])\\1(?:(?:19)?[6-9]|(?:20)?[0-5])\\d(?!\\1|\\d)");
     static final Pattern DATE_MDY = compile(
-            "(0?[1-9]|1[012])[-/.](0?[1-9]|[12]\\d|3[01])[-/.]((19)?[6-9]|(20)?[0-5])\\d");
+            "(?<!\\d)(?:0?[1-9]|1[012])([-/.,])(?:0?[1-9]|[12]\\d|3[01])\\1(?:(?:19)?[6-9]|(?:20)?[0-5])\\d(?!\\1|\\d)");
     static final Pattern DATE_YMD = compile(
-            "((19)?[6-9]|(20)?[0-5])\\d[-/.](0?[1-9]|1[012])[-/.](0?[1-9]|[12]\\d|3[01])");
+            "(?<!\\d)(?:(?:19)?[6-9]|(?:20)?[0-5])\\d([-/.,])(?:0?[1-9]|1[012])\\1(?:0?[1-9]|[12]\\d|3[01])(?!\\1|\\d)");
+    //back reference/forward reference not supported in lookbehind but is supported in lookahead
 
     // match every number (with optional hundreds mark) with 2 decimal digits or a "-" (netherlands)
-    // accept if there is something before or a single non digit after (€).
+    // accept if there is something before or a single non digit after (ex: €).
     static final Pattern AMOUNT_PRICE_STRICT = compile(
-            "(0|[1-9][\\d,.]*)[,.](\\d{2}|-)[^\\d]?$");
+            "(?<!\\d)(?:0|[1-9][\\d,.]*)[,.](?:\\d{2}|-)(?=[^\\d]?$)");
 
     // regex-score pairs.
     static final List<Pair<Pattern, Double>> DATE_REGEX_EN = asList(
@@ -49,12 +50,14 @@ class OcrVars {
     );
     static final List<Pair<Pattern, Double>> DATE_REGEX_IT = singletonList(new Pair<>(DATE_DMY, 3.));
 
-    static final List<TextMatcher> AMOUNT_MATCHERS = asList(
-            new TextMatcher("T[OUD]TALE.?", 6, 1, 1),
-            new TextMatcher("TOT.?", 3, 0, 1),
-            new TextMatcher("T[OUD]TALEE[UI]R[OD]?", 8, 3, 1),
-            new TextMatcher("IMP[OU]RT[OD]", 7, 1, 1),
-            new TextMatcher("IMP[OU]RT[OD]E[UI]R[OD]?", 8, 3, 1)
+    static final List<WordMatcher> AMOUNT_MATCHERS = asList(
+            new WordMatcher("T[OUD]TALE", 6, 1),
+            new WordMatcher("TOT", 3, 0),
+            new WordMatcher("T[OUD]TALEE[UI]R[OD]", 8, 3),
+            new WordMatcher("IMP[OU]RT[OD]", 7, 1),
+            new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 8, 3)
     );
 
+    // ideal character width / height
+    static final double CHAR_ASPECT_RATIO = 5./8.;
 }

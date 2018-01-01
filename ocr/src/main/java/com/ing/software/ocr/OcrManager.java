@@ -51,21 +51,21 @@ public class OcrManager {
     }
 
     /**
-     * Get a Ticket from an ImagePreprocessor. Some fields of the new ticket can be null.
-     * @param preprocessor ImagePreprocessor. Not null.
+     * Get a Ticket from an ImageProcessor. Some fields of the new ticket can be null.
+     * @param preprocessor ImageProcessor. Not null.
      * @param ticketCb     callback to get the ticket. Not null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
-    public void getTicket(@NonNull ImagePreprocessor preprocessor, @NonNull Consumer<Ticket> ticketCb) {
+    public void getTicket(@NonNull ImageProcessor preprocessor, @NonNull Consumer<Ticket> ticketCb) {
         new Thread(() -> {
             synchronized (this) {
                 if (!operative)
                     return;
                 long startTime = System.nanoTime();
-                Bitmap bm = preprocessor.undistortForOCR();
-                OcrResult result = analyzer.analyze(bm);
+                Bitmap frame = preprocessor.undistortForOCR();
+                OcrResult result = analyzer.analyze(frame);
                 ticketCb.accept(getTicketFromResult(result));
                 long endTime = System.nanoTime();
                 double duration = ((double) (endTime - startTime)) / 1000000000;

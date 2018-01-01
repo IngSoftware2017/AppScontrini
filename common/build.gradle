@@ -34,4 +34,5 @@ dependencies {
     api 'com.github.mifmif:generex:1.0.2'
     //api 'dk.brics:automaton:1.12-1'
     //api 'org.apache.tika:tika-langdetect:1.17'
+    api 'com.optimaize.languagedetector:language-detector:0.6'
 }

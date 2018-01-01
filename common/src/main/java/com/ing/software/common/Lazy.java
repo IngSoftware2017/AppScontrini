@@ -4,8 +4,9 @@ import com.annimon.stream.function.Supplier;
 
 /**
  * Lazily instantiate an object.
- * Useful if in an array of objects, only some fields of some elements are accessed.
+ * Useful if in a collection of objects, only some fields of some elements are accessed.
  * Please mind that everything before :: operator is executed in place.
+ * Ex: instead of (...::toList) use (() -> ... .toList()).
  * @param <T> object
  */
 public class Lazy<T> {

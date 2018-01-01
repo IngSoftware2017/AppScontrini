@@ -3,6 +3,7 @@ package com.ing.software.ocr;
 import android.graphics.*;
 import android.support.annotation.NonNull;
 import android.util.Pair;
+import android.util.SizeF;
 
 import com.annimon.stream.Stream;
 import com.ing.software.common.*;
@@ -33,26 +34,26 @@ import static java.util.Collections.*;
  * <p> USAGE CASES: </p>
  *
  * <p> Real time visual feedback when framing a ticket: </p>
- * <ol> Create new ImagePreprocessor passing a the bitmap of the preview frame.</ol>
+ * <ol> Create new ImageProcessor passing a the bitmap of the preview frame.</ol>
  * <ol> Call findTicket(true) </ol>
  * <ol> If findTicket callback has an empty error list, call getCorners() to get the rectangle corners
  *       to overlay on top of the preview. </ol>
  * <ol> If the callback list contains CROOKED_TICKET, alert user that the ticket is framed sideways </ol>
  *
  * <p> User shoots a photo: </p>
- * <ol> Use ImagePreprocessor instance of last frame when rectangle was found. </ol>
+ * <ol> Use ImageProcessor instance of last frame when rectangle was found. </ol>
  * <ol> Call findTicket(false); </ol>
  * <ol> If findTicket callback has an empty error list, proceed to step 5) </ol>
  * <ol> If the callback list contains RECT_NOT_FOUND, let user drag the rectangle corners into position,
  *     then proceed to call setCorners(). </ol>
- * <ol> Call OcrManager.getTicket passing this ImagePreprocessor instance.
+ * <ol> Call OcrManager.getTicket passing this ImageProcessor instance.
  *       Call undistort() to get the photo of the ticket unwarped. </ol>
  *
  * <p> New photo imported from storage: </p>
- * <ol> Same as when user shot a photo, but ImagePreprocessor must be created with imported photo. </ol>
+ * <ol> Same as when user shot a photo, but ImageProcessor must be created with imported photo. </ol>
  *
  * <p> Load and show photo already processed: </p>
- * <ol> Create new ImagePreprocessor passing the photo and the corners. </ol>
+ * <ol> Create new ImageProcessor passing the photo and the corners. </ol>
  * <ol> Call undistort().</ol>
  *
  * @author Riccardo Zaglia
@@ -61,11 +62,11 @@ import static java.util.Collections.*;
  * I used only pivate-static and public methods to avoid side effects that increase complexity.
  * I'm sticking to the one-purpose-method rule.
  */
-public class ImagePreprocessor {
+public class ImageProcessor {
 
     // length of smallest side of downscaled image
     // SHORT_SIDE must be chosen to limit side effects of resampling, on both 16:9 and 4:3 aspect ratio images
-    private static final int SHORT_SIDE = 720;
+    private static final float SHORT_SIDE = 720;
 
     //Bilateral filter:
     private static final int BF_KER_SZ = 9; // kernel size, must be odd
@@ -180,11 +181,10 @@ public class ImagePreprocessor {
      * @return RGBA Mat.
      */
     private static Mat downScaleRgba(Mat img) {
-        float aspectRatio = (float)img.rows() / img.cols();
-        Size size = aspectRatio > 1 ? new Size(SHORT_SIDE, (int)(SHORT_SIDE * aspectRatio))
-                : new Size((int)(SHORT_SIDE / aspectRatio), SHORT_SIDE);
+        float aspectRatio = (float)img.cols() / img.rows();
         Mat bgrResized = new Mat();
-        resize(img, bgrResized, size);
+        resize(img, bgrResized, aspectRatio < 1 ? new Size(SHORT_SIDE, SHORT_SIDE / aspectRatio)
+                : new Size(SHORT_SIDE * aspectRatio, SHORT_SIDE));
         return bgrResized;
     }
 
@@ -472,6 +472,7 @@ public class ImagePreprocessor {
 
     private Mat srcImg;
     private Mat resized;
+    private Mat undistorted;
     private List<Point> corners;
 
 
@@ -480,8 +481,28 @@ public class ImagePreprocessor {
     synchronized Bitmap undistortForOCR() {
         if (corners == null || srcImg == null || resized == null)
             return null;
-        return matToBitmap(undistort(resized, scale(new MatOfPoint2f(corners.toArray(new Point[4])),
-                srcImg.size(), resized.size()), MARGIN_MUL_OCR));
+        undistorted = undistort(resized, scale(new MatOfPoint2f(corners.toArray(new Point[4])),
+                srcImg.size(), resized.size()), MARGIN_MUL_OCR);
+        return matToBitmap(undistorted);
+    }
+
+    /**
+     * Get a cropped version of the undistorted image, with "newAspectRatio".
+     * The returned Bitmap size is always >= of region size.
+     * @param region region of undistorted image to crop.
+     * @param newAspectRatio new Bitmap aspectRatio
+     * @return new Bitmap.
+     */
+    synchronized Bitmap undistortedSubregion(RectF region, double newAspectRatio) {
+        if (undistorted == null)
+            undistortForOCR();
+        double stretchMul = newAspectRatio / (region.width() / region.height());
+        Size newSize = stretchMul > 1 ? new Size(region.width() * stretchMul, region.height())
+                : new Size(region.width(), region.height() / stretchMul);
+        Mat finalImg = new Mat();
+        resize(undistorted.submat((int)region.top, (int)region.bottom,
+                (int)region.left, (int)region.right), finalImg, newSize);
+        return matToBitmap(finalImg);
     }
 
 
@@ -490,13 +511,13 @@ public class ImagePreprocessor {
     /**
      * You need to call setBitmap()
      */
-    public ImagePreprocessor() {}
+    public ImageProcessor() {}
 
     /**
      * No need to call setBitmap().
      * @param bm ticket bitmap. Not null.
      */
-    public ImagePreprocessor(@NonNull Bitmap bm) {
+    public ImageProcessor(@NonNull Bitmap bm) {
         setImage(bm);
     }
 
@@ -505,7 +526,10 @@ public class ImagePreprocessor {
      * Always call this method before any other image manipulation method.
      * @param bm ticket bitmap. Not null.
      */
-    public void setImage(@NonNull Bitmap bm) {
+    public synchronized void setImage(@NonNull Bitmap bm) {
+        corners = null;
+        resized = null;
+        undistorted = null;
         srcImg = new Mat();
         Utils.bitmapToMat(bm, srcImg);
     }
@@ -529,6 +553,7 @@ public class ImagePreprocessor {
         new Thread(() -> {
             synchronized (this) { // make sure this code is not executed concurrently when findTicket
                                   // is called more than once consecutively
+                undistorted = null;
                 if (srcImg == null) {
                     callback.accept(singletonList(TicketError.INVALID_STATE));
                     return;
@@ -588,6 +613,7 @@ public class ImagePreprocessor {
      *                      - INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
      */
     public synchronized TicketError setCorners(@NonNull List<PointF> corners) {
+        undistorted = null;
         this.corners = androidPtsToCV(corners);
         //todo check if corners are ordered correctly
         return corners.size() == 4 ? TicketError.NONE : TicketError.INVALID_POINTS;

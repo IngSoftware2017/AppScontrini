@@ -2,10 +2,6 @@ package com.ing.software.ocr;
 
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -13,18 +9,11 @@ import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Locale;
 
-import com.ing.software.common.Ref;
-import com.ing.software.ocr.OcrObjects.Block;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
 import com.ing.software.ocr.OcrObjects.RawText;
-import com.ing.software.ocr.OcrObjects.TextLine;
-import com.ing.software.ocr.OcrObjects.TextMatcher;
-import com.ing.software.ocr.OcrObjects.Word;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.Size;
@@ -570,39 +559,5 @@ public class DataAnalyzer {
         }
 
         return date;
-    }
-
-
-    // does not work
-    /**
-     * Get the most likely language of ticket.
-     * @param lines all the TextLines of ticket.
-     * @return language.
-     *
-     * @author Riccardo Zaglia
-     */
-    static String getTicketLanguage(List<TextLine> lines) {
-        Map<String, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
-        String bestLang = "undefined";
-        double bestScore = 0;
-        for (TextLine l : lines) {
-//            todo use apache TIKA library
-//            String lang = w.lang();
-//            if (!Objects.equals(lang, "und") && !Objects.equals(lang, "")) { // if lang is not undefined
-//                double area = b.area();
-//                Ref<Double> score = accumulator.get(lang);
-//                if (score != null)
-//                    score.value += area;
-//                else {
-//                    score = new Ref<>(area);
-//                    accumulator.put(lang, score);
-//                }
-//                if (score.value > bestScore) {
-//                    bestScore = score.value;
-//                    bestLang = lang;
-//                }
-//            }
-        }
-        return bestLang;
     }
 }

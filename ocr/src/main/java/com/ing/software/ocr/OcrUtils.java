@@ -261,51 +261,6 @@ public class OcrUtils {
 
     /**
      * @author Salvagno
-     * Returns the distance of Levenshtein between two strings | S | e | T |.
-     * The Levenshtein distance is a string metric for measuring the difference between two sequences.
-     * Informally, the Levenshtein distance between two words is the minimum number of single-character
-     * edits (insertions, deletions or substitutions) required to change one word into the other.
-     * The distance is an integer between 0 and the maximum length of the two strings.
-     * If only one string is null then return -1
-     * If the distance exceeds the maximum input distance, the function stops and returns the maximum value
-     *
-     * @param S The first string to be compared
-     * @param T The second string to be compared
-     * @param max maximum distance accepted
-     * @return distance between two strings or the maximum value if it has been exceeded
-     */
-    static int levDistance(String S, String T, Integer max)
-    {
-        if(S == null || T == null)
-            return -1;
-
-        int i, j;
-        final int n = S.length(), m = T.length();
-        int L[][] = new int[n+1][m+1];
-        for ( i=0; i<n+1; i++ ) {
-            for ( j=0; j<m+1; j++ ) {
-                if ( i==0 || j==0 ) {
-                    L[i][j] = maxLengthStrings(i, j);
-                } else {
-                    L[i][j] = minLengthStrings(L[i-1][j] + 1, L[i][j-1] + 1,
-                            L[i-1][j-1] + (S.charAt(i-1) != T.charAt(j-1) ? 1 : 0) );
-                }
-
-                if(L[n][m] > max)
-                {
-                    return max;
-                }
-
-
-            }
-
-        }
-
-        return L[n][m];
-    }
-
-    /**
-     * @author Salvagno
      * Check if there is a substring in the text
      * The text is subdivided into tokens and each token is checked
      * If only one string is null then return -1
@@ -344,58 +299,6 @@ public class OcrUtils {
                 break;
             start++;
             }
-
-        return minDistance;
-    }
-
-
-    /**
-     * @author Salvagno
-     * Check if there is a substring in the text
-     * The text is subdivided into tokens and each token is checked
-     * If only one string is null then return -1
-     * If the token length is less than 2 then returns -1
-     * If the distance exceeds the maximum input distance, returns the maximum value
-     *
-     * @param text The text to be compared
-     * @param substring The second string to be compared
-     * @param max maximum distance accepted
-     * @return the slightest difference between strings and text
-     */
-    public static int findSubstring(String text, String substring, Integer max)
-    {
-        if(text == null || substring == null || text.length() == 0)
-            return -1;
-
-        int minDistance = substring.length();
-        int subLength = minDistance;
-
-        //Analyze the text by removing the spaces
-        String text_w_o_space =  text.replace(" ", "");
-        //If the text is smaller than the searched string, invert the strings
-        if(text_w_o_space.length() < minDistance)
-        {
-            String temp_text = text_w_o_space;
-            text_w_o_space = substring;
-            substring = temp_text;
-        }
-
-        //Search a piece of string as long as the length of the searched string in the text
-        int start=0;
-        for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
-            String token = text_w_o_space.substring( start, finish);
-            int distanceNow = levDistance(token.toUpperCase(), substring.toUpperCase(), max);
-            if (distanceNow < minDistance)
-                minDistance = distanceNow;
-            //Lucky case
-            if(distanceNow == 0)
-                break;
-            //maximum value accepted
-            if(distanceNow >= max)
-                break;
-
-            start++;
-        }
 
         return minDistance;
     }

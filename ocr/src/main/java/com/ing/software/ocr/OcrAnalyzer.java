@@ -5,22 +5,29 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
+import android.util.Pair;
+import android.util.SizeF;
 import android.util.SparseArray;
 
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Line;
-import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.android.gms.vision.text.*;
+import com.ing.software.common.Ref;
+import com.ing.software.common.Scored;
+import com.ing.software.common.Ticket;
 import com.ing.software.ocr.OcrObjects.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
+import static java.util.Collections.*;
 
 /**
  * Class containing different methods to analyze a picture
@@ -61,7 +68,7 @@ public class OcrAnalyzer {
      * @param frame Bitmap used to create an OcrResult. Not null.
      * @return OcrResult containing raw data to be further analyzed.
      */
-    OcrResult analyze(@NonNull Bitmap frame){
+    OcrResult analyze(Bitmap frame){
         //cropping must be used somewhere else (if used with textRecognizer). Can be used here if using opencv
         //frame = getCroppedPhoto(frame, context);
         mainImage = new RawImage(frame);
@@ -79,16 +86,6 @@ public class OcrAnalyzer {
         List<RawGridResult> dateList = getDateList(rawOrigTexts);
         return new OcrResult(valuedTexts, dateList, getProductPrices(rawOrigTexts));
     }
-
-    private static List<TextLine> textBlocksToLines(SparseArray<TextBlock> textBlocks) {
-        List<TextLine> lines = new ArrayList<>();
-        for (int i = 0; i < textBlocks.size(); i++) {
-            lines.addAll(Stream.of(textBlocks.valueAt(i).getComponents())
-                    .map(txt -> new TextLine((Line)txt)).toList());
-        }
-        return lines;
-    }
-
 
     /**
      * List in debug log blocks parsed (detection + grid)
@@ -308,5 +305,137 @@ public class OcrAnalyzer {
         int top = borders[1];
         int bottom = borders[3];
         return OcrUtils.cropImage(photo, left, top, right, bottom);
+    }
+
+
+
+    //PLEASE IGNORE FOR NOW
+    //@author Riccardo Zaglia
+
+    // Extended rectangle vertical multiplier
+    private static final double EXT_RECT_V_MUL = 3;
+
+    /**
+     * This function runs the ocr detection on the given bitmap.
+     * @param bm
+     * @param ocrEngine
+     * @return
+     */
+    private static List<TextLine> bitmapToLines(Bitmap bm, TextRecognizer ocrEngine) {
+        SparseArray<TextBlock> blocks = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
+        List<TextLine> lines = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) {
+            lines.addAll(Stream.of(blocks.valueAt(i).getComponents())
+                    .map(txt -> new TextLine((Line)txt)).toList());
+        }
+        return lines;
+    }
+
+    /**
+     * Choose the TextLine that most probably contains the amount string.
+     * Criteria: AMOUNT_MATCHER score; character size
+     * @param lines list of TextLines. Can be empty
+     * @return TextLine with higher score. Can be null if no match is found.
+     */
+    private static TextLine findAmountString(List<TextLine> lines, double ticketHeight) {
+        if (lines.isEmpty())
+            return null;
+        Scored<TextLine> candidate = max(Stream.of(lines).map(line -> {
+            double score = max(Stream.of(AMOUNT_MATCHERS).map(M -> M.match(line)).toList());
+            score *= line.charWidth() + line.height();
+            score *= 1. - line.centerY() / ticketHeight;
+            return new Scored<>(score, line);
+        }).toList());
+        return candidate.getScore() > 0 ? candidate.obj() : null;
+    }
+
+    @NonNull
+    private static RectF getAmountStripRect(TextLine line, double imageWidth) {
+        double halfHeight = line.height() * EXT_RECT_V_MUL / 2.;
+        // here I account that the amount number could be in the same line of the amount string.
+        // I use the center of the line as a left boundary.
+        return new RectF((float)line.centerX(), (float)(line.centerY() - halfHeight),
+                (float)imageWidth, (float)(line.centerY() + halfHeight));
+    }
+
+    private static Bitmap getAmountStrip(ImageProcessor ip, TextLine line, double imageWidth) {
+        RectF rect = getAmountStripRect(line, imageWidth);
+        return ip.undistortedSubregion(rect,
+                rect.width() / rect.height() * CHAR_ASPECT_RATIO / line.charAspectRatio());
+    }
+
+    private static List<Pair<String, TextLine>> findAllDateStrings(List<TextLine> lines) {
+        List<Pair<String, TextLine>> dateStrings = new ArrayList<>();
+        for (TextLine line : lines) {
+            String lineMatch = null;
+            for (Word w : line.words()) {
+                Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
+                if (matcher.find()) {
+                    lineMatch = matcher.group(); // get first group -> entire regex match
+                    break;
+                }
+            }
+            if (lineMatch == null) {
+                Matcher matcher = DATE_DMY.matcher(line.textSanitizedNum());
+                if (matcher.find())
+                    lineMatch = matcher.group();
+            }
+            if (lineMatch != null)
+                dateStrings.add(new Pair<>(lineMatch, line));
+        }
+        return dateStrings;
+    }
+
+    void analyzeTicket(ImageProcessor preproc, Consumer<Ticket> ticketCb) {
+        Bitmap bm = preproc.undistortForOCR();
+        double width = bm.getWidth(), height = bm.getHeight();
+        List<TextLine> lines = bitmapToLines(bm, ocrEngine);
+
+        //find total
+        TextLine amountStringLine = findAmountString(lines, height);
+        if (amountStringLine != null) {
+            Bitmap amountStrip = getAmountStrip(preproc, amountStringLine, width);
+
+        }
+
+        //todo find date
+
+        Ticket ticket = new Ticket();
+
+        ticketCb.accept(ticket);
+    }
+
+
+    // does not work
+    /**
+     * Get the most likely language of ticket.
+     * @param lines all the TextLines of ticket.
+     * @return language.
+     *
+     * @author Riccardo Zaglia
+     */
+    static String getTicketLanguage(List<TextLine> lines) {
+        Map<String, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
+        String bestLang = "undefined";
+        double bestScore = 0;
+        for (TextLine line : lines) {
+//            todo use apache TIKA library
+//            String lang = w.lang();
+//            if (!Objects.equals(lang, "und") && !Objects.equals(lang, "")) { // if lang is not undefined
+//                double area = b.area();
+//                Ref<Double> score = accumulator.get(lang);
+//                if (score != null)
+//                    score.value += area;
+//                else {
+//                    score = new Ref<>(area);
+//                    accumulator.put(lang, score);
+//                }
+//                if (score.value > bestScore) {
+//                    bestScore = score.value;
+//                    bestLang = lang;
+//                }
+//            }
+        }
+        return bestLang;
     }
 }

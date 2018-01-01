@@ -7,13 +7,12 @@ import com.google.android.gms.vision.text.Element;
 import com.ing.software.common.Lazy;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static com.ing.software.common.CommonUtils.ptsToPtsF;
 import static java.util.Arrays.asList;
 
 public class Word {
-    static List<Pair<String, String>> NUM_SANITIZE_LIST = asList(
+    private static List<Pair<String, String>> NUM_SANITIZE_LIST = asList(
             new Pair<>("O", "0"),
             new Pair<>("o", "0"),
             new Pair<>("D", "0"),
@@ -27,13 +26,13 @@ public class Word {
     private Element elem;
     private Lazy<List<PointF>> corners;
     private Lazy<String> textOnlyAlpha;
-    private Lazy<String> textOnlyNum;
+    private Lazy<String> textSanitizedNum;
 
     public Word(Element element) {
         elem = element;
         corners = new Lazy<>(() -> ptsToPtsF(asList(elem.getCornerPoints())));
         textOnlyAlpha = new Lazy<>(() -> text().replaceAll("[^A-Z]", ""));
-        textOnlyNum = new Lazy<>(() -> {
+        textSanitizedNum = new Lazy<>(() -> {
             String res = elem.getValue();
             for (Pair<String, String> p : NUM_SANITIZE_LIST)
                 res = res.replace(p.first, p.second);
@@ -54,7 +53,7 @@ public class Word {
         return textOnlyAlpha.get();
     }
 
-    public String textOnlyNum() {
-        return textOnlyNum.get();
+    public String textSanitizedNum() {
+        return textSanitizedNum.get();
     }
 }

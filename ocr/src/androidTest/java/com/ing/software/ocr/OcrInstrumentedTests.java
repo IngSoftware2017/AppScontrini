@@ -45,7 +45,7 @@ public class OcrInstrumentedTests {
 //                final Ticket target = null; //todo: initialize
 //                Bitmap photo = getBitmap(i);
 //                if (photo != null) {
-//                    ImagePreprocessor preproc = new ImagePreprocessor(photo);
+//                    ImageProcessor preproc = new ImageProcessor(photo);
 //                    preproc.findTicket(false, err -> {
 //                        analyzer.getTicket(preproc, ticket -> {
 //
