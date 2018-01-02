@@ -18,7 +18,7 @@ import android.net.Uri;
 
 @Entity(tableName = Constants.MISSION_TABLE_NAME,
         foreignKeys = @ForeignKey(entity = PersonEntity.class,
-                parentColumns = Constants.PERSON_PRIMARY_KEY_NAME,
+                parentColumns = Constants.PERSON_PRIMARY_KEY,
                 childColumns = Constants.PERSON_CHILD_COLUMNS,
                 onDelete = ForeignKey.CASCADE))
 @TypeConverters(Converters.class) // automatic converters for database correct type
@@ -26,10 +26,10 @@ import android.net.Uri;
 public class MissionEntity {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY_NAME)
+    @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY)
     private long ID;
-    private Date startMission;
-    private Date endMission;
+    private Date startDate;
+    private Date endDate;
     private String location;
     private boolean isRepay;
     private Uri excel;
@@ -48,14 +48,14 @@ public class MissionEntity {
     /**
      * Parametric constructor
      *
-     * @param startMission Date of the beginning of the mission
-     * @param endMission Date of the end of the mission
+     * @param startDate Date of the beginning of the mission
+     * @param endDate Date of the end of the mission
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public MissionEntity(String name, Date startMission, Date endMission, String location, int personID) {
-        this.startMission = startMission;
-        this.endMission = endMission;
+    public MissionEntity(String name, Date startDate, Date endDate, String location, int personID) {
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.location = location;
         isRepay = false;
         excel = null;
@@ -82,34 +82,34 @@ public class MissionEntity {
 
     /**
      * Returns the beginning date of the mission
-     * @return startMission
+     * @return startDate
      */
-    public Date getStartMission() {
-        return startMission;
+    public Date getStartDate() {
+        return startDate;
     }
 
     /**
      * Sets the beginning date of the mission
-     * @param startMission
+     * @param startDate
      */
-    public void setStartMission(Date startMission) {
-        this.startMission = startMission;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     /**
      * Returns the end date of the mission
-     * @return endMission
+     * @return endDate
      */
-    public Date getEndMission() {
-        return endMission;
+    public Date getEndDate() {
+        return endDate;
     }
 
     /**
      * Sets the end date of the mission
-     * @param endMission
+     * @param endDate
      */
-    public void setEndMission(Date endMission) {
-        this.endMission = endMission;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     /**

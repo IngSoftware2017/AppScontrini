@@ -27,23 +27,23 @@ public class MissionEntityTest {
 
     @Test
     public void getStartMissionReturnTheDateOfBeginning(){
-        assertTrue(missionEntity1.getStartMission().equals(dateI));
+        assertTrue(missionEntity1.getStartDate().equals(dateI));
     }
 
     @Test
     public void setStartMissionSetTheDateOfBeginning(){
-        missionEntity2.setStartMission(dateI);
-        assertTrue(missionEntity2.getStartMission().equals(missionEntity1.getStartMission()));
+        missionEntity2.setStartDate(dateI);
+        assertTrue(missionEntity2.getStartDate().equals(missionEntity1.getStartDate()));
     }
     @Test
     public void getEndMissionReturnTheDateOfEnding(){
-        assertTrue(missionEntity1.getEndMission().equals(dateF));
+        assertTrue(missionEntity1.getEndDate().equals(dateF));
     }
 
     @Test
     public void setEndMissionSetTheDateOfEnding(){
-        missionEntity2.setEndMission(dateF);
-        assertTrue(missionEntity2.getEndMission().equals(missionEntity1.getEndMission()));
+        missionEntity2.setEndDate(dateF);
+        assertTrue(missionEntity2.getEndDate().equals(missionEntity1.getEndDate()));
     }
 
     @Test
