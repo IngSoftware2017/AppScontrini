@@ -22,6 +22,7 @@ import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
 import database.TicketEntity;
 
 public class MainActivityGruppo1 extends AppCompatActivity implements OnTicketReadyListener{
@@ -31,6 +32,8 @@ public class MainActivityGruppo1 extends AppCompatActivity implements OnTicketRe
     DataAnalyzer analyzer;
     public static MainActivityGruppo1 mainActivity;
     ArrayList<OnTicketReadyListener> listeners = new ArrayList<OnTicketReadyListener>();
+    //Initialization of an user Person who will own every mission without associated Person
+    PersonEntity user = new PersonEntity("user","user","");
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,8 @@ public class MainActivityGruppo1 extends AppCompatActivity implements OnTicketRe
         analyzer = new DataAnalyzer();
         analyzer.initialize(this);
         printAllMissions();
+        //set the "super-owner"
+        dataManager.addPerson(user);
     }
 
     /** Dal Maso

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:windowSoftInputMode="stateAlwaysHidden"
     tools:context=".AddMission">
 
     <EditText
@@ -22,8 +23,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:focusable="true"
-        tools:ignore="MissingConstraints" />
+        android:focusable="true" />
 
     <EditText
         android:id="@+id/starMissionText"
@@ -40,7 +40,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameText"
-        android:windowSoftInputMode="stateHidden"/>
+        android:windowSoftInputMode="stateHidden" />
 
     <EditText
         android:id="@+id/endMissionText"
@@ -57,8 +57,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/starMissionText"
-        android:focusable="true"
-        tools:ignore="MissingConstraints" />
+        android:windowSoftInputMode="stateHidden" />
 
     <TextView
         android:id="@+id/textView"
@@ -72,8 +71,7 @@
         app:layout_constraintHorizontal_bias="0.307"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/endMissionText"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toBottomOf="@+id/endMissionText" />
 
 
 
@@ -96,8 +94,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.982"
-        app:srcCompat="@android:drawable/ic_menu_save"
-        tools:ignore="MissingConstraints" />
+        app:srcCompat="@android:drawable/ic_menu_save" />
 
     <Spinner
         android:id="@+id/personsSpinner"

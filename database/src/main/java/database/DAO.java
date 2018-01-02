@@ -153,4 +153,13 @@ public interface DAO {
      */
     @Query("SELECT * FROM " + Constants.PERSON_TABLE_NAME + " WHERE " + Constants.PERSON_PRIMARY_KEY_NAME + " =:id")
     PersonEntity getPerson(int id);
+
+    /**
+     * Executes a SELECT of a specific person from the last name returning the ID
+     *
+     * @param ln last name of the person
+     * @the ID of the first match
+     */
+    @Query("SELECT "+Constants.PERSON_PRIMARY_KEY_NAME+" FROM "+Constants.PERSON_TABLE_NAME + " WHERE lastName=:ln")
+    int getPersonIDByLastName(String ln);
 }

@@ -76,8 +76,8 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
 
     int personID;
 
-    //Initialization of an user Person who will own every mission without associated Person
-    PersonEntity user = new PersonEntity("user","user","");
+    //TODO:trick to always have a person associated, must be modified
+    PersonEntity user;
     MissionEntity missionEntity = new MissionEntity();
 
 
@@ -95,11 +95,12 @@ public class AddMission extends AppCompatActivity implements View.OnClickListene
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         setContentView(R.layout.activity_add_mission);
 
-        //TODO solve this
-        //Add a user who own every unassociated mission, must be initialized in the main activity
-        //or every call of the activity will add one user to the db
-        DataManager.getInstance(this).addPerson(user);
-        missionEntity.setPersonID(user.getID());
+        //associate the "user" with every mission at the beginning
+        //This line result in a null pointer
+        //user = DataManager.getInstance(this).getPerson(0);
+        //setting the ID to 0 is an hardcode and doesn't work
+        //This hardcode seems to work TODO find a better way
+        missionEntity.setPersonID(DataManager.getInstance(this).getPersonIDByLastName("user"));
 
         // Nome Missione
         nameMissionText = findViewById(R.id.nameText);

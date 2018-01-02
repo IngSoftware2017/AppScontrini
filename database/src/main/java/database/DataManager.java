@@ -177,4 +177,12 @@ public class DataManager {
 //        }
 //        return tickets;
 //    }
+
+    /**
+     * Return the ID of the first Person having the searched Last Name
+     *
+     * @param ln Last Name of the person
+     * @return the ID
+     */
+    public int getPersonIDByLastName(String ln){ return database.ticketDao().getPersonIDByLastName(ln);}
 }
