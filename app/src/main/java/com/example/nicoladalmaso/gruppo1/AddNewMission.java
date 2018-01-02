@@ -46,13 +46,16 @@ public class AddNewMission extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
+        setTitle(getString(R.string.newMission));
+        setContentView(R.layout.activity_add_new_mission);
+
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        setTitle(context.getString(R.string.newMission));
-        setContentView(R.layout.activity_add_new_mission);
+
         Intent intent = getIntent();
         personID = intent.getExtras().getInt("person");
         Log.d("PersonIDAddMission", ""+personID);
+
         initializeComponents();
     }
 
@@ -106,13 +109,12 @@ public class AddNewMission extends AppCompatActivity{
                 String name = editName.getText().toString();
                 String location = editLocation.getText().toString();
 
-                if((name == null) || name.replaceAll(" ","").equals("") || (location==null) || location.replaceAll(" ","").equals("")) {
-                    String errors="";
-                    if ((name == null) || name.replaceAll(" ","").equals(""))
-                        errors+=getResources().getString(R.string.toast_missionNoName)+"\n" ;
-                    if((location==null) || location.replaceAll(" ","").equals(""))
-                        errors+=getResources().getString(R.string.toast_missionNoLocation)+"\n";
-                    Toast.makeText(context,errors, Toast.LENGTH_SHORT).show();
+                if ((name == null) || name.replaceAll(" ","").equals("")) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_missionNoName), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((location==null) || location.replaceAll(" ","").equals("")) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_missionNoLocation), Toast.LENGTH_SHORT).show();
                     return false;
                 }
 

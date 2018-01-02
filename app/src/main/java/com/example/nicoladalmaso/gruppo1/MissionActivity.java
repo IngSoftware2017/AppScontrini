@@ -112,7 +112,10 @@ public class MissionActivity extends AppCompatActivity {
         Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-
+                default:
+                    clearAllMissions();
+                    printAllMissionsDB();
+                    break;
             }
         }
     }
@@ -144,17 +147,13 @@ public class MissionActivity extends AppCompatActivity {
      * get all missions from the DB and print
      */
     public void printAllMissionsDB(){
-        List<MissionEntity> missions = DB.getAllMission();
+        List<MissionEntity> missions = DB.getMissionsForPerson(personID);
         TextView noMissions = (TextView)findViewById(R.id.noMissions);
-        int count = 0;
         for (int i = 0; i < missions.size(); i++)
         {
-            if(missions.get(i).getPersonID() == personID) {
-                addToListDB(missions.get(i));
-                count++;
-            }
+            addToListDB(missions.get(i));
         }
-        if(count == 0){
+        if(missions.size() == 0){
             noMissions.setVisibility(View.VISIBLE);
         }
         else{

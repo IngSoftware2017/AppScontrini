@@ -128,7 +128,7 @@ public class BillActivity extends AppCompatActivity {
      *  Manage all animations and catch onclick events about FloatingActionButtons
      */
     public void initializeComponents(){
-        printAllImages();
+        printAllTickets();
         fab = (FloatingActionButton)findViewById(R.id.fab);
         fab1 = (FloatingActionButton)findViewById(R.id.fab1);
         fab2 = (FloatingActionButton)findViewById(R.id.fab2);
@@ -318,7 +318,7 @@ public class BillActivity extends AppCompatActivity {
                     deleteTempFiles();
                     waitDB();
                     clearAllImages();
-                    printAllImages();
+                    printAllTickets();
                     break;
 
                 //Dal Maso
@@ -330,7 +330,7 @@ public class BillActivity extends AppCompatActivity {
                         savePickedFile(btm);
                         waitDB();
                         clearAllImages();
-                        printAllImages();
+                        printAllTickets();
                     }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
                     }
@@ -340,12 +340,17 @@ public class BillActivity extends AppCompatActivity {
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     waitDB();
                     clearAllImages();
-                    printAllImages();
+                    printAllTickets();
                     break;
 
                 case(4):
                     clearAllImages();
-                    printAllImages();
+                    printAllTickets();
+                    break;
+
+                default:
+                    clearAllImages();
+                    printAllTickets();
                     break;
             }
         }
@@ -436,7 +441,7 @@ public class BillActivity extends AppCompatActivity {
     /** Dal Maso
      *  Print all tickets, get it from DB
      */
-    public void printAllImages(){
+    public void printAllTickets(){
         List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
         Log.d("Tickets", ticketList.toString());
         TicketEntity t;

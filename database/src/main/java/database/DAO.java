@@ -11,7 +11,8 @@ import java.util.List;
 
 /**
  * Created by Federico Taschin on 08/11/2017.
- * Modified by Marco Olivieri on 28/11/2017
+ * Modified by Marco Olivieri
+ * Modify by Matteo Mascotto: improve getPerson from id and complete methods documentation
  */
 
 /*Data Access Objects Interface. Defines the queries using Room libraries
@@ -54,26 +55,30 @@ public interface DAO {
 
     //DELETE
 
-    /**Deletes a MissionEntity from the database
-     * @param id int the ID of the MissionEntity to be deleted
+    /**
+     * @author Marco Olivieri
+     * Deletes a MissionEntity from the database
+     * @param id long the ID of the MissionEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.MISSION_TABLE_NAME+" WHERE "+ Constants.MISSION_PRIMARY_KEY_NAME+" = :id")
-    int deleteMission(int id);
+    int deleteMission(long id);
 
-    /**Deletes a PersonEntity from the database
-     * @param id int the ID of the PersonEntity to be deleted
+    /**
+     * @author Marco Olivieri
+     * Deletes a PersonEntity from the database
+     * @param id long the ID of the PersonEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.PERSON_TABLE_NAME+" WHERE "+ Constants.PERSON_PRIMARY_KEY_NAME+" = :id")
-    int deletePerson(int id);
+    int deletePerson(long id);
 
     /**Deletes a TicketEntity from the database
      * @param id int the ID of the TicketEntity to be deleted
      * @return the number of deleted entities.
      */
     @Query("DELETE FROM "+ Constants.TICKET_TABLE_NAME+" WHERE "+ Constants.TICKET_PRIMARY_KEY_NAME+" = :id")
-    int deleteTicket(int id);
+    int deleteTicket(long id);
 
     //UPDATE
 
@@ -87,7 +92,9 @@ public interface DAO {
     @Update
     int updateTicket(TicketEntity ticketEntity);
 
-    /**Updates the given MissionEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+    /**
+     * @author Marco Olivieri
+     * Updates the given MissionEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param missionEntity MissionEntity not null, the entity to be inserted
      *               missionEntity.personID not null, must be an existing code
      * @return the number of updated entities
@@ -95,7 +102,9 @@ public interface DAO {
     @Update
     int updateMission(MissionEntity missionEntity);
 
-    /**Updates the given PersonEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+    /**
+     * @author Marco Olivieri
+     * Updates the given PersonEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param personEntity PersonEntity not null, the entity to be inserted
      *               personEntity.name not null
      * @return the number of updated entities
@@ -126,19 +135,49 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
+    //SELECT FROM ID
+
     /**
     *Gets all the TicketEnt of a MissionEntity
-    *@param int id, the id of the MissionEntity 
-    *@return List<MissionEntity> not null (at least of 0 size) which contains all the tickets for the given mission id 
+    *@param id long, the id of the MissionEntity
+    *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets for the given mission id
     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
-    public List<TicketEntity> getTicketsForMission(int id);
+    public List<TicketEntity> getTicketsForMission(long id);
+
+    /**
+     * @author Marco Olivieri
+     * Gets all the Missions done by a specific Person
+     * @param id long, the id of the Person
+     * @return List<MissionEntity> not null (at least of 0 size) which contains all the missions for the given person id
+     */
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+" = :id")
+    public List<MissionEntity> getMissionsForPerson(long id);
 
     /**
     *Executes a SELECT query for a specified TicketEntity id
-    *@param int id, the id of the TicketEntity 
+    *@param id long, the id of the TicketEntity
     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY_NAME+" =:id")
-    public TicketEntity getTicket(int id);
+    public TicketEntity getTicket(long id);
+
+    /**
+     * @author Marco Olivieri
+     * Executes a SELECT of a specific mission from id
+     *
+     * @param id long, identifier of the mission
+     * @return MissionEntity
+     */
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME +" WHERE "+Constants.MISSION_PRIMARY_KEY_NAME+" =:id")
+    public MissionEntity getMission(long id);
+
+    /**
+     * Executes a SELECT of a specific person from id
+     *
+     * @param id long, identifier of the person
+     * @return PersonEntity
+     */
+    @Query("SELECT * FROM " + Constants.PERSON_TABLE_NAME + " WHERE " + Constants.PERSON_PRIMARY_KEY_NAME + " =:id")
+    PersonEntity getPerson(long id);
 }

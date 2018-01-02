@@ -59,6 +59,7 @@ public class AddNewPerson extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent();
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_addMission:
@@ -91,15 +92,17 @@ public class AddNewPerson extends AppCompatActivity {
                 //Start billActivity
                 Bundle bundle = new Bundle();
 
-                Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
-                startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startImageView.putExtra("personID", (int) personID);
-                startImageView.putExtra("personName", name);
-                context.startActivity(startImageView);
+                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
+                startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startMissionView.putExtra("personID", (int) personID);
+                startMissionView.putExtra("personName", name);
+                context.startActivity(startMissionView);
+                setResult(RESULT_OK, intent);
                 finish();
                 break;
 
             default:
+                setResult(RESULT_OK, intent);
                 finish();
                 break;
         }

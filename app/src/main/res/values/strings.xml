@@ -30,7 +30,7 @@
     <string name="defaultDescription">Nessuna descrizione</string>
     <string name="deleteTitle">Cancellazione</string>
     <string name="toast_missionNoName">Nome missione mancante</string>
-    <string name="toast_personNoName">Nome missione mancante</string>
-    <string name="toast_missionNoLocation">Nome persona mancante</string>
+    <string name="toast_personNoName">Nome persona mancante</string>
+    <string name="toast_missionNoLocation">Luogo missione mancante</string>
     <string name="toast_personNoLastName">Cognome persona mancante</string>
 </resources>

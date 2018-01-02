@@ -50,6 +50,7 @@ import database.PersonEntity;
 public class MainActivity extends AppCompatActivity {
     public DataManager DB;
     public List<PersonEntity> listPeople = new LinkedList<PersonEntity>();
+    static final int person_added = 1;
 
     //Dal Maso
     @Override
@@ -61,13 +62,37 @@ public class MainActivity extends AppCompatActivity {
         printAllPeople();
     }
 
+    /** Dal Maso
+     * Catch intent results
+     * @param requestCode action number
+     * @param resultCode intent result code
+     * @param data intent data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Result", ""+requestCode);
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case (person_added):
+                    clearAllPeople();
+                    printAllPeople();
+                    break;
+                default:
+                    clearAllPeople();
+                    printAllPeople();
+                    break;
+            }
+        }
+    }
+
     private void initialize(){
         DB = new DataManager(this.getApplicationContext());
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
-                startActivity(addPerson);
+                startActivityForResult(addPerson, person_added);
             }
         });
     }

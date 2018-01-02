@@ -82,8 +82,7 @@ public class EditTicket extends AppCompatActivity {
                 }
                 thisTicket.setShop(txtShop.getText().toString());
                 thisTicket.setAmount(BigDecimal.valueOf(Integer.parseInt(txtAmount.getText().toString())));
-                DB.deleteTicket((int)thisTicket.getID());
-                DB.addTicket(thisTicket);
+                DB.updateTicket(thisTicket);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
