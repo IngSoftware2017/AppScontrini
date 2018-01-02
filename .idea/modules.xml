@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
       <module fileurl="file://D:\MARCO\Android\GitHub\comune\.idea\modules\AppScontrini.iml" filepath="D:\MARCO\Android\GitHub\comune\.idea\modules\AppScontrini.iml" />
       <module fileurl="file://C:\Users\Task\Desktop\AppScontrini\app\app.iml" filepath="C:\Users\Task\Desktop\AppScontrini\app\app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/comune.iml" filepath="$PROJECT_DIR$/comune.iml" />
+      <module fileurl="file://C:\Users\fedet\StudioProjects\AppScontrini\comune.iml" filepath="C:\Users\fedet\StudioProjects\AppScontrini\comune.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
       <module fileurl="file://C:\Users\Task\Desktop\AppScontrini\gruppo3.iml" filepath="C:\Users\Task\Desktop\AppScontrini\gruppo3.iml" />
       <module fileurl="file://D:\MARCO\Android\GitHub\ingegneria-software\ing-software.iml" filepath="D:\MARCO\Android\GitHub\ingegneria-software\ing-software.iml" />
