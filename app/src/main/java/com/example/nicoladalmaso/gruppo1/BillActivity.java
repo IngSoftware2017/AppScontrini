@@ -45,6 +45,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import database.DataManager;
+import database.MissionEntity;
 import database.TicketEntity;
 
 public class BillActivity extends AppCompatActivity {
@@ -57,6 +58,7 @@ public class BillActivity extends AppCompatActivity {
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
     String tempPhotoPath;
     Integer missionID;
+    MissionEntity thisMission;
     Context context;
     String root;
     public DataManager DB;
@@ -69,7 +71,11 @@ public class BillActivity extends AppCompatActivity {
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+
         Intent intent = getIntent();
+        missionID = intent.getExtras().getInt("missionID");
+        thisMission = DB.getMission(missionID);
+        setTitle(thisMission.getName());
 
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
@@ -82,10 +88,6 @@ public class BillActivity extends AppCompatActivity {
             }
         }
 
-        String missionName = intent.getExtras().getString("missionName");
-        missionID = intent.getExtras().getInt("missionID");
-
-        setTitle(missionName);
         initializeComponents();
     }
 
@@ -97,12 +99,11 @@ public class BillActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.deletemission_menu, menu);
+        inflater.inflate(R.menu.mission_menu, menu);
         return true;
     }
 
     /** Dal Maso
-     * Edit by Lazzarin
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
@@ -110,13 +111,15 @@ public class BillActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        Intent intent = new Intent();
         switch (item.getItemId()) {
             case (R.id.action_deleteMission):
                 deleteMission();
                 break;
-
+            case (R.id.action_editMission):
+                //TODO: modifica la missione
+                break;
             default:
-                Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
                 break;

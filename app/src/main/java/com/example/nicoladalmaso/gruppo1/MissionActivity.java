@@ -67,32 +67,35 @@ public class MissionActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.deletemission_menu, menu);
+        inflater.inflate(R.menu.person_menu, menu);
         return true;
     }
 
     /** Dal Maso
-     * Edit by Lazzarin
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent();
         // Handle item selection
         switch (item.getItemId()) {
-            case (R.id.action_deleteMission):
+
+            case (R.id.action_deletePerson):
                 //TODO: cancella la persona
-                //deletePerson();
                 break;
 
-            case(1):
+            case (R.id.action_editPerson):
+                //TODO: modifica la persona
+                break;
+
+            case (1):
                 clearAllMissions();
                 printAllMissionsDB();
                 break;
 
             default:
-                Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
                 break;

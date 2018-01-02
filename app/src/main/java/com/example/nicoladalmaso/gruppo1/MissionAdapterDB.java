@@ -29,7 +29,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
     Context context;
     String path = "";
-    int pos = 0;
+    int missionID = 0;
     List<MissionEntity> missions;
 
     public MissionAdapterDB(Context context, int textViewResourceId,
@@ -73,23 +73,11 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                pos = Integer.parseInt(v.getTag().toString());
-                //path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-                //File directory = new File(path);
-                //File[] files = directory.listFiles();
-                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
-                //Variables.getInstance().setCurrentMissionDir(files[pos].getPath());
-                String name = "";
-                for(int i = 0; i < missions.size(); i++){
-                    if(missions.get(i).getID() == pos){
-                        name = missions.get(i).getName();
-                    }
-                }
-                Log.d("MissionName", name);
-                startMissionView.putExtra("missionName", name);
-                startMissionView.putExtra("missionID", pos);
-                ((MissionActivity)context).startActivityForResult(startMissionView, 1);
-            }//onClick
+                missionID = Integer.parseInt(v.getTag().toString());
+                Intent startTicketsView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
+                startTicketsView.putExtra("missionID", missionID);
+                ((MissionActivity)context).startActivityForResult(startTicketsView, 1);
+            }
         });
 
         return convertView;

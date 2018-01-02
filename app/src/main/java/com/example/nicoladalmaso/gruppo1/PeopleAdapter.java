@@ -52,10 +52,10 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
 
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
-                startMissionView.putExtra("personID", Integer.parseInt(v.getTag().toString()));
-                startMissionView.putExtra("personName", person.getName());
-                context.startActivity(startMissionView);
+                Intent startMissionsView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
+                startMissionsView.putExtra("personID", Integer.parseInt(v.getTag().toString()));
+                startMissionsView.putExtra("personName", person.getName());
+                ((MainActivity)context).startActivityForResult(startMissionsView, 1);
             }
         });
 

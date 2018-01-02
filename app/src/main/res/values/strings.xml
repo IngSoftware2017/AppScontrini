@@ -6,7 +6,10 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="action_addMission">Aggiungi missione</string>
     <string name="action_editTicket">Modifica scontrino</string>
+    <string name="action_editMission">Modifica missione</string>
+    <string name="action_editPerson">Modifica persona</string>
     <string name="action_deleteMission">Elimina missione</string>
+    <string name="action_deletePerson">Elimina persona</string>
     <string name="billTitle">Il tuo scontrino</string>
     <string name="name">Nome</string>
     <string name="shop">Negozio</string>
