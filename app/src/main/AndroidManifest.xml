@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    package="com.unipd.ingsw.gruppo3">
+    package="com.example.nicoladalmaso.gruppo1">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.unipd.ingsw.gruppo3.MainActivityGruppo1">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,28 +31,37 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.unipd.ingsw.gruppo3.fileprovider"
+            android:authorities="com.example.android.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity
-            android:name="com.unipd.ingsw.gruppo3.BillViewerGruppo1"
-            android:parentActivityName="com.unipd.ingsw.gruppo3.BillActivityGruppo1"
+            android:name=".BillViewer"
+            android:parentActivityName=".BillActivity"
             android:theme="@style/AppTheme.ActionBar.Transparent" />
         <activity
-            android:name="com.unipd.ingsw.gruppo3.BillActivityGruppo1"
-            android:parentActivityName="com.unipd.ingsw.gruppo3.MainActivityGruppo1" />
+            android:name=".BillActivity"
+            android:parentActivityName=".MissionActivity" />
         <activity
-            android:name="com.unipd.ingsw.gruppo3.AddNewMissionGruppo1"
-            android:parentActivityName="com.unipd.ingsw.gruppo3.MainActivity">
-        </activity>
+            android:name=".AddNewMission"
+            android:parentActivityName=".MissionActivity" />
         <activity
-            android:name="com.unipd.ingsw.gruppo3.AddMission"
-            android:parentActivityName=".MainActivityGruppo1"></activity>
+            android:name=".EditTicket"
+            android:parentActivityName=".BillViewer" />
+        <activity
+            android:name=".MissionActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".AddNewPerson"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".EditPerson"
+            android:parentActivityName=".MissionActivity" />
+
     </application>
 
 </manifest>

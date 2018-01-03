@@ -1,5 +1,8 @@
 package com.ing.software.common;
 
+import android.support.annotation.NonNull;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +12,6 @@ import java.util.List;
  */
 public class Reflect {
 
-    public static class UnknownException extends Exception {
-    }
-
     /**
      * Invoke a static or non static method (with any access level) of a class.
      *
@@ -19,37 +19,38 @@ public class Reflect {
      * @param methodName Method name. Not null
      * @param params List of arguments of the method. They can be null.
      * @param <T> return type of the method.
-     * @return return of the method or void.
-     * @throws NoSuchMethodException: The method name, the number or type of parameters is wrong
-     * @throws NullPointerException: Calling an instance method with a class type.
-     * @throws ClassCastException: Return type mismatch.
-     * @throws UnknownException: Something went wrong. The causes might be:
-     *                           * parameters incompatible with method annotations;
-     *                           * exception raised inside method.
+     * @return return value of the method or void.
+     *
+     * @throws Exception:
+     *  NoSuchMethodException: The method name, the number or type of parameters is wrong
+     *  NullPointerException: Calling an instance method with a class type.
+     *  ClassCastException: Return type mismatch.
+     *  Other exception: Something went wrong. The causes might be:
+     *                    * parameters incompatible with method annotations;
+     *                    * exception raised inside method.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T invoke(Object clazz, String methodName, Object... params)
-            throws NoSuchMethodException, NullPointerException, ClassCastException, UnknownException {
-        List<Class<?>> paramsTypes = new ArrayList<>(params.length);
-        for (Object p : params) {
-            if (p != null)
-                paramsTypes.add(p.getClass());
-            else
-                paramsTypes.add(null);
-        }
+    public static <T> T invoke(@NonNull Object clazz, @NonNull String methodName, Object... params) throws Exception {
+        //get type of parameters, or null if null
+        List<Class<?>> givenParamTypes = new ArrayList<>();
+        for (Object param : params)
+            givenParamTypes.add(param != null ? param.getClass() : null);
 
         boolean isType = clazz instanceof Class<?>;
-        Method[] methods = (isType ? (Class<?>)clazz : clazz.getClass()).getDeclaredMethods();
+        Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
 
-        for (Method m : methods) {
-            Class<?>[] mParamsTypes = m.getParameterTypes();
-            if (m.getName().equals(methodName) && mParamsTypes.length == paramsTypes.size()) {
+        for (Method method : classType.getDeclaredMethods()) {
+            Class<?>[] methodParamTypes = method.getParameterTypes();
+            if (method.getName().equals(methodName)
+                    && methodParamTypes.length == givenParamTypes.size()) {
+
                 boolean paramsMatch = true;
-                for (int i = 0; i < mParamsTypes.length; i++) {
-                    Class<?> need = mParamsTypes[i], got = paramsTypes.get(i);
+                for (int i = 0; i < methodParamTypes.length; i++) {
+                    Class<?> need = methodParamTypes[i],
+                            got = givenParamTypes.get(i);
 
                     //Problem: since params is an array of objects, primitive types are boxed to respective wrappers.
-                    // so if a wrapper is passed, we accept the match with the primitive type.
+                    // so if a wrapper is passed, we accept it as if it was the primitive type.
                     paramsMatch &= (boolean.class.equals(need) && Boolean.class.equals(got))
                             || (byte.class.equals(need) && Byte.class.equals(got))
                             || (short.class.equals(need) && Short.class.equals(got))
@@ -62,23 +63,50 @@ public class Reflect {
                             || got == null || need.isAssignableFrom(got);
                 }
                 if (paramsMatch) {
-                    m.setAccessible(true);
-
-                    //Exception if there is a return type mismatch (cannot handle it in unit tests)
-                    try {
-                        return (T)m.invoke(isType ? null : clazz, params);
-                    }
-                    catch (NullPointerException | ClassCastException e) {
-                        throw e;
-                    }
-                    catch (Exception e) {
-                        System.out.println();
-                        throw new UnknownException();
-                    }
-
+                    method.setAccessible(true);
+                    return (T)method.invoke(isType ? null : clazz, params);
                 }
             }
         }
         throw new NoSuchMethodException();
     }
+
+    /**
+     * Get value of a static or non static field (with any access level).
+     * @param clazz A class instance or class type. Not null
+     * @param fieldName Field name. Not null
+     * @param <T> Type of the field.
+     * @return Value of the field.
+     *
+     * @throws Exception:
+     *  NullPointerException: Trying to get an instance field passing a class type.
+     *  ClassCastException: Field type mismatch.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getField(@NonNull Object clazz, @NonNull String fieldName) throws Exception {
+        boolean isType = clazz instanceof Class<?>;
+        Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
+        Field field = classType.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return (T)field.get(isType ? null : clazz);
+    }
+
+    /**
+     * Set value of a static or non static field (with any access level).
+     * @param clazz A class instance or class type. Not null
+     * @param fieldName Field name. Not null
+     * @param newVal New value of the field.
+     *
+     * @throws Exception:
+     *  NullPointerException: Trying to set an instance field passing a class type.
+     */
+    public static void setField(@NonNull Object clazz, @NonNull String fieldName, Object newVal) throws Exception {
+        boolean isType = clazz instanceof Class<?>;
+        Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
+        Field field = classType.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(isType ? null : clazz, newVal);
+    }
+
+    // I know these two functions have duplicate code but I don't bother putting it in another function.
 }

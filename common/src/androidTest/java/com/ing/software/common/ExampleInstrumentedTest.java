@@ -7,6 +7,11 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
 import static org.junit.Assert.*;
 
 /**
@@ -22,5 +27,26 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("com.ing.software.common.test", appContext.getPackageName());
+    }
+//
+//    @Test
+//    public void fdjskhfjksdhf() {
+//        Ransac<Object, Object> fdsf = new Ransac<>(new ArrayList<>(), 1, 2, 3, new Ransac.ModelHandler<Object, Object>() {
+//            @Override
+//            public double calcModelFromElements(List<Object> eList, Ref<Object> modRef) {
+//                return 0;
+//            }
+//
+//            @Override
+//            public double inverseError(Object mod, Object elem) {
+//                return 0;
+//            }
+//        });
+//    }
+
+    @Test
+    public void java8test() {
+        //List<Integer> list = new ArrayList<>(Arrays.asList(1,2,3));
+        //boolean fds = list.stream().allMatch(integer -> integer < 4);
     }
 }

@@ -1,25 +1,40 @@
 <resources>
-    <string name="app_name">Ticket Manager</string>
+    <!--Dal Maso-->
+    <string name="app_name">TicketManager</string>
     <string name="title_activity_collapse">Collapse</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="action_addMission">Aggiungi Missione</string>
-    <string name="action_deleteMission">Elimina Missione</string>
+    <string name="action_addMission">Aggiungi missione</string>
+    <string name="action_editTicket">Modifica scontrino</string>
+    <string name="action_editMission">Modifica missione</string>
+    <string name="action_editPerson">Modifica persona</string>
+    <string name="action_deleteMission">Elimina missione</string>
+    <string name="action_deletePerson">Elimina persona</string>
     <string name="billTitle">Il tuo scontrino</string>
     <string name="name">Nome</string>
-    <string name="description">Descrizione</string>
+    <string name="shop">Negozio</string>
+    <string name="total">Totale</string>
+    <string name="date">Data</string>
+    <string name="location">Luogo</string>
     <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
-    <string name="emptyMission_string">Nessun missione presente.\nAggiungi una missione con il tasto +</string>
-    <string name="nameMission_string">Nome Missione</string>
-    <string name="startMission_string">Data Inizio Missione</string>
-    <string name="endMission_string">Data Fine Missione</string>
-    <string name="select_person_label">Seleziona o inserisci la persona della missione:</string>
-    <string name="add_person_surname_label">Cognome nuova persona</string>
-
-    <string name="missionErrorMessage">Inserire un valore corretto di Missione</string>
-    <string name="startErrorMessage">Inserire un valore corretto di data di inizio Missione</string>
-    <string name="endErrorMessage">Inserire un valore corretto di data di fine Missione</string>
-    <string name="personErrorMessage">Inserire o selezionare una persona</string>
-
+    <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + iniziare</string>
+    <string name="dateStart">Data inizio</string>
+    <string name="dateFinish">Data fine</string>
+    <!--lazzarin-->
+    <string name="newMission">Nuova missione</string>
+    <string name="newPerson">Nuova persona</string>
+    <string name="deleteMissionToast">Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati</string>
+    <string name="buttonDelete">Elimina</string>
+    <string name="cancel">Annulla</string>
+    <string name="deleteTicketToast">Sei sicuro di voler eliminare lo scontrino?</string>
+    <string name="titleMission">Missioni</string>
+    <string name="titlePeople">Persone</string>
+    <string name="defaultDescription">Nessuna descrizione</string>
+    <string name="deleteTitle">Cancellazione</string>
+    <string name="toast_missionNoName">Nome missione mancante</string>
+    <string name="toast_personNoName">Nome persona mancante</string>
+    <string name="toast_missionNoLocation">Luogo missione mancante</string>
+    <string name="toast_personNoLastName">Cognome persona mancante</string>
+    <string name="toast_errorDate">La data di fine precede \n quella di inizio</string>
 </resources>

@@ -25,18 +25,12 @@ import org.junit.runner.RunWith;
 public class OcrInstrumentedTests {
 
     @Test
-    public void findCornersTest() throws Exception {
-        //ImagePreprocessor.findCorners(getBitmap(0));
-        assertEquals(4, 2 + 2);
-    }
-
-    @Test
     public void ocrMainTest() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
         final Semaphore sem = new Semaphore(0);
         int imgsTot = getTotImgs();
 
-        DataAnalyzer analyzer = new DataAnalyzer();
+        OcrManager analyzer = new OcrManager();
 
         int c = 0;
         int TIMEOUT = 60; // 1 min
@@ -51,19 +45,18 @@ public class OcrInstrumentedTests {
                 final Ticket target = null; //todo: initialize
                 Bitmap photo = getBitmap(i);
                 if (photo != null) {
-                    analyzer.getTicket(photo, new OnTicketReadyListener() {
-                        @Override
-                        public void onTicketReady(Ticket ticket) {
+                    ImagePreprocessor preproc = new ImagePreprocessor(photo);
+                    preproc.findTicket(false, err -> {
+                        analyzer.getTicket(preproc, ticket -> {
 
                             //todo: compare Ticket to dataset
                             //assertEquals(target, ticket);
 
                             sem.release();
                             System.out.println("Done img " + String.valueOf(idx));
-                        }
+                        });
                     });
                 }
-
                 sem.acquire();
             }
         }

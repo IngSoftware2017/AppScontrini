@@ -36,7 +36,7 @@ public class OcrUtils {
      * @return cropped image, null if invalid coordinates
      */
     static Bitmap cropImage(@NonNull Bitmap photo, @IntRange(from = 0) int startX, @IntRange(from = 0) int startY, @IntRange(from = 0) int endX, @IntRange(from = 0) int endY) {
-        log(2,"OcrUtils.cropImage","Received crop: left " + startX + " top: " + startY + " right: " + endX + " bottom: " + endY);
+        log(4,"OcrUtils.cropImage","Received crop: left " + startX + " top: " + startY + " right: " + endX + " bottom: " + endY);
         if (endX < startX || endY < startY)
             return null;
         int width = Math.abs(endX - startX);
@@ -70,14 +70,14 @@ public class OcrUtils {
                 bottom = Math.round(rectF.bottom);
             if (rectF.top<top)
                 top = Math.round(rectF.top);
-            log(4,"OcrUtils.getRectBorder","Value: " + textBlock.getValue());
-            log(4,"OcrUtils.getRectBorder","Temp rect: (left, top, right, bottom): " + rectF.left + "; " + rectF.top + "; " + rectF.right + "; " + rectF.bottom);
+            log(6,"OcrUtils.getRectBorder","Value: " + textBlock.getValue());
+            log(6,"OcrUtils.getRectBorder","Temp rect: (left, top, right, bottom): " + rectF.left + "; " + rectF.top + "; " + rectF.right + "; " + rectF.bottom);
         }
         borders[0] = left;
         borders[1] = top;
         borders[2] = right;
         borders[3] = bottom;
-        log(2,"OcrUtils.getRectBorder","New rect: (left, top, right, bottom): " + left + "; " + top + "; " + right + "; " + bottom);
+        log(4,"OcrUtils.getRectBorder","New rect: (left, top, right, bottom): " + left + "; " + top + "; " + right + "; " + bottom);
         return borders;
     }
 
@@ -176,7 +176,7 @@ public class OcrUtils {
         float left = 0;
         float right = photo.getWidth();
         RectF rectF = new RectF(left, top, right, bottom);
-        log(2,"OcrUtils.getExtendRect","Extended rect: left " + rectF.left + " top: "
+        log(6,"OcrUtils.getExtendRect","Extended rect: left " + rectF.left + " top: "
                 + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
         return rectF;
     }
@@ -271,10 +271,8 @@ public class OcrUtils {
     {
         if(text == null || substring == null || text.length() == 0)
             return -1;
-
         int minDistance = substring.length();
         int subLength = minDistance;
-
         /*
         //Splits the string into tokens
         String[] pack = text.split("\\s");
@@ -287,10 +285,8 @@ public class OcrUtils {
 
         }
         */
-
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
-
         //If the text is smaller than the searched string, invert the strings
         if(text_w_o_space.length() < minDistance)
         {
@@ -298,7 +294,6 @@ public class OcrUtils {
             text_w_o_space = substring;
             substring = temp_text;
         }
-
         //Search a piece of string as long as the length of the searched string in the text
         int start=0;
         for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
@@ -308,18 +303,80 @@ public class OcrUtils {
                 minDistance = distanceNow;
             start++;
             }
-
         return minDistance;
-
     }
 
+    /**
+     * @author Michelon
+     * Extends width of rect according to percentage
+     * @param originalRect rect containing amount
+     * @param percentage   percentage of the width of the rect to extend. Int >0
+     * @return extended rect
+     */
+    static RectF partialExtendWidthRect(RectF originalRect, int percentage) {
+        float width = originalRect.width();
+        float left = originalRect.left - (width * percentage / 200);
+        if (left <0)
+            left = 0;
+        float right = originalRect.right + (width * percentage / 200);
+        return new RectF(left, originalRect.top, right, originalRect.bottom);
+    }
 
+    /**
+     * @author Michelon
+     * Extends height of rect according to percentage
+     * @param originalRect rect containing amount
+     * @param percentage   percentage of the height of the rect to extend. Int >0
+     * @return extended rect
+     */
+    static RectF partialExtendHeightRect(RectF originalRect, int percentage) {
+        float height = originalRect.height();
+        float top = originalRect.top - (height * percentage / 200);
+        if (top < 0)
+            top = 0;
+        float bottom = originalRect.bottom + (height * percentage / 200);
+        return new RectF(originalRect.left, top, originalRect.right, bottom);
+    }
 
+    /**
+     * @author Michelon
+     * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
+     * Note: Min value for top and left is 0
+     * todo: revise method to include both height and width extension (with different values to replace also the two above
+     * @param rect source rect. Not null
+     * @param percent chosen percentage. Int >= 0
+     * @return new extended rectangle
+     */
+    static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
+        float extendedHeight = rect.height()*percent/100;
+        float extendedWidth = rect.width()*percent/100;
+        float left = rect.left - extendedWidth/2;
+        if (left<0)
+            left = 0;
+        float top = rect.top - extendedHeight/2;
+        if (top < 0)
+            top = 0;
+        //Doesn't matter if bottom and right are outside the photo
+        float right = rect.right + extendedWidth/2;
+        float bottom = rect.bottom + extendedHeight/2;
+        return new RectF(left, top, right, bottom);
+    }
 
-
-
-
-
-
-
+    /**
+     * @author Michelon
+     * @date 9-12-17
+     * Check if a string may be a number. Removes spaces, 's', 'S', '.' before analysis.
+     * @param s string to analyze
+     * @return true if more than half (included) of the chars in the string are numbers
+     */
+    static boolean isPossibleNumber(String s) {
+        int counter = 0;
+        s = s.replaceAll(" ", "").replaceAll("\\.", "")
+                .replaceAll("S", ""); //sometimes '5' are recognized as 'S'
+        for (int i = 0; i < s.length(); ++i) {
+            if (Character.isDigit(s.charAt(i)))
+                ++counter;
+        }
+        return counter >= s.length()/2;
+    }
 }

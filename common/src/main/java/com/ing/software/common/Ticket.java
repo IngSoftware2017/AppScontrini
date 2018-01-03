@@ -1,7 +1,6 @@
 package com.ing.software.common;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
+import android.graphics.Point;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -22,7 +21,7 @@ public class Ticket {
     /**
      * URI pointing to the ticket photo (local or remote).
      */
-    public Uri fileURI;
+    public URI fileURI;
 
     /**
      * Ticket title
@@ -40,11 +39,12 @@ public class Ticket {
     public BigDecimal amount;
 
     /**
+     * Ordered list of vertices of rectangle (first top-left, counter-clockwise)
+     */
+    public List<Point> rectangle;
+
+    /**
      * List of errors related to the creation or manipulation of the Ticket
      */
     public List<TicketError> errors = new ArrayList<>();
-
-    public int missionId;
-
-    public Bitmap bitmap;
 }

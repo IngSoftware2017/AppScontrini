@@ -4,33 +4,49 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="#DFDFDF">
 
     <TextView
-        android:id="@+id/emptyNoticeTextView"
+        android:id="@+id/noPeople"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="82dp"
-        tools:layout_editor_absoluteY="62dp"
-        tools:text="@string/emptyMission_string" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/noPeople"
+        android:visibility="invisible"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/relativeLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ListView
-        android:id="@+id/missionsList"
-        android:layout_width="384dp"
-        android:layout_height="515dp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="-3dp"
-        tools:ignore="MissingConstraints" />
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/newMissionButton"
-        android:layout_width="45dp"
-        android:layout_height="47dp"
-        android:clickable="true"
-        app:srcCompat="@android:drawable/ic_input_add"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="323dp"
-        tools:layout_editor_absoluteY="450dp" />
+        <ListView
+            android:id="@+id/listPeople"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_addPerson"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/colorPrimary"
+            android:clickable="true"
+            app:srcCompat="@mipmap/ic_add_white_24dp" />
+
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
