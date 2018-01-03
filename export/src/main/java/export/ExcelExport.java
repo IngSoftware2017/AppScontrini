@@ -10,9 +10,9 @@ import database.Database;
  * This class defines the methods to export db datas in Excel file
  */
 
-public class DBtoExcel extends ExportManager {
+public class ExcelExport extends ExportManager {
 
-    public DBtoExcel(Database database, String pathDirectory){
+    public ExcelExport(Database database, String pathDirectory){
         super(database, pathDirectory);
     }
 
