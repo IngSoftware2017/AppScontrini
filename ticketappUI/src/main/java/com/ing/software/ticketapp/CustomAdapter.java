@@ -61,7 +61,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
         FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
-        FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
+        //FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
 
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
@@ -122,6 +122,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             }
         });
 
+        /*
         //PICCOLO
         fabCrop.setTag(position);
         fabCrop.setOnClickListener(new View.OnClickListener(){
@@ -130,6 +131,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                 cropFile(ticketID);
             }
         });
+        */
 
         //Dal Maso
         convertView.setOnClickListener(new View.OnClickListener(){

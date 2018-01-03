@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -362,6 +364,19 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     printAllImages();
                     break;
             }
+        } else if (resultCode == REDO_OCR) {
+            int ticketID = Integer.parseInt(data.getStringExtra("ticketID"));
+            TicketEntity ticket = DB.getTicket(ticketID);
+            Uri bitmapUri = ticket.getFileUri();
+            String fname = getFileName(bitmapUri);
+            DB.deleteTicket(ticketID);
+            Log.d("###################", "#####################################");
+            Log.d("Image_file_name", "is: " + fname);
+            Intent intent = new Intent(BillActivity.this, TestService.class);
+            intent.putExtra("receiver", mReceiver);
+            intent.putExtra("image", fname);
+            intent.putExtra("root", root);
+            startService(intent);
         }
     }
 
@@ -596,5 +611,27 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 }
             }
         }
+    }
+
+    public String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 }

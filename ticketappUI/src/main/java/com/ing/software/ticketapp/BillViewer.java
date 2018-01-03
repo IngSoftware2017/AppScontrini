@@ -30,6 +30,8 @@ import java.math.RoundingMode;
 import database.DataManager;
 import database.TicketEntity;
 
+import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
+
 public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
@@ -59,6 +61,9 @@ public class BillViewer extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 cropPhoto(ticketId);
+                Intent intent = new Intent();
+                intent.putExtra("ticketID", "" + ticketId);
+                setResult(REDO_OCR, intent);
            }//onClick
         });
         fabDelete.setOnClickListener(new View.OnClickListener() {
@@ -231,6 +236,7 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
+        intent.putExtra("ticketID", "" + ticketId);
         setResult(RESULT_OK, intent);
         finish();
     }

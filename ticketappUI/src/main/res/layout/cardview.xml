@@ -53,18 +53,6 @@
             android:scaleType="center"
             app:srcCompat="@drawable/ic_clear_white_24px"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/btnCrop"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="10dp"
-            android:clickable="true"
-            android:scaleType="center"
-            android:tag=""
-            app:backgroundTint="#D81B60"
-            app:layout_anchorGravity="right|end|bottom"
-            app:srcCompat="@drawable/ic_content_cut_white_24px" />
     </android.support.v7.widget.CardView>
 
 </RelativeLayout>

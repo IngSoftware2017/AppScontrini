@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import database.DataManager;
 import database.TicketEntity;
@@ -70,7 +71,7 @@ public class EditTicket extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_addMission:
                 //Salva i file nel DB
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
                 thisTicket.setTitle(txtTitle.getText().toString());
                 try {
                     thisTicket.setDate(format.parse(txtDate.getText().toString()));
@@ -79,7 +80,7 @@ public class EditTicket extends AppCompatActivity {
                 }
                 thisTicket.setShop(txtShop.getText().toString());
                 try {
-                    thisTicket.setAmount(new BigDecimal(txtAmount.getText().toString().replaceAll(",", ".")));
+                    thisTicket.setAmount(new BigDecimal(txtAmount.getText().toString().replaceAll(",", ".").replaceAll(" ", "")));
                 } catch (NumberFormatException e) {
                     AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -116,7 +117,8 @@ public class EditTicket extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
-        ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
+        if (thisTicket.getAmount() != null)
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
         ticketShop = thisTicket.getShop();
 
         //set those values to the edittext

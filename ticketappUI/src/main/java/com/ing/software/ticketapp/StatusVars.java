@@ -13,4 +13,5 @@ public class StatusVars {
     public static final String IMAGE_RECEIVED = "image";
     public static final String DATE_RECEIVED = "date_received";
     public static final String ROOT_RECEIVED = "root";
+    public static final int REDO_OCR = 222;
 }
