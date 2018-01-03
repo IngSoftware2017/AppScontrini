@@ -270,6 +270,15 @@ public class DataManager {
         return database.ticketDao().getMissionWithLocation(location);
     }
 
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions. Those ones that weren't repaid
+     * @return List<MissionEntity> not null with all active missions
+     */
+    List<MissionEntity> getActiveMission(){
+        return database.ticketDao().getActiveMission();
+    }
+
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name
      * @param name String not null

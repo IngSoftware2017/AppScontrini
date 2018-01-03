@@ -31,6 +31,8 @@ public class MissionEntity {
     private Date startDate;
     private Date endDate;
     private String location;
+
+    @ColumnInfo(name = Constants.MISSION_FIELD_REPAID)
     private boolean isRepay;
     private Uri excel;
     private String name;

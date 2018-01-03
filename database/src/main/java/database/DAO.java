@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
 
 import java.util.Date;
@@ -23,6 +24,7 @@ import java.util.List;
   in the parameters and executes the correspondent SQL INSERT query. The use of these methods can be seen in the DataManager class.
 */
 @Dao
+@TypeConverters(Converters.class)
 public interface DAO {
 
     //INSERT
@@ -203,7 +205,7 @@ public interface DAO {
      * @param category String not null, category to be searched
      * @return List<TicketEntity> not null with all TicketEntity with the given category
      */
-    @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.TICKET_FIELD_CATEGORY +" LIKE '%:category%' ")
+    @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.TICKET_FIELD_CATEGORY +" LIKE :category ")
     List<TicketEntity> getTicketWithCategory(String category);
 
     /**Created by Federico Taschin
@@ -229,6 +231,14 @@ public interface DAO {
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_LOCATION +" =:location")
     List<MissionEntity> getMissionWithLocation(String location);
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions. Those ones that weren't repaid
+     * @return List<MissionEntity> not null with all active missions
+     */
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = 'FALSE' ")
+    List<MissionEntity> getActiveMission();
 
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name
