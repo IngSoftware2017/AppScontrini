@@ -26,9 +26,6 @@ public class AddNewPerson extends AppCompatActivity {
 
     Context context;
     public DataManager DB;
-    TextView missionStart;
-    TextView missionFinish;
-    int personID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +33,10 @@ public class AddNewPerson extends AppCompatActivity {
         getSupportActionBar().setElevation(0);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        setTitle(context.getString(R.string.newPerson));
+        setTitle(getResources().getString(R.string.newPerson));
         setContentView(R.layout.activity_add_new_person);
     }
+
     /** Dal Maso
      * Setting toolbar buttons and style from /res/menu
      * @param menu

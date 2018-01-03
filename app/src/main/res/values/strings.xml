@@ -36,7 +36,8 @@
     <string name="toast_personNoName">Nome persona mancante</string>
     <string name="toast_missionNoLocation">Luogo missione mancante</string>
     <string name="toast_personNoLastName">Cognome persona mancante</string>
-    <string name="toast_errorDate">La data di fine precede \n quella di inizio</string>
+    <string name="toast_errorDate">La data di fine precede \nquella di inizio</string>
     <string name="toast_errorDateStart">Inserire una data di inizio</string>
     <string name="toast_errorDateEnd">Inserire una data di fine</string>
+    <string name="editPerson">Modifica persona</string>
 </resources>

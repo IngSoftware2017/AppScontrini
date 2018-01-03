@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -19,12 +21,17 @@ import database.PersonEntity;
 
 /**
  * Created by Francesco on 02/01/2018.
+ *
+ * Modified: Improve the Person Modify
+ * @author matteo.mascotto on 03/01/2018
  */
 
 public class EditPerson extends AppCompatActivity{
+
     public DataManager DB;
-    int personID;
     Context context;
+
+    int personID;
     PersonEntity thisPerson;
     String personName = "", personLastName = "", personAcademicTitle = "";
     TextView txtName;
@@ -35,15 +42,15 @@ public class EditPerson extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
-        //TODO: use string.xml
-        setTitle("Modifica persona");
-        setContentView(R.layout.activity_edit_person);
+
+        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        DB = new DataManager(context);
+
+        setTitle(getResources().getString(R.string.editPerson));
+        setContentView(R.layout.activity_edit_person);
 
         //Get data from parent view
         setPersonValues();
-
     }
 
     /** Dal Maso
@@ -54,9 +61,10 @@ public class EditPerson extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addmission_menu, menu);
+        inflater.inflate(R.menu.editmission_menu, menu);
         return true;
     }
+
     /** Dal Maso, adapted by Piccolo
      * Catch events on toolbar
      * @param item object on the toolbar
@@ -65,20 +73,49 @@ public class EditPerson extends AppCompatActivity{
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        Intent intent = new Intent();
+
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_addMission:
-                //TODO set the right intent
+            case R.id.action_editMission:
+                // Extract data from EditTexts
+                EditText editName = findViewById(R.id.input_personName);
+                EditText editLastName = findViewById(R.id.input_personLastName);
+                EditText editAcademicTitle = findViewById(R.id.input_personAcademicTitle);
+                personName = editName.getText().toString();
+                personLastName = editLastName.getText().toString();
+                personAcademicTitle = editAcademicTitle.getText().toString();
+
+                // Check if there's no Name or LastName
+                if ((personName == null) || personName.replaceAll(" ","").equals("")) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_personNoName), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((personLastName==null) || personLastName.replaceAll(" ","").equals("")) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_personNoLastName), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+
                 thisPerson.setName(txtName.getText().toString());
                 thisPerson.setLastName(txtLastName.getText().toString());
                 thisPerson.setAcademicTitle(txtAcademicTitle.getText().toString());
-                DB.updatePerson(thisPerson);
-                Intent intent = new Intent();
+
+                // UPDATE PERSON if it's all OK, return false otherwise
+                if (!DB.updatePerson(thisPerson)) return false;
+
+                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
+                startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startMissionView.putExtra("personID", personID);
+                startMissionView.putExtra("personName", personName);
+
+                context.startActivity(startMissionView);
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
 
             default:
+                setResult(RESULT_OK, intent);
                 finish();
                 break;
         }
@@ -89,14 +126,21 @@ public class EditPerson extends AppCompatActivity{
      * set the values of the person
      */
     private void setPersonValues(){
+
+        Bundle person;
+
         Intent intent = getIntent();
-        personID = (int) intent.getExtras().getLong("personID");
-        Log.d("personID", "Edit person "+personID);
+        person = intent.getExtras();
+        personID = person.getInt("personID", -1);
+
+        Log.d("personID", "Edit person " + personID);
         thisPerson = DB.getPerson(personID);
         personName=thisPerson.getName();
         personLastName=thisPerson.getLastName();
         personAcademicTitle=thisPerson.getAcademicTitle();
+
         Log.d("DBPerson",personID+" "+personName+" "+personLastName);
+
         //set those values to the edittext
         setPersonValuesOnScreen();
     }
