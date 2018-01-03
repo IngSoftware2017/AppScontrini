@@ -67,14 +67,14 @@ public class AddNewMission extends AppCompatActivity{
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
-                newFragment.show(getFragmentManager(), "datePicker");
+                newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
-                newFragment.show(getFragmentManager(), "datePicker");
+                newFragment.show(getFragmentManager(), "finishDatePicker");
             }
         });
     }
@@ -125,8 +125,22 @@ public class AddNewMission extends AppCompatActivity{
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
-                    miss.setStartMission(format.parse((String)missionStart.getText()));
-                    miss.setEndMission(format.parse((String)missionFinish.getText()));
+
+                    String start=(String) missionStart.getText();
+
+                    String finish=(String) missionFinish.getText();
+                    if(!AppUtilities.checkDate(start,finish)) {
+                        Log.d("formato data inserita", "errato");
+                        Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    else
+                        Log.d("formato data inserita","corretto");
+
+
+
+                    miss.setStartMission(format.parse(start));
+                    miss.setEndMission(format.parse(finish));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -154,4 +168,8 @@ public class AddNewMission extends AppCompatActivity{
         }
         return true;
     }
+
+
+
+
 }

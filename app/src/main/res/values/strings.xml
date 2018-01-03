@@ -36,6 +36,5 @@
     <string name="toast_personNoName">Nome persona mancante</string>
     <string name="toast_missionNoLocation">Luogo missione mancante</string>
     <string name="toast_personNoLastName">Cognome persona mancante</string>
-    <!--PICCOLO-->
-    <string name="deletePersonToast">Sei sicuro di voler eliminare la persona?\nTutte le missioni e i relativi scontrini verranno cancellati</string>
+    <string name="toast_errorDate">La data di fine precede \n quella di inizio</string>
 </resources>
