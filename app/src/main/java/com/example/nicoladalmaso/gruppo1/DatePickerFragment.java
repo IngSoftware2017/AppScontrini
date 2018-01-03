@@ -11,17 +11,25 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Nicola on 22/12/2017.
+ *
+ * Modified: Fixed month assigned issue and set a date format
+ * @author matteo.mascotto on 03/01/2017
  */
 
 public class  DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
     int id;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy");
+    Date inputDate;
 
     public static DatePickerFragment newInstance(TextView textView) {
         DatePickerFragment f = new DatePickerFragment();
@@ -49,8 +57,16 @@ public class  DatePickerFragment extends DialogFragment
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
+        String dateIn;
         Log.d("TextInputEditTextID", "ID: "+id+", R.id: "+R.id.input_missionStart);
         TextView textView = (TextView) getActivity().findViewById(id);
-        textView.setText(day + "/" + month + "/" + year);
+        // Month return a value [0-11] so for a correct month value it's necessary + 1
+        dateIn = day + "/" + (month + 1) + "/" + year;
+        try {
+            inputDate = dateFormat.parse(dateIn);
+            textView.setText(dateFormat.format(inputDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -34,6 +34,11 @@ import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 
+/**
+ *
+ * Modified: Check if there's some correct date value into the Begin and End mission
+ * @author matteo.mascotto on 03/01/2018
+ */
 public class AddNewMission extends AppCompatActivity{
 
     Context context;
@@ -127,8 +132,18 @@ public class AddNewMission extends AppCompatActivity{
                 try {
 
                     String start=(String) missionStart.getText();
-
                     String finish=(String) missionFinish.getText();
+
+                    // If there's no date insert as start or end it return an error
+                    if (start == getResources().getString(R.string.dateStart)) {
+                        Toast.makeText(context, getResources().getString(R.string.toast_errorDateStart), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    if (finish == getResources().getString(R.string.dateFinish)) {
+                        Toast.makeText(context, getResources().getString(R.string.toast_errorDateEnd), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
                     if(!AppUtilities.checkDate(start,finish)) {
                         Log.d("formato data inserita", "errato");
                         Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
