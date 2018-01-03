@@ -1,12 +1,16 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,12 +30,15 @@ import java.util.List;
 import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
+import database.TicketEntity;
 
 public class MissionActivity extends AppCompatActivity {
 
     public DataManager DB;
     int personID;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
+    Context context;
+    final int PERSON_MOD = 1;
 
     //Dal Maso
     @Override
@@ -38,15 +46,15 @@ public class MissionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         DB = new DataManager(this.getApplicationContext());
         setContentView(R.layout.activity_mission);
-
+        context=getApplicationContext();
         Intent intent = getIntent();
 
         personID = intent.getExtras().getInt("personID");
         String personName = intent.getExtras().getString("personName");
-        setTitle(personName);
-
+        //TODO set the title right using string.xml(like personName+" 's missions")
+        setTitle(personName+"- Missioni");
+        Log.d("idPersona:", personID+" "+personName);
         Log.d("PersonID", ""+personID);
-
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -83,11 +91,14 @@ public class MissionActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case (R.id.action_deletePerson):
-                //TODO: cancella la persona
+                //TODO:DELETE THE PERSON
                 break;
 
             case (R.id.action_editPerson):
-                //TODO: modifica la persona
+                //Open Edit Person Activity
+                Intent editPerson = new Intent(context, com.example.nicoladalmaso.gruppo1.EditPerson.class);
+                editPerson.putExtra("personID", personID);
+                startActivityForResult(editPerson,PERSON_MOD);
                 break;
 
             case (1):

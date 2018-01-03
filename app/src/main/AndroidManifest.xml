@@ -58,6 +58,9 @@
         <activity
             android:name=".AddNewPerson"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".EditPerson"
+            android:parentActivityName=".MissionActivity" />
 
     </application>
 

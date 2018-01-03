@@ -48,6 +48,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
 
         PersonEntity person = getItem(position);
         name.setText(person.getName() + " " + person.getLastName());
+        //TODO show the accademicTitle
         convertView.setTag(person.getID());
 
         convertView.setOnClickListener(new View.OnClickListener(){
