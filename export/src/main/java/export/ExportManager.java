@@ -2,7 +2,7 @@ package export;
 
 import java.io.File;
 
-import database.Database;
+import database.DataManager;
 
 /**
  * @author Marco Olivieri on 03/01/2018
@@ -13,13 +13,13 @@ import database.Database;
 
 public abstract class ExportManager {
 
-    Database database;
-    String pathDirectory;
+    DataManager database;
+    String pathLocation;
 
 
-    public ExportManager(Database database, String pathDirectory) {
+    public ExportManager(DataManager database, String pathLocation) {
         this.database = database;
-        this.pathDirectory = pathDirectory;
+        this.pathLocation = pathLocation;
         //TODO : check new or exist path
     }
 
