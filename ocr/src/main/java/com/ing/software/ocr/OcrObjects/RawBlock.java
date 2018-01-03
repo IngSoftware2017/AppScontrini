@@ -1,10 +1,12 @@
 package com.ing.software.ocr.OcrObjects;
 
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
+import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
@@ -22,7 +24,7 @@ import static com.ing.software.ocr.OcrUtils.log;
 public class RawBlock implements Comparable<RawBlock> {
 
     private List<RawText> rawTexts = new ArrayList<>();
-    private RectF rectF;
+    private Rect rectF;
     private RawImage rawImage;
 
     /**
@@ -31,7 +33,7 @@ public class RawBlock implements Comparable<RawBlock> {
      * @param imageMod source image. Not null.
      */
     public RawBlock(@NonNull TextBlock textBlock, @NonNull RawImage imageMod) {
-        rectF = new RectF(textBlock.getBoundingBox());
+        rectF = textBlock.getBoundingBox();
         this.rawImage = imageMod;
         initialize(textBlock);
     }
@@ -39,7 +41,7 @@ public class RawBlock implements Comparable<RawBlock> {
     /**
      * @return rect containing this block
      */
-    public RectF getRectF() {
+    public Rect getRectF() {
         return rectF;
     }
 
@@ -61,7 +63,7 @@ public class RawBlock implements Comparable<RawBlock> {
      * Populates this block with its RawTexts
      */
     private void initialize(TextBlock textBlock) {
-        for (Text currentText : textBlock.getComponents()) {
+        for (Line currentText : (List<Line>)textBlock.getComponents()) {
             rawTexts.add(new RawText(currentText, rawImage));
         }
     }
@@ -104,13 +106,13 @@ public class RawBlock implements Comparable<RawBlock> {
      * @param percent error accepted on chosen rect. Int >= 0
      * @return list of RawTexts in chosen rect, null if nothing found
      */
-    public List<RawText> findByPosition(RectF rect, @IntRange(from = 0) int percent) {
+    public List<RawText> findByPosition(Rect rect, @IntRange(from = 0) int percent) {
         List<RawText> rawTextList = new ArrayList<>();
-        RectF newRect = extendRect(rect, percent);
+        Rect newRect = extendRect(rect, percent);
         for (RawText rawText : rawTexts) {
             if (rawText.isInside(newRect)) {
                 rawTextList.add(rawText);
-                log(3,"OcrAnalyzer", "Found target rect: " + rawText.getDetection());
+                log(3,"OcrAnalyzer", "Found target rect: " + rawText.getValue());
             }
         }
         if (rawTextList.size()>0)
@@ -139,28 +141,28 @@ public class RawBlock implements Comparable<RawBlock> {
      * @param percent chosen percentage. Int >= 0
      * @return new extended rectangle
      */
-    private RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
+    private Rect extendRect(@NonNull Rect rect, @IntRange(from = 0) int percent) {
         log(4, "RawObjects.extendRect","Source rect: left " + rect.left + " top: "
                 + rect.top + " right: " + rect.right + " bottom: " + rect.bottom);
-        float extendedHeight = rect.height()*percent/100;
-        float extendedWidth = rect.width()*percent/100;
-        float left = rect.left - extendedWidth/2;
+        int extendedHeight = rect.height()*percent/100;
+        int extendedWidth = rect.width()*percent/100;
+        int left = rect.left - extendedWidth/2;
         if (left<0)
             left = 0;
-        float top = rect.top - extendedHeight/2;
+        int top = rect.top - extendedHeight/2;
         if (top < 0)
             top = 0;
         //Doesn't matter if bottom and right are outside the photo
-        float right = rect.right + extendedWidth/2;
-        float bottom = rect.bottom + extendedHeight/2;
+        int right = rect.right + extendedWidth/2;
+        int bottom = rect.bottom + extendedHeight/2;
         log(4, "RawObjects.extendRect","Extended rect: left " + left + " top: " + top
                 + " right: " + right + " bottom: " + bottom);
-        return new RectF(left, top, right, bottom);
+        return new Rect(left, top, right, bottom);
     }
 
     @Override
     public int compareTo(@NonNull RawBlock rawBlock) {
-        RectF block2Rect = rawBlock.getRectF();
+        Rect block2Rect = rawBlock.getRectF();
         if (block2Rect.top != rectF.top)
             return Math.round(rectF.top - block2Rect.top);
         else if (block2Rect.left != rectF.left)

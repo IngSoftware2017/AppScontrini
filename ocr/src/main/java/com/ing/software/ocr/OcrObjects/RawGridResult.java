@@ -47,8 +47,8 @@ public class RawGridResult implements Comparable<RawGridResult>{
     public boolean equals(@NonNull Object o) {
         if (o instanceof RawGridResult) {
             RawGridResult e2 = (RawGridResult) o;
-            return singleText.getDetection().equals(e2.getText().getDetection()) &&
-                    singleText.getRect().equals(e2.getText().getRect());
+            return singleText.getValue().equals(e2.getText().getValue()) &&
+                    singleText.getBoundingBox().equals(e2.getText().getBoundingBox());
         }
         else
             return false;

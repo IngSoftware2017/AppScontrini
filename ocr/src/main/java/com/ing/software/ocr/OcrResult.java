@@ -1,6 +1,5 @@
 package com.ing.software.ocr;
 
-import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
 import com.ing.software.ocr.OcrObjects.RawText;
@@ -65,7 +64,7 @@ class OcrResult {
                 List<RawText> rawTexts = result.getDetectedTexts();
                 if (rawTexts != null) {
                     for (RawText text : rawTexts) {
-                        list.append(text.getDetection()).append("\n");
+                        list.append(text.getValue()).append("\n");
                     }
                 }
             }
@@ -74,10 +73,10 @@ class OcrResult {
         if (dateList != null) {
             for (RawGridResult result : dateList) {
                 int probability = result.getPercentage();
-                list.append("POSSIBLE DATE: ").append(result.getText().getDetection()).append(" with probability: ")
+                list.append("POSSIBLE DATE: ").append(result.getText().getValue()).append(" with probability: ")
                         .append(probability);
-                log(5,"POSSIBLE DATE: ", result.getText().getDetection() + " with probability: "
-                        + probability + " and distance: " + DataAnalyzer.findDate(result.getText().getDetection()));
+                log(5,"POSSIBLE DATE: ", result.getText().getValue() + " with probability: "
+                        + probability + " and distance: " + DataAnalyzer.findDate(result.getText().getValue()));
                 list.append("\n");
             }
         }

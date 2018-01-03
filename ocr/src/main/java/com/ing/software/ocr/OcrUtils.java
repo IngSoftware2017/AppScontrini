@@ -1,7 +1,7 @@
 package com.ing.software.ocr;
 
 import android.graphics.Bitmap;
-import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -12,11 +12,9 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
 import com.ing.software.ocr.OcrObjects.RawText;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 
 import static com.ing.software.ocr.OcrVars.LOG_LEVEL;
 
@@ -86,48 +84,6 @@ public class OcrUtils {
 
     /**
      * @author Michelon
-     * Get preferred grid according to height/width ratio
-     * @param photo original photo. Not null.
-     * @return preferred ratio defined in ProbGrid, -1 if something went wrong
-     */
-     public static String getPreferredGrid(@NonNull Bitmap photo) {
-        double width = photo.getWidth();
-        double heigth = photo.getHeight();
-        String preferredRatio = "-1";
-        if (width <= 0 || heigth <= 0)
-            return preferredRatio;
-        double ratio = heigth/width;
-        List<Double> availableRatios = new ArrayList<>(ProbGrid.gridMap.keySet());
-        double diff = Double.MAX_VALUE;
-        for(Double testRatio : availableRatios) {
-            if (Math.abs(testRatio-ratio)<diff) {
-                diff = Math.abs(testRatio - ratio);
-                preferredRatio = ProbGrid.gridMap.get(testRatio);
-            }
-        }
-        log(2,"OcrUtils.getPrefGrid","Ratio is: " + ratio + " Grid is: " + preferredRatio + " Diff is: " + diff);
-        return preferredRatio;
-    }
-
-    /**
-     * @author Michelon
-     * @date 27-12-17
-     * Find box of the grid containing the center of the text rect
-     * @return coordinates of the grid, where int[0] = column, int[1] = row
-     */
-    public static PointF getGridBox(RawImage image) {
-        Scanner gridder = new Scanner(image.getGrid());
-        gridder.useDelimiter("x");
-        int rows = Integer.parseInt(gridder.next());
-        int columns = Integer.parseInt(gridder.next());
-        gridder.close();
-        float rowsHeight = image.getHeight()/rows;
-        float columnsWidth = image.getWidth()/columns;
-        return new PointF();
-    }
-
-    /**
-     * @author Michelon
      * Order a list of TextBlock from top to bottom, left to right
      * @param textBlocks original list. Not null.
      * @return ordered list
@@ -162,20 +118,20 @@ public class OcrUtils {
      * @param sourceRect Rect from which check the distance
      * @return ordered list
      */
-    static List<RawText> orderRawTextFromRect(@NonNull List<RawText> rawTexts, final RectF sourceRect) {
+    static List<RawText> orderRawTextFromRect(@NonNull List<RawText> rawTexts, final Rect sourceRect) {
         Collections.sort(rawTexts, new Comparator<RawText>() {
             @Override
             public int compare(RawText text1, RawText text2) {
-                float centerPoint = sourceRect.centerY();
-                float center1 = text1.getRect().centerY();
-                float center2 = text2.getRect().centerY();
-                float diff1 = Math.abs(center1 - centerPoint);
-                float diff2 = Math.abs(center2 - centerPoint);
-                if (Math.round(diff1 - diff2) == 0) {
+                int centerPoint = sourceRect.centerY();
+                int center1 = text1.getBoundingBox().centerY();
+                int center2 = text2.getBoundingBox().centerY();
+                int diff1 = Math.abs(center1 - centerPoint);
+                int diff2 = Math.abs(center2 - centerPoint);
+                if (diff1 - diff2 == 0) {
                     //same distance from center, return one on top
-                    return Math.round(center1 - center2);
+                    return center1 - center2;
 				}
-                return Math.round(diff1 - diff2);
+                return diff1 - diff2;
             }
         });
         return rawTexts;
@@ -188,12 +144,12 @@ public class OcrUtils {
      * @param photo source rawImage (to get max width). Not null.
      * @return rect with max width
      */
-    static RectF extendWidthFromPhoto(@NonNull RectF rect, @NonNull RawImage photo) {
-        float top = rect.top;
-        float bottom = rect.bottom;
-        float left = 0;
-        float right = photo.getWidth();
-        RectF rectF = new RectF(left, top, right, bottom);
+    static Rect extendWidthFromPhoto(@NonNull Rect rect, @NonNull RawImage photo) {
+        int top = rect.top;
+        int bottom = rect.bottom;
+        int left = 0;
+        int right = photo.getWidth();
+        Rect rectF = new Rect(left, top, right, bottom);
         log(6,"OcrUtils.getExtendRect","Extended rect: left " + rectF.left + " top: "
                 + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
         return rectF;
@@ -344,33 +300,33 @@ public class OcrUtils {
      * @param percentWidth chosen percentage for width. \pixels if negative
      * @return new extended rectangle
      */
-    static RectF extendRect(@NonNull RectF rect, int percentHeight, int percentWidth) {
-        float top;
-        float bottom;
-        float right;
-        float left;
+    static Rect extendRect(@NonNull Rect rect, int percentHeight, int percentWidth) {
+        int top;
+        int bottom;
+        int right;
+        int left;
         if (percentHeight > 0) {
-            float extendedHeight = rect.height() * percentHeight / 100;
+            int extendedHeight = rect.height() * percentHeight / 100;
             top = rect.top - extendedHeight / 2;
             bottom = rect.bottom + extendedHeight/2;
         } else {
-            top = rect.top - (float)Math.abs(percentHeight);
-            bottom = rect.bottom + (float)Math.abs(percentHeight);
+            top = rect.top - Math.abs(percentHeight);
+            bottom = rect.bottom + Math.abs(percentHeight);
         }
         if (percentWidth > 0) {
-            float extendedWidth = rect.width() * percentWidth / 100;
+            int extendedWidth = rect.width() * percentWidth / 100;
             left = rect.left - extendedWidth / 2;
             right = rect.right + extendedWidth/2;
         } else {
-            left = rect.left - (float)Math.abs(percentWidth);
-            right = rect.right + (float)Math.abs(percentWidth);
+            left = rect.left - Math.abs(percentWidth);
+            right = rect.right + Math.abs(percentWidth);
         }
         if (left<0)
             left = 0;
         if (top < 0)
             top = 0;
         //Doesn't matter if bottom and right are outside the photo
-        return new RectF(left, top, right, bottom);
+        return new Rect(left, top, right, bottom);
     }
 
     /**
@@ -378,22 +334,28 @@ public class OcrUtils {
      * @date 26-12-17
      * Check if a string may be a number.
      * Removes spaces, 'S', 'O','o', '.', ',' before analysis.
-     * If string is longer than maxlength default is false (allowed numbers up to nn.nnn,nn)
+     * If string is longer than maxlength default is Integer.MAX_VALUE (allowed numbers up to nn.nnn,nn)
      * @param s string to analyze
-     * @return true if more than 3/4 (rounded) of the chars in the string are numbers
+     * @return Integer.MAX_VALUE if less than 2/3 of the string are not numbers; number of non-digit chars (*0.5 if special (see above))/length
+	 * todo: reduce distance if one '.' is present (add if more than 1)
      */
-    static boolean isPossibleNumber(String s) {
+    static double isPossibleNumber(String s) {
         int counter = 0;
+        s = s.replaceAll(" ", "");
+        int initialLength = s.length();
         int maxLength = 8; //Assume we can't have prices longer than 8 chars (so nn.nnn,nn)
-        s = s.replaceAll(",", "").replaceAll(" ", "").replaceAll("O", "") //sometimes '0' are recognized as 'O'
+        s = s.replaceAll(",", "").replaceAll("O", "") //sometimes '0' are recognized as 'O'
                 .replaceAll("o", "").replaceAll("\\.", "").replaceAll("S", ""); //sometimes '5' are recognized as 'S'
         if (s.length() >= maxLength)
-            return false;
+            return Integer.MAX_VALUE;
         for (int i = 0; i < s.length(); ++i) {
             if (Character.isDigit(s.charAt(i)))
                 ++counter;
         }
-        return counter >= Math.round((double)s.length()*3/4);
+        //return counter >= Math.round((double)s.length()*3/4);
+        if (counter < Math.round((double)s.length()*2/3))
+            return Integer.MAX_VALUE;
+        return ((initialLength - s.length())*0.5 + s.length() - counter)/s.length();
     }
 
     /**
@@ -402,25 +364,24 @@ public class OcrUtils {
      * @param rawTexts texts detected. Not null.
      * @return Rect containing all rects passed
      */
-    static RectF getMaxRectBorders(@NonNull List<RawText> rawTexts) {
+    public static Rect getMaxRectBorders(@NonNull List<RawText> rawTexts) {
         //Extreme borders for chosen photo (will be overwritten in foreach)
         if (rawTexts.size() == 0)
             return null;
-        float left = rawTexts.get(0).getRawImage().getWidth();
-        float right = 0;
-        float top = rawTexts.get(0).getRawImage().getHeight();
-        float bottom = 0;
+        int left = rawTexts.get(0).getRawImage().getWidth();
+        int right = 0;
+        int top = rawTexts.get(0).getRawImage().getHeight();
+        int bottom = 0;
         for (RawText rawText : rawTexts) {
-            if (rawText.getRect().left<left)
-                left = rawText.getRect().left;
-            if (rawText.getRect().right>right)
-                right = rawText.getRect().right;
-            if (rawText.getRect().bottom>bottom)
-                bottom = rawText.getRect().bottom;
-            if (rawText.getRect().top<top)
-                top = rawText.getRect().top;
+            if (rawText.getBoundingBox().left<left)
+                left = rawText.getBoundingBox().left;
+            if (rawText.getBoundingBox().right>right)
+                right = rawText.getBoundingBox().right;
+            if (rawText.getBoundingBox().bottom>bottom)
+                bottom = rawText.getBoundingBox().bottom;
+            if (rawText.getBoundingBox().top<top)
+                top = rawText.getBoundingBox().top;
         }
-        return new RectF(left, top, right, bottom);
+        return new Rect(left, top, right, bottom);
     }
-
 }

@@ -1,9 +1,7 @@
 package com.ing.software.ocr;
 
 import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +19,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
+import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
 import java.text.ParseException;
 
@@ -52,18 +51,18 @@ class DataAnalyzer {
                 int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
                 if (stringResult.getDetectedTexts() != null) {
                     //Here we order texts according to their distance (position) from source rect
-                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getDetectedTexts(), stringResult.getSourceText().getRect());
+                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getDetectedTexts(), stringResult.getSourceText().getBoundingBox());
                     for (RawText rawText : orderedDetectedTexts) {
                         if (!rawText.equals(sourceText)) {
                             possibleResults.add(new RawGridResult(rawText, singleCatch));
-                            OcrUtils.log(3, "getPossibleAmount", "Analyzing source text: " + sourceText.getDetection() +
-                                    " where target is: " + rawText.getDetection() + " with probability: " + sourceText.getAmountProbability() +
+                            OcrUtils.log(3, "getPossibleAmount", "Analyzing source text: " + sourceText.getValue() +
+                                    " where target is: " + rawText.getValue() + " with probability: " + sourceText.getAmountProbability() +
                                     " and distance: " + stringResult.getDistanceFromTarget());
                         }
                     }
                 }
             } else {
-                OcrUtils.log(3, "getPossibleAmount", "Ignoring text: " + stringResult.getSourceText().getDetection());
+                OcrUtils.log(3, "getPossibleAmount", "Ignoring text: " + stringResult.getSourceText().getValue());
             }
         }
         if (possibleResults.size() > 0) {
@@ -85,7 +84,7 @@ class DataAnalyzer {
      */
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
-        if (OcrUtils.isPossibleNumber(amountString)) {
+        if (OcrUtils.isPossibleNumber(amountString) < NUMBER_MIN_VALUE) {
             try {
                 String decoded = deepAnalyzeAmountChars(amountString);
                 if (!decoded.equals(""))
@@ -521,12 +520,12 @@ class DataAnalyzer {
         Collections.sort(dateResults);
         for (RawGridResult gridResult : dateResults) {
             //Ignore text with invalid distance (-1) according to findDate() documentation
-            int distanceFromDate = findDate(gridResult.getText().getDetection());
+            int distanceFromDate = findDate(gridResult.getText().getValue());
             if (distanceFromDate > -1) {
                 int singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
                 possibleResults.add(new RawGridResult(gridResult.getText(), singleCatch));
             } else {
-                OcrUtils.log(5, "getPossibleDate", "Ignoring text: " + gridResult.getText().getDetection());
+                OcrUtils.log(5, "getPossibleDate", "Ignoring text: " + gridResult.getText().getValue());
             }
         }
         if (possibleResults.size() > 0) {

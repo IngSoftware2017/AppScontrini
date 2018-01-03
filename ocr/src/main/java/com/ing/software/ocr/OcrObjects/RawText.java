@@ -1,18 +1,22 @@
 package com.ing.software.ocr.OcrObjects;
 
 
-import android.graphics.RectF;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
 import com.google.android.gms.vision.text.Text;
+import com.google.android.gms.vision.text.Line;
 import com.ing.software.ocr.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import static com.ing.software.ocr.OcrUtils.log;
+import static com.ing.software.ocr.OcrVars.*;
 
 /**
  * Class to store texts detected.
@@ -21,36 +25,40 @@ import static com.ing.software.ocr.OcrUtils.log;
  * @author Michelon
  */
 
-public class RawText implements Comparable<RawText> {
+public class RawText implements Comparable<RawText>, Text {
 
-    private RectF rectText;
+    private Rect rectText;
     private String detection;
     private RawImage rawImage;
-    private RawTag tag = new RawTag();
+    private List<String> tags = new ArrayList<>();
+    private int position;
+    private Line line;
 
     /**
      * Constructor
      * todo: use getCornerPoints() to ease process
-     * @param text current Text inside TextBlock. Not null.
+     * @param line current Text inside TextBlock. Not null.
      * @param rawImage source image. Not null.
      */
-    public RawText(@NonNull Text text, @NonNull RawImage rawImage) {
-        rectText = new RectF(text.getBoundingBox());
-        this.detection = text.getValue();
+    public RawText(@NonNull Line line, @NonNull RawImage rawImage) {
+        rectText = line.getBoundingBox();
+        detection = line.getValue();
         this.rawImage = rawImage;
     }
 
     /**
      * @return string contained in this Text
      */
-    public String getDetection() {
+    @Override
+    public String getValue() {
         return detection;
     }
 
     /**
      * @return rect of this Text
      */
-    public RectF getRect() {
+    @Override
+    public Rect getBoundingBox() {
         return rectText;
     }
 
@@ -62,19 +70,20 @@ public class RawText implements Comparable<RawText> {
     }
 
     public List<String> getTags() {
-        return tag.getTag();
+        return tags;
     }
 
     public void addTag(String tag) {
-        this.tag.addTag(tag);
+        if (!this.tags.contains(tag))
+            this.tags.add(tag);
     }
 
     public void removeTag(String tag) {
-        this.tag.removeTag(tag);
+        this.tags.remove(tag);
     }
 
     public void setTagPosition(double position) {
-        tag.setPosition(position);
+        this.position = (int)(position*10);
     }
 
     /**
@@ -82,11 +91,14 @@ public class RawText implements Comparable<RawText> {
      * @return probability that date is present
      */
     public int getDateProbability() {
-        log(8,"Value is: ", getDetection());
-        int[] gridBox = getGridBox();
-        log(8,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
-        int probability = ProbGrid.dateMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
-        log(8,"Date Probability is", " " +probability);
+        int probability = 0;
+        if (tags.contains(INTRODUCTION_TAG))
+            probability = ProbGrid.dateBlockIntroduction[position];
+        else if (tags.contains(PRODUCTS_TAG) || tags.contains(PRICES_TAG))
+            probability = ProbGrid.dateBlockProducts[position];
+        else if (tags.contains(CONCLUSION_TAG))
+            probability = ProbGrid.dateBlockConclusion[position];
+        log(8,"RawText.getDateProb", "Date Probability is " + probability);
         return probability;
     }
 
@@ -95,30 +107,15 @@ public class RawText implements Comparable<RawText> {
      * @return probability that amount is present
      */
     public int getAmountProbability() {
-        log(8,"Value is: ", getDetection());
-        int[] gridBox = getGridBox();
-        log(8,"Grid box is: ", " " + gridBox[1] + ":" + gridBox[0]);
-        int probability = ProbGrid.amountMap.get(rawImage.getGrid())[gridBox[1]][gridBox[0]];
-        log(8,"Amount Probability is", " " +probability);
+        int probability = 0;
+        if (tags.contains(INTRODUCTION_TAG))
+            probability = ProbGrid.amountBlockIntroduction[position];
+        else if (tags.contains(PRODUCTS_TAG) || tags.contains(PRICES_TAG))
+            probability = ProbGrid.amountBlockProducts[position];
+        else if (tags.contains(CONCLUSION_TAG))
+            probability = ProbGrid.amountBlockConclusion[position];
+        log(8,"RawText.getAmountProb", "Amount Probability is " + probability);
         return probability;
-    }
-
-    /**
-     * Find box of the grid containing the center of the text rect
-     * todo: replace with point
-     * @return coordinates of the grid, where int[0] = column, int[1] = row
-     */
-    public int[] getGridBox() {
-        Scanner gridder = new Scanner(rawImage.getGrid());
-        gridder.useDelimiter("x");
-        int rows = Integer.parseInt(gridder.next());
-        int columns = Integer.parseInt(gridder.next());
-        gridder.close();
-        double rowsHeight = rawImage.getHeight()/rows;
-        double columnsWidth = rawImage.getWidth()/columns;
-        int gridX = (int) (rectText.centerX()/columnsWidth);
-        int gridY = (int) (rectText.centerY()/rowsHeight);
-        return new int[] {gridX, gridY};
     }
 
     /**
@@ -141,7 +138,7 @@ public class RawText implements Comparable<RawText> {
      * @return int according to OcrUtils.findSubstring()
      */
     int bruteSearch(@Size(min = 1) String string) {
-        return OcrUtils.findSubstring(getDetection(), string);
+        return OcrUtils.findSubstring(getValue(), string);
     }
 
     /**
@@ -149,7 +146,7 @@ public class RawText implements Comparable<RawText> {
      * @param rect target rect that could contain this text. Not null.
      * @return true if is inside
      */
-    public boolean isInside(@NonNull RectF rect) {
+    public boolean isInside(@NonNull Rect rect) {
         return rect.contains(rectText);
     }
 
@@ -160,15 +157,15 @@ public class RawText implements Comparable<RawText> {
      */
     @Override
     public int compareTo(@NonNull RawText rawText) {
-        RectF text2Rect = rawText.getRect();
+        Rect text2Rect = rawText.getBoundingBox();
         if (text2Rect.top != rectText.top)
-            return Math.round(rectText.top - text2Rect.top);
+            return rectText.top - text2Rect.top;
         else if (text2Rect.left != rectText.left)
-            return Math.round(rectText.left - text2Rect.left);
+            return rectText.left - text2Rect.left;
         else if (text2Rect.bottom != rectText.bottom)
-            return Math.round(rectText.bottom - text2Rect.bottom);
+            return rectText.bottom - text2Rect.bottom;
         else
-            return Math.round(rectText.right - text2Rect.right);
+            return rectText.right - text2Rect.right;
     }
 
     @Override
@@ -178,5 +175,16 @@ public class RawText implements Comparable<RawText> {
         if (!(other instanceof RawText))return false;
         RawText target = (RawText) other;
         return this.compareTo(target) == 0;
+    }
+
+    @Override
+    public Point[] getCornerPoints() {
+        return new Point[] {new Point(rectText.left, rectText.top), new Point(rectText.right, rectText.top),
+        new Point(rectText.right, rectText.bottom), new Point(rectText.left, rectText.bottom)};
+    }
+
+    @Override
+    public List<? extends Text> getComponents() {
+        return line.getComponents();
     }
 }

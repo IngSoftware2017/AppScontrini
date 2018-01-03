@@ -1,12 +1,11 @@
 package com.ing.software.ocr;
 
-import android.graphics.RectF;
+import android.graphics.Rect;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
 import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.OcrObjects.RawTag;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ class OcrSchemer {
         if (blocks.size() > 0) {
             RawImage rawImage = blocks.get(0).getRawImage();
             for (RawBlock block : blocks) {
-                RectF extendedRect = OcrUtils.extendWidthFromPhoto(block.getRectF(), rawImage);
+                Rect extendedRect = OcrUtils.extendWidthFromPhoto(block.getRectF(), rawImage);
                 for (RawBlock block1 : blocks) {
                     if (block1 != block && extendedRect.contains(block1.getRectF())) {
                         candidates.add(block);
@@ -56,7 +55,7 @@ class OcrSchemer {
     static List<RawText> getPricesTexts(List<RawText> blocks) {
         List<RawText> texts = new ArrayList<>();
         for (RawText text : blocks) {
-            if (text.getRect().centerX() > text.getRawImage().getWidth()*0.75)
+            if (text.getBoundingBox().centerX() > text.getRawImage().getWidth()*0.75)
                 texts.add(text);
         }
         return texts;
@@ -70,7 +69,7 @@ class OcrSchemer {
     static List<RawText> findTextsOnRight(List<RawText> blocks) {
         List<RawText> texts = new ArrayList<>();
         for (RawText text : blocks) {
-            if (text.getRect().centerX() > text.getRawImage().getWidth()/2)
+            if (text.getBoundingBox().centerX() > text.getRawImage().getWidth()/2)
                 texts.add(text);
         }
         return texts;
@@ -84,9 +83,9 @@ class OcrSchemer {
      */
     static boolean isPossibleCash(RawText amount, RawText cash) {
         int extendWidth = 50;
-        RectF extendedRect = OcrUtils.extendRect(amount.getRect(), -amount.getRawImage().getHeight(), extendWidth);
-        extendedRect.set(extendedRect.left, amount.getRect().top, extendedRect.right, extendedRect.bottom);
-        return extendedRect.contains(cash.getRect());
+        Rect extendedRect = OcrUtils.extendRect(amount.getBoundingBox(), -amount.getRawImage().getHeight(), extendWidth);
+        extendedRect.set(extendedRect.left, amount.getBoundingBox().top, extendedRect.right, extendedRect.bottom);
+        return extendedRect.contains(cash.getBoundingBox());
     }
 
     /**
@@ -97,24 +96,19 @@ class OcrSchemer {
         for (RawText rawText : textList) {
             switch (getPosition(rawText)) {
                 case 0: rawText.addTag(LEFT_TAG);
-                OcrUtils.log(2, "prepareScheme", "Text: "+rawText.getDetection() + " is left");
+                    OcrUtils.log(4, "prepareScheme", "Text: "+rawText.getValue() + " is left");
                     break;
                 case 1: rawText.addTag(CENTER_TAG);
-                    if (isHalfUp(rawText)) {
-                        rawText.addTag(INTRODUCTION_TAG);
-                        OcrUtils.log(2, "prepareScheme", "Text: " + rawText.getDetection() + " is center-introduction");
-                    } else {
-                        rawText.addTag(CONCLUSION_TAG);
-                        OcrUtils.log(2, "prepareScheme", "Text: "+rawText.getDetection() + " is center-conclusion");
-                    }
-                    waveTagger(textList, rawText);
+                    OcrUtils.log(4, "prepareScheme", "Text: "+rawText.getValue() + " is center");
                     break;
                 case 2: rawText.addTag(RIGHT_TAG);
-                    OcrUtils.log(2, "prepareScheme", "Text: "+rawText.getDetection() + " is right");
+                    OcrUtils.log(4, "prepareScheme", "Text: "+rawText.getValue() + " is right");
                     break;
-                default: OcrUtils.log(1, "prepareScheme", "Could not find position for text: " + rawText.getDetection());
+                default: OcrUtils.log(1, "prepareScheme", "Could not find position for text: " + rawText.getValue());
             }
         }
+        int targetHeight = getBestCentralArea(textList);
+        centralTagger(textList, targetHeight);
         missTagger(textList);
         Collections.sort(textList);
         int endingIntroduction = densitySnake(textList, INTRODUCTION_TAG);
@@ -140,16 +134,67 @@ class OcrSchemer {
      */
     static private int getPosition(@NonNull RawText text) {
         int width = text.getRawImage().getWidth();
-        return Math.round(text.getRect().centerX())*3/width;
+        /*
+        int position = Math.round(text.getBoundingBox().centerX())*7/width;
+        if (0<=position && position<=2)
+            return 0;
+        else if (2<position && position<=5)
+            return 1;
+        else
+            return 2;
+        */
+        return Math.round(text.getBoundingBox().centerX())*3/width;
     }
 
     /**
      * @param text source text. Not null.
-     * @return True if text is in half up of the image (temporary method)
+     * @param targetHeight target height
+     * @return True if text is above target height
      */
-    private static boolean isHalfUp(@NonNull RawText text) {
-        int height = text.getRawImage().getHeight();
-        return text.getRect().centerY() < height/2;
+    private static boolean isHalfUp(@NonNull RawText text, int targetHeight) {
+        //int height = text.getRawImage().getHeight();
+        //return text.getBoundingBox().centerY() < height/2;
+        return text.getBoundingBox().centerY() < targetHeight;
+    }
+
+    /**
+     * Cerca l'area dello scontrino in cui hai il maggior numero di text left\right
+     * per decidere dove far finire introduction e dove iniziare conclusion
+     * @param texts
+     * @return
+     */
+    private static int getBestCentralArea(List<RawText> texts) {
+        Collections.sort(texts);
+        int areaDivider = 4;
+        if (texts.size() == 0)
+            return -1;
+        Rect maximRect = texts.get(0).getRawImage().getExtendedRect();
+        int targetHeight = texts.get(0).getRawImage().getExtendedRect().height()/areaDivider;
+        SortedMap<Double, Integer> map = new TreeMap<>();
+        for (int i = 0; i < texts.size(); ++i) {
+            RawText rawText = texts.get(i);
+            Rect areaRect = new Rect(maximRect.left, rawText.getBoundingBox().top, maximRect.right, rawText.getBoundingBox().top + targetHeight);
+            if (areaRect.bottom > maximRect.bottom)
+                break;
+            double leftRightArea = 0;
+            double targetArea = 0;
+            for (RawText text : texts) {
+                if (areaRect.contains(text.getBoundingBox())) {
+                    if (text.getTags().contains(LEFT_TAG) || text.getTags().contains(RIGHT_TAG)) {
+                        leftRightArea += getRectArea(text.getBoundingBox());
+                    }
+                    targetArea += getRectArea(text.getBoundingBox());
+                }
+            }
+            if (targetArea == 0) //should never happen
+                targetArea = 1;
+            OcrUtils.log(5, "getBestCentralArea", "Partial density for: " + rawText.getValue() + " is: " + leftRightArea / targetArea);
+            map.put(leftRightArea / targetArea, i);
+        }
+        RawText chosenRect = texts.get(map.get(map.lastKey()));
+        OcrUtils.log(3, "getBestCentralArea", "Best center is at: " + (chosenRect.getBoundingBox().centerY())
+            + " of rect " + chosenRect.getValue() + " and density: " + map.lastKey());
+        return chosenRect.getBoundingBox().centerY();
     }
 
     /**
@@ -160,18 +205,38 @@ class OcrSchemer {
      */
     private static void waveTagger(@NonNull List<RawText> texts, @NonNull RawText source) {
         int extendHeight = 20;
-        RectF extendedRect = OcrUtils.extendRect(source.getRect(), extendHeight, -source.getRawImage().getWidth());
+        Rect extendedRect = OcrUtils.extendRect(source.getBoundingBox(), extendHeight, -source.getRawImage().getWidth());
         for (RawText text : texts) {
             if (!text.getTags().contains(CENTER_TAG)) { //here we are excluding source
-                if (extendedRect.contains(text.getRect())) {
+                if (extendedRect.contains(text.getBoundingBox())) {
                     if (source.getTags().contains(INTRODUCTION_TAG)) {
                         text.addTag(INTRODUCTION_TAG);
-                        OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is introduction");
+                        OcrUtils.log(4, "waveTagger", "Text: " + text.getValue() + " is introduction");
                     } else {
                         text.addTag(CONCLUSION_TAG);
-                        OcrUtils.log(2, "waveTagger", "Text: " + text.getDetection() + " is conclusion");
+                        OcrUtils.log(4, "waveTagger", "Text: " + text.getValue() + " is conclusion");
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Tags central texts according to position
+     * @param texts ordered list of RawTexts. Not null.
+     * @param targetHeight
+     */
+    private static void centralTagger(@NonNull List<RawText> texts, int targetHeight) {
+        for (RawText rawText : texts) {
+            if (rawText.getTags().contains(CENTER_TAG)) { //here we are excluding source
+                if (isHalfUp(rawText, targetHeight)) {
+                    rawText.addTag(INTRODUCTION_TAG);
+                    OcrUtils.log(4, "centralTagger", "Text: " + rawText.getValue() + " is center-introduction");
+                } else {
+                    rawText.addTag(CONCLUSION_TAG);
+                    OcrUtils.log(4, "centralTagger", "Text: "+rawText.getValue() + " is center-conclusion");
+                }
+                waveTagger(texts, rawText);
             }
         }
     }
@@ -182,19 +247,20 @@ class OcrSchemer {
      */
     private static void missTagger(@NonNull List<RawText> texts) {
         for (RawText text : texts) {
-            if (text.getTags().size() < 2 && text.getTags().get(0).equals(LEFT_TAG)) {
-                text.addTag(PRODUCTS_TAG);
-                OcrUtils.log(2, "waveTagger", "Text: "+text.getDetection() + " is possible product");
-            } else if (text.getTags().size() < 2) {
-                text.addTag(PRICES_TAG);
-                OcrUtils.log(2, "waveTagger", "Text: "+text.getDetection() + " is possible price");
+            if (!text.getTags().contains(INTRODUCTION_TAG) && !text.getTags().contains(CONCLUSION_TAG)) {
+                if (text.getTags().contains(LEFT_TAG)) {
+                    text.addTag(PRODUCTS_TAG);
+                    OcrUtils.log(4, "missTagger", "Text: " + text.getValue() + " is possible product");
+                } else {
+                    text.addTag(PRICES_TAG);
+                    OcrUtils.log(4, "missTagger", "Text: " + text.getValue() + " is possible price");
+                }
             }
         }
-
     }
 
     /**
-     * Get index of rect at witch you want to stop tag 'block'
+     * Get index of rect at which you want to stop tag 'block'
      * Method comments are an example of introduction tag
      * @param textList list of rawTexts. Not null.
      * @param tag tag for current block. Not null.
@@ -209,10 +275,10 @@ class OcrSchemer {
         for (int i = 0; i < textList.size(); ++i) {
             RawText text = textList.get(i);
             if (text.getTags().contains(tag)) {
-                targetArea += getRectArea(text.getRect());
+                targetArea += getRectArea(text.getBoundingBox());
             }
-            totalArea += getRectArea(text.getRect());
-            OcrUtils.log(1, "densitySnake", "Text: " + text.getDetection() + "\ncurrent density is: "
+            totalArea += getRectArea(text.getBoundingBox());
+            OcrUtils.log(5, "densitySnake", "Text: " + text.getValue() + "\ncurrent density is: "
                 + targetArea/totalArea + "\nand tag: " + tag);
             map.put(targetArea/totalArea, i); // if we have same density but bigger area, let's choose biggest area
         }
@@ -222,10 +288,10 @@ class OcrSchemer {
         if (limitText == 0)
             limitText = 1;
         double limit = ((totalArea/textList.size())*(textList.size() - limitText)/totalArea);
-        OcrUtils.log(1, "densitySnake", "Limit density is: " + limit);
+        OcrUtils.log(5, "densitySnake", "Limit density is: " + limit);
         double targetDensity = -1;
         for (Double currentDensity : map.keySet()) {
-            OcrUtils.log(1, "densitySnake", "Possible density is: " + currentDensity);
+            OcrUtils.log(5, "densitySnake", "Possible density is: " + currentDensity);
             if (currentDensity > limit) {
                 targetDensity = currentDensity;
                 break;
@@ -242,8 +308,8 @@ class OcrSchemer {
                 break;
             }
         }
-        OcrUtils.log(1, "densitySnake", "Final target text is: " + position
-            + "\nWith text: " + textList.get(position).getDetection() + "\nand tag: " + tag);
+        OcrUtils.log(2, "densitySnake", "Final target text is: " + position
+            + "\nWith text: " + textList.get(position).getValue() + "\nand tag: " + tag);
         //Now position is the value of the last rect for introduction
         return position;
     }
@@ -253,7 +319,7 @@ class OcrSchemer {
      * @param rect A rect. Not null.
      * @return Area of the rect.
      */
-    private static double getRectArea(@NonNull RectF rect) {
+    private static double getRectArea(@NonNull Rect rect) {
         return rect.width() * rect.height();
     }
 
@@ -271,9 +337,9 @@ class OcrSchemer {
             RawText text = textList.get(i);
             removeOldTags(text);
             text.addTag(tag);
-            text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
-            OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
-                    "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+            text.setTagPosition(getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom));
+            OcrUtils.log(5, "intervalTagger", "Text: " + text.getValue() +
+                    "\nis in position: " + getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom)
                     + "\nwith tag: " + tag);
         }
     }
@@ -296,21 +362,21 @@ class OcrSchemer {
             removeOldTags(text);
             if (text.getTags().contains(LEFT_TAG)) {
                 text.addTag(tagLeft);
-                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
-                OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
-                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom));
+                OcrUtils.log(5, "intervalTagger", "Text: " + text.getValue() +
+                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom)
                         + "\nwith tag: " + tagLeft);
             } else if (text.getTags().contains(RIGHT_TAG)) {
                 text.addTag(tagRight);
-                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
-                OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
-                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom));
+                OcrUtils.log(5, "intervalTagger", "Text: " + text.getValue() +
+                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom)
                         + "\nwith tag: " + tagRight);
             } else {
                 text.addTag(tagCenter);
-                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom));
-                OcrUtils.log(1, "intervalTagger", "Text: " + text.getDetection() +
-                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getRect().top, textList.get(end).getRect().bottom)
+                text.setTagPosition(getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom));
+                OcrUtils.log(5, "intervalTagger", "Text: " + text.getValue() +
+                        "\nis in position: " + getTextBlockPosition(text, textList.get(start).getBoundingBox().top, textList.get(end).getBoundingBox().bottom)
                         + "\nwith tag: " + tagCenter);
             }
         }
@@ -335,6 +401,6 @@ class OcrSchemer {
      * @return position as a 0 <= double <= 1.
      */
     private static double getTextBlockPosition(RawText text, float startPosition, float endPosition) {
-        return ((double)(text.getRect().centerY() - startPosition))/(endPosition - startPosition);
+        return ((double)(text.getBoundingBox().centerY() - startPosition))/(endPosition - startPosition);
     }
 }

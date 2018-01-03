@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 
+import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.ocr.OcrObjects.RawImage;
 import com.ing.software.ocr.OcrObjects.RawText;
@@ -45,7 +46,7 @@ public class RawTextFactory {
         }
     };
     RawImage rawImage = new RawImage(image);
-    return new RawText(text, rawImage);
+    return new RawText((Line)text, rawImage);
     }
 
     public static RawText getRawText(final String value, final Rect rect) {

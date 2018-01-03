@@ -1,9 +1,12 @@
 package com.ing.software.ocr.OcrObjects;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 
 import com.ing.software.ocr.OcrUtils;
+
+import java.util.List;
 
 /**
  * Class to store only useful properties of source images
@@ -14,7 +17,7 @@ public class RawImage {
 
     private int height;
     private int width;
-    private String grid;
+    private Rect extendedRect;
 
     /**
      * Constructor, initializes variables
@@ -23,7 +26,6 @@ public class RawImage {
     public RawImage(@NonNull Bitmap bitmap) {
         height = bitmap.getHeight();
         width = bitmap.getWidth();
-        grid = OcrUtils.getPreferredGrid(bitmap);
     }
 
     public int getHeight() {
@@ -34,7 +36,11 @@ public class RawImage {
         return width;
     }
 
-    public String getGrid() {
-        return grid;
+    public void setExtendedRect(List<RawText> texts) {
+        extendedRect = OcrUtils.getMaxRectBorders(texts);
+    }
+
+    public Rect getExtendedRect() {
+        return extendedRect;
     }
 }

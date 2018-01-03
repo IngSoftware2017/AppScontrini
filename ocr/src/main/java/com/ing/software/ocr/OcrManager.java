@@ -3,9 +3,13 @@ package com.ing.software.ocr;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.vision.text.Line;
+import com.google.android.gms.vision.text.Text;
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
@@ -70,7 +74,7 @@ public class OcrManager {
                     return;
                 long startTime = System.nanoTime();
                 Bitmap bm = preprocessor.undistort(0.05);
-                bm = scaleBitmap(bm); //for tests
+                //bm = scaleBitmap(bm); //for tests
                 OcrResult result = analyzer.analyze(bm);
                 ticketCb.accept(getTicketFromResult(result));
                 long endTime = System.nanoTime();
@@ -115,7 +119,7 @@ public class OcrManager {
 
     /**
      * @author Michelon
-     * @date 9-12-17
+     * @date 3-1-18
      * Analyze possible RawTexts containing amount. When one is found check if it consistent with list of products,
      * subtotal, cash and change.
      * @param possibleResults List of RawGridResults containing possible amount. Not null.
@@ -125,8 +129,10 @@ public class OcrManager {
     private static BigDecimal extendedAmountAnalysis(@NonNull List<RawGridResult> possibleResults, @NonNull List<RawText> products) {
         BigDecimal amount = null;
         RawText amountText = null;
+        if (possibleResults.size() == 0)
+            return null;
         for (RawGridResult result : possibleResults) {
-            String amountString = result.getText().getDetection();
+            String amountString = result.getText().getValue();
             OcrUtils.log(2, "getPossibleAmount", "Possible amount is: " + amountString);
             amount = DataAnalyzer.analyzeAmount(amountString);
             if (amount != null) {
@@ -135,14 +141,16 @@ public class OcrManager {
                 break;
             }
         }
-        if (amount != null) {
-            AmountComparator amountComparator = new AmountComparator(amountText, amount);
-            //check against list of products and cash + change
-            List<RawGridResult> possiblePrices = getPricesList(amountText, products);
-            amountComparator.analyzePrices(possiblePrices);
-            amountComparator.analyzeTotals(possiblePrices);
-            amount = amountComparator.getBestAmount();
+        if (amount == null) {
+            //Create a sample rawText to emulate an amount, using first result as source
+            amountText = getDummyAmountText(possibleResults.get(0).getText());
         }
+        AmountComparator amountComparator = new AmountComparator(amountText, amount);
+        //check against list of products and cash + change
+        List<RawGridResult> possiblePrices = getPricesList(amountText, products);
+        amountComparator.analyzePrices(possiblePrices);
+        amountComparator.analyzeTotals(possiblePrices);
+        amount = amountComparator.getBestAmount();
         return amount;
     }
 
@@ -153,14 +161,53 @@ public class OcrManager {
      */
     private static Date getDateFromList(@NonNull List<RawGridResult> dateList) {
         for (RawGridResult gridResult : dateList) {
-            String possibleDate = gridResult.getText().getDetection();
+            String possibleDate = gridResult.getText().getValue();
             OcrUtils.log(2, "getDateFromList", "Possible date is: " + possibleDate);
             Date evaluatedDate = DataAnalyzer.getDate(possibleDate);
             if (evaluatedDate != null) {
-                OcrUtils.log(2, "getDateFromList", "Possible amount is: " + evaluatedDate.toString());
+                OcrUtils.log(2, "getDateFromList", "Possible extended date is: " + evaluatedDate.toString());
                 return evaluatedDate;
             }
         }
         return null;
+    }
+
+    /**
+     * @author Michelon
+     * @date 3-1-18
+     * Get a dummy RawText on right side of image at the same height of source rect
+     * @param source source RawText. Not null.
+     * @return a dummy RawText
+     */
+    private static RawText getDummyAmountText(@NonNull RawText source) {
+        Rect amountRect = new Rect(source.getBoundingBox());
+        amountRect.set(source.getRawImage().getWidth()/2, source.getBoundingBox().top,
+                source.getRawImage().getWidth(), source.getBoundingBox().bottom);
+        Text text = new Text() {
+            @Override
+            public String getValue() {
+                return "";
+            }
+
+            @Override
+            public Rect getBoundingBox() {
+                return amountRect;
+            }
+
+            @Override
+            public Point[] getCornerPoints() {
+                Point a = new Point(amountRect.left, amountRect.top);
+                Point b = new Point(amountRect.right, amountRect.top);
+                Point c = new Point(amountRect.left, amountRect.bottom);
+                Point d = new Point(amountRect.right, amountRect.bottom);
+                return new Point[]{a, b, c, d};
+            }
+
+            @Override
+            public List<? extends Text> getComponents() {
+                return null;
+            }
+        };
+        return new RawText((Line)text, source.getRawImage());
     }
 }
