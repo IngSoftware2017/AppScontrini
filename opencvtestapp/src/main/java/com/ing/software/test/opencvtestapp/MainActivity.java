@@ -1,6 +1,7 @@
 package com.ing.software.test.opencvtestapp;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
@@ -12,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
+import android.util.SizeF;
 import android.widget.*;
 
 import com.annimon.stream.Stream;
@@ -24,11 +26,13 @@ import com.ing.software.ocr.OcrObjects.*;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 
+import static com.ing.software.common.CommonUtils.size;
 import static com.ing.software.common.Reflect.*;
 import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
 import static org.opencv.imgproc.Imgproc.*;
 import static java.util.Collections.*;
+import static java.lang.String.*;
 
 
 /**
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String folder = "TestOCR";
     private static final Class<?> IP_CLASS = ImageProcessor.class; // alias
+    private static final Class<?> OA_CLASS = OcrAnalyzer.class; // alias
     private static final int DEF_THICK = 20;
     private static final int LINE_THICK = 6;
     private static final double FONT_SIZE = 0.6;
@@ -84,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     });
 
     ExceptionHandler errHdlr = new ExceptionHandler(e ->
-            hdl.obtainMessage(MSG_EXCEPTION, e.getMessage()).sendToTarget()
+            hdl.obtainMessage(MSG_EXCEPTION, e.toString() + "\n" + e.getMessage()).sendToTarget()
     );
 
     /**
@@ -213,12 +218,22 @@ public class MainActivity extends AppCompatActivity {
         return img;
     }
 
+    /**
+     * Get number of images in the dataset
+     * @return number of images
+     */
     static int getImgsTot() {
         return new File(Environment.getExternalStorageDirectory().toString() + "/" + folder)
                 .listFiles().length;
     }
 
-    static Bitmap getBitmap(int idx) throws Exception {
+    /**
+     * Get i-th image in the dataset
+     * @param idx index
+     * @return bitmap
+     * @throws FileNotFoundException bitmap not found
+     */
+    static Bitmap getBitmap(int idx) throws FileNotFoundException {
         return BitmapFactory.decodeStream(new FileInputStream(
                 new File(Environment.getExternalStorageDirectory().toString()
                 + "/" + folder  + "/" + String.valueOf(idx) + ".jpg")));
@@ -267,11 +282,10 @@ public class MainActivity extends AppCompatActivity {
                 asyncSetTitle(String.valueOf(imageIdx));
 
                 Bitmap bm = getBitmap(imageIdx);
-
-                ImageProcessor ip = new ImageProcessor(bm);
+                ImageProcessor imgProc = new ImageProcessor(bm);
 
                 if (!resultOnly) {
-                    Mat srcImg = getField(ip, "srcImg");
+                    Mat srcImg = getField(imgProc, "srcImg");
                     Mat rgbaResized = invoke(IP_CLASS, "downScaleRgba", srcImg);
                     showMat(rgbaResized);
 
@@ -301,39 +315,43 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Semaphore sem = new Semaphore(0);
-                ip.findTicket(false, e -> sem.release());
+                imgProc.findTicket(false, e -> sem.release());
                 sem.acquire();
-                Bitmap finalBm = invoke(ip, "undistortForOCR");
-                double bmWidth = finalBm.getWidth(), bmHeight = finalBm.getHeight();
-                List<TextLine> lines = invoke(OcrAnalyzer.class, "bitmapToLines",
-                        finalBm, ocrEngine);
-                TextLine amountStringLine = invoke(OcrAnalyzer.class, "findAmountString",
-                        lines, bmHeight);
-                String lang = invoke(OcrAnalyzer.class, "getTicketLanguage", lines);
-                String titleStr = String.valueOf(imageIdx) + " - " + lang;
+                Bitmap textLinesBm = invoke(imgProc, "undistortForOCR");
 
+                //find amount
+                List<TextLine> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
+                TextLine amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
+                String titleStr;
+
+//                List<Pair<String, TextLine>> dateResults = invoke(OcrAnalyzer.class,
+//                        "findAllDateStrings", lines);
+//                drawTextLines(mat, Stream.of(dateResults).map(p -> p.second).toList(), PURPLE);
+//                if (dateResults.size() == 1)
+//                    titleStr += " - " + dateResults.get(0).first;
+//                else if (dateResults.size() > 1) {
+//                    titleStr += " - multiple date matches";
+//                }
                 Mat mat = new Mat();
-                bitmapToMat(finalBm, mat);
+                bitmapToMat(textLinesBm, mat);
                 drawTextLines(mat, lines, BLUE);
-                List<Pair<String, TextLine>> dateResults = invoke(OcrAnalyzer.class,
-                        "findAllDateStrings", lines);
-                drawTextLines(mat, Stream.of(dateResults).map(p -> p.second).toList(), PURPLE);
-                if (dateResults.size() == 1)
-                    titleStr += " - " + dateResults.get(0).first;
-                else if (dateResults.size() > 1) {
-                    titleStr += " - multiple date matches";
-                }
-                if (amountStringLine != null)
-                    drawTextLines(mat, singletonList(amountStringLine), DARK_GREEN);
-
-                asyncSetTitle(titleStr);
+                if (amountStr != null)
+                    drawTextLines(mat, singletonList(amountStr), DARK_GREEN);
+                //asyncSetTitle(titleStr);
                 showMat(mat);
-                if (amountStringLine != null) {
-                    Bitmap amountBm = invoke(OcrAnalyzer.class, "getAmountStrip",
-                            ip, amountStringLine, bmWidth);
-                    List<TextLine> amountLines = invoke(OcrAnalyzer.class, "bitmapToLines",
-                            amountBm, ocrEngine);
-                    bitmapToMat(amountBm, mat);
+
+                if (amountStr != null) {
+                    RectF srcStripRect = invoke(OA_CLASS, "getAmountStripRect", amountStr, size(textLinesBm));
+                    Bitmap amountStrip = invoke(OA_CLASS, "getAmountStrip", imgProc, amountStr, srcStripRect);
+                    List<TextLine> amountLines =invoke(OA_CLASS, "bitmapToLines", amountStrip, ocrEngine);
+                    BigDecimal price = invoke(OA_CLASS, "findAmountPrice",
+                            amountLines, amountStr, size(srcStripRect), size(amountStrip));
+
+                    titleStr = valueOf(imageIdx);
+                    if (price != null)
+                        titleStr += " -  " + price.toString();
+                    asyncSetTitle(titleStr);
+                    bitmapToMat(amountStrip, mat);
                     drawTextLines(mat, amountLines, BLUE);
                     showMat(mat);
                 }

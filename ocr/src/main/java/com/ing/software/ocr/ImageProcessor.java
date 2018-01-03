@@ -444,13 +444,13 @@ public class ImageProcessor {
         return newPts;
     }
 
-//    private static Mat rotateMat(Mat rgba, double angle) {
-//        Mat m = getRotationMatrix2D(new Point(rgba.cols() / 2, rgba.rows() / 2), angle, 1);
-//        Mat img = new Mat(rgba.size(), CV_8UC4);
-//        warpAffine(rgba, img, m, rgba.size());
-//        return img;
-//    }
-
+    /**
+     * Apply a perspective straightening to a Mat. The returned Mat has the same level of detail of the input Mat.
+     * @param img Mat of any color
+     * @param corners MatOfPoint2f containing 4 points ordered counter-clockwise
+     * @param marginMul border multiplier
+     * @return undistorted Mat
+     */
     private static Mat undistort(Mat img, MatOfPoint2f corners, double marginMul) {
         Mat dstImg = new Mat();
         if (corners.rows() == 4) { // at this point "corners" should have always 4 points.
@@ -474,13 +474,17 @@ public class ImageProcessor {
     private Mat resized;
     private Mat undistorted;
     private List<Point> corners;
+    private boolean quickCorners;
 
 
     //PACKAGE PRIVATE:
 
     synchronized Bitmap undistortForOCR() {
-        if (corners == null || srcImg == null || resized == null)
+        if (srcImg == null)
             return null;
+        if (quickCorners || corners == null || resized == null)
+            findTicket(false);
+
         undistorted = undistort(resized, scale(new MatOfPoint2f(corners.toArray(new Point[4])),
                 srcImg.size(), resized.size()), MARGIN_MUL_OCR);
         return matToBitmap(undistorted);
@@ -490,6 +494,7 @@ public class ImageProcessor {
      * Get a cropped version of the undistorted image, with "newAspectRatio".
      * The returned Bitmap size is always >= of region size.
      * @param region region of undistorted image to crop.
+     *               Must be contained in the bitmap obtained with undistortForOCR()
      * @param newAspectRatio new Bitmap aspectRatio
      * @return new Bitmap.
      */
@@ -499,9 +504,10 @@ public class ImageProcessor {
         double stretchMul = newAspectRatio / (region.width() / region.height());
         Size newSize = stretchMul > 1 ? new Size(region.width() * stretchMul, region.height())
                 : new Size(region.width(), region.height() / stretchMul);
+
         Mat finalImg = new Mat();
-        resize(undistorted.submat((int)region.top, (int)region.bottom,
-                (int)region.left, (int)region.right), finalImg, newSize);
+        resize(undistorted.submat((int) region.top, (int) region.bottom,
+                    (int) region.left, (int) region.right), finalImg, newSize);
         return matToBitmap(finalImg);
     }
 
@@ -541,69 +547,68 @@ public class ImageProcessor {
      *                                                     No orientation detection. </ul>
      *              <ul> false: slower but more accurate, good for recalculating the rectangle after the shot
      *                                                    or for analyzing an imported image. </ul>
-     * @param callback callback with a list of TicketError argument, called when computation is finished
-     *                 or an error ha occurred. The list parameter can contain.
-     *                 <ul> RECT_NOT_FOUND: the rectangle is not found; </ul>
-     *                 <ul> CROOKED_TICKET: The ticket is framed sideways; </ul>
-     *                 <ul> INVALID_STATE: the bitmap image has not been set for this I.P. instance </ul>
-     *                 <p> if there are no errors, the rectangle is found and the corners
-     *                      can be obtained with getCorners(); </p>
+     * @return list of TicketError, can contain:
+     *         <ul> RECT_NOT_FOUND: the rectangle is not found; </ul>
+     *         <ul> CROOKED_TICKET: The ticket is framed sideways; </ul>
+     *         <ul> INVALID_STATE: the bitmap image has not been set for this I.P. instance </ul>
+     *         <p> if there are no errors, the rectangle is found and the corners
+     *             can be obtained with getCorners(); </p>
+     */
+    public synchronized List<TicketError> findTicket(boolean quick) {
+        if (srcImg == null)
+            return singletonList(TicketError.INVALID_STATE);
+        undistorted = null;
+
+        resized = downScaleRgba(srcImg);
+        Swap<Mat> graySwap = new Swap<>(Mat::new);
+        prepareBinaryImg(graySwap, resized);
+        Mat binary = graySwap.first.clone();
+        toEdges(graySwap);
+        Mat edges = graySwap.first.clone();
+        graySwap.first = binary; // not cloning the image, it will be overwritten by using the swap
+
+        List<Scored<Pair<MatOfPoint2f, Double>>> candidates = new ArrayList<>();
+        for (Scored<MatOfPoint> ctrPair : findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS)) {
+            double angle = 0;
+
+            MatOfPoint2f rect = findPolySimple(ctrPair.obj());
+            if (!quick) {
+                // find Hough lines of ticket text
+                graySwap.first = edges.clone();
+                removeBackground(graySwap, ctrPair.obj());
+                angle = predominantAngle(houghLines(graySwap));
+
+                if (rect.rows() == 4)// fix orientation of already found rectangle
+                    rect = orderRectCorners(rect, angle, resized.size());
+                else { // find rotated bounding box of contour
+                    rect = rotatedBoundingBox(ctrPair.obj(), angle, resized.size());
+                }
+                //todo use RANSAC to find undistort transform matrix
+            }
+            candidates.add(new Scored<>(0., new Pair<>(rect, angle)));
+        }
+        //todo assign score and use Collections.max
+        Pair<MatOfPoint2f, Double> winner = candidates.get(0).obj();
+
+        //scale up the the corners to match the scale of the original image
+        corners = scale(winner.first, resized.size(), srcImg.size()).toList();
+        quickCorners = quick;
+
+        List<TicketError> errors = new ArrayList<>();
+        if (corners.size() != 4)
+            errors.add(TicketError.RECT_NOT_FOUND);
+        if (winner.second < -60 || winner.second > 60)
+            errors.add(TicketError.CROOKED_TICKET);
+        return errors;
+    }
+
+    /**
+     * Asynchronous version of findTicket(quick). The errors are passed by the callback parameter.
+     * @param quick true: fast mode; false: slow mode.
+     * @param callback Callback
      */
     public void findTicket(boolean quick, @NonNull Consumer<List<TicketError>> callback) {
-        new Thread(() -> {
-            synchronized (this) { // make sure this code is not executed concurrently when findTicket
-                                  // is called more than once consecutively
-                undistorted = null;
-                if (srcImg == null) {
-                    callback.accept(singletonList(TicketError.INVALID_STATE));
-                    return;
-                }
-                resized = downScaleRgba(srcImg);
-                Swap<Mat> graySwap = new Swap<>(Mat::new);
-                prepareBinaryImg(graySwap, resized);
-                Mat binary = graySwap.first.clone();
-                toEdges(graySwap);
-                Mat edges = graySwap.first.clone();
-                graySwap.first = binary; // not cloning the image, it will be overwritten by using the swap
-
-                List<Scored<Pair<MatOfPoint2f, Double>>> candidates = new ArrayList<>();
-                for (Scored<MatOfPoint> ctrPair :
-                        findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS)) {
-                    double angle = 0;
-
-                    MatOfPoint2f rect = findPolySimple(ctrPair.obj());
-                    if (!quick) {
-                        // find Hough lines of ticket text
-                        graySwap.first = edges.clone();
-                        removeBackground(graySwap, ctrPair.obj());
-                        angle = predominantAngle(houghLines(graySwap));
-
-                        if (rect.rows() == 4)// fix orientation of already found rectangle
-                            rect = orderRectCorners(rect, angle, resized.size());
-                        else { // find rotated bounding box of contour
-                            rect = rotatedBoundingBox(ctrPair.obj(), angle, resized.size());
-                        }
-                        //todo use RANSAC to find undistort transform matrix
-                    }
-                    candidates.add(new Scored<>(0., new Pair<>(rect, angle)));
-                }
-                //todo assign score and use Collections.max
-                Pair<MatOfPoint2f, Double> winner = candidates.get(0).obj();
-
-                //scale up the the corners to match the scale of the original image
-                corners = scale(winner.first, resized.size(), srcImg.size()).toList();
-
-                List<TicketError> errors = new ArrayList<>();
-                if (corners.size() != 4)
-                    errors.add(TicketError.RECT_NOT_FOUND);
-                if (winner.second < -60 || winner.second > 60)
-                    errors.add(TicketError.CROOKED_TICKET);
-
-                // As long as I use a new thread in only this method, calling this method or any other method
-                // of this class instance inside the callback, is not gonna create a double lock condition.
-                callback.accept(errors);
-            }
-        }).start();
+        new Thread(() -> callback.accept(findTicket(quick))).start();
     }
 
     /**
@@ -613,16 +618,20 @@ public class ImageProcessor {
      *                      - INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
      */
     public synchronized TicketError setCorners(@NonNull List<PointF> corners) {
+        if (corners.size() != 4)
+            return TicketError.INVALID_POINTS;
         undistorted = null;
+
         this.corners = androidPtsToCV(corners);
+        quickCorners = false;
         //todo check if corners are ordered correctly
-        return corners.size() == 4 ? TicketError.NONE : TicketError.INVALID_POINTS;
+        return TicketError.NONE;
     }
 
     /**
      * Get rectangle corners.
      * @return List of corners in bitmap space (range from (0,0) to (width, height) ).
-     *         The corners should always be 4. Never null.
+     *         The corners should always be 4. Empty if error. Never null.
      */
     public synchronized List<PointF> getCorners() {
         return corners == null ? new ArrayList<>() : cvPtsToAndroid(corners);
@@ -638,6 +647,15 @@ public class ImageProcessor {
         if (corners == null || srcImg == null)
             return null;
         return matToBitmap(undistort(srcImg, new MatOfPoint2f(corners.toArray(new Point[4])), marginMul));
+    }
+
+    /**
+     * Asynchronous version of undistort(marginMul). The bitmap is passed by the callback parameter.
+     * @param marginMul Margin multiplier
+     * @param callback Callback
+     */
+    public void undistort(double marginMul, @NonNull Consumer<Bitmap> callback) {
+        new Thread(() -> callback.accept(undistort(marginMul))).start();
     }
 
 

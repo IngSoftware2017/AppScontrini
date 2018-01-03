@@ -38,14 +38,13 @@ public class WordMatcher {
                     L[i][j] = min(min(L[i-1][j] + 1, L[i][j-1] + 1),
                             L[i-1][j-1] + (compRegex.get(i-1).contains(target.charAt(j-1)) ? 0 : 1));
                 }
-
-                if(L[n][m] > max)
-                {
-                    return Integer.MAX_VALUE;
-                }
             }
         }
 
+        if(L[n][m] > max)
+        {
+            return Integer.MAX_VALUE;
+        }
         return L[n][m];
     }
 
@@ -98,8 +97,8 @@ public class WordMatcher {
 
     /**
      * Get a score of how well the input line matches with the previously passed regex.
-     * @param line TextLine
-     * @return range [0, maxScore]. maxScore is the value passed in the constructor.
+     * @param line TextLine to match
+     * @return value in range [0, maxScore]. maxScore is the value passed in the constructor.
      *         0 means that there was no match.
      * @author Riccardo Zaglia
      */

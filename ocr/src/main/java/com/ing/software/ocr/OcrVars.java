@@ -22,26 +22,30 @@ class OcrVars {
     static final String[] AMOUNT_STRINGS = {"TOTALE", "IMPORTO"};
     static final int MAX_STRING_DISTANCE = 3;
 
-    static final int LANG_EN = 0;
-    static final int LANG_IT = 1;
+    static final String LANG_EN = "en";
+    static final String LANG_IT = "it";
+    static final List<String> LANGS = asList(LANG_EN, LANG_IT);
 
     // day 1 to 31 with or without 0 tens.
     // month 1 to 12 with or without 0 tens.
     // year 1960 to 2059 with or without hundreds.
     // go to https://regex101.com/ to check the behaviour of these regular expressions.
     static final int YEAR_CUT = 60; // YY < 60 -> 20YY;  YY >= 60 -> 19YY
+    // use groups "day", "month", "year" to retrieve respective values
     static final Pattern DATE_DMY = compile(
-            "(?<!\\d)(?:0?[1-9]|[12]\\d|3[01])([-/.,])(?:0?[1-9]|1[012])\\1(?:(?:19)?[6-9]|(?:20)?[0-5])\\d(?!\\1|\\d)");
+            "(?<!\\d)(?<day>0?[1-9]|[12]\\d|3[01])([-\\/.])(?<month>0?[1-9]|1[012])\\2(?<year>(?:19)?[6-9]\\d|(?:20)?[0-5]\\d)(?!\\2|\\d)");
     static final Pattern DATE_MDY = compile(
-            "(?<!\\d)(?:0?[1-9]|1[012])([-/.,])(?:0?[1-9]|[12]\\d|3[01])\\1(?:(?:19)?[6-9]|(?:20)?[0-5])\\d(?!\\1|\\d)");
+            "(?<!\\d)(?<month>0?[1-9]|1[012])([-\\/.])(?<day>0?[1-9]|[12]\\d|3[01])\\2(?<year>(?:19)?[6-9]\\d|(?:20)?[0-5]\\d)(?!\\2|\\d)");
     static final Pattern DATE_YMD = compile(
-            "(?<!\\d)(?:(?:19)?[6-9]|(?:20)?[0-5])\\d([-/.,])(?:0?[1-9]|1[012])\\1(?:0?[1-9]|[12]\\d|3[01])(?!\\1|\\d)");
+            "(?<!\\d)(?<year>(?:19)?[6-9]\\d|(?:20)?[0-5]\\d)([-\\/.])(?<month>0?[1-9]|1[012])\\2(?<day>0?[1-9]|[12]\\d|3[01])(?!\\2|\\d)");
     //back reference/forward reference not supported in lookbehind but is supported in lookahead
 
-    // match every number (with optional hundreds mark) with 2 decimal digits or a "-" (netherlands)
+    // match every number (with optional thousands mark) with 2 decimal digits or a "-" (netherlands)
     // accept if there is something before or a single non digit after (ex: €).
-    static final Pattern AMOUNT_PRICE_STRICT = compile(
-            "(?<!\\d)(?:0|[1-9][\\d,.]*)[,.](?:\\d{2}|-)(?=[^\\d]?$)");
+    static final Pattern PRICE_PERMISSIVE = compile(
+            "(?<!\\d|\\.)(?:0|[1-9][\\d.]*?)\\.(?:\\d{2}|-)(?=[^\\d]?$)");
+    static final Pattern PRICE_NO_THOUSAND_MARK = compile(
+            "(?<!\\d|\\.)(?:0|[1-9]\\d*?)\\.(?:\\d{2}|-)(?=[^\\d.]?$)");
 
     // regex-score pairs.
     static final List<Pair<Pattern, Double>> DATE_REGEX_EN = asList(
@@ -52,7 +56,7 @@ class OcrVars {
 
     static final List<WordMatcher> AMOUNT_MATCHERS = asList(
             new WordMatcher("T[OUD]TALE", 6, 1),
-            new WordMatcher("TOT", 3, 0),
+            new WordMatcher("TOT", 4, 0),
             new WordMatcher("T[OUD]TALEE[UI]R[OD]", 8, 3),
             new WordMatcher("IMP[OU]RT[OD]", 7, 1),
             new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 8, 3)

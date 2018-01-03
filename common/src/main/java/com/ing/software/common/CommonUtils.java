@@ -1,6 +1,8 @@
 package com.ing.software.common;
 
 import android.graphics.*;
+import android.util.SizeF;
+
 import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
@@ -46,5 +48,13 @@ public class CommonUtils {
                 new PointF(rect.right, rect.bottom),
                 new PointF(rect.right, rect.top)
         );
+    }
+
+    public static SizeF size(Bitmap bm) {
+        return new SizeF(bm.getWidth(), bm.getHeight());
+    }
+
+    public static SizeF size(RectF rect) {
+        return new SizeF(rect.width(), rect.height());
     }
 }

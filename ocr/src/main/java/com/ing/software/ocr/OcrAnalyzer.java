@@ -4,30 +4,28 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.Size;
 import android.util.Pair;
 import android.util.SizeF;
 import android.util.SparseArray;
-
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.*;
-import com.ing.software.common.Ref;
-import com.ing.software.common.Scored;
-import com.ing.software.common.Ticket;
-import com.ing.software.ocr.OcrObjects.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.regex.Matcher;
 
+import com.ing.software.common.*;
+import com.ing.software.ocr.OcrObjects.*;
+
+import static com.ing.software.common.CommonUtils.size;
+import static java.util.Collections.*;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
-import static java.util.Collections.*;
+import static java.lang.Math.*;
 
 /**
  * Class containing different methods to analyze a picture
@@ -309,61 +307,134 @@ public class OcrAnalyzer {
 
 
 
-    //PLEASE IGNORE FOR NOW
-    //@author Riccardo Zaglia
+
 
     // Extended rectangle vertical multiplier
     private static final double EXT_RECT_V_MUL = 3;
 
+//    private static LanguageDetector langDetector;
+//
+//    static {
+//        LanguageProfileReader langReader = new LanguageProfileReader();
+//        List<LanguageProfile> profiles = new ArrayList<>();
+//        try {
+//            for (String lang : LANGS)
+//                profiles.add(langReader.readBuiltIn(LdLocale.fromString(lang)));
+//        }
+//        catch (IOException e) {
+//            log(0, "EXCEPTION:", e.getMessage());
+//        }
+//        langDetector = LanguageDetectorBuilder.create(NgramExtractors.standard())
+//                .withProfiles(profiles).build();
+//        com.google.common.base.Optional<LdLocale> optional = langDetector.detect("hello world");
+//    }
+
     /**
      * This function runs the ocr detection on the given bitmap.
-     * @param bm
-     * @param ocrEngine
-     * @return
+     * @param bm input bitmap
+     * @param ocrEngine TextRecognizer
+     * @return list of TextLine
+     * @author Riccardo Zaglia
      */
     private static List<TextLine> bitmapToLines(Bitmap bm, TextRecognizer ocrEngine) {
         SparseArray<TextBlock> blocks = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
         List<TextLine> lines = new ArrayList<>();
-        for (int i = 0; i < blocks.size(); i++) {
-            lines.addAll(Stream.of(blocks.valueAt(i).getComponents())
-                    .map(txt -> new TextLine((Line)txt)).toList());
-        }
+        for (int i = 0; i < blocks.size(); i++)
+            for (Text txt : blocks.valueAt(i).getComponents())
+                lines.add(new TextLine((Line)txt));
         return lines;
     }
 
     /**
      * Choose the TextLine that most probably contains the amount string.
-     * Criteria: AMOUNT_MATCHER score; character size
+     * Criteria: AMOUNT_MATCHER score; character size; higher in the photo
      * @param lines list of TextLines. Can be empty
      * @return TextLine with higher score. Can be null if no match is found.
+     * @author Riccardo Zaglia
      */
-    private static TextLine findAmountString(List<TextLine> lines, double ticketHeight) {
-        if (lines.isEmpty())
-            return null;
-        Scored<TextLine> candidate = max(Stream.of(lines).map(line -> {
+    // todo: find most meaningful way to combine score criteria.
+    private static TextLine findAmountString(List<TextLine> lines, SizeF bmSize) {
+        TextLine bestLine = null;
+        double bestScore = 0;
+        for (TextLine line : lines) {
             double score = max(Stream.of(AMOUNT_MATCHERS).map(M -> M.match(line)).toList());
-            score *= line.charWidth() + line.height();
-            score *= 1. - line.centerY() / ticketHeight;
-            return new Scored<>(score, line);
-        }).toList());
-        return candidate.getScore() > 0 ? candidate.obj() : null;
+            score *= line.charWidth() + line.charHeight();
+            score *= 1. - line.centerY() / bmSize.getHeight();
+            if (score > bestScore) {
+                bestLine = line;
+                bestScore = score;
+            }
+        }
+        return bestLine;
     }
 
+    /**
+     * Get a strip rectangle where the amount price should be found.
+     * @param amountStr amount string line.
+     * @param bmSize bitmap size.
+     * @return RectF rectangle in bitmap space.
+     * @author Riccardo Zaglia
+     */
     @NonNull
-    private static RectF getAmountStripRect(TextLine line, double imageWidth) {
-        double halfHeight = line.height() * EXT_RECT_V_MUL / 2.;
-        // here I account that the amount number could be in the same line of the amount string.
-        // I use the center of the line as a left boundary.
-        return new RectF((float)line.centerX(), (float)(line.centerY() - halfHeight),
-                (float)imageWidth, (float)(line.centerY() + halfHeight));
+    private static RectF getAmountStripRect(TextLine amountStr, SizeF bmSize) {
+        double halfHeight = amountStr.charHeight() * EXT_RECT_V_MUL / 2.;
+        // here I account that the amount number could be in the same TextLine as the amount string.
+        // I use the center of the TextLine as a left boundary.
+        return new RectF((float)amountStr.centerX(), (float)(amountStr.centerY() - halfHeight),
+                bmSize.getWidth(), (float)(amountStr.centerY() + halfHeight));
     }
 
-    private static Bitmap getAmountStrip(ImageProcessor ip, TextLine line, double imageWidth) {
-        RectF rect = getAmountStripRect(line, imageWidth);
-        return ip.undistortedSubregion(rect,
-                rect.width() / rect.height() * CHAR_ASPECT_RATIO / line.charAspectRatio());
+    private static Bitmap getAmountStrip(ImageProcessor imgProc, TextLine amountStr, RectF srcRect) {
+        return imgProc.undistortedSubregion(srcRect,
+                srcRect.width() / srcRect.height() * CHAR_ASPECT_RATIO / amountStr.charAspectRatio());
     }
 
+    /**
+     * Choose the TextLine that most probably contains the amount price and return it as a BigDecimal.
+     * Criteria: lower distance from center of strip; least character size difference from amount string
+     * @param lines all lines contained inside amount strip.
+     * @param amountStr amount string line.
+     * @param srcStripSize amount strip size in the original bitmap space.
+     * @param dstStripSize actual amount strip size.
+     * @return BigDecimal containing price, or null if no price found.
+     */
+    // todo: find most meaningful way to combine score criteria.
+    // todo: reject false positives adding a lower limit to the score > 0.
+    @Nullable
+    private static BigDecimal findAmountPrice(
+            List<TextLine> lines,
+            TextLine amountStr,
+            SizeF srcStripSize,
+            SizeF dstStripSize) {
+        double dstAmountStrWidth = amountStr.charWidth() * dstStripSize.getWidth() / srcStripSize.getWidth();
+        double dstAmountStrHeight = amountStr.charHeight() * dstStripSize.getHeight() / srcStripSize.getHeight();
+
+        String priceStr = null;
+        double bestScore = 0;
+        for (TextLine line : lines) {
+            Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
+            boolean matched = matcher.find();
+            if (!matched) {
+                matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numConcatDot());
+                matched = matcher.find();
+            }
+            if (matched) {
+                double score = 1 - abs(1 - 2 * line.centerY() / dstStripSize.getHeight());
+                score *= 2 - abs(1 - line.charWidth() / dstAmountStrWidth)
+                        - abs(1 - line.charHeight() / dstAmountStrHeight);
+                if (score > bestScore) {
+                    bestScore = score;
+                    priceStr = matcher.group();
+                }
+            }
+        }
+        return priceStr != null ? new BigDecimal(priceStr) : null;
+    }
+
+    /**
+     * TEMPORARY
+     */
+    //Todo: extract day, month, year using group()
     private static List<Pair<String, TextLine>> findAllDateStrings(List<TextLine> lines) {
         List<Pair<String, TextLine>> dateStrings = new ArrayList<>();
         for (TextLine line : lines) {
@@ -372,70 +443,101 @@ public class OcrAnalyzer {
                 Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
                 if (matcher.find()) {
                     lineMatch = matcher.group(); // get first group -> entire regex match
+                    // use matcher.group("day") or "month" or "year" to get respective strings
                     break;
                 }
             }
-            if (lineMatch == null) {
-                Matcher matcher = DATE_DMY.matcher(line.textSanitizedNum());
-                if (matcher.find())
-                    lineMatch = matcher.group();
-            }
+            // It's better to avoid word concatenation because it could match a wrong date.
+            // Ex: 1/1/20 14:30 -> 1/1/2014:30
             if (lineMatch != null)
                 dateStrings.add(new Pair<>(lineMatch, line));
         }
         return dateStrings;
     }
 
-    void analyzeTicket(ImageProcessor preproc, Consumer<Ticket> ticketCb) {
-        Bitmap bm = preproc.undistortForOCR();
-        double width = bm.getWidth(), height = bm.getHeight();
-        List<TextLine> lines = bitmapToLines(bm, ocrEngine);
-
-        //find total
-        TextLine amountStringLine = findAmountString(lines, height);
-        if (amountStringLine != null) {
-            Bitmap amountStrip = getAmountStrip(preproc, amountStringLine, width);
-
-        }
-
-        //todo find date
-
-        Ticket ticket = new Ticket();
-
-        ticketCb.accept(ticket);
-    }
-
-
-    // does not work
     /**
-     * Get the most likely language of ticket.
-     * @param lines all the TextLines of ticket.
-     * @return language.
-     *
+     * Extract a Ticket from an ImageProcessor loaded with a bitmap.
+     * @param imgProc ImagePreprocessor with at least an image assigned (corners can be set manually).
+     * @return Ticket containing any information found, and/or a list of errors occurred.
      * @author Riccardo Zaglia
      */
-    static String getTicketLanguage(List<TextLine> lines) {
-        Map<String, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
-        String bestLang = "undefined";
-        double bestScore = 0;
-        for (TextLine line : lines) {
-//            todo use apache TIKA library
-//            String lang = w.lang();
-//            if (!Objects.equals(lang, "und") && !Objects.equals(lang, "")) { // if lang is not undefined
-//                double area = b.area();
-//                Ref<Double> score = accumulator.get(lang);
-//                if (score != null)
-//                    score.value += area;
-//                else {
-//                    score = new Ref<>(area);
-//                    accumulator.put(lang, score);
-//                }
-//                if (score.value > bestScore) {
-//                    bestScore = score.value;
-//                    bestLang = lang;
-//                }
-//            }
+    // not tested
+    // todo: integrate schemer and other heuristics
+    public synchronized Ticket analyzeTicket(@NonNull ImageProcessor imgProc) {
+        Ticket ticket = new Ticket();
+        ticket.errors = new ArrayList<>();
+        ticket.rectangle = imgProc.getCorners();
+
+        Bitmap bm = imgProc.undistortForOCR();
+        if (bm == null) {
+            ticket.errors.add(TicketError.INVALID_STATE);
+            return ticket;
         }
-        return bestLang;
+        List<TextLine> lines = bitmapToLines(bm, ocrEngine);
+
+        //find amount
+        TextLine amountStr = findAmountString(lines, size(bm));
+        if (amountStr != null) {
+            RectF srcStripRect = getAmountStripRect(amountStr, size(bm));
+            Bitmap amountStrip = getAmountStrip(imgProc, amountStr, srcStripRect);
+            List<TextLine> amountLines = bitmapToLines(amountStrip, ocrEngine);
+            ticket.amount = findAmountPrice(amountLines, amountStr, size(srcStripRect), size(amountStrip));
+        }
+        if (ticket.amount == null)
+            ticket.errors.add(TicketError.AMOUNT_NOT_FOUND);
+
+        ticket.date = null;          //todo find date
+        if (ticket.date == null)
+            ticket.errors.add(TicketError.DATE_NOT_FOUND);
+
+        return ticket;
     }
+
+    /**
+     * Asynchronous version of analyzeTicket(imgProc). The ticket is passed by the callback parameter.
+     * @param imgProc ImagePreprocessor
+     * @param ticketCb Callback
+     */
+    public void analyzeTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<Ticket> ticketCb) {
+        new Thread(() -> ticketCb.accept(analyzeTicket(imgProc))).start();
+    }
+
+
+//    // does not work
+//    /**
+//     * Get the most likely language of ticket.
+//     * @param lines all the TextLines of ticket.
+//     * @return language.
+//     *
+//     * @author Riccardo Zaglia
+//     */
+//    static String getTicketLanguage(List<TextLine> lines) {
+//        Map<LdLocale, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
+//        LdLocale bestLocale = null;
+//        double bestScore = 0;
+//
+//        StringBuilder strBuilder = new StringBuilder();
+//        for (TextLine line : lines) {
+//            strBuilder.append(line.text() + " ");
+////            Optional<LdLocale> optLocale = langDetector.detect();
+////            if (optLocale.isPresent()) {
+////                double length = line.text().length();
+////                LdLocale locale = optLocale.get();
+////                Ref<Double> score = accumulator.get(locale);
+////                if (score != null)
+////                    score.value += length;
+////                else {
+////                    score = new Ref<>(length);
+////                    accumulator.put(locale, score);
+////                }
+////                if (score.value > bestScore) {
+////                    bestScore = score.value;
+////                    bestLocale = locale;
+////                }
+////            }
+//        }
+//        //return bestLocale != null ? bestLocale.getLanguage() : "undefined";
+//        Optional<LdLocale> optLocale = langDetector.detect(strBuilder.toString());
+//        return optLocale.isPresent() ? optLocale.get().getLanguage() : "undefined";
+//    }
 }
