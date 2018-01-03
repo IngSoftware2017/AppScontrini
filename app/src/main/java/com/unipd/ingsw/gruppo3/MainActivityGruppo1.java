@@ -53,7 +53,9 @@ public class MainActivityGruppo1 extends AppCompatActivity implements OnTicketRe
         analyzer.initialize(this);
         printAllMissions();
         //set the "super-owner"
-        dataManager.addPerson(user);
+        if (dataManager.getAllPerson().size()==0) {
+            dataManager.addPerson(user);
+        }
     }
 
     /** Dal Maso
