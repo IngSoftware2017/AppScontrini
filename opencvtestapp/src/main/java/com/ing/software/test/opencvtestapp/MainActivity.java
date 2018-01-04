@@ -314,9 +314,7 @@ public class MainActivity extends AppCompatActivity {
                     showBitmap(drawPoly(bm, corners, corners.size() == 4 ? Color.GREEN : Color.RED, DEF_THICK));
                 }
 
-                Semaphore sem = new Semaphore(0);
-                imgProc.findTicket(false, e -> sem.release());
-                sem.acquire();
+                imgProc.findTicket(false);
                 Bitmap textLinesBm = invoke(imgProc, "undistortForOCR");
 
                 //find amount
@@ -360,40 +358,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle item selection
-//        switch (item.getItemId()) {
-//            case R.id.action_fetch:
-//
-//                break;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//        return true;
-//    }
-
-//    void fetchPhotos() {
-//        errHdlr.tryRun(() -> {
-//            int idx = 0;
-//
-//            while (true) {
-//                URL website = new URL("http://www.website.com/information.asp");
-//                try (InputStream in = website.openStream()) {
-//                    FileSystems.getDefault().getPath()
-//                    Files.copy(in, new Path());
-//                }
-//                Zip
-//                idx++;
-//            }
-//        });
-//    }
 }

@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.ing.software.common.Ticket;
+import com.ing.software.common.TicketError;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import com.annimon.stream.function.Consumer;
 
@@ -52,26 +54,56 @@ public class OcrManager {
 
     /**
      * Get a Ticket from an ImageProcessor. Some fields of the new ticket can be null.
-     * @param imgProc ImageProcessor. Not null.
-     * @param ticketCb     callback to get the ticket. Not null.
+     * <p> Possible errors inside Ticket.errors can be: </p>
+     * <ul> INVALID_STATE: this OcrManager has not been properly initialized. </ul>
+     * <ul> INVALID_PROCESSOR: the ImageProcessor passed as parameter is not valid. </ul>
+     * <ul> AMOUNT_NOT_FOUND: the amount has not been found. </ul>
+     * <ul> DATE_NOT_FOUND: the date has not been found. </ul>
+     * @param imgProc ImageProcessor which has been set an image. Not null.
+     * @return Ticket. Never null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
+    public synchronized Ticket getTicket(@NonNull ImageProcessor imgProc) {
+        Ticket ticket = new Ticket();
+        ticket.errors = new ArrayList<>();
+        ticket.rectangle = imgProc.getCorners();
+        if (!operative) {
+            ticket.errors.add(TicketError.INVALID_STATE);
+            return ticket;
+        }
+
+        long startTime = System.nanoTime();
+        Bitmap frame = imgProc.undistortForOCR();
+        if (frame == null) {
+            ticket.errors.add(TicketError.INVALID_PROCESSOR);
+            return ticket;
+        }
+        OcrResult result = analyzer.analyze(frame);
+        Ticket newTicket = getTicketFromResult(result);
+        long endTime = System.nanoTime();
+        double duration = ((double) (endTime - startTime)) / 1000000000;
+        OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+
+        ticket.amount = newTicket.amount;
+        ticket.date = newTicket.date;
+        if (ticket.amount == null)
+            ticket.errors.add(TicketError.AMOUNT_NOT_FOUND);
+        if (ticket.date == null)
+            ticket.errors.add(TicketError.DATE_NOT_FOUND);
+        return ticket;
+    }
+
+    /**
+     * Asynchronous version of getTicket(imgProc). The ticket is passed by the callback parameter.
+     * @param imgProc ImageProcessor which has been set an image. Not null.
+     * @param ticketCb callback to get the ticket. Not null.
+     *
+     * @author Riccardo Zaglia
+     */
     public void getTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<Ticket> ticketCb) {
-        new Thread(() -> {
-            synchronized (this) {
-                if (!operative)
-                    return;
-                long startTime = System.nanoTime();
-                Bitmap frame = imgProc.undistortForOCR();
-                OcrResult result = analyzer.analyze(frame);
-                ticketCb.accept(getTicketFromResult(result));
-                long endTime = System.nanoTime();
-                double duration = ((double) (endTime - startTime)) / 1000000000;
-                OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
-            }
-        }).start();
+        new Thread(() -> ticketCb.accept(getTicket(imgProc))).start();
     }
 
     /**

@@ -312,23 +312,6 @@ public class OcrAnalyzer {
     // Extended rectangle vertical multiplier
     private static final double EXT_RECT_V_MUL = 3;
 
-//    private static LanguageDetector langDetector;
-//
-//    static {
-//        LanguageProfileReader langReader = new LanguageProfileReader();
-//        List<LanguageProfile> profiles = new ArrayList<>();
-//        try {
-//            for (String lang : LANGS)
-//                profiles.add(langReader.readBuiltIn(LdLocale.fromString(lang)));
-//        }
-//        catch (IOException e) {
-//            log(0, "EXCEPTION:", e.getMessage());
-//        }
-//        langDetector = LanguageDetectorBuilder.create(NgramExtractors.standard())
-//                .withProfiles(profiles).build();
-//        com.google.common.base.Optional<LdLocale> optional = langDetector.detect("hello world");
-//    }
-
     /**
      * This function runs the ocr detection on the given bitmap.
      * @param bm input bitmap
@@ -501,43 +484,4 @@ public class OcrAnalyzer {
     public void analyzeTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<Ticket> ticketCb) {
         new Thread(() -> ticketCb.accept(analyzeTicket(imgProc))).start();
     }
-
-
-//    // does not work
-//    /**
-//     * Get the most likely language of ticket.
-//     * @param lines all the TextLines of ticket.
-//     * @return language.
-//     *
-//     * @author Riccardo Zaglia
-//     */
-//    static String getTicketLanguage(List<TextLine> lines) {
-//        Map<LdLocale, Ref<Double>> accumulator = new HashMap<>(); //I use Ref to make the score mutable
-//        LdLocale bestLocale = null;
-//        double bestScore = 0;
-//
-//        StringBuilder strBuilder = new StringBuilder();
-//        for (TextLine line : lines) {
-//            strBuilder.append(line.text() + " ");
-////            Optional<LdLocale> optLocale = langDetector.detect();
-////            if (optLocale.isPresent()) {
-////                double length = line.text().length();
-////                LdLocale locale = optLocale.get();
-////                Ref<Double> score = accumulator.get(locale);
-////                if (score != null)
-////                    score.value += length;
-////                else {
-////                    score = new Ref<>(length);
-////                    accumulator.put(locale, score);
-////                }
-////                if (score.value > bestScore) {
-////                    bestScore = score.value;
-////                    bestLocale = locale;
-////                }
-////            }
-//        }
-//        //return bestLocale != null ? bestLocale.getLanguage() : "undefined";
-//        Optional<LdLocale> optLocale = langDetector.detect(strBuilder.toString());
-//        return optLocale.isPresent() ? optLocale.get().getLanguage() : "undefined";
-//    }
 }

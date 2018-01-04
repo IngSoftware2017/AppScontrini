@@ -480,10 +480,9 @@ public class ImageProcessor {
     //PACKAGE PRIVATE:
 
     synchronized Bitmap undistortForOCR() {
-        if (srcImg == null)
-            return null;
         if (quickCorners || corners == null || resized == null)
-            findTicket(false);
+            if (findTicket(false).contains(TicketError.INVALID_STATE))
+                return null;
 
         undistorted = undistort(resized, scale(new MatOfPoint2f(corners.toArray(new Point[4])),
                 srcImg.size(), resized.size()), MARGIN_MUL_OCR);
@@ -614,8 +613,9 @@ public class ImageProcessor {
     /**
      * Set rectangle corners.
      * @param corners must be 4, ordered counter-clockwise, first is top-left of ticket. Not null.
-     * @return TicketError. - NONE: corners are valid.
-     *                      - INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise.
+     * @return TicketError, can be:
+     * <ul> NONE: corners are valid. </ul>
+     * <ul> INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise. </ul>
      */
     public synchronized TicketError setCorners(@NonNull List<PointF> corners) {
         if (corners.size() != 4)
