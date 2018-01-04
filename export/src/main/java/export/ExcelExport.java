@@ -88,6 +88,8 @@ public class ExcelExport extends ExportManager {
     public boolean export(){
 
         writeTickets();
+        writeMissions();
+        writePersons();
 
         try{
             FileOutputStream fos = new FileOutputStream(file);
@@ -166,6 +168,91 @@ public class ExcelExport extends ExportManager {
             for (int i=0; i<list.size(); i++)
                 s+=list.get(i)+"/";
             return s;
+        }
+    }
+
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Writes in workbook all the missions in a separeted sheet
+     */
+    private void writeMissions(){
+        //creates a new sheet
+        HSSFSheet secondSheet = workbook.createSheet("Missions");
+
+        //create header row
+        HSSFRow rowHeader = secondSheet.createRow(0);
+        String[] header = MISSION_FILE_HEADER.split(";");
+        for(int i=0; i<header.length; i++) {
+            HSSFCell icell = rowHeader.createCell(i);
+            icell.setCellValue(new HSSFRichTextString(header[i]));
+        }
+
+        //write all one mission row
+        for (int i=0; i<tickets.size(); i++) {
+            HSSFRow irow = secondSheet.createRow(i+1); //row 0 alredy created above
+
+            MissionEntity m = missions.get(i);
+            HSSFCell cell0 = irow.createCell(0);
+            cell0.setCellValue(new HSSFRichTextString(String.valueOf(m.getID())));
+
+            HSSFCell cell1 = irow.createCell(1);
+            cell1.setCellValue(new HSSFRichTextString(m.getName()));
+
+            HSSFCell cell2 = irow.createCell(2);
+            cell2.setCellValue(new HSSFRichTextString(String.valueOf(m.getStartDate())));
+
+            HSSFCell cell3 = irow.createCell(3);
+            cell3.setCellValue(new HSSFRichTextString(String.valueOf(m.getEndDate())));
+
+            HSSFCell cell4 = irow.createCell(4);
+            cell4.setCellValue(new HSSFRichTextString(m.getLocation()));
+
+            HSSFCell cell5 = irow.createCell(5);
+            cell5.setCellValue(new HSSFRichTextString(String.valueOf(m.isRepay())));
+
+            HSSFCell cell6 = irow.createCell(6);
+            cell6.setCellValue(new HSSFRichTextString(String.valueOf(m.getPersonID())));
+
+        }
+    }
+
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Writes in workbook all the persons in a separeted sheet
+     */
+    private void writePersons(){
+        //creates a new sheet
+        HSSFSheet thirdSheet = workbook.createSheet("Persons");
+
+        //create header row
+        HSSFRow rowHeader = thirdSheet.createRow(0);
+        String[] header = PERSON_FILE_HEADER.split(";");
+        for(int i=0; i<header.length; i++) {
+            HSSFCell icell = rowHeader.createCell(i);
+            icell.setCellValue(new HSSFRichTextString(header[i]));
+        }
+
+        //write all one person row
+        for (int i=0; i<persons.size(); i++) {
+            HSSFRow irow = thirdSheet.createRow(i+1); //row 0 alredy created above
+
+            PersonEntity p = persons.get(i);
+            HSSFCell cell0 = irow.createCell(0);
+            cell0.setCellValue(new HSSFRichTextString(String.valueOf(p.getID())));
+
+            HSSFCell cell1 = irow.createCell(1);
+            cell1.setCellValue(new HSSFRichTextString(p.getName()));
+
+            HSSFCell cell2 = irow.createCell(2);
+            cell2.setCellValue(new HSSFRichTextString(p.getLastName()));
+
+            HSSFCell cell3 = irow.createCell(3);
+            cell3.setCellValue(new HSSFRichTextString(p.getAcademicTitle()));
+
         }
     }
 
