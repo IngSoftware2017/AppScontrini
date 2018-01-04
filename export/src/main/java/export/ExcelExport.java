@@ -1,9 +1,18 @@
 package export;
 
+import android.util.Log;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -39,7 +48,7 @@ public class ExcelExport extends ExportManager {
     private List<PersonEntity> persons;
 
     private File file;
-    private String fileName;
+    HSSFWorkbook workbook; //Excel document
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH.mm.ss");
 
     /**
@@ -57,8 +66,10 @@ public class ExcelExport extends ExportManager {
         persons = database.getAllPerson();
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        fileName = "dbAppScontrini_" + sdf.format(timestamp);
+        String fileName = "export" + sdf.format(timestamp);
         file = new File(pathLocation, fileName);
+
+        workbook = new HSSFWorkbook();
 
         //outFile = new FileInputStream(new File(pathDirectory));
         //Workbook workbook = new XSSFWorkbook(outFile);
@@ -70,10 +81,92 @@ public class ExcelExport extends ExportManager {
      * @author Marco Olivieri
      *
      * Implementation of the extended abstract class ExportManager
+     * Writes all tables entities in separeted sheet of the workbook.
+     * Than it creates the complete document of the exportation db
      * @return boolean - if the exportation is ok
      */
     public boolean export(){
-        Workbook wb = new HSSFWorkbook();
-        return false;
+
+        writeTickets();
+
+        try{
+            FileOutputStream fos = new FileOutputStream(file);
+            workbook.write(fos);
+            return true;
+        }
+        catch (IOException e){
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
     }
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Writes in workbook all the tickets in a separeted sheet
+     * The category list of the ticket is wrote in one cell all values separated from a slash
+     */
+    private void writeTickets(){
+        //creates a new sheet
+        HSSFSheet firstSheet = workbook.createSheet("Tickets");
+
+        //create header row
+        HSSFRow rowHeader = firstSheet.createRow(0);
+        String[] header = TICKET_FILE_HEADER.split(";");
+        for(int i=0; i<header.length; i++) {
+            HSSFCell icell = rowHeader.createCell(i);
+            icell.setCellValue(new HSSFRichTextString(header[i]));
+        }
+
+        //write all one ticket row
+        for (int i=0; i<tickets.size(); i++) {
+            HSSFRow irow = firstSheet.createRow(i+1); //row 0 alredy created above
+
+            TicketEntity t = tickets.get(i);
+            HSSFCell cell0 = irow.createCell(0);
+            cell0.setCellValue(new HSSFRichTextString(String.valueOf(t.getID())));
+
+            HSSFCell cell1 = irow.createCell(1);
+            cell1.setCellValue(new HSSFRichTextString(String.valueOf(t.getAmount())));
+
+            HSSFCell cell2 = irow.createCell(2);
+            cell2.setCellValue(new HSSFRichTextString(String.valueOf(t.getDate())));
+
+            HSSFCell cell3 = irow.createCell(3);
+            cell3.setCellValue(new HSSFRichTextString(t.getShop()));
+
+            HSSFCell cell4 = irow.createCell(4);
+            cell4.setCellValue(new HSSFRichTextString(t.getTitle()));
+
+            HSSFCell cell5 = irow.createCell(5);
+            cell5.setCellValue(new HSSFRichTextString(categoryToString(t.getCategory())));
+
+            HSSFCell cell6 = irow.createCell(6);
+            cell6.setCellValue(new HSSFRichTextString(String.valueOf(t.getMissionID())));
+
+            HSSFCell cell7 = irow.createCell(7);
+            cell7.setCellValue(new HSSFRichTextString(String.valueOf(t.getFileUri())));
+        }
+    }
+
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Converts a list of string in one string with all values separeted from a slash
+     * @param list, List<String>
+     * @return String - string with all values
+     */
+    private String categoryToString(List<String> list) {
+        if (list == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<list.size(); i++)
+                s+=list.get(i)+"/";
+            return s;
+        }
+    }
+
 }
