@@ -9,9 +9,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabItem;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,11 +24,12 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ing.software.common.Ticket;
+import com.ing.software.ocr.ImagePreprocessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -36,6 +37,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,6 +57,9 @@ public class BillActivity extends AppCompatActivity {
     public boolean isFabOpen = false;
     static final int REQUEST_TAKE_PHOTO = 1;
     public static final int PICK_PHOTO_FOR_AVATAR = 2;
+    static final String FILE_PROVIDER_AUTHORITY ="com.example.android.fileprovider" ;
+    static final String FILENAME_PREFIX = "JPEG_";
+    static final String FILENAME_SUFFIX = "_";
     String tempPhotoPath;
     Integer missionID;
     MissionEntity thisMission;
@@ -61,6 +67,7 @@ public class BillActivity extends AppCompatActivity {
     String root;
     public DataManager DB;
     OcrManager ocrManager;
+    int sleep = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +87,7 @@ public class BillActivity extends AppCompatActivity {
             try {
                 //On first run vision library will be downloaded
                 Toast.makeText(this, R.string.downloading_library, Toast.LENGTH_LONG).show();
-                Thread.sleep(2000);
+                Thread.sleep(sleep);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -240,7 +247,7 @@ public class BillActivity extends AppCompatActivity {
             }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
+                        FILE_PROVIDER_AUTHORITY,
                         photoFile);
                 takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
@@ -315,7 +322,9 @@ public class BillActivity extends AppCompatActivity {
                 case(REQUEST_TAKE_PHOTO):
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
-                    savePickedFile(bitmapPhoto);
+                    Uri photoUri = savePickedFile(bitmapPhoto);
+                    Ticket ticket = getTicket(bitmapPhoto);
+                    saveTicket(ticket, photoUri);
                     deleteTempFiles();
                     waitDB();
                     clearAllImages();
@@ -328,7 +337,9 @@ public class BillActivity extends AppCompatActivity {
                     photoURI = data.getData();
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                        savePickedFile(btm);
+                        Uri photoGalleryUri = savePickedFile(btm);
+                        Ticket ticket1 = getTicket(btm);
+                        saveTicket(ticket1, photoGalleryUri);
                         waitDB();
                         clearAllImages();
                         printAllTickets();
@@ -369,13 +380,13 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-    /** Dal Maso
+    /** Dal Maso (Modified by Federico Taschin)
      * Save the bitmap passed
      * @param imageToSave bitmap to save
      */
-    private void savePickedFile(Bitmap imageToSave) {
+    private Uri savePickedFile(Bitmap imageToSave) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = FILENAME_PREFIX + timeStamp + FILENAME_SUFFIX;
         String fname = imageFileName+".jpg";
         File file = new File(root, fname);
         File originalPhoto = new File(root,fname+"orig");
@@ -387,15 +398,6 @@ public class BillActivity extends AppCompatActivity {
         try {
             FileOutputStream out = new FileOutputStream(file);
 
-            TicketEntity ticket = new TicketEntity();
-            ticket.setDate(Calendar.getInstance().getTime());
-            ticket.setFileUri(uri);
-            ticket.setAmount(BigDecimal.valueOf(10000).movePointLeft(2));
-            ticket.setShop("Pam Padova");
-            ticket.setTitle("Scontrino ");
-            ticket.setMissionID(missionID);
-            DB.addTicket(ticket);
-
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
@@ -403,9 +405,11 @@ public class BillActivity extends AppCompatActivity {
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
             outOriginal.flush();
             outOriginal.close();
+            return uri;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     /**PICCOLO
@@ -462,6 +466,66 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Wait the ocr thread to analyze the image
+     * Taschin Federico
+     * @param photo
+     * @return
+     */
+    public synchronized Ticket getTicket(Bitmap photo) {
+        Ticket ticket = new Ticket();
+        ticket.date = Calendar.getInstance().getTime();
+        ImagePreprocessor preproc = new ImagePreprocessor();
+        preproc.setImage(photo);
+        SimpleMonitor monitor = new SimpleMonitor(ticket);
+        preproc.findTicket(false, errs -> {
+            // handle here all errors inside errs.
+            ocrManager.getTicket(preproc, result -> {
+                ticket.amount = result.amount;
+                monitor.notifyActivity();
+            });
+        });
+        while (ticket.amount==null){
+                monitor.waitTicket();
+        }
+        return ticket;
+    }
+
+    class SimpleMonitor{
+        Ticket ticket;
+        public SimpleMonitor(Ticket ticket){
+            this.ticket = ticket;
+        }
+        public synchronized void waitTicket(){
+            while (ticket.amount==null){
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        public synchronized void notifyActivity(){
+            notifyAll();
+        }
+    }
+
+    /**
+     * Taschin Federico
+     * @param ticket
+     * @param photoPath
+     */
+    public void saveTicket(Ticket ticket, Uri photoPath){
+        TicketEntity ticketEntity = new TicketEntity();
+        ticketEntity.setAmount(ticket.amount);
+        ticketEntity.setDate(ticket.date);
+        ticketEntity.setFileUri(photoPath);
+        ticketEntity.setShop("Pam Padova");
+        ticketEntity.setTitle("Scontrino ");
+        ticketEntity.setMissionID(missionID);
+        DB.addTicket(ticketEntity);
+    }
+
     /**PICCOLO_Edit by Dal Maso
      * Method that lets the user crop the photo
      * @param toCrop photo's index
@@ -473,4 +537,10 @@ public class BillActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
+
+    @Override
+    protected void onDestroy() {
+        ocrManager.release();
+        super.onDestroy();
+    }
 }
