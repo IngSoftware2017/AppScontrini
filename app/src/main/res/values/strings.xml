@@ -37,7 +37,13 @@
     <string name="toast_personNoName">Nome persona mancante</string>
     <string name="toast_missionNoLocation">Luogo missione mancante</string>
     <string name="toast_personNoLastName">Cognome persona mancante</string>
-    <string name="toast_errorDate">La data di fine precede \n quella di inizio</string>
+    <string name="toast_errorDate">Inizio > Fine</string>
     <!--Piccolo-->
     <string name="text_isRepaid">La missione è stata archiviata?</string>
+    <string name="title_activity_missions_tabbed">MissionsTabbed</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

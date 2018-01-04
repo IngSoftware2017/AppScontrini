@@ -65,7 +65,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/button_missionStart"
+                android:id="@+id/button_missionEditStart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="30dp"
@@ -93,7 +93,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/button_missionFinish"
+                android:id="@+id/button_missionEditFinish"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="35dp"

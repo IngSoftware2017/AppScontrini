@@ -151,6 +151,8 @@ public class BillViewer extends AppCompatActivity {
                 break;
 
             default:
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
                 finish();
                 break;
         }
@@ -233,19 +235,5 @@ public class BillViewer extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
         imgView.setImageBitmap(bitmap);
     }//cropPhoto
-
-    //Dal Maso, manage back button
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
-        finish();
-    }
 }
 

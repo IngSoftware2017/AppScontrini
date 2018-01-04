@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -46,14 +48,16 @@ public class MissionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DB = new DataManager(this.getApplicationContext());
-        setContentView(R.layout.activity_mission);
-        context=getApplicationContext();
-        Intent intent = getIntent();
+        
 
+        DB = new DataManager(this.getApplicationContext());
+        context = getApplicationContext();
+
+        Intent intent = getIntent();
         personID = intent.getExtras().getInt("personID");
         thisPerson = DB.getPerson(personID);
 
+        setContentView(R.layout.activity_mission);
         //TODO set the title right using string.xml(like personName+" 's missions")
         setTitle(thisPerson.getName());
 
@@ -66,8 +70,10 @@ public class MissionActivity extends AppCompatActivity {
                 startActivityForResult(addMission, 1);
             }
         });
-        printAllMissionsDB();
+
+        printAllMissions();
     }
+
     /** Dal Maso
      * Setting toolbar delete button and style from /res/menu
      * @param menu
@@ -125,7 +131,7 @@ public class MissionActivity extends AppCompatActivity {
 
                 case (MISSION_MOD):
                     clearAllMissions();
-                    printAllMissionsDB();
+                    printAllMissions();
                     break;
 
                 case (PERSON_MOD):
@@ -135,7 +141,7 @@ public class MissionActivity extends AppCompatActivity {
 
                 default:
                     clearAllMissions();
-                    printAllMissionsDB();
+                    printAllMissions();
                     break;
             }
         }
@@ -167,7 +173,7 @@ public class MissionActivity extends AppCompatActivity {
     /** Dal Maso
      * get all missions from the DB and print
      */
-    public void printAllMissionsDB(){
+    public void printAllMissions(){
         List<MissionEntity> missions = DB.getMissionsForPerson(personID);
         TextView noMissions = (TextView)findViewById(R.id.noMissions);
         for (int i = 0; i < missions.size(); i++)

@@ -63,8 +63,7 @@
             android:parentActivityName=".MissionActivity" />
         <activity
             android:name=".EditMission"
-            android:parentActivityName=".BillActivity"/>
-
+            android:parentActivityName=".BillActivity" />
     </application>
 
 </manifest>

@@ -54,8 +54,6 @@ public class BillActivity extends AppCompatActivity {
     public List<TicketEntity> list = new LinkedList<TicketEntity>();
     public Uri photoURI;
     public boolean isFabOpen = false;
-    static final int REQUEST_TAKE_PHOTO = 1;
-    public static final int PICK_PHOTO_FOR_AVATAR = 2;
     String tempPhotoPath;
     Integer missionID;
     MissionEntity thisMission;
@@ -63,7 +61,11 @@ public class BillActivity extends AppCompatActivity {
     String root;
     public DataManager DB;
     OcrManager ocrManager;
-    int MISSION_MOD=1;
+
+    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int PICK_PHOTO_FOR_AVATAR = 2;
+    static final int TICKET_MOD = 4;
+    static final int MISSION_MOD = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -342,6 +344,7 @@ public class BillActivity extends AppCompatActivity {
                         Log.d("Foto da galleria", "ERROR");
                     }
                     break;
+
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
@@ -350,7 +353,14 @@ public class BillActivity extends AppCompatActivity {
                     printAllTickets();
                     break;
 
-                case(4):
+                case (TICKET_MOD):
+                    clearAllImages();
+                    printAllTickets();
+                    break;
+
+                case (MISSION_MOD):
+                    thisMission = DB.getMission(missionID);
+                    setTitle(thisMission.getName());
                     clearAllImages();
                     printAllTickets();
                     break;
