@@ -2,15 +2,9 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,19 +12,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
-import database.PersonEntity;
-import database.TicketEntity;
 
 public class MissionActivity extends AppCompatActivity {
 
@@ -39,6 +28,7 @@ public class MissionActivity extends AppCompatActivity {
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     Context context;
     final int PERSON_MOD = 1;
+    final int MISSION_ADD = 2;
 
     //Dal Maso
     @Override
@@ -49,10 +39,9 @@ public class MissionActivity extends AppCompatActivity {
         context=getApplicationContext();
         Intent intent = getIntent();
 
-        personID = intent.getExtras().getInt("personID");
-        String personName = intent.getExtras().getString("personName");
-        //TODO set the title right using string.xml(like personName+" 's missions")
-        setTitle(personName+"- Missioni");
+        personID = intent.getExtras().getInt(IntentCodes.INTENT_PERSON_ID_CODE);
+        String personName = intent.getExtras().getString(IntentCodes.INTENT_PERSON_NAME_CODE);
+        setTitle(personName+R.string.mission_title);
         Log.d("idPersona:", personID+" "+personName);
         Log.d("PersonID", ""+personID);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
@@ -60,9 +49,9 @@ public class MissionActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
-                addMission.putExtra("person", personID);
+                addMission.putExtra(IntentCodes.INTENT_PERSON_ID_CODE, personID);
                 Log.d("PersonID", ""+personID);
-                startActivityForResult(addMission, 1);
+                startActivityForResult(addMission, MISSION_ADD);
             }
         });
         printAllMissionsDB();

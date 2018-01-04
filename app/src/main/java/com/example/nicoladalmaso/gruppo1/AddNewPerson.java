@@ -1,6 +1,5 @@
 package com.example.nicoladalmaso.gruppo1;
 
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -9,17 +8,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import database.DataManager;
-import database.MissionEntity;
 import database.PersonEntity;
 
 public class AddNewPerson extends AppCompatActivity {
@@ -92,8 +84,8 @@ public class AddNewPerson extends AppCompatActivity {
 
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startMissionView.putExtra("personID", (int) personID);
-                startMissionView.putExtra("personName", name);
+                startMissionView.putExtra(IntentCodes.INTENT_PERSON_ID_CODE, (int) personID);
+                startMissionView.putExtra(IntentCodes.INTENT_PERSON_NAME_CODE, name);
                 context.startActivity(startMissionView);
                 setResult(RESULT_OK, intent);
                 finish();

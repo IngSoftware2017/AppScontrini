@@ -45,7 +45,10 @@ public class AddNewMission extends AppCompatActivity{
     public DataManager DB;
     TextView missionStart;
     TextView missionFinish;
-    int personID = 1;
+    int personID;
+    final String START_DATEPICKER_TAG = "startDatePicker";
+    final String FINISH_DATEPICKER_TAG = "finishDatePicker";
+    final String DATE_FORMAT ="dd/MM/yyyy";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +57,11 @@ public class AddNewMission extends AppCompatActivity{
         setTitle(getString(R.string.newMission));
         setContentView(R.layout.activity_add_new_mission);
 
-        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+        DB = new DataManager(context);
 
         Intent intent = getIntent();
-        personID = intent.getExtras().getInt("person");
+        personID = intent.getExtras().getInt(IntentCodes.INTENT_PERSON_ID_CODE);
         Log.d("PersonIDAddMission", ""+personID);
 
         initializeComponents();
@@ -72,14 +75,14 @@ public class AddNewMission extends AppCompatActivity{
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
-                newFragment.show(getFragmentManager(), "startDatePicker");
+                newFragment.show(getFragmentManager(), START_DATEPICKER_TAG);
             }
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
-                newFragment.show(getFragmentManager(), "finishDatePicker");
+                newFragment.show(getFragmentManager(), FINISH_DATEPICKER_TAG);
             }
         });
     }
@@ -128,7 +131,7 @@ public class AddNewMission extends AppCompatActivity{
                 miss.setPersonID(personID);
                 miss.setLocation(location);
 
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
                 try {
 
                     String start=(String) missionStart.getText();
@@ -169,8 +172,8 @@ public class AddNewMission extends AppCompatActivity{
 
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startImageView.putExtra("missionID", (int) missionID);
-                startImageView.putExtra("missionName", miss.getName());
+                startImageView.putExtra(IntentCodes.INTENT_MISSION_ID_CODE, (int) missionID);
+                startImageView.putExtra(IntentCodes.INTENT_MISSION_NAME_CODE, miss.getName());
                 context.startActivity(startImageView);
                 setResult(RESULT_OK, intent);
                 finish();
