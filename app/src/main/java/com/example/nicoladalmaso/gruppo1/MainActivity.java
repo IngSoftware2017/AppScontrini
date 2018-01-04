@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //ExportManager e = new CSVExport(DB,context.getExternalFilesDir(null));
                 ExportManager e = new CSVExport(DB,getFilesDir().getAbsolutePath());
                 boolean export = e.export();
             }

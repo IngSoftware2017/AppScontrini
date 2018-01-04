@@ -58,7 +58,7 @@ public class CSVExport extends ExportManager {
      *
      * Implementation of the extended abstract class ExportManager
      * Create a CSV file export for each tables entities of database
-     * @return
+     * @return boolean - if the exportation is ok
      */
     public boolean export() {
 
