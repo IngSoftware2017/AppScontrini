@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import database.MissionEntity;
 
@@ -52,7 +54,16 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         title.setText(c.getName());
         location.setText(c.getLocation());
         convertView.setTag(c.getID());
-        Log.d("Mission", ""+c.getStartMission());
+        Log.d("MissionStartBadFormat", ""+c.getStartMission());
+        //Lazzarin :blocco per convertire in formato più leggibile la data
+        Date start=c.getStartMission();
+        SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
+        String startDate=tr.format(start);
+        Date finish=c.getEndMission();
+        String finishDate=tr.format(finish);
+        Log.d("missionStart", startDate);
+        Log.d("missionEnd",finishDate);
+
 
         //Dal Maso
         //Sets a default background color for the mission's card

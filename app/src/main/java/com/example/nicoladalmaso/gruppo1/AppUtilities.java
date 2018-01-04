@@ -45,6 +45,37 @@ public class AppUtilities {
         }
         return false;
     }
+    /**
+          * Lazzarin
+          * Method written to fix a bug of Android's DatePicker that save the date with month before the selected month.(When this bug will be eliminated, simply we'll
+          * don't use this method)
+          * @param date on format dd/MM/yyyy
+          * @return date with +1 about Month, on format dd/MM/yyyy
+          */
+    public static String addMonth(String date)
+    {        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
+                String newDate="00000000";
+        try
+         {
+                Log.d("dateOrigin",date);
+                Date in=basicFormat.parse(date);
+                newDate=formatCheck.format(in);
+                Log.d("formatoData",newDate);
+                int temp=Integer.parseInt(newDate);
+                temp = temp+100; // on this format, month is in the hundreds order
+                Log.d("meseAggiunto",temp+"");
+                newDate=temp+"";
+                in=formatCheck.parse(newDate);
+                newDate=basicFormat.format(in);
+                Log.d("formatoDataRestituito",newDate);
+
+        }
+        catch(ParseException e){
+            Log.d("Error","Wrong date format");
+        }
+        return newDate;
+    }
 
 
 }

@@ -108,6 +108,9 @@ public class AddNewMission extends AppCompatActivity{
                 EditText editLocation = (EditText)findViewById(R.id.input_missionLocation);
                 String name = editName.getText().toString();
                 String location = editLocation.getText().toString();
+                String startDate=(String) missionStart.getText();
+                String finishDate=(String) missionFinish.getText();
+                Log.d("marsadenadata",startDate);
 
                 if ((name == null) || name.replaceAll(" ","").equals("")) {
                     Toast.makeText(context, getResources().getString(R.string.toast_missionNoName), Toast.LENGTH_SHORT).show();
@@ -115,6 +118,14 @@ public class AddNewMission extends AppCompatActivity{
                 }
                 if((location==null) || location.replaceAll(" ","").equals("")) {
                     Toast.makeText(context, getResources().getString(R.string.toast_missionNoLocation), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((startDate==null) ||startDate.equals(getResources().getString(R.string.dateStart))) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_noDataStart), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((finishDate==null) || finishDate.equals(getResources().getString(R.string.dateFinish))) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_noDataFinish), Toast.LENGTH_SHORT).show();
                     return false;
                 }
 
@@ -127,9 +138,9 @@ public class AddNewMission extends AppCompatActivity{
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
 
-                    String start=(String) missionStart.getText();
+                    String start=AppUtilities.addMonth(startDate);
 
-                    String finish=(String) missionFinish.getText();
+                    String finish=AppUtilities.addMonth(finishDate);
                     if(!AppUtilities.checkDate(start,finish)) {
                         Log.d("formato data inserita", "errato");
                         Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
