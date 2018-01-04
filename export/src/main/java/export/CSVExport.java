@@ -27,14 +27,23 @@ public class CSVExport extends ExportManager {
     private final String SEMICOLON_DELIMITER = ";";
     private final String NEW_LINE_SEPARATOR = "\n";
 
+    //Header CSV file
     private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
     private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE";
 
+    //TablesEntity of db
     private List<TicketEntity> tickets;
     private List<MissionEntity> missions;
     private List<PersonEntity> persons;
 
+    /**
+     * @author Marco Olivieri
+     *
+     * Costructor
+     * @param database, DataManager - the instance of AppScontrini db
+     * @param pathLocation, String - path directory to save exportation files
+     */
     public CSVExport(DataManager database, String pathLocation){
         super(database, pathLocation);
 
@@ -47,7 +56,8 @@ public class CSVExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Create a CSV file export for each table entities of database
+     * Implementation of the extended abstract class ExportManager
+     * Create a CSV file export for each tables entities of database
      * @return
      */
     public boolean export() {
