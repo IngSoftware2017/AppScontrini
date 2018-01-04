@@ -30,7 +30,7 @@ public abstract class ExportManager {
         folder = new File(pathLocation);
         boolean check = false;
         if (!folder.exists())
-            check = folder.mkdir();
+            check = folder.mkdirs();
         Log.d(TAG, "Folder created: "+ String.valueOf(check));
     }
 

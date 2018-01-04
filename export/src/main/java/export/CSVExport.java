@@ -1,9 +1,7 @@
 package export;
 
 import android.util.Log;
-import android.util.LogPrinter;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;

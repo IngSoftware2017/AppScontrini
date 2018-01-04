@@ -7,12 +7,10 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -27,10 +25,8 @@ import database.TicketEntity;
  *
  * This class defines the methods to export db datas in Excel file
  * References:
- * http://www.cuelogic.com/blog/creatingreading-an-excel-file-in-android/
+ * https://stackoverflow.com/questions/8006087/how-to-create-an-excel-file-in-android
  * https://poi.apache.org/download.html
- * http://www.baeldung.com/java-microsoft-excel
- *
  */
 
 public class ExcelExport extends ExportManager {
@@ -70,10 +66,6 @@ public class ExcelExport extends ExportManager {
         file = new File(pathLocation, fileName);
 
         workbook = new HSSFWorkbook();
-
-        //outFile = new FileInputStream(new File(pathDirectory));
-        //Workbook workbook = new XSSFWorkbook(outFile);
-
     }
 
 
@@ -94,6 +86,8 @@ public class ExcelExport extends ExportManager {
         try{
             FileOutputStream fos = new FileOutputStream(file);
             workbook.write(fos);
+            fos.flush();
+            fos.close();
             return true;
         }
         catch (IOException e){
