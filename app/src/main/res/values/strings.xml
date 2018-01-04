@@ -41,4 +41,7 @@
     <string name="toast_errorDateStart">Inserire una data di inizio</string>
     <string name="toast_errorDateEnd">Inserire una data di fine</string>
     <string name="editPerson">Modifica persona</string>
+    <!--taschin-->
+    <string name="mission_title">- Missioni</string>
+    <string name="downloading_library">Downloading library...</string>
 </resources>

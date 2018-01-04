@@ -67,11 +67,11 @@ public class BillActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+        DB = new DataManager(context);
 
         Intent intent = getIntent();
-        missionID = intent.getExtras().getInt("missionID");
+        missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID_CODE);
         thisMission = DB.getMission(missionID);
         setTitle(thisMission.getName());
 
@@ -79,7 +79,7 @@ public class BillActivity extends AppCompatActivity {
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
                 //On first run vision library will be downloaded
-                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.downloading_library, Toast.LENGTH_LONG).show();
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
