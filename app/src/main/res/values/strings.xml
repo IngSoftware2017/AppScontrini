@@ -25,6 +25,7 @@
     <string name="newMission">Nuova missione</string>
     <string name="newPerson">Nuova persona</string>
     <string name="deleteMissionToast">Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati</string>
+    <string name="deletePersonToast">Sei sicuro di voler eliminare la persona?\nTutte le missioni verranno eliminate</string>
     <string name="buttonDelete">Elimina</string>
     <string name="cancel">Annulla</string>
     <string name="deleteTicketToast">Sei sicuro di voler eliminare lo scontrino?</string>

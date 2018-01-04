@@ -2,9 +2,15 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,15 +18,24 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
+import database.TicketEntity;
 
+/**
+ * Modified: Develop of deletePerson function
+ * @author matteo.mascotto on 04/01/2018
+ */
 public class MissionActivity extends AppCompatActivity {
 
     public DataManager DB;
@@ -28,7 +43,6 @@ public class MissionActivity extends AppCompatActivity {
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     Context context;
     final int PERSON_MOD = 1;
-    final int MISSION_ADD = 2;
 
     //Dal Maso
     @Override
@@ -41,7 +55,7 @@ public class MissionActivity extends AppCompatActivity {
 
         personID = intent.getExtras().getInt(IntentCodes.INTENT_PERSON_ID_CODE);
         String personName = intent.getExtras().getString(IntentCodes.INTENT_PERSON_NAME_CODE);
-        setTitle(personName+R.string.mission_title);
+        setTitle(personName + " " + getResources().getString(R.string.mission_title));
         Log.d("idPersona:", personID+" "+personName);
         Log.d("PersonID", ""+personID);
         String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
@@ -49,13 +63,14 @@ public class MissionActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
-                addMission.putExtra(IntentCodes.INTENT_PERSON_ID_CODE, personID);
+                addMission.putExtra("person", personID);
                 Log.d("PersonID", ""+personID);
-                startActivityForResult(addMission, MISSION_ADD);
+                startActivityForResult(addMission, 1);
             }
         });
         printAllMissionsDB();
     }
+
     /** Dal Maso
      * Setting toolbar delete button and style from /res/menu
      * @param menu
@@ -80,7 +95,7 @@ public class MissionActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case (R.id.action_deletePerson):
-                //TODO:DELETE THE PERSON
+                deletePerson();
                 break;
 
             case (R.id.action_editPerson):
@@ -163,5 +178,40 @@ public class MissionActivity extends AppCompatActivity {
             noMissions.setVisibility(View.INVISIBLE);
         }
 
+    }
+
+    /**
+     * Delete the Person and all the Missions associate to him
+     *
+     * @author matteo.mascotto on 04/01/2018
+     */
+    public void deletePerson(){
+        AlertDialog.Builder toast = new AlertDialog.Builder(MissionActivity.this);
+        // Dialog
+        toast.setMessage(context.getString(R.string.deletePersonToast))
+                .setTitle(context.getString(R.string.deleteTitle));
+        // Positive button
+        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                List<MissionEntity> list = DB.getMissionsForPerson(personID);
+                for(int i = 0; i < list.size(); i++){
+                    DB.deleteMission((int) list.get(i).getID());
+                }
+                DB.deletePerson(personID);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        // NOPE
+        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Nothing to do
+            }
+        });
+        //Show toast
+        AlertDialog alert = toast.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 }
