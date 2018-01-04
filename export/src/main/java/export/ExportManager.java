@@ -23,5 +23,5 @@ public abstract class ExportManager {
         //TODO : check new or exist path
     }
 
-    abstract boolean export();
+    public abstract boolean export();
 }

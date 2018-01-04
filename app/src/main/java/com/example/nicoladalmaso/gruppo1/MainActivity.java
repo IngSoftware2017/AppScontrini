@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,6 +46,8 @@ import database.DAO;
 import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
+import export.CSVExport;
+import export.ExportManager;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -95,6 +98,17 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(addPerson, person_added);
             }
         });
+
+
+        //Marco Olivieri
+        Button b = (Button) findViewById(R.id.buttonExport);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ExportManager e = new CSVExport(DB,getFilesDir().getAbsolutePath());
+                boolean export = e.export();
+            }
+        });
     }
 
     /** PICCOLO
@@ -138,4 +152,7 @@ public class MainActivity extends AppCompatActivity {
             addToList(people.get(i));
         }
     }
+
+
+
 }
