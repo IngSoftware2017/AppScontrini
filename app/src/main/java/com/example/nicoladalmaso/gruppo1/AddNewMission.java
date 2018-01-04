@@ -87,7 +87,7 @@ public class AddNewMission extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addmission_menu, menu);
+        inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
 
@@ -102,7 +102,7 @@ public class AddNewMission extends AppCompatActivity{
         // Handle item selection
         Intent intent = new Intent();
         switch (item.getItemId()) {
-            case R.id.action_addMission:
+            case R.id.action_confirm:
                 //read input text
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
                 EditText editLocation = (EditText)findViewById(R.id.input_missionLocation);

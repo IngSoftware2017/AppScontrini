@@ -36,9 +36,11 @@ public class MissionActivity extends AppCompatActivity {
 
     public DataManager DB;
     int personID;
+    PersonEntity thisPerson;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     Context context;
-    final int PERSON_MOD = 1;
+    final int MISSION_MOD = 1;
+    final int PERSON_MOD = 2;
 
     //Dal Maso
     @Override
@@ -50,12 +52,11 @@ public class MissionActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         personID = intent.getExtras().getInt("personID");
-        String personName = intent.getExtras().getString("personName");
+        thisPerson = DB.getPerson(personID);
+
         //TODO set the title right using string.xml(like personName+" 's missions")
-        setTitle(personName+"- Missioni");
-        Log.d("idPersona:", personID+" "+personName);
-        Log.d("PersonID", ""+personID);
-        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+        setTitle(thisPerson.getName());
+
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -101,11 +102,6 @@ public class MissionActivity extends AppCompatActivity {
                 startActivityForResult(editPerson,PERSON_MOD);
                 break;
 
-            case (1):
-                clearAllMissions();
-                printAllMissionsDB();
-                break;
-
             default:
                 setResult(RESULT_OK, intent);
                 finish();
@@ -126,6 +122,17 @@ public class MissionActivity extends AppCompatActivity {
         Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
+
+                case (MISSION_MOD):
+                    clearAllMissions();
+                    printAllMissionsDB();
+                    break;
+
+                case (PERSON_MOD):
+                    thisPerson = DB.getPerson(personID);
+                    setTitle(thisPerson.getName());
+                    break;
+
                 default:
                     clearAllMissions();
                     printAllMissionsDB();

@@ -4,8 +4,8 @@
 
     <!-- "Mark Favorite", should appear as action button if possible -->
     <item
-        android:id="@+id/action_addMission"
+        android:id="@+id/action_confirm"
         android:icon="@drawable/ic_done_white"
-        android:title="@string/action_addMission"
+        android:title="@string/add"
         app:showAsAction="always" />
 </menu>

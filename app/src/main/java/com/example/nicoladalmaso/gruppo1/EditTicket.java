@@ -57,7 +57,7 @@ public class EditTicket extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addmission_menu, menu);
+        inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
 
@@ -71,7 +71,7 @@ public class EditTicket extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_addMission:
+            case R.id.action_confirm:
                 //Salva i file nel DB
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 thisTicket.setTitle(txtTitle.getText().toString());

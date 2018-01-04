@@ -11,6 +11,7 @@
     <string name="action_deleteMission">Elimina missione</string>
     <string name="action_deletePerson">Elimina persona</string>
     <string name="billTitle">Il tuo scontrino</string>
+    <string name="add">Aggiungi</string>
     <string name="name">Nome</string>
     <string name="shop">Negozio</string>
     <string name="total">Totale</string>

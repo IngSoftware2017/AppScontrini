@@ -38,12 +38,14 @@ public class EditPerson extends AppCompatActivity{
         //TODO: use string.xml
         setTitle("Modifica persona");
         setContentView(R.layout.activity_edit_person);
+
         context = this.getApplicationContext();
         DB = new DataManager(context);
 
         //Get data from parent view
         setPersonValues();
 
+        setPersonValuesOnScreen();
     }
 
     /** Dal Maso
@@ -54,7 +56,7 @@ public class EditPerson extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addmission_menu, menu);
+        inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
     /** Dal Maso, adapted by Piccolo
@@ -67,7 +69,7 @@ public class EditPerson extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_editPerson:
+            case R.id.action_confirm:
                 //TODO set the right intent
                 thisPerson.setName(txtName.getText().toString());
                 thisPerson.setLastName(txtLastName.getText().toString());
@@ -90,25 +92,24 @@ public class EditPerson extends AppCompatActivity{
      */
     private void setPersonValues(){
         Intent intent = getIntent();
-        personID = (int) intent.getExtras().getLong("personID");
+        personID = intent.getExtras().getInt("personID");
         Log.d("personID", "Edit person "+personID);
         thisPerson = DB.getPerson(personID);
         //TODO: fix the crash
-        personName=thisPerson.getName();
-        personLastName=thisPerson.getLastName();
-        personAcademicTitle=thisPerson.getAcademicTitle();
+        personName = thisPerson.getName();
+        personLastName = thisPerson.getLastName();
+        personAcademicTitle = thisPerson.getAcademicTitle();
         Log.d("DBPerson",personID+" "+personName+" "+personLastName);
         //set those values to the edittext
-        setPersonValuesOnScreen();
     }
 
     /**Dal Maso, adapted by Piccolo
      * show on screen the values of the person
      */
     private void setPersonValuesOnScreen(){
-        txtName=(TextView)findViewById(R.id.input_personName);
-        txtLastName=(TextView)findViewById(R.id.input_personLastName);
-        txtAcademicTitle=(TextView)findViewById(R.id.input_personAcademicTitle) ;
+        txtName = (TextView)findViewById(R.id.input_personEditName);
+        txtLastName = (TextView)findViewById(R.id.input_personEditLastName);
+        txtAcademicTitle = (TextView)findViewById(R.id.input_personEditAcademicTitle);
         txtName.setText(personName);
         txtLastName.setText(personLastName);
         txtAcademicTitle.setText(personAcademicTitle);

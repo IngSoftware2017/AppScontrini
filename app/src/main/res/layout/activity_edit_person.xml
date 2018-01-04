@@ -19,7 +19,7 @@
             android:orientation="horizontal"></LinearLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_personName"
+            android:id="@+id/input_layout_personEditName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -28,7 +28,7 @@
             android:theme="@style/TextLabel">
 
             <EditText
-                android:id="@+id/input_personName"
+                android:id="@+id/input_personEditName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
@@ -38,7 +38,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_personLastName"
+            android:id="@+id/input_layout_personEditLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -48,7 +48,7 @@
             android:theme="@style/TextLabel">
 
             <EditText
-                android:id="@+id/input_personLastName"
+                android:id="@+id/input_personEditLastName"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Cognome"
@@ -94,7 +94,7 @@
                     <android.support.design.widget.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/input_personAcademicTitle"
+                        android:id="@+id/input_personEditAcademicTitle"
                         android:hint="Titolo accademico"
                         android:singleLine="true"/>
                 </android.support.design.widget.TextInputLayout>

@@ -14,7 +14,7 @@
         android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_missionName"
+            android:id="@+id/input_layout_missionEditName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -23,7 +23,7 @@
             android:theme="@style/TextLabel">
 
             <EditText
-                android:id="@+id/input_missionName"
+                android:id="@+id/input_missionEditName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
@@ -33,7 +33,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_missionDescription"
+            android:id="@+id/input_layout_missionEditLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -43,7 +43,7 @@
             android:theme="@style/TextLabel">
 
             <EditText
-                android:id="@+id/input_missionLocation"
+                android:id="@+id/input_missionEditLocation"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/location"
@@ -80,7 +80,7 @@
                     app:srcCompat="@drawable/ic_date_range_black_48px" />
 
                 <TextView
-                    android:id="@+id/input_missionStart"
+                    android:id="@+id/input_missionEditStart"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -108,7 +108,7 @@
                     app:srcCompat="@drawable/ic_date_range_black_48px" />
 
                 <TextView
-                    android:id="@+id/input_missionFinish"
+                    android:id="@+id/input_missionEditFinish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
