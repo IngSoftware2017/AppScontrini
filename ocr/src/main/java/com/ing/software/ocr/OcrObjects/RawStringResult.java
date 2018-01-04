@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -68,6 +69,7 @@ public class RawStringResult implements Comparable<RawStringResult>{
     }
 
     public List<RawGridResult> getDetectedTexts() {
+        Collections.sort(detectedTexts);
         return detectedTexts;
     }
 

@@ -52,6 +52,7 @@ class OcrSchemer {
      * @param blocks list of texts
      * @return list of texts on right side
      */
+    @Deprecated
     static List<RawText> getPricesTexts(List<RawText> blocks) {
         List<RawText> texts = new ArrayList<>();
         for (RawText text : blocks) {
@@ -135,10 +136,10 @@ class OcrSchemer {
     static private int getPosition(@NonNull RawText text) {
         int width = text.getRawImage().getWidth();
         /*
-        int position = Math.round(text.getBoundingBox().centerX())*7/width;
-        if (0<=position && position<=2)
+        int position = Math.round(text.getBoundingBox().centerX())*13/width;
+        if (0<=position && position<=4)
             return 0;
-        else if (2<position && position<=5)
+        else if (position<=9)
             return 1;
         else
             return 2;

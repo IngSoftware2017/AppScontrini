@@ -109,7 +109,7 @@ public class OcrManager {
         OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
         List<RawText> prices = result.getRawImage().getPossiblePrices();
-        //First level, if we have a string for "total" we try to decode a value on the same height and if necessary fix it
+        //First level, if we have a string from "AMOUNT_STRINGS[]" we try to decode a value on the same height and if necessary fix it
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
         ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
         long endTime = System.nanoTime();
@@ -212,6 +212,11 @@ public class OcrManager {
         return new RawText(text, source.getRawImage());
     }
 
+    /**
+     * We have no valid amount from string search. Try to decode the amount only from products prices.
+     * @param texts
+     * @return
+     */
     private static List<RawGridResult> analyzeAlternativeAmount(List<RawText> texts) {
         return null;
     }

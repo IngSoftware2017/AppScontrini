@@ -19,6 +19,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
+import static com.ing.software.ocr.OcrVars.HEIGTH_DIFF_MULTIPLIER;
 import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
 import java.text.ParseException;
@@ -47,15 +48,19 @@ class DataAnalyzer {
             //Ignore text with invalid distance (-1) according to findSubstring() documentation
             if (stringResult.getDistanceFromTarget() > -1) {
                 RawText sourceText = stringResult.getSourceText();
-                double singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
+                double baseSingleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
                 if (stringResult.getDetectedTexts() != null) {
                     //Here we order texts according to their distance (position) from source rect
-                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getTargetTexts(), stringResult.getSourceText().getBoundingBox());
-                    for (RawText rawText : orderedDetectedTexts) {
+                    //List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getTargetTexts(), stringResult.getSourceText().getBoundingBox());
+                    for (RawGridResult gridResult : stringResult.getDetectedTexts()) {
+                        RawText rawText = gridResult.getText();
+                        double diffCenter = Math.abs(rawText.getBoundingBox().centerY() - sourceText.getBoundingBox().centerY());
+                        diffCenter = (sourceText.getRawImage().getHeight() - diffCenter)/sourceText.getRawImage().getHeight()*HEIGTH_DIFF_MULTIPLIER;
+                        double singleCatch = baseSingleCatch + gridResult.getPercentage() + diffCenter;
                         if (!rawText.equals(sourceText)) {
                             possibleResults.add(new RawGridResult(rawText, singleCatch));
                             OcrUtils.log(3, "getPossibleAmount", "Analyzing source text: " + sourceText.getValue() +
-                                    " where target is: " + rawText.getValue() + " with probability: " + sourceText.getAmountProbability() +
+                                    " where target is: " + rawText.getValue() + " with decoded probability: " + singleCatch +
                                     " and distance: " + stringResult.getDistanceFromTarget());
                         }
                     }
@@ -67,7 +72,7 @@ class DataAnalyzer {
         if (possibleResults.size() > 0) {
             /* Here we order considering their final probability to contain the amount:
             If the probability is the same, the fallback is their previous order, so based on when
-            they are inserted (=their distance (position) from source rect).
+            they are inserted.
             */
             Collections.sort(possibleResults);
         }

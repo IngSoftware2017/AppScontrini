@@ -6,7 +6,7 @@ package com.ing.software.ocr;
 public class OcrVars {
 
     static final boolean IS_DEBUG_ENABLED = true;
-    static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
+    static final int LOG_LEVEL = 2; //A Higher level, means more things are logged
     static final String[] AMOUNT_STRINGS = {"TOTAL", "IMPORTO"};
     static final int MAX_STRING_DISTANCE = 3;
     public static final String LEFT_TAG = "left";
@@ -17,4 +17,5 @@ public class OcrVars {
     public static final String PRICES_TAG = "prices";
     public static final String CONCLUSION_TAG = "conclusion";
     static final double NUMBER_MIN_VALUE = 0.4;
+    static final int HEIGTH_DIFF_MULTIPLIER = 50;
 }
