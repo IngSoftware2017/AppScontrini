@@ -138,4 +138,5 @@ public class MainActivity extends AppCompatActivity {
             addToList(people.get(i));
         }
     }
+
 }

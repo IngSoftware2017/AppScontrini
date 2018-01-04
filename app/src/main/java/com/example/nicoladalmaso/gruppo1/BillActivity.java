@@ -491,6 +491,9 @@ public class BillActivity extends AppCompatActivity {
         return ticket;
     }
 
+    /**
+     * Federico Taschin
+     */
     class SimpleMonitor{
         Ticket ticket;
         public SimpleMonitor(Ticket ticket){

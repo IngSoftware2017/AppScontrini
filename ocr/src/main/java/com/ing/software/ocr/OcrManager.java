@@ -3,6 +3,7 @@ package com.ing.software.ocr;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
@@ -72,6 +73,9 @@ public class OcrManager {
                 long endTime = System.nanoTime();
                 double duration = ((double) (endTime - startTime)) / 1000000000;
                 OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+                //Taschin Federico (added wait&notify)
+                notifyAll();
+                Log.d("TICKETDEBUG","NOTIFIED");
             }
         }).start();
     }
