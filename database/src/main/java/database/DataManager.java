@@ -29,6 +29,7 @@ public class DataManager {
         }else{
             return dataManager;
         }
+
     }
 
     /** Adds a ticketEntity into the database
@@ -40,6 +41,7 @@ public class DataManager {
     public long addTicket(TicketEntity ticketEntity){
         ticketEntity.setID(database.ticketDao().addTicket(ticketEntity));
         return ticketEntity.getID();
+
     }
 
     /**
