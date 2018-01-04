@@ -63,17 +63,18 @@ public class CSVExport extends ExportManager {
     public boolean export() {
 
         try {
-            FileWriter fileTickets = new FileWriter(pathLocation + "/tickets.csv");
+
+            FileWriter fileTickets = new FileWriter(folder + "/tickets.csv");
             fileTickets = writeTickets(fileTickets);
             fileTickets.flush();
             fileTickets.close();
 
-            FileWriter fileMissions = new FileWriter(pathLocation + "/missions.csv");
+            FileWriter fileMissions = new FileWriter(folder + "/missions.csv");
             fileMissions = writeMissions(fileMissions);
             fileMissions.flush();
             fileMissions.close();
 
-            FileWriter filePersons = new FileWriter(pathLocation + "/persons.csv");
+            FileWriter filePersons = new FileWriter(folder + "/persons.csv");
             filePersons = writePersons(filePersons);
             filePersons.flush();
             filePersons.close();
