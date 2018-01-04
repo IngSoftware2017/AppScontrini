@@ -335,14 +335,17 @@ public class OcrUtils {
      * Check if a string may be a number.
      * Removes spaces, 'S', 'O','o', '.', ',' before analysis.
      * If string is longer than maxlength default is Integer.MAX_VALUE (allowed numbers up to nn.nnn,nn)
+     * return is decreased if one '.' or ',' is present, increased if more than one are present.
      * @param s string to analyze
      * @return Integer.MAX_VALUE if less than 2/3 of the string are not numbers; number of non-digit chars (*0.5 if special (see above))/length
-	 * todo: reduce distance if one '.' is present (add if more than 1)
-     */
-    static double isPossibleNumber(String s) {
+	 */
+    static double isPossiblePriceNumber(String s) {
         int counter = 0;
         s = s.replaceAll(" ", "");
         int initialLength = s.length();
+        int reducedLength = 0;
+        if (s.contains(".") || s.contains(","))
+            ++reducedLength;
         int maxLength = 8; //Assume we can't have prices longer than 8 chars (so nn.nnn,nn)
         s = s.replaceAll(",", "").replaceAll("O", "") //sometimes '0' are recognized as 'O'
                 .replaceAll("o", "").replaceAll("\\.", "").replaceAll("S", ""); //sometimes '5' are recognized as 'S'
@@ -352,10 +355,11 @@ public class OcrUtils {
             if (Character.isDigit(s.charAt(i)))
                 ++counter;
         }
+        reducedLength += s.length();
         //return counter >= Math.round((double)s.length()*3/4);
         if (counter < Math.round((double)s.length()*2/3))
             return Integer.MAX_VALUE;
-        return ((initialLength - s.length())*0.5 + s.length() - counter)/s.length();
+        return ((initialLength - reducedLength)*0.5 + s.length() - counter)/reducedLength;
     }
 
     /**

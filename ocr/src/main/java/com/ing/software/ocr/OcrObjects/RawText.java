@@ -95,7 +95,7 @@ public class RawText implements Comparable<RawText>, Text {
      * Retrieves probability that date is present in current text
      * @return probability that date is present
      */
-    public int getDateProbability() {
+    public double getDateProbability() {
         int probability = 0;
         if (tags.contains(INTRODUCTION_TAG))
             probability = ProbGrid.dateBlockIntroduction[position];
@@ -111,15 +111,16 @@ public class RawText implements Comparable<RawText>, Text {
      * Retrieves probability that amount is present in current text
      * @return probability that amount is present
      */
-    public int getAmountProbability() {
-        int probability = 0;
+    public double getAmountProbability() {
+        double probability = 0;
         if (tags.contains(INTRODUCTION_TAG))
             probability = ProbGrid.amountBlockIntroduction[position];
         else if (tags.contains(PRODUCTS_TAG) || tags.contains(PRICES_TAG))
             probability = ProbGrid.amountBlockProducts[position];
         else if (tags.contains(CONCLUSION_TAG))
             probability = ProbGrid.amountBlockConclusion[position];
-        log(8,"RawText.getAmountProb", "Amount Probability is " + probability);
+        log(8,"RawText.getAmountProb", "Amount Probability from grid is " + probability);
+        probability += ProbGrid.getAmountProbRectHeight(this);
         return probability;
     }
 

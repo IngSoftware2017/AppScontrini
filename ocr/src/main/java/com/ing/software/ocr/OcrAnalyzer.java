@@ -69,8 +69,9 @@ class OcrAnalyzer {
         OcrUtils.log(1, "DETECTOR: ", "EXECUTION TIME: "+ duration + " seconds");
         long startTime2 = System.nanoTime();
         List<RawText> rawOrigTexts = orderBlocks(mainImage, tempArray);
-        mainImage.setRects(rawOrigTexts);
+        mainImage.setRects(rawOrigTexts); //save rect configuration in rawimage
         OcrSchemer.prepareScheme(rawOrigTexts);
+        mainImage.textFitter(); //save configuration from prepareScheme in rawimage
         listEverything(rawOrigTexts);
         List<RawStringResult> valuedTexts = new ArrayList<>();
         for (String amountString : AMOUNT_STRINGS) {
@@ -81,7 +82,7 @@ class OcrAnalyzer {
         long endTime2 = System.nanoTime();
         double duration2 = ((double) (endTime2 - startTime2)) / 1000000000;
         OcrUtils.log(1, "OCR ANALYZER: ", "EXECUTION TIME: "+ duration2 + " seconds");
-        return new OcrResult(valuedTexts, dateList, getProductPrices(rawOrigTexts));
+        return new OcrResult(valuedTexts, dateList, mainImage);
     }
 
     /**
@@ -231,12 +232,12 @@ class OcrAnalyzer {
         else if (IS_DEBUG_ENABLED){
             log(4,"OcrAnalyzer", "Final list: " + results.size());
             for (RawStringResult rawStringResult : results) {
-                List<RawText> textList = rawStringResult.getDetectedTexts();
+                List<RawGridResult> textList = rawStringResult.getDetectedTexts();
                 if (textList == null)
                     log(3,"OcrAnalyzer.SCSE", "Value not found.");
                 else {
-                    for (RawText rawText : textList) {
-                        log(4,"OcrAnalyzer.SCSE", "Value: " + rawText.getValue());
+                    for (RawGridResult rawText : textList) {
+                        log(4,"OcrAnalyzer.SCSE", "Value: " + rawText.getText().getValue());
                         log(4,"OcrAnalyzer.SCSE", "Source: " + rawStringResult.getSourceText().getValue());
                     }
                 }
@@ -268,6 +269,7 @@ class OcrAnalyzer {
      * @param texts list of texts. Not null.
      * @return list of texts on right side of receipt
      */
+    @Deprecated
     private static List<RawText> getProductPrices(@NonNull List<RawText> texts) {
         //blocks = OcrSchemer.findBlocksOnLeft(blocks);
         texts = OcrSchemer.findTextsOnRight(texts);

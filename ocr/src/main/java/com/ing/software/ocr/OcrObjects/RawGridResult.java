@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 
 public class RawGridResult implements Comparable<RawGridResult>{
 
-    private int percentage;
+    private double percentage;
     private RawText singleText;
 
     /**
@@ -19,7 +19,7 @@ public class RawGridResult implements Comparable<RawGridResult>{
      * @param singleText source text
      * @param percentage percentage corresponding to this text
      */
-    public RawGridResult(RawText singleText, int percentage) {
+    public RawGridResult(RawText singleText, double percentage) {
         this.percentage = percentage;
         this.singleText = singleText;
     }
@@ -27,7 +27,7 @@ public class RawGridResult implements Comparable<RawGridResult>{
     /**
      * @return percentage of this rawText
      */
-    public int getPercentage() {
+    public double getPercentage() {
         return percentage;
     }
 
@@ -40,7 +40,7 @@ public class RawGridResult implements Comparable<RawGridResult>{
 
     @Override
     public int compareTo(@NonNull RawGridResult rawGridResult) {
-        return  rawGridResult.getPercentage() - getPercentage();
+        return (int) (rawGridResult.getPercentage() - getPercentage());
     }
 
     @Override

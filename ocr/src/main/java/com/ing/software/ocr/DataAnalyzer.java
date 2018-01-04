@@ -28,7 +28,6 @@ import java.text.ParseException;
 /**
  * Class used to extract informations from raw data
  * todo: fallback, if no amount is present try to decode a possible pricelist
- * todo: remove rectangle-probability and use block-specific-probability
  */
 class DataAnalyzer {
 
@@ -48,10 +47,10 @@ class DataAnalyzer {
             //Ignore text with invalid distance (-1) according to findSubstring() documentation
             if (stringResult.getDistanceFromTarget() > -1) {
                 RawText sourceText = stringResult.getSourceText();
-                int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
+                double singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
                 if (stringResult.getDetectedTexts() != null) {
                     //Here we order texts according to their distance (position) from source rect
-                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getDetectedTexts(), stringResult.getSourceText().getBoundingBox());
+                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getTargetTexts(), stringResult.getSourceText().getBoundingBox());
                     for (RawText rawText : orderedDetectedTexts) {
                         if (!rawText.equals(sourceText)) {
                             possibleResults.add(new RawGridResult(rawText, singleCatch));
@@ -84,7 +83,7 @@ class DataAnalyzer {
      */
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
-        if (OcrUtils.isPossibleNumber(amountString) < NUMBER_MIN_VALUE) {
+        if (OcrUtils.isPossiblePriceNumber(amountString) < NUMBER_MIN_VALUE) {
             try {
                 String decoded = deepAnalyzeAmountChars(amountString);
                 if (!decoded.equals(""))
@@ -522,7 +521,7 @@ class DataAnalyzer {
             //Ignore text with invalid distance (-1) according to findDate() documentation
             int distanceFromDate = findDate(gridResult.getText().getValue());
             if (distanceFromDate > -1) {
-                int singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
+                double singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
                 possibleResults.add(new RawGridResult(gridResult.getText(), singleCatch));
             } else {
                 OcrUtils.log(5, "getPossibleDate", "Ignoring text: " + gridResult.getText().getValue());

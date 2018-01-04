@@ -108,7 +108,8 @@ public class OcrManager {
         Ticket ticket = new Ticket();
         OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
-        List<RawText> prices = OcrSchemer.getPricesTexts(result.getProducts());
+        List<RawText> prices = result.getRawImage().getPossiblePrices();
+        //First level, if we have a string for "total" we try to decode a value on the same height and if necessary fix it
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
         ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
         long endTime = System.nanoTime();
@@ -208,6 +209,10 @@ public class OcrManager {
                 return null;
             }
         };
-        return new RawText((Line)text, source.getRawImage());
+        return new RawText(text, source.getRawImage());
+    }
+
+    private static List<RawGridResult> analyzeAlternativeAmount(List<RawText> texts) {
+        return null;
     }
 }

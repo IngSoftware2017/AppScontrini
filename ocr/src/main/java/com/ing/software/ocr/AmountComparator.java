@@ -239,7 +239,7 @@ class AmountComparator {
         //Search for first parsable product price
         while (productsSum == null && index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
             String productPrice = possiblePrices.get(index).getText().getValue();
-            if (OcrUtils.isPossibleNumber(productPrice) < NUMBER_MIN_VALUE)
+            if (OcrUtils.isPossiblePriceNumber(productPrice) < NUMBER_MIN_VALUE)
                 productsSum = analyzeAmount(productPrice);
             ++index;
         }
@@ -249,7 +249,7 @@ class AmountComparator {
             OcrUtils.log(3, "analyzePrices", "List of prices, no value found");
         while (index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
             String productPrice = possiblePrices.get(index).getText().getValue();
-            if (OcrUtils.isPossibleNumber(productPrice) < NUMBER_MIN_VALUE) {
+            if (OcrUtils.isPossiblePriceNumber(productPrice) < NUMBER_MIN_VALUE) {
                 BigDecimal adder = analyzeAmount(productPrice);
                 if (adder != null) {
                     productsSum = productsSum.add(adder);
@@ -328,7 +328,7 @@ class AmountComparator {
             if (possiblePrices.get(index).getPercentage() < 0) {//must be below total
                 if (OcrSchemer.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
                     String possibleCash = possiblePrices.get(index).getText().getValue();
-                    if (OcrUtils.isPossibleNumber(possibleCash) < NUMBER_MIN_VALUE) {
+                    if (OcrUtils.isPossiblePriceNumber(possibleCash) < NUMBER_MIN_VALUE) {
                         cash = analyzeAmount(possibleCash);
                         cashText = possiblePrices.get(index).getText();
                     }
@@ -342,7 +342,7 @@ class AmountComparator {
                 //change must be below cash, here i use the same method as above, but parsing cash as rawtext
                 if (OcrSchemer.isPossibleCash(cashText, possiblePrices.get(index).getText())) {
                     String possibleChange = possiblePrices.get(index).getText().getValue();
-                    if (OcrUtils.isPossibleNumber(possibleChange) < NUMBER_MIN_VALUE)
+                    if (OcrUtils.isPossiblePriceNumber(possibleChange) < NUMBER_MIN_VALUE)
                         change = analyzeAmount(possibleChange);
                 }
                 ++index;
