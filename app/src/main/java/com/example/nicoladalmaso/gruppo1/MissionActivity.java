@@ -44,6 +44,7 @@ public class MissionActivity extends AppCompatActivity {
     final int MISSION_MOD = 1;
     final int PERSON_MOD = 2;
 
+
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +99,7 @@ public class MissionActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case (R.id.action_deletePerson):
-                //TODO:DELETE THE PERSON
+                deletePerson();
                 break;
 
             case (R.id.action_editPerson):
@@ -187,5 +188,44 @@ public class MissionActivity extends AppCompatActivity {
             noMissions.setVisibility(View.INVISIBLE);
         }
 
+    }
+
+    /**
+     * Mantovan Federico
+     *
+     * Delete the person and the missions\tickets associated with it
+     */
+    public void deletePerson(){
+        AlertDialog.Builder toast = new AlertDialog.Builder(MissionActivity.this);
+        //Dialog
+        toast.setMessage(context.getString(R.string.delete_person))
+                .setTitle(context.getString(R.string.delete_title_person));
+        //Positive button
+        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                List<MissionEntity> listMission = DB.getMissionsForPerson(personID);
+                for(int i = 0; i < listMission.size(); i++){
+                    List<TicketEntity> listTicket = DB.getTicketsForMission((int) listMission.get(i).getID());
+                    for(int j = 0; j < listTicket.size(); j++){
+                        DB.deleteTicket((int) listTicket.get(j).getID());
+                    }
+                }
+                DB.deleteMission(personID);
+                DB.deletePerson(personID);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        //Negative button
+        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Nothing to do
+            }
+        });
+        //Show toast
+        AlertDialog alert = toast.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 }
