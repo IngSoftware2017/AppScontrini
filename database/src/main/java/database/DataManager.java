@@ -13,22 +13,12 @@ import java.util.List;
  */
 
 public class DataManager {
-    private static DataManager dataManager;
     private Database database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 
     public DataManager(Context context){
         //receives the instance of the database
         database = Database.getAppDatabase(context);
-    }
-
-    public static DataManager getInstance(Context context){
-        if(dataManager ==null){
-            dataManager = new DataManager(context);
-            return dataManager;
-        }else{
-            return dataManager;
-        }
     }
 
     /** Adds a ticketEntity into the database
