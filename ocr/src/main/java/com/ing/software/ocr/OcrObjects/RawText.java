@@ -9,11 +9,11 @@ import android.support.annotation.Size;
 
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.Line;
+import com.google.android.gms.vision.text.Element;
 import com.ing.software.ocr.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
@@ -33,6 +33,7 @@ public class RawText implements Comparable<RawText>, Text {
     private List<String> tags = new ArrayList<>();
     private int position;
     private Line line;
+    private Element word;
 
     /**
      * Constructor
@@ -40,7 +41,11 @@ public class RawText implements Comparable<RawText>, Text {
      * @param line current Text inside TextBlock. Not null.
      * @param rawImage source image. Not null.
      */
-    public RawText(@NonNull Line line, @NonNull RawImage rawImage) {
+    public RawText(@NonNull Text line, @NonNull RawImage rawImage) {
+        if (line instanceof Line)
+            this.line = (Line)line;
+        else if (line instanceof Element)
+            this.word = (Element)line;
         rectText = line.getBoundingBox();
         detection = line.getValue();
         this.rawImage = rawImage;
@@ -185,6 +190,9 @@ public class RawText implements Comparable<RawText>, Text {
 
     @Override
     public List<? extends Text> getComponents() {
-        return line.getComponents();
+        if (line != null)
+            return line.getComponents();
+        else
+            return word.getComponents();
     }
 }

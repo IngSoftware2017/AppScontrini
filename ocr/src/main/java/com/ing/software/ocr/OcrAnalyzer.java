@@ -8,7 +8,7 @@ import android.support.annotation.Size;
 import android.util.SparseArray;
 
 import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Line;
+import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.ing.software.ocr.OcrObjects.*;
@@ -69,7 +69,7 @@ class OcrAnalyzer {
         OcrUtils.log(1, "DETECTOR: ", "EXECUTION TIME: "+ duration + " seconds");
         long startTime2 = System.nanoTime();
         List<RawText> rawOrigTexts = orderBlocks(mainImage, tempArray);
-        mainImage.setExtendedRect(rawOrigTexts);
+        mainImage.setRects(rawOrigTexts);
         OcrSchemer.prepareScheme(rawOrigTexts);
         listEverything(rawOrigTexts);
         List<RawStringResult> valuedTexts = new ArrayList<>();
@@ -135,7 +135,7 @@ class OcrAnalyzer {
         log(3,"OcrAnalyzer.analyzeST:" , "New Blocks ordered");
         List<RawText> rawTexts = new ArrayList<>();
         for (TextBlock textBlock : newOrderedTextBlocks) {
-            for (Line currentText : (List<Line>)textBlock.getComponents()) {
+            for (Text currentText : textBlock.getComponents()) {
                 rawTexts.add(new RawText(currentText, photo));
             }
         }

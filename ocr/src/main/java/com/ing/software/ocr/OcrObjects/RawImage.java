@@ -18,6 +18,7 @@ public class RawImage {
     private int height;
     private int width;
     private Rect extendedRect;
+    private double averageRectHeight;
 
     /**
      * Constructor, initializes variables
@@ -36,11 +37,24 @@ public class RawImage {
         return width;
     }
 
-    public void setExtendedRect(List<RawText> texts) {
+    public void setRects(List<RawText> texts) {
         extendedRect = OcrUtils.getMaxRectBorders(texts);
+        averageRectHeight = checkAverageHeight(texts);
     }
 
     public Rect getExtendedRect() {
         return extendedRect;
+    }
+
+    public double getAverageRectHeight() {
+        return averageRectHeight;
+    }
+
+    private double checkAverageHeight(List<RawText> texts) {
+        double average = 0;
+        for (RawText text : texts) {
+            average += text.getBoundingBox().height();
+        }
+        return average/texts.size();
     }
 }

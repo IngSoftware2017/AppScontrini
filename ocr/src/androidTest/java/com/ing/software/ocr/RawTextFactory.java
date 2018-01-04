@@ -46,7 +46,7 @@ public class RawTextFactory {
         }
     };
     RawImage rawImage = new RawImage(image);
-    return new RawText((Line)text, rawImage);
+    return new RawText(text, rawImage);
     }
 
     public static RawText getRawText(final String value, final Rect rect) {
