@@ -29,7 +29,8 @@
                 android:hint="@string/name"
                 android:textColor="#FFF"
                 android:textSize="23dp"
-                android:layout_marginBottom="15dp"/>
+                android:layout_marginBottom="15dp"
+                android:singleLine="true"/>
 
         </android.support.design.widget.TextInputLayout>
 

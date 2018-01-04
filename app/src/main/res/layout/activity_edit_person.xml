@@ -95,7 +95,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/input_personAcademicTitle"
-                        android:hint="Titolo accademico" />
+                        android:hint="Titolo accademico"
+                        android:singleLine="true"/>
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>

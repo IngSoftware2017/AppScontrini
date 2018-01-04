@@ -37,4 +37,6 @@
     <string name="toast_missionNoLocation">Luogo missione mancante</string>
     <string name="toast_personNoLastName">Cognome persona mancante</string>
     <string name="toast_errorDate">La data di fine precede \n quella di inizio</string>
+    <!--Piccolo-->
+    <string name="text_isRepaid">La missione è stata archiviata?</string>
 </resources>

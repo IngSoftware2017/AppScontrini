@@ -67,7 +67,7 @@ public class EditPerson extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_addMission:
+            case R.id.action_editPerson:
                 //TODO set the right intent
                 thisPerson.setName(txtName.getText().toString());
                 thisPerson.setLastName(txtLastName.getText().toString());
@@ -93,6 +93,7 @@ public class EditPerson extends AppCompatActivity{
         personID = (int) intent.getExtras().getLong("personID");
         Log.d("personID", "Edit person "+personID);
         thisPerson = DB.getPerson(personID);
+        //TODO: fix the crash
         personName=thisPerson.getName();
         personLastName=thisPerson.getLastName();
         personAcademicTitle=thisPerson.getAcademicTitle();

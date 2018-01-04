@@ -122,6 +122,7 @@ public class AddNewMission extends AppCompatActivity{
                 miss.setName(name);
                 miss.setPersonID(personID);
                 miss.setLocation(location);
+                miss.setRepay(false);
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
