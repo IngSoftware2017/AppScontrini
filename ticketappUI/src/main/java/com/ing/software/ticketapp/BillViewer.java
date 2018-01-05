@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -107,9 +108,14 @@ public class BillViewer extends AppCompatActivity {
 
         //Full image view
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
-        imgView.setImageBitmap(bitmap);
+        //BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        //Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
+        //imgView.setImageBitmap(bitmap);
+        Glide
+                .with(context)
+                .load(ticketPath)
+                .thumbnail(0.1f)
+                .into(imgView);
     }
 
     /** Dal Maso

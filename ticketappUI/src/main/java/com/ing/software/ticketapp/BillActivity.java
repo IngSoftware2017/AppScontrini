@@ -343,6 +343,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
+                    if(bitmapPhoto!=null) {
+                        bitmapPhoto.recycle();
+                        bitmapPhoto=null;
+                    }
                     deleteTempFiles();
                     waitDB();
                     clearAllImages();

@@ -47,7 +47,7 @@ public class MissionsOpen extends Fragment {
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
+                Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                 addMission.putExtra("person", personID);
                 Log.d("PersonID", ""+personID);
                 startActivityForResult(addMission, 1);
