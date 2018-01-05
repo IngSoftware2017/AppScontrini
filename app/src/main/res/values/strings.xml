@@ -17,11 +17,11 @@
     <string name="total">Totale</string>
     <string name="date">Data</string>
     <string name="location">Luogo</string>
-    <string name="noMissions">Nessuna missione aperta Clicca sul pulsante + per iniziare</string>
+    <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + per iniziare</string>
     <string name="noMissionsClosed">Nessuna missione chiusa</string>
     <string name="noBills">Nessun scontrino disponibile</string>
     <string name="noBillsOpen">\nClicca sul pulsante + per iniziare</string>
-
+    <string name="noAcademicTitle">Nessun titolo accademico</string>
     <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + per iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
