@@ -17,11 +17,14 @@
     <string name="total">Totale</string>
     <string name="date">Data</string>
     <string name="location">Luogo</string>
-    <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + iniziare</string>
+    <string name="noMissionsClosed">Nessuna missione chiusa</string>
     <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
     <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
+    <string name="Open">Aperte</string>
+    <string name="Closed">Chiuse</string>
     <!--lazzarin-->
     <string name="newMission">Nuova missione</string>
     <string name="newPerson">Nuova persona</string>
@@ -51,5 +54,5 @@
     <!--Mantovan-->
     <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
-    </resources>
+</resources>
 

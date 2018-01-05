@@ -87,7 +87,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 missionID = Integer.parseInt(v.getTag().toString());
                 Intent startTicketsView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startTicketsView.putExtra("missionID", missionID);
-                ((MissionActivity)context).startActivityForResult(startTicketsView, 1);
+                ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);
             }
         });
 
