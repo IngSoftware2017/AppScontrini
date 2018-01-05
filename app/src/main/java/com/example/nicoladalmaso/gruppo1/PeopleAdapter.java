@@ -45,10 +45,11 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.person_card, null);
         TextView name = (TextView)convertView.findViewById(R.id.personName);
-
+        TextView title=(TextView)convertView.findViewById(R.id.personTitle);
         PersonEntity person = getItem(position);
-        name.setText(person.getName() + " " + person.getLastName());
-        //TODO show the accademicTitle
+        name.setText(person.getLastName()+" "+person.getName());
+        title.setText(person.getAcademicTitle());
+
         convertView.setTag(person.getID());
 
         convertView.setOnClickListener(new View.OnClickListener(){

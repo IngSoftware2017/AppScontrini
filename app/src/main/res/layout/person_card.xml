@@ -9,7 +9,7 @@
     <android.support.v7.widget.CardView
         android:id="@+id/personCard"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="110dp"
         android:layout_marginBottom="0dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
@@ -49,11 +49,26 @@
                         android:id="@+id/personName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="1dp"
                         android:text="Text"
                         android:textColor="@color/cardview_dark_background"
                         android:textSize="20dp" />
-
+                    <TextView
+                        android:id="@+id/personTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="AcademicTitle"
+                        android:textColor="@color/cardview_dark_background"
+                        android:textSize="12dp" />
+                    <!--<TextView
+                        android:id="@+id/personEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="something@something.com"
+                        android:textColor="@color/cardview_dark_background"
+                        android:textSize="12dp" />-->
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>

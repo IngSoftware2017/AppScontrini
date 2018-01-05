@@ -162,6 +162,12 @@ public class BillActivity extends AppCompatActivity {
                 pickImageFromGallery();
             }
         });
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
     }
 
     /** Dal Maso
@@ -402,7 +408,7 @@ public class BillActivity extends AppCompatActivity {
             originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
-
+            //TODO: OCR HERE
             TicketEntity ticket = new TicketEntity();
             ticket.setDate(Calendar.getInstance().getTime());
             ticket.setFileUri(uri);
@@ -470,6 +476,10 @@ public class BillActivity extends AppCompatActivity {
         }
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
+        String noBillsError=getResources().getString(R.string.noBills);
+        if(!thisMission.isRepay())
+            noBillsError+=getResources().getString(R.string.noBillsOpen);
+        noBills.setText(noBillsError);
         if(count == 0){
             noBills.setVisibility(View.VISIBLE);
         }
@@ -489,4 +499,18 @@ public class BillActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
+
+    /**PICCOLO
+     * Method that is run when the activity is resumed.
+     * it hides the button for adding tickets if the mission is closed, else it shows it.
+     */
+    public void onResume(){
+        super.onResume();
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
+    }
 }
