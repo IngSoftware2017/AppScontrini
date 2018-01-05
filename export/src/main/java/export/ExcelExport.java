@@ -64,8 +64,6 @@ public class ExcelExport extends ExportManager {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String fileName = "export_" + sdf.format(timestamp)+".xlsx";
         file = new File(pathLocation, fileName);
-
-        workbook = new HSSFWorkbook();
     }
 
 
@@ -78,6 +76,8 @@ public class ExcelExport extends ExportManager {
      * @return boolean - if the exportation is ok
      */
     public boolean export(){
+
+        workbook = new HSSFWorkbook();
 
         writeTickets();
         writeMissions();

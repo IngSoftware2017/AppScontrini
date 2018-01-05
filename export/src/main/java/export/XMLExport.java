@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import database.DataManager;
-import database.Database;
 import database.MissionEntity;
 import database.PersonEntity;
 import database.TicketEntity;
@@ -30,7 +29,7 @@ import database.TicketEntity;
 
 public class XMLExport extends ExportManager {
 
-    private final String TAG = "EXCEL_EXPORT";
+    private final String TAG = "XML_EXPORT";
 
     //TablesEntity of db
     private List<TicketEntity> tickets;

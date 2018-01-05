@@ -22,6 +22,13 @@ public abstract class ExportManager {
     String pathLocation;
 
 
+    /**
+     * @author Marco Olivieri
+     *
+     * Costructor
+     * @param database, DataManager - the instance of AppScontrini db
+     * @param pathLocation, String - path directory to save exportation files
+     */
     public ExportManager(DataManager database, String pathLocation) {
         this.database = database;
         this.pathLocation = pathLocation;
