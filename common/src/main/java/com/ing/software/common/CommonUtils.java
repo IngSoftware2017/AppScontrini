@@ -1,6 +1,7 @@
 package com.ing.software.common;
 
 import android.graphics.*;
+import android.support.annotation.NonNull;
 import android.util.SizeF;
 
 import com.annimon.stream.Stream;
@@ -22,9 +23,19 @@ public class CommonUtils {
      * @param pt2 point 2
      * @return distance
      */
-    public static double dist(PointF pt1, PointF pt2) {
+    public static double dist(@NonNull PointF pt1, @NonNull PointF pt2) {
         double xDiff = pt1.x - pt2.x, yDiff = pt1.y - pt2.y;
         return sqrt(xDiff * xDiff + yDiff * yDiff);
+    }
+
+    /**
+     * Calculate "num" mod "den".
+     * @param num any number
+     * @param den >= 0
+     * @return modulus
+     */
+    public static int mod(int num, int den) {
+        return num < 0 ? (num % den + den) % den : num % den;
     }
 
     /**
@@ -32,7 +43,7 @@ public class CommonUtils {
      * @param pts List of Point
      * @return List of PointF
      */
-    public static List<PointF> ptsToPtsF(List<Point> pts) {
+    public static List<PointF> ptsToPtsF(@NonNull List<Point> pts) {
         return Stream.of(pts).map(PointF::new).toList();
     }
 
@@ -41,7 +52,8 @@ public class CommonUtils {
      * @param rect RectF
      * @return List of PointF
      */
-    public static List<PointF> rectToPts(RectF rect) {
+    @NonNull
+    public static List<PointF> rectToPts(@NonNull RectF rect) {
         return asList(
                 new PointF(rect.left, rect.top),
                 new PointF(rect.left, rect.bottom),
@@ -50,11 +62,23 @@ public class CommonUtils {
         );
     }
 
-    public static SizeF size(Bitmap bm) {
+    /**
+     * Get size of a Bitmap
+     * @param bm bitmap. Not null.
+     * @return Size
+     */
+    @NonNull
+    public static SizeF size(@NonNull Bitmap bm) {
         return new SizeF(bm.getWidth(), bm.getHeight());
     }
 
-    public static SizeF size(RectF rect) {
+    /**
+     * Get size of a rectangle
+     * @param rect RectF. Not null.
+     * @return Size
+     */
+    @NonNull
+    public static SizeF size(@NonNull RectF rect) {
         return new SizeF(rect.width(), rect.height());
     }
 }

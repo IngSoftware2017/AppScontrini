@@ -50,7 +50,7 @@ public class WordMatcher {
 
     /**
      * Compile a regular expression (supports only square bracket operator and no escaping).
-     * This algorithm does not catch any error in the regex, it's out of its scope.
+     * This algorithm does not catch any error in the regex, it's beyond of its scope.
      * @param regex regular expression
      * @return compiled list structure
      * @author Riccardo Zaglia

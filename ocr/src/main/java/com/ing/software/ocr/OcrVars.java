@@ -56,7 +56,7 @@ class OcrVars {
 
     static final List<WordMatcher> AMOUNT_MATCHERS = asList(
             new WordMatcher("T[OUD]TALE", 6, 1),
-            new WordMatcher("TOT", 4, 0),
+            new WordMatcher("TOT", 3, 0),
             new WordMatcher("T[OUD]TALEE[UI]R[OD]", 8, 3),
             new WordMatcher("IMP[OU]RT[OD]", 7, 1),
             new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 8, 3)

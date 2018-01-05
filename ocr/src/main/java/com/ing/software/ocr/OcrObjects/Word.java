@@ -48,7 +48,7 @@ public class Word {
             String res = elem.getValue();
             for (Pair<String, String> p : NUM_SANITIZE_LIST)
                 res = res.replace(p.first, p.second);
-            return res;
+            return/*textSanitizedNum*/ res;
         });
     }
 

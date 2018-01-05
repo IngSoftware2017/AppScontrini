@@ -3,7 +3,6 @@ package com.ing.software.ocr;
 import android.graphics.*;
 import android.support.annotation.NonNull;
 import android.util.Pair;
-import android.util.SizeF;
 
 import com.annimon.stream.Stream;
 import com.ing.software.common.*;
@@ -25,7 +24,9 @@ import static org.opencv.core.CvType.*;
 import static org.opencv.imgproc.Imgproc.*;
 import static com.annimon.stream.Stream.*;
 import static java.lang.Math.*;
+import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static com.ing.software.common.CommonUtils.*;
 
 /**
  * Class used to process an image of a ticket.
@@ -95,8 +96,13 @@ public class ImageProcessor {
     private static final int THR_WIN_SZ = 75; // window size. must be odd
     private static final int THR_OFFSET = 1; //
 
-    //Hough lines
+    //Accumulator for Hough lines
     private static final int SECTORS = 101; // accumulator resolution, should be odd
+    private static final int MAX_SECTOR_DIST = SECTORS / 5;
+    private static final double MAX_SCORE_SECTOR_OUTLIERS_MUL = 0.5;
+    private static final int MIN_LINES = 5;
+
+    //Hough lines
     private static final double DIST_RES = 1; // rho, resolution in hough space
     private static final double ANGLE_RES = PI / SECTORS; // theta, resolution in hough space
     private static final int HOUGH_THRESH = 50; // threshold
@@ -327,14 +333,14 @@ public class ImageProcessor {
 
     /**
      * Get size of a rectangle in perspective.
-     * @param perspRect ordered corners of a rectangle in perspective. Not null.
+     * @param perspRect MatOfPoints of a rectangle in perspective. Should contain exactly 4 rows. Not null.
      * @return Size in pixels proportional to the real ticket.
      */
     @NonNull
-    private static Size getRectSizeSimple(List<Point> perspRect) {
+    private static Size rectSizeSimple(MatOfPoint2f perspRect) {
         double width = 1, height = 1; // non 0 initial values (should be overwritten)
-        if (perspRect.size() == 4) {
-            List<MatOfPoint> pts = Stream.of(perspRect).map(MatOfPoint::new).toList();
+        if (perspRect.rows() == 4) {
+            List<Mat> pts =  range(0, 4).map(perspRect::row).toList();
             // The width is calculated summing the distance between the two upper and two lower corners
             // then dividing by two to get the average.
             // Similarly the height is calculated using the distance between the leftmost
@@ -363,20 +369,66 @@ public class ImageProcessor {
     /**
      * Find predominant angle of Hough lines using an accumulator.
      * @param lines MatOfInt4 containing the hough lines. Not null.
-     * @return predominant angle in degrees.
+     * @return predominant angle in degrees [-90, 90].
      */
-    private static double predominantAngle(MatOfInt4 lines) {
+    //I do not calculate an average of the angles in the chosen sector,
+    // so if the ticket is already upright, undistort() will not create unnecessary aliasing
+    private static double predominantAngle(MatOfInt4 lines, Ref<Boolean> reliable) {
         double[] accumulator = new double[SECTORS];
         for (int i = 0; i < lines.rows(); i++) {
             double[] line = lines.get(i, 0);
             double xDiff = line[0] - line[2], yDiff = line[1] - line[3];
-            double angle = atan(yDiff / xDiff);
             double length = sqrt(xDiff * xDiff + yDiff * yDiff);
-            accumulator[min((int)((angle + PI / 2) * SECTORS / PI), SECTORS - 1)] += length;
+            int sector = (int)((atan(yDiff / xDiff) + PI / 2.) * SECTORS / PI);
+            // to mitigate aliasing, contribute also to sector + 1 and sector - 1.
+            accumulator[mod(sector + 1, SECTORS)] += length * 0.99;
+            accumulator[mod(sector - 1, SECTORS)] += length * 0.99;
+            //graphical algorithm explanation (these are sectors, the number is the score):
+            // ... | 0 | 5 | 0 | ... | 0 | 2 | 3 | 0 | ...
+            //          VVV                 VVV
+            // ... | 5-| 5 | 5-| ... | 2-| 5-| 5-| 3-| ...
+            //          win
+
+            // ... | 0 | 5 | 0 | ... | 0 | 3 | 3 | 0 | ...
+            //          VVV                 VVV
+            // ... | 5-| 5 | 5-| ... | 3-| 6-| 6-| 3-| ...
+            //                            win win
         }
 
-        return ((double)max(range(0, SECTORS).map(i -> new Scored<>(accumulator[i], i)).toList()).obj()
-                + 0.5) * 180. / SECTORS - 90.;
+        // 4 means: (1 -> best angle) + (2 -> adjacent to best) + (1 -> outlier to be found)
+        Podium<Scored<Integer>> accPodium = new Podium<>(4);
+        accPodium.tryAddAll(range(0, SECTORS).map(i -> new Scored<>(accumulator[i], i)).toList());
+        List<Scored<Integer>> bestSects = accPodium.getAll();
+        Scored<Integer> bestSect = bestSects.get(0);
+
+        //angle is reliable if all outlier sectors are of score < best score * MAX_SCORE_SECTOR_OUTLIERS_MUL.
+        // if there were <= MIN_LINES lines, angle is not reliable.
+        reliable.value = lines.rows() > MIN_LINES && Stream.of(bestSects).reduce(true, (reliab, sect) -> {
+            if (reliab && sect.getScore() > 0) {
+                int dist = min(abs(sect.obj() - bestSect.obj()), abs(sect.obj() - bestSect.obj() + SECTORS));
+                return/*reliable*/ !(dist > MAX_SECTOR_DIST // <- is outlier
+                        && sect.getScore() > bestSect.getScore() * MAX_SCORE_SECTOR_OUTLIERS_MUL);
+            }
+            return/*reliable*/ false;
+        });
+
+        //if there are no lines, assume the ticket is upright.
+        return lines.rows() > 0 ? ((double)bestSect.obj() + 0.5) * 180. / SECTORS - 90. : 0.;
+    }
+
+    /**
+     * Shift the points of a MatOfPoint2f in order to make a selected point the new first point.
+     * @param pts MatOfPoint2f
+     * @param newFirstIdx selected index of the point to make first.
+     * @return MatOfPoint2f with shifted points
+     */
+    @NonNull
+    private static MatOfPoint2f shiftMatPoints(MatOfPoint2f pts, int newFirstIdx) {
+        //NB: sublist creates a view, not a copy.
+        List<Point> newVerts = new ArrayList<>(pts.toList()); // MatOfPoint2f.toList() is immutable
+        newVerts.addAll(newVerts.subList(0, newFirstIdx));
+        newVerts.subList(0, newFirstIdx).clear();
+        return ptsToMat(newVerts);
     }
 
     /**
@@ -400,11 +452,7 @@ public class ImageProcessor {
                 new Scored<>(p.x + p.y, i)).toList()).obj();
 
         //shift verts by topLeftIdx
-        //NB: sublist creates a view, not a copy.
-        List<Point> newVerts = new ArrayList<>(srcRect.toList()); // Mat.toList() is immutable
-        newVerts.addAll(newVerts.subList(0, topLeftIdx));
-        newVerts.subList(0, topLeftIdx).clear();
-        return ptsToMat(newVerts);
+        return shiftMatPoints(srcRect, topLeftIdx);
     }
 
     /**
@@ -454,7 +502,7 @@ public class ImageProcessor {
     private static Mat undistort(Mat img, MatOfPoint2f corners, double marginMul) {
         Mat dstImg = new Mat();
         if (corners.rows() == 4) { // at this point "corners" should have always 4 points.
-            Size sz = getRectSizeSimple(corners.toList());
+            Size sz = rectSizeSimple(corners);
             double m = marginMul * min(sz.width, sz.height);
 
             MatOfPoint2f dstRect = new MatOfPoint2f( // counter-clockwise
@@ -479,6 +527,10 @@ public class ImageProcessor {
 
     //PACKAGE PRIVATE:
 
+    /**
+     * Undistort with a margin suitable for OCR.
+     * @return
+     */
     synchronized Bitmap undistortForOCR() {
         if (quickCorners || corners == null || resized == null)
             if (findTicket(false).contains(TicketError.INVALID_STATE))
@@ -499,7 +551,8 @@ public class ImageProcessor {
      */
     synchronized Bitmap undistortedSubregion(RectF region, double newAspectRatio) {
         if (undistorted == null)
-            undistortForOCR();
+            if (undistortForOCR() == null)
+                return null;
         double stretchMul = newAspectRatio / (region.width() / region.height());
         Size newSize = stretchMul > 1 ? new Size(region.width() * stretchMul, region.height())
                 : new Size(region.width(), region.height() / stretchMul);
@@ -568,22 +621,25 @@ public class ImageProcessor {
 
         List<Scored<Pair<MatOfPoint2f, Double>>> candidates = new ArrayList<>();
         for (Scored<MatOfPoint> ctrPair : findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS)) {
-            double angle = 0;
-
             MatOfPoint2f rect = findPolySimple(ctrPair.obj());
-            if (!quick) {
-                // find Hough lines of ticket text
-                graySwap.first = edges.clone();
-                removeBackground(graySwap, ctrPair.obj());
-                angle = predominantAngle(houghLines(graySwap));
+            // find Hough lines of ticket text
+            graySwap.first = edges.clone();
+            removeBackground(graySwap, ctrPair.obj());
+            Ref<Boolean> isAngleReliableRef = new Ref<>();
+            double angle = predominantAngle(houghLines(graySwap), isAngleReliableRef);
 
-                if (rect.rows() == 4)// fix orientation of already found rectangle
-                    rect = orderRectCorners(rect, angle, resized.size());
-                else { // find rotated bounding box of contour
-                    rect = rotatedBoundingBox(ctrPair.obj(), angle, resized.size());
-                }
-                //todo use RANSAC to find undistort transform matrix
+            if (rect.rows() == 4)// fix orientation of already found rectangle
+                rect = orderRectCorners(rect, angle, resized.size());
+            else { // find rotated bounding box of contour
+                rect = rotatedBoundingBox(ctrPair.obj(), angle, resized.size());
             }
+            // if angle is not reliable, correct orientation as width < height (make ticket vertical).
+            if (!isAngleReliableRef.value) {
+                Size size = rectSizeSimple(rect);
+                if (size.width > size.height)
+                    rect = shiftMatPoints(rect, 3); //last idx -> first idx
+            }
+            //todo use RANSAC to find undistort transform matrix
             candidates.add(new Scored<>(0., new Pair<>(rect, angle)));
         }
         //todo assign score and use Collections.max
@@ -596,7 +652,7 @@ public class ImageProcessor {
         List<TicketError> errors = new ArrayList<>();
         if (corners.size() != 4)
             errors.add(TicketError.RECT_NOT_FOUND);
-        if (winner.second < -60 || winner.second > 60)
+        if (abs(winner.second) > 60.)
             errors.add(TicketError.CROOKED_TICKET);
         return errors;
     }
@@ -675,18 +731,18 @@ public class ImageProcessor {
 
     /**
      * Apply perspective transform to a collection of points.
-     * @param srcPoints Points to be transformed.
+     * @param points Points to be transformed.
      * @param srcRect Reference rectangle.
      * @param dstRect Distorted reference rectangle.
      * @return Output distorted points. Empty if error.
      */
     public static List<PointF> transform(
-            List<PointF> srcPoints,
+            List<PointF> points,
             List<PointF> srcRect,
             List<PointF> dstRect) {
         if (srcRect.size() != 4 || dstRect.size() != 4)
             return new ArrayList<>();
-        MatOfPoint2f pts = ptsToMat(androidPtsToCV(srcPoints));
+        MatOfPoint2f pts = ptsToMat(androidPtsToCV(points));
         MatOfPoint2f rect1 = ptsToMat(androidPtsToCV(srcRect));
         MatOfPoint2f rect2 = ptsToMat(androidPtsToCV(dstRect));
         MatOfPoint2f dstPts = new MatOfPoint2f();

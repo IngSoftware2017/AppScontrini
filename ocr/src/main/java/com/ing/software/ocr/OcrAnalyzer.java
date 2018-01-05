@@ -438,6 +438,10 @@ public class OcrAnalyzer {
         return dateStrings;
     }
 
+    private static Date findDate(List<TextLine> lines) {
+        return null; // stub
+    }
+
     /**
      * Extract a Ticket from an ImageProcessor loaded with a bitmap.
      * @param imgProc ImagePreprocessor with at least an image assigned (corners can be set manually).
@@ -453,7 +457,7 @@ public class OcrAnalyzer {
 
         Bitmap bm = imgProc.undistortForOCR();
         if (bm == null) {
-            ticket.errors.add(TicketError.INVALID_STATE);
+            ticket.errors.add(TicketError.INVALID_PROCESSOR);
             return ticket;
         }
         List<TextLine> lines = bitmapToLines(bm, ocrEngine);
@@ -469,7 +473,7 @@ public class OcrAnalyzer {
         if (ticket.amount == null)
             ticket.errors.add(TicketError.AMOUNT_NOT_FOUND);
 
-        ticket.date = null;          //todo find date
+        ticket.date = findDate(lines);
         if (ticket.date == null)
             ticket.errors.add(TicketError.DATE_NOT_FOUND);
 
