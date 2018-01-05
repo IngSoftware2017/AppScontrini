@@ -52,6 +52,7 @@ public class OcrUtils {
      * @param photo original photo. Not null.
      * @return array of int where int[0] = left border, int[1] = top border, int[2] = right border, int[3] = bottom border
      */
+    @Deprecated
     static int[] getRectBorders(@NonNull List<TextBlock> orderedTextBlocks, @NonNull RawImage photo) {
         int numberOfBorders = 4; //it's a rect
         int[] borders = new int[numberOfBorders];
@@ -120,9 +121,8 @@ public class OcrUtils {
                 int diffLefts = block1.getBoundingBox().left - block2.getBoundingBox().left;
                 int diffBottoms = block1.getBoundingBox().bottom - block2.getBoundingBox().bottom;
                 int diffRights = block1.getBoundingBox().right - block2.getBoundingBox().right;
-                if (diffTops != 0) {
+                if (diffTops != 0)
                     return diffTops;
-                }
                 else if (diffLefts != 0)
                     return diffLefts;
                 else if (diffBottoms != 0)
@@ -136,6 +136,7 @@ public class OcrUtils {
 
     /**
      * @author Michelon
+     * @date 18-12-2017
      * Order a list of rawText following its distance (of its center) from the center of another rect.
      * Order is based only on y coordinate.
      * @param rawTexts original list. Not null.
@@ -152,10 +153,8 @@ public class OcrUtils {
                 float diff1 = Math.abs(center1 - centerPoint);
                 float diff2 = Math.abs(center2 - centerPoint);
                 if (Math.round(diff1 - diff2) == 0) {
-                    if (Math.round(center1 - center2) == 0)
-						return -1; //same center
-					else //return the one on top
-						return Math.round(center1 - center2);
+                    //same distance from center, return one on top
+                    return Math.round(center1 - center2);
 				}
                 return Math.round(diff1 - diff2);
             }
@@ -227,6 +226,9 @@ public class OcrUtils {
     /**
      * @author Salvagno
      * Returns the distance of Levenshtein between two strings | S | e | T |.
+     * The Levenshtein distance is a string metric for measuring the difference between two sequences.
+     * Informally, the Levenshtein distance between two words is the minimum number of single-character
+     * edits (insertions, deletions or substitutions) required to change one word into the other.
      * The distance is an integer between 0 and the maximum length of the two strings.
      * If only one string is null then return -1
      *
@@ -273,6 +275,7 @@ public class OcrUtils {
             return -1;
         int minDistance = substring.length();
         int subLength = minDistance;
+
         /*
         //Splits the string into tokens
         String[] pack = text.split("\\s");
@@ -285,6 +288,7 @@ public class OcrUtils {
 
         }
         */
+
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
         //If the text is smaller than the searched string, invert the strings
@@ -294,6 +298,7 @@ public class OcrUtils {
             text_w_o_space = substring;
             substring = temp_text;
         }
+
         //Search a piece of string as long as the length of the searched string in the text
         int start=0;
         for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
@@ -301,55 +306,27 @@ public class OcrUtils {
             int distanceNow = levDistance(token.toUpperCase(), substring.toUpperCase());
             if (distanceNow < minDistance)
                 minDistance = distanceNow;
+            //Lucky case
+            if(distanceNow == 0)
+                break;
             start++;
             }
+
         return minDistance;
-    }
-
-    /**
-     * @author Michelon
-     * Extends width of rect according to percentage
-     * @param originalRect rect containing amount
-     * @param percentage   percentage of the width of the rect to extend. Int >0
-     * @return extended rect
-     */
-    static RectF partialExtendWidthRect(RectF originalRect, int percentage) {
-        float width = originalRect.width();
-        float left = originalRect.left - (width * percentage / 200);
-        if (left <0)
-            left = 0;
-        float right = originalRect.right + (width * percentage / 200);
-        return new RectF(left, originalRect.top, right, originalRect.bottom);
-    }
-
-    /**
-     * @author Michelon
-     * Extends height of rect according to percentage
-     * @param originalRect rect containing amount
-     * @param percentage   percentage of the height of the rect to extend. Int >0
-     * @return extended rect
-     */
-    static RectF partialExtendHeightRect(RectF originalRect, int percentage) {
-        float height = originalRect.height();
-        float top = originalRect.top - (height * percentage / 200);
-        if (top < 0)
-            top = 0;
-        float bottom = originalRect.bottom + (height * percentage / 200);
-        return new RectF(originalRect.left, top, originalRect.right, bottom);
     }
 
     /**
      * @author Michelon
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
      * Note: Min value for top and left is 0
-     * todo: revise method to include both height and width extension (with different values to replace also the two above
      * @param rect source rect. Not null
-     * @param percent chosen percentage. Int >= 0
+     * @param percentHeight chosen percentage for height. Int >= 0
+     * @param percentWidth chosen percentage for width. Int >= 0
      * @return new extended rectangle
      */
-    static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
-        float extendedHeight = rect.height()*percent/100;
-        float extendedWidth = rect.width()*percent/100;
+    static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percentHeight, @IntRange(from = 0) int percentWidth) {
+        float extendedHeight = rect.height()*percentHeight/100;
+        float extendedWidth = rect.width()*percentWidth/100;
         float left = rect.left - extendedWidth/2;
         if (left<0)
             left = 0;
@@ -364,19 +341,25 @@ public class OcrUtils {
 
     /**
      * @author Michelon
-     * @date 9-12-17
-     * Check if a string may be a number. Removes spaces, 's', 'S', '.' before analysis.
+     * @date 26-12-17
+     * Check if a string may be a number.
+     * Removes spaces, 'S', '.', ',' before analysis.
+     * If string is longer than maxlength default is false (allowed numbers up to nn.nnn,nn)
      * @param s string to analyze
-     * @return true if more than half (included) of the chars in the string are numbers
+     * @return true if more than 3/4 (rounded) of the chars in the string are numbers
      */
     static boolean isPossibleNumber(String s) {
         int counter = 0;
-        s = s.replaceAll(" ", "").replaceAll("\\.", "")
-                .replaceAll("S", ""); //sometimes '5' are recognized as 'S'
+        int maxLength = 8; //Assume we can't have prices longer than 8 chars (so nn.nnn,nn)
+        s = s.replaceAll(",", "").replaceAll(" ", "")
+                .replaceAll("\\.", "").replaceAll("S", ""); //sometimes '5' are recognized as 'S'
+        if (s.length() >= maxLength)
+            return false;
         for (int i = 0; i < s.length(); ++i) {
             if (Character.isDigit(s.charAt(i)))
                 ++counter;
         }
-        return counter >= s.length()/2;
+        return counter >= Math.round((double)s.length()*3/4);
     }
+
 }

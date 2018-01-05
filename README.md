@@ -1,7 +1,16 @@
-| Gruppo2  | Gruppo2_dev | Gruppo2-modular | K_main | K_gruppo2 | K_gruppo2-modular |
-| ------------- | ------------- | ------------- | -------------| ------------- | ------------- |
-| [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/IngSoftware2017/AppScontrini)  | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_dev)](https://travis-ci.org/IngSoftware2017/AppScontrini)  | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=K_main)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/Kraktun/AppScontrini) |
+| Gruppo2_master  | Gruppo2-modular | Gruppo2-modular-complete | K_gruppo2-modular | K_gruppo2-modular-complete |
+| ------------- | ------------- | ------------- | -------------| ------------- |
+| [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2_master)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/IngSoftware2017/AppScontrini.svg?branch=gruppo2-modular-complete)](https://travis-ci.org/IngSoftware2017/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular)](https://travis-ci.org/Kraktun/AppScontrini) | [![Build Status](https://travis-ci.org/Kraktun/AppScontrini.svg?branch=gruppo2-modular-complete)](https://travis-ci.org/Kraktun/AppScontrini) |
 
+| IngSoftware2017  |  Kraktun  |
+| ------------- | ------------- |
+| [![GitHub release](https://img.shields.io/github/release/IngSoftware2017/AppScontrini.svg?)](https://github.com/IngSoftware2017/AppScontrini/releases/latest) | [![GitHub release](https://img.shields.io/github/release/Kraktun/AppScontrini.svg?)](https://github.com/Kraktun/AppScontrini/releases/latest) |      
+| [![Github All Releases](https://img.shields.io/github/downloads/IngSoftware2017/AppScontrini/total.svg?)](https://github.com/IngSoftware2017/AppScontrini/releases) | [![Github All Releases](https://img.shields.io/github/downloads/Kraktun/AppScontrini/total.svg?)](https://github.com/Kraktun/AppScontrini/releases) |      
+| [![GitHub pull requests](https://img.shields.io/github/issues-pr/IngSoftware2017/AppScontrini.svg)](https://github.com/IngSoftware2017/AppScontrini/pulls) | [![GitHub pull requests](https://img.shields.io/github/issues-pr/Kraktun/AppScontrini.svg)](https://github.com/Kraktun/AppScontrini/pulls) |    
+| [![GitHub issues](https://img.shields.io/github/issues/IngSoftware2017/AppScontrini.svg)](https://github.com/IngSoftware2017/AppScontrini/issues) | [![GitHub issues](https://img.shields.io/github/issues/Kraktun/AppScontrini.svg)](https://github.com/Kraktun/AppScontrini/issues) |     
+
+
+ 
  
 ## BRANCH DI TEST
 « Per me si va ne la città dolente,  

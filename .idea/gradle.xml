@@ -9,9 +9,11 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/database" />
             <option value="$PROJECT_DIR$/ocr" />
             <option value="$PROJECT_DIR$/ocrtestapp" />
             <option value="$PROJECT_DIR$/opencvtestapp" />
+            <option value="$PROJECT_DIR$/ticketappUI" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

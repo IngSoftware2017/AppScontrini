@@ -1,12 +1,17 @@
 package com.ing.software.ocr;
 
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
@@ -17,13 +22,16 @@ import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
 
+import java.text.ParseException;
+
+
 
 /**
  * Class used to extract informations from raw data
  * todo: fallback, if no amount is present try to decode a possible pricelist
  * todo: remove rectangle-probability and use block-specific-probability
  */
-public class DataAnalyzer {
+class DataAnalyzer {
 
     /**
      * @author Michelon
@@ -31,7 +39,7 @@ public class DataAnalyzer {
      * probability to contain the amount calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
      * If no amount was found in first result iterate through all results following previous order.
      * @param amountResults list of RawStringResult from amount search. Not null.
-     * @return BigDecimal containing the amount found. Null if nothing found
+     * @return List of ordered possible amounts as RawGridResults.
      */
     static List<RawGridResult> getPossibleAmounts(@NonNull List<RawStringResult> amountResults) {
         int distanceMultiplier = 15;
@@ -70,6 +78,7 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
+     * @date 23-12-17
      * Tries to find a BigDecimal from string
      * @param amountString string containing possible amount. Length > 0.
      * @return BigDecimal containing the amount, null if no number was found
@@ -78,16 +87,10 @@ public class DataAnalyzer {
         BigDecimal amount = null;
         if (OcrUtils.isPossibleNumber(amountString)) {
             try {
-                amount = new BigDecimal(amountString);
-            } catch (NumberFormatException e) {
-                try {
-                    String decoded = deepAnalyzeAmountChars(amountString);
-                    if (!decoded.equals(""))
-                        amount = new BigDecimal(decoded);
-                } catch (Exception e1) {
-                    amount = null;
-                }
-            } catch (Exception e2) {
+                String decoded = deepAnalyzeAmountChars(amountString);
+                if (!decoded.equals(""))
+                    amount = new BigDecimal(decoded);
+            } catch (Exception e1) {
                 amount = null;
             }
             if (amount != null)
@@ -393,6 +396,7 @@ public class DataAnalyzer {
         else
             //Returns the absolute value of the distance by subtracting the minimum character
             return Math.abs(minCharaterDate-minDistance);
+
     }
 
 
@@ -403,12 +407,15 @@ public class DataAnalyzer {
      * @param text The text to find the date
      * @return date or null if the date is not there
      */
-    static String getDate(String text) {
+    static Date getDate(String text) {
         if (text.length() == 0)
             return null;
 
+        Date date = null;
+
         //Possible date formats
         String[] formatDate = {"xx/xxxx/xx", "xxxx/xx/xx","xx/xx/xxxx", "xx-xxxx-xx", "xxxx-xx-xx","xx-xx-xxxx","xx.xxxx.xx","xxxx.xx.xx" ,"xx.xx.xxxx"};
+
 
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
@@ -456,10 +463,75 @@ public class DataAnalyzer {
         }
 
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
-        if(minDistance>=10)
-            return null;
-        else
-            return dataSearch;
+        if(dataSearch != null && minDistance<10)
+        {
+            String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy","MM/dd/yyyy","MM-dd-yyyy","MM.dd.yyyy"};
+            date = parseDate(dataSearch,expectedPattern);
 
+        }
+        return date;
+
+
+    }
+
+    /**
+     * @author Salvagno
+     *
+     * @param dateString An input date string.
+     * @param formats An array of date formats that we have allowed for.
+     * @return A Date (java.util.Date) reference. The reference will be null if
+     *         we could not match any of the known formats.
+     */
+    public static Date parseDate(String dateString, String[] formats)
+    {
+        Date date = null;
+        Locale locale = new Locale("US");
+
+        for (int i = 0; i < formats.length; i++)
+        {
+            String format = formats[i];
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format,locale);
+            try
+            {
+                // parse() will throw an exception if the given dateString doesn't match
+                // the current format
+                date = dateFormat.parse(dateString);
+                break;
+            }
+            catch(ParseException e)
+            {
+                // don't do anything. just let the loop continue.
+            }
+        }
+
+        return date;
+    }
+
+    /**
+     * @author Michelon
+     * Search through results from the research of date string and retrieves the text with highest
+     * probability to contain the date calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
+     * If no date was found in first result iterate through all results following previous order.
+     * @param dateResults list of RawGridResult from date search. Not null.
+     * @return List of possible dates ordered
+     */
+    static List<RawGridResult> getPossibleDates(@NonNull List<RawGridResult> dateResults) {
+        int distanceMultiplier = 15;
+        List<RawGridResult> possibleResults = new ArrayList<>();
+        Collections.sort(dateResults);
+        for (RawGridResult gridResult : dateResults) {
+            //Ignore text with invalid distance (-1) according to findDate() documentation
+            int distanceFromDate = findDate(gridResult.getText().getDetection());
+            if (distanceFromDate > -1) {
+                int singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
+                possibleResults.add(new RawGridResult(gridResult.getText(), singleCatch));
+            } else {
+                OcrUtils.log(3, "getPossibleDate", "Ignoring text: " + gridResult.getText().getDetection());
+            }
+        }
+        if (possibleResults.size() > 0) {
+            Collections.sort(possibleResults);
+        }
+        return possibleResults;
     }
 }

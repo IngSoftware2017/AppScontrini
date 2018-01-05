@@ -33,9 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 
 import static com.ing.software.ocrtestapp.StatusVars.*;
+import static com.ing.software.ocrtestapp.StatusVars.DATE_RECEIVED;
 
 /**
  * This class analyze all pics in folder 'sdcard/TestOCR' for now it does not handle errors
@@ -141,8 +143,8 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
             case STATUS_FINISHED:
                 //Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                 //        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
-                s = "\nRectangle: " + resultData.getString(RECTANGLE_RECEIVED) +
-                        "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
+                s = "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
+                        "\nDate is: " + resultData.getString(DATE_RECEIVED) +
                         "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds";
                 break;
             case STATUS_ERROR:
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
      */
     private String getDate() {
         Calendar cal = Calendar.getInstance();
-        return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(cal.getTime());
+        return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.US).format(cal.getTime());
     }
 
     /**

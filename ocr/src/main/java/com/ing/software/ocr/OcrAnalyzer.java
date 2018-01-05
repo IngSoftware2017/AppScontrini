@@ -86,7 +86,7 @@ class OcrAnalyzer {
         if (IS_DEBUG_ENABLED)
             for (RawText text : texts) {
                 OcrUtils.log(2, "FULL LIST: ", text.getDetection());
-                OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
+                //OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
             }
     }
 
@@ -189,7 +189,7 @@ class OcrAnalyzer {
             for (RawStringResult singleResult : results) {
                 RawText rawTextSource = singleResult.getSourceText();
                 log(4,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getDetection());
-                RectF newRect = OcrUtils.extendRect(OcrUtils.getExtendedRect(rawTextSource.getRect(), rawTextSource.getRawImage()), precision);
+                RectF newRect = OcrUtils.extendRect(OcrUtils.getExtendedRect(rawTextSource.getRect(), rawTextSource.getRawImage()), precision, precision);
                 if (rawText.isInside(newRect)) {
                     singleResult.addDetectedTexts(rawText);
                     log(3,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getDetection());

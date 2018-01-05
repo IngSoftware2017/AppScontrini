@@ -9,7 +9,9 @@ import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
+
 import com.annimon.stream.function.Consumer;
 
 import static com.ing.software.ocr.AmountComparator.*;
@@ -88,6 +90,7 @@ public class OcrManager {
         List<RawGridResult> dateList = result.getDateList();
         List<RawText> prices = OcrSchemer.getPricesTexts(result.getProducts());
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
+        ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
         return ticket;
     }
 
@@ -122,5 +125,23 @@ public class OcrManager {
             amount = amountComparator.getBestAmount();
         }
         return amount;
+    }
+
+    /**
+     * Extracts first not null date from list of ordered dates
+     * @param dateList list of ordered RawGridResults containing possible dates. Not null
+     * @return First possible date. Null if nothing found
+     */
+    private static Date getDateFromList(@NonNull List<RawGridResult> dateList) {
+        for (RawGridResult gridResult : dateList) {
+            String possibleDate = gridResult.getText().getDetection();
+            OcrUtils.log(2, "getDateFromList", "Possible date is: " + possibleDate);
+            Date evaluatedDate = DataAnalyzer.getDate(possibleDate);
+            if (evaluatedDate != null) {
+                OcrUtils.log(2, "getDateFromList", "Possible amount is: " + evaluatedDate.toString());
+                return evaluatedDate;
+            }
+        }
+        return null;
     }
 }

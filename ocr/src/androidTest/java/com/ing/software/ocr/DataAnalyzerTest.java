@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Can't test directly with the equivalent BigDecimal cause of approximation
@@ -46,11 +47,11 @@ public class DataAnalyzerTest {
     @Test
     public void analyzeAmountSingleCharLett() throws Exception {
         String amount = "5c";
-        BigDecimal expected = new BigDecimal(5).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal expected = null; //less than 3/4 of length
         Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
         method.setAccessible(true);
         BigDecimal result = (BigDecimal)method.invoke(null,amount);
-        assertEquals(0, expected.compareTo(result));
+        assertEquals(expected, result);
     }
 
     @Test
@@ -294,6 +295,16 @@ public class DataAnalyzerTest {
         method.setAccessible(true);
         String result = (String)method.invoke(null,amount);
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void deepAmount2NoPointMain() throws Exception {
+        String amount = "250";
+        BigDecimal expected = new BigDecimal("2.50");
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
+        method.setAccessible(true);
+        BigDecimal result = (BigDecimal) method.invoke(null,amount);
+        assertTrue(expected.compareTo(result) == 0);
     }
 
     @Test
