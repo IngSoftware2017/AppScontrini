@@ -68,6 +68,7 @@ public class BillActivity extends AppCompatActivity {
     public DataManager DB;
     OcrManager ocrManager;
     int sleep = 2000;
+    final int MISSION_MOD = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,9 +122,14 @@ public class BillActivity extends AppCompatActivity {
             case (R.id.action_deleteMission):
                 deleteMission();
                 break;
+
             case (R.id.action_editMission):
-                //TODO: modifica la missione
+                //Open EditMission Activity
+                Intent editMission = new Intent(context, com.example.nicoladalmaso.gruppo1.EditMission.class);
+                editMission.putExtra("missionID", missionID);
+                startActivityForResult(editMission, MISSION_MOD);
                 break;
+
             default:
                 setResult(RESULT_OK, intent);
                 finish();

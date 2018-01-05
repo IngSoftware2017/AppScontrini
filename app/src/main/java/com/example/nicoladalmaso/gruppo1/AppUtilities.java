@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -46,5 +47,22 @@ public class AppUtilities {
         return false;
     }
 
+    /**
+     * Sets the right date format
+     * @param input date to change format
+     * @return string date in format dd/mm/yyyy
+     *
+     * @author matteo.mascotto
+     */
+    public String dateToStandardFormat(Date input) {
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(input);
+
+        int year = calendar.get(calendar.YEAR);
+        int month = 1 + calendar.get(calendar.MONTH);
+        int day = calendar.get(calendar.DATE);
+
+        return day + "/" + month + "/" + year;
+    }
 }
