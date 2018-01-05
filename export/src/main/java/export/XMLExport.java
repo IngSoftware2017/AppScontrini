@@ -32,13 +32,6 @@ public class XMLExport extends ExportManager {
 
     private final String TAG = "EXCEL_EXPORT";
 
-    /*Header CSV file
-    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
-    private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
-    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE";
-    */
-
-
     //TablesEntity of db
     private List<TicketEntity> tickets;
     private List<MissionEntity> missions;
@@ -46,6 +39,7 @@ public class XMLExport extends ExportManager {
 
     private File file;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+    XmlSerializer serializer;
 
     /**
      * @author Marco Olivieri
@@ -67,22 +61,29 @@ public class XMLExport extends ExportManager {
     }
 
 
-
+    /**
+     * @author Marco Olivieri
+     *
+     * Implementation of the extended abstract class ExportManager
+     * Writes all tables entities in a XML file
+     * Than it creates the file
+     * @return boolean - if the exportation is ok
+     */
     public boolean export(){
 
         try{
             file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);
-            XmlSerializer serializer = Xml.newSerializer();
+            serializer = Xml.newSerializer();
             serializer.setOutput(fos, "UTF-8");
             serializer.startDocument(null, Boolean.valueOf(true));
 
             serializer.startTag(null,"Database");
             serializer.startTag(null,"Tables");
 
-            writeTickets(serializer);
-            writeMissions(serializer);
-            writePersons(serializer);
+            writeTickets();
+            writeMissions();
+            writePersons();
 
             serializer.endTag(null,"Tables");
             serializer.endTag(null,"Database");
@@ -104,10 +105,9 @@ public class XMLExport extends ExportManager {
      * @author Marco Olivieri
      *
      * Writes in xmlSerializer all the tickets
-     * @param serializer, XmlSerializer - where the tickets are wrote
      * @throws IOException
      */
-    private void writeTickets(XmlSerializer serializer) throws IOException {
+    private void writeTickets() throws IOException {
         try {
             serializer.startTag(null,"Ticket");
             for (int i=0; i<tickets.size();i++) {
@@ -168,16 +168,35 @@ public class XMLExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Writes in xmlSerializer all the tickets
-     * @param serializer, XmlSerializer - where the missions are wrote
+     * Writes in xmlSerializer all the missions
      * @throws IOException
      */
-    private void writeMissions(XmlSerializer serializer) throws IOException {
+    private void writeMissions() throws IOException {
         try {
             serializer.startTag(null,"Mission");
             for (int i=0; i<missions.size();i++) {
                 MissionEntity m = missions.get(i);
-
+                serializer.startTag(null, "Id");
+                serializer.text(String.valueOf(m.getID()));
+                serializer.endTag(null, "Id");
+                serializer.startTag(null, "Name");
+                serializer.text(m.getName());
+                serializer.endTag(null, "Name");
+                serializer.startTag(null, "StartDate");
+                serializer.text(String.valueOf(m.getStartDate()));
+                serializer.endTag(null, "StartDate");
+                serializer.startTag(null, "EndDate");
+                serializer.text(String.valueOf(m.getEndDate()));
+                serializer.endTag(null, "EndDate");
+                serializer.startTag(null, "Location");
+                serializer.text(m.getLocation());
+                serializer.endTag(null, "Location");
+                serializer.startTag(null, "Repaid");
+                serializer.text(String.valueOf(m.isRepay()));
+                serializer.endTag(null, "Repaid");
+                serializer.startTag(null, "PersonId");
+                serializer.text(String.valueOf(m.getPersonID()));
+                serializer.endTag(null, "PersonId");
             }
             serializer.endTag(null,"Mission");
 
@@ -186,6 +205,36 @@ public class XMLExport extends ExportManager {
         }
     }
 
-    private void writePersons(XmlSerializer serializer) throws IOException {}
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Writes in xmlSerializer all the persons
+     * @throws IOException
+     */
+    private void writePersons() throws IOException {
+        try {
+            serializer.startTag(null,"Person");
+            for (int i=0; i<persons.size();i++) {
+                PersonEntity p = persons.get(i);
+                serializer.startTag(null, "Id");
+                serializer.text(String.valueOf(p.getID()));
+                serializer.endTag(null, "Id");
+                serializer.startTag(null, "Name");
+                serializer.text(p.getName());
+                serializer.endTag(null, "Name");
+                serializer.startTag(null, "LastName");
+                serializer.text(p.getLastName());
+                serializer.endTag(null, "LastName");
+                serializer.startTag(null, "AcademicTitle");
+                serializer.text(p.getAcademicTitle());
+                serializer.endTag(null, "AcademicTitle");
+            }
+            serializer.endTag(null,"Person");
+
+        }catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
 
 }
