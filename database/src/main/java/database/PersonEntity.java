@@ -17,7 +17,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class PersonEntity {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = Constants.PERSON_PRIMARY_KEY_NAME)
+    @ColumnInfo(name = Constants.PERSON_PRIMARY_KEY)
     private long ID;
     private String name;
     private String lastName;

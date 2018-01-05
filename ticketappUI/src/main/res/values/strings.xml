@@ -8,8 +8,12 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="action_addMission">Aggiungi missione</string>
     <string name="action_editTicket">Modifica scontrino</string>
+    <string name="action_editMission">Modifica missione</string>
+    <string name="action_editPerson">Modifica persona</string>
     <string name="action_deleteMission">Elimina missione</string>
+    <string name="action_deletePerson">Elimina persona</string>
     <string name="billTitle">Il tuo scontrino</string>
+    <string name="add">Aggiungi</string>
     <string name="name">Nome</string>
     <string name="shop">Negozio</string>
     <string name="total">Totale</string>
@@ -37,8 +41,21 @@
     <string name="newPerson">Nuova persona</string>
     <string name="titlePeople">Persone</string>
     <string name="toast_missionNoName">Nome missione mancante</string>
-    <string name="toast_personNoName">Nome missione mancante</string>
-    <string name="toast_missionNoLocation">Nome persona mancante</string>
+    <string name="toast_personNoName">Nome persona mancante</string>
+    <string name="toast_missionNoLocation">Luogo missione mancante</string>
     <string name="toast_personNoLastName">Cognome persona mancante</string>
     <string name="no_amount">No amount found</string>
+    <string name="toast_errorDate">Inizio > Fine</string>
+    <string name="toast_noDataStart">Data di inizio mancante</string>
+    <string name="toast_noDataFinish">Data di fine mancante</string>
+    <string name="text_isRepaid">La missione è stata archiviata?</string>
+    <string name="title_activity_missions_tabbed">MissionsTabbed</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
+    <string name="delete_title_person">Cancellazione</string>
+
 </resources>

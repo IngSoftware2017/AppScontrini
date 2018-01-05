@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Locale;
 
 import database.DataManager;
+import database.MissionEntity;
 import database.TicketEntity;
 
 import static com.ing.software.ticketapp.StatusVars.*;
@@ -68,12 +69,16 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     public Uri photoURI;
     public boolean isFabOpen = false;
     static final int REQUEST_TAKE_PHOTO = 1;
-    public static final int PICK_PHOTO_FOR_AVATAR = 2;
+    static final int PICK_PHOTO_FOR_AVATAR = 2;
+    static final int TICKET_MOD = 4;
+    static final int MISSION_MOD = 5;
     String tempPhotoPath;
     Integer missionID;
     Context context;
     String root;
     public DataManager DB;
+    MissionEntity thisMission;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,10 +89,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         context = this.getApplicationContext();
         Intent intent = getIntent();
 
-        String missionName = intent.getExtras().getString("missionName");
         missionID = intent.getExtras().getInt("missionID");
+        thisMission = DB.getMission(missionID);
+        setTitle(thisMission.getName());
         context = this.getApplicationContext();
-        setTitle(missionName);
         initializeComponents();
         mReceiver.setReceiver(this);
         ocrManager = new OcrManager();
@@ -115,7 +120,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.deletemission_menu, menu);
+        inflater.inflate(R.menu.mission_menu, menu);
         return true;
     }
 
@@ -128,12 +133,18 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        Intent intent = new Intent();
         switch (item.getItemId()) {
             case R.id.action_deleteMission:
                 deleteMission();
                 break;
+            case (R.id.action_editMission):
+                //TODO: modifica la missione
+                Intent editMission = new Intent(context, EditMission.class);
+                editMission.putExtra("missionID", thisMission.getID());
+                startActivityForResult(editMission, MISSION_MOD);
+                break;
             default:
-                Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
@@ -145,7 +156,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
      *  Manage all animations and catch onclick events about FloatingActionButtons
      */
     public void initializeComponents(){
-        printAllImages();
+        printAllTickets();
         fab = (FloatingActionButton)findViewById(R.id.fab);
         fab1 = (FloatingActionButton)findViewById(R.id.fab1);
         fab2 = (FloatingActionButton)findViewById(R.id.fab2);
@@ -335,7 +346,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     deleteTempFiles();
                     waitDB();
                     clearAllImages();
-                    printAllImages();
+                    printAllTickets();
                     break;
 
                 //Dal Maso
@@ -347,7 +358,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                         savePickedFile(btm);
                         waitDB();
                         clearAllImages();
-                        printAllImages();
+                        printAllTickets();
                     }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
                     }
@@ -357,11 +368,21 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     waitDB();
                     clearAllImages();
-                    printAllImages();
+                    printAllTickets();
                     break;
-                case(4):
+                case (TICKET_MOD):
                     clearAllImages();
-                    printAllImages();
+                    printAllTickets();
+                    break;
+                case (MISSION_MOD):
+                    thisMission = DB.getMission(missionID);
+                    setTitle(thisMission.getName());
+                    clearAllImages();
+                    printAllTickets();
+                    break;
+                default:
+                    clearAllImages();
+                    printAllTickets();
                     break;
             }
         } else if (resultCode == REDO_OCR) {
@@ -464,7 +485,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     /** Dal Maso
      *  Print all tickets, get it from DB
      */
-    public void printAllImages(){
+    public void printAllTickets(){
         List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
         Log.d("Tickets", ticketList.toString());
         TicketEntity t;
@@ -523,7 +544,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     date = Calendar.getInstance().getTime();
                 DB.addTicket(new TicketEntity(uri, amount, null, date, null, missionID));
                 clearAllImages();
-                printAllImages();
+                printAllTickets();
                 break;
             case STATUS_ERROR:
                 /* Handle the error */

@@ -60,8 +60,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
-        FloatingActionButton fabDelete = (FloatingActionButton)convertView.findViewById(R.id.btnDelete);
-        //FloatingActionButton fabCrop = (FloatingActionButton)convertView.findViewById(R.id.btnCrop);
 
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
@@ -84,54 +82,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
         img.setImageBitmap(bitmap);
 
-        //For next ticket manages
-        fabDelete.setTag(c.getID());
         convertView.setTag(c.getID());
-
-        //Dal Maso, delete ticket
-        fabDelete.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                ticketID =  Integer.parseInt(v.getTag().toString());
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(context.getString(R.string.deleteTicketToast))
-                        .setTitle(context.getString(R.string.deleteTitle));
-                TicketEntity thisTicket = DB.getTicket(ticketID);
-                String toDelete = "";
-                //Get the ticket to delete
-                toDelete = thisTicket.getFileUri().toString().substring(7);
-                final File ticketDelete = new File(toDelete);
-                // Add the buttons
-                builder.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if(DB.deleteTicket(ticketID) && ticketDelete.delete()){
-                            Log.d("ELIMINATO", "OK");
-                            ((BillActivity)context).clearAllImages();
-                            ((BillActivity)context).printAllImages();
-                        }
-                    }
-                });
-                builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //Nothing
-                    }
-                });
-                AlertDialog alert = builder.show();
-                Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
-                nbutton.setTextColor(Color.parseColor("#2196F3"));
-            }
-        });
-
-        /*
-        //PICCOLO
-        fabCrop.setTag(position);
-        fabCrop.setOnClickListener(new View.OnClickListener(){
-            public void onClick (View v){
-                ticketID = Integer.parseInt(v.getTag().toString());
-                cropFile(ticketID);
-            }
-        });
-        */
 
         //Dal Maso
         convertView.setOnClickListener(new View.OnClickListener(){
@@ -155,19 +106,4 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         });
         return convertView;
     }
-
-    /**PICCOLO_Edit by Dal Maso
-     * Method that lets the user crop the photo
-     * @param toCrop the index of the photo to resize
-     */
-    public void cropFile(int toCrop){
-        Log.d("Crop", "Start crop activity");
-        boolean result = false;
-        TicketEntity ticket = DB.getTicket(toCrop);
-        Uri toCropUri = ticket.getFileUri();
-        CropImage.activity(toCropUri)
-                .setOutputUri(toCropUri)
-                .start(((BillActivity)context));
-    }
-
 }

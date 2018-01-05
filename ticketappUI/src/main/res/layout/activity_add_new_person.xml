@@ -29,6 +29,7 @@
 
             <EditText
                 android:id="@+id/input_personName"
+                android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
@@ -49,6 +50,7 @@
 
             <EditText
                 android:id="@+id/input_personLastName"
+                android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Cognome"
@@ -95,6 +97,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/input_personAcademicTitle"
+                        android:singleLine="true"
                         android:hint="Titolo accademico" />
                 </android.support.design.widget.TextInputLayout>
 

@@ -1,7 +1,11 @@
 package com.ing.software.ticketapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,29 +24,34 @@ import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
+import database.TicketEntity;
 
 public class MissionActivity extends AppCompatActivity {
 
     public DataManager DB;
     int personID;
+    PersonEntity thisPerson;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
+    Context context;
+    final int MISSION_MOD = 1;
+    final int PERSON_MOD = 2;
 
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DB = new DataManager(this.getApplicationContext());
-        setContentView(R.layout.activity_mission);
+        context = getApplicationContext();
 
         Intent intent = getIntent();
-
         personID = intent.getExtras().getInt("personID");
-        String personName = intent.getExtras().getString("personName");
-        setTitle(personName);
+        thisPerson = DB.getPerson(personID);
 
-        Log.d("PersonID", ""+personID);
+        setContentView(R.layout.activity_mission);
+        //TODO set the title right using string.xml(like personName+" 's missions")
+        setTitle(thisPerson.getName());
 
-        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -51,7 +61,7 @@ public class MissionActivity extends AppCompatActivity {
                 startActivityForResult(addMission, 1);
             }
         });
-        printAllMissionsDB();
+        printAllMissions();
     }
     /** Dal Maso
      * Setting toolbar delete button and style from /res/menu
@@ -61,7 +71,7 @@ public class MissionActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.deletemission_menu, menu);
+        inflater.inflate(R.menu.person_menu, menu);
         return true;
     }
 
@@ -74,19 +84,20 @@ public class MissionActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        Intent intent = new Intent();
         switch (item.getItemId()) {
-            case (R.id.action_deleteMission):
-                //TODO: cancella la persona
-                //deletePerson();
+            case (R.id.action_deletePerson):
+                deletePerson();
                 break;
 
-            case(1):
-                clearAllMissions();
-                printAllMissionsDB();
+            case (R.id.action_editPerson):
+                //Open Edit Person Activity
+                Intent editPerson = new Intent(context, EditPerson.class);
+                editPerson.putExtra("personID", personID);
+                startActivityForResult(editPerson,PERSON_MOD);
                 break;
 
             default:
-                Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
@@ -106,7 +117,20 @@ public class MissionActivity extends AppCompatActivity {
         Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
+                case (MISSION_MOD):
+                    clearAllMissions();
+                    printAllMissions();
+                    break;
 
+                case (PERSON_MOD):
+                    thisPerson = DB.getPerson(personID);
+                    setTitle(thisPerson.getName());
+                    break;
+
+                default:
+                    clearAllMissions();
+                    printAllMissions();
+                    break;
             }
         }
     }
@@ -137,23 +161,58 @@ public class MissionActivity extends AppCompatActivity {
     /** Dal Maso
      * get all missions from the DB and print
      */
-    public void printAllMissionsDB(){
-        List<MissionEntity> missions = DB.getAllMission();
+    public void printAllMissions(){
+        List<MissionEntity> missions = DB.getMissionsForPerson(personID);
         TextView noMissions = (TextView)findViewById(R.id.noMissions);
-        int count = 0;
         for (int i = 0; i < missions.size(); i++)
         {
-            if(missions.get(i).getPersonID() == personID) {
-                addToListDB(missions.get(i));
-                count++;
-            }
+            addToListDB(missions.get(i));
         }
-        if(count == 0){
+        if(missions.size() == 0){
             noMissions.setVisibility(View.VISIBLE);
         }
         else{
             noMissions.setVisibility(View.INVISIBLE);
         }
 
+    }
+
+    /**
+     * Mantovan Federico
+     *
+     * Delete the person and the missions\tickets associated with it
+     */
+    public void deletePerson(){
+        AlertDialog.Builder toast = new AlertDialog.Builder(MissionActivity.this);
+        //Dialog
+        toast.setMessage(context.getString(R.string.delete_person))
+                .setTitle(context.getString(R.string.delete_title_person));
+        //Positive button
+        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                List<MissionEntity> listMission = DB.getMissionsForPerson(personID);
+                for(int i = 0; i < listMission.size(); i++){
+                    List<TicketEntity> listTicket = DB.getTicketsForMission((int) listMission.get(i).getID());
+                    for(int j = 0; j < listTicket.size(); j++){
+                        DB.deleteTicket((int) listTicket.get(j).getID());
+                    }
+                }
+                DB.deleteMission(personID);
+                DB.deletePerson(personID);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        //Negative button
+        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Nothing to do
+            }
+        });
+        //Show toast
+        AlertDialog alert = toast.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 }

@@ -33,10 +33,10 @@ public class AddNewMission extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
+        setTitle(getString(R.string.newMission));
+        setContentView(R.layout.activity_add_new_mission);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        setTitle(context.getString(R.string.newMission));
-        setContentView(R.layout.activity_add_new_mission);
         Intent intent = getIntent();
         personID = intent.getExtras().getInt("person");
         Log.d("PersonIDAddMission", ""+personID);
@@ -51,14 +51,14 @@ public class AddNewMission extends AppCompatActivity{
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
-                newFragment.show(getFragmentManager(), "datePicker");
+                newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
-                newFragment.show(getFragmentManager(), "datePicker");
+                newFragment.show(getFragmentManager(), "finishDatePicker");
             }
         });
     }
@@ -71,7 +71,7 @@ public class AddNewMission extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addmission_menu, menu);
+        inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
 
@@ -86,20 +86,30 @@ public class AddNewMission extends AppCompatActivity{
         // Handle item selection
         Intent intent = new Intent();
         switch (item.getItemId()) {
-            case R.id.action_addMission:
+            case R.id.action_confirm:
                 //read input text
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
                 EditText editLocation = (EditText)findViewById(R.id.input_missionLocation);
                 String name = editName.getText().toString();
                 String location = editLocation.getText().toString();
+                String startDate=(String) missionStart.getText();
+                String finishDate=(String) missionFinish.getText();
+                Log.d("marsadenadata",startDate);
 
-                if((name == null) || name.replaceAll(" ","").equals("") || (location==null) || location.replaceAll(" ","").equals("")) {
-                    String errors="";
-                    if ((name == null) || name.replaceAll(" ","").equals(""))
-                        errors+=getResources().getString(R.string.toast_missionNoName)+"\n" ;
-                    if((location==null) || location.replaceAll(" ","").equals(""))
-                        errors+=getResources().getString(R.string.toast_missionNoLocation)+"\n";
-                    Toast.makeText(context,errors, Toast.LENGTH_SHORT).show();
+                if ((name == null) || name.replaceAll(" ","").equals("")) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_missionNoName), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((location==null) || location.replaceAll(" ","").equals("")) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_missionNoLocation), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((startDate==null) ||startDate.equals(getResources().getString(R.string.dateStart))) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_noDataStart), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((finishDate==null) || finishDate.equals(getResources().getString(R.string.dateFinish))) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_noDataFinish), Toast.LENGTH_SHORT).show();
                     return false;
                 }
 
@@ -107,11 +117,26 @@ public class AddNewMission extends AppCompatActivity{
                 miss.setName(name);
                 miss.setPersonID(personID);
                 miss.setLocation(location);
+                miss.setRepay(false);
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
-                    miss.setStartMission(format.parse((String)missionStart.getText()));
-                    miss.setEndMission(format.parse((String)missionFinish.getText()));
+
+                    String start=AppUtilities.addMonth(startDate);
+
+                    String finish=AppUtilities.addMonth(finishDate);
+                    if(!AppUtilities.checkDate(start,finish)) {
+                        Log.d("formato data inserita", "errato");
+                        Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    else
+                        Log.d("formato data inserita","corretto");
+
+
+
+                    miss.setStartDate(format.parse(start));
+                    miss.setEndDate(format.parse(finish));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

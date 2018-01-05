@@ -23,7 +23,7 @@ public final class Converters {
 
     /**
      * Converts from a timestamp to a Date object
-     * @param Long value the timestamp
+     * @param value the timestamp
      * @return the corresponding Date object, null if value is null
      */
     @TypeConverter
@@ -33,7 +33,7 @@ public final class Converters {
 
     /**
      * Converts from Date to the corresponding timestamp
-     * @param Date date, the Date object to be converted
+     * @param date, the Date object to be converted
      * @return the corresponding timestamp, null if date is null
      */
     @TypeConverter
@@ -43,7 +43,7 @@ public final class Converters {
 
     /**
      * Converts from a double to a BigDecimal object
-     * @param Double value the value to be converted
+     * @param value the value to be converted
      * @return the corresponding BigDecimal, null if value is null
      */
     @TypeConverter
@@ -53,7 +53,7 @@ public final class Converters {
 
     /**
      * Converts from BigDecimal to double
-     * @param BigDecimal value to be converted
+     * @param value to be converted
     * @return Double with the correspondent value, null if value is null
      */
     @TypeConverter
@@ -63,7 +63,7 @@ public final class Converters {
 
     /**
     * Converts from Uri to String
-    * @param Uri uri to be converted
+    * @param uri to be converted
     * @return String with the Uri path, null if Uri is null
     */
     @TypeConverter
@@ -74,7 +74,7 @@ public final class Converters {
 
     /**
     * Converts from String to Uri
-    * @param String path to be converted
+    * @param path to be converted
     * @return Uri with the given path, null if path is null
     */
     @TypeConverter
@@ -85,7 +85,7 @@ public final class Converters {
     /**
      * @author Marco Olivieri
      * Converts from a List<String> to a String for db
-     * @param List<String> list of category
+     * @param list of category
      * @return the corresponding String object, null if value is null
      */
     @TypeConverter
@@ -104,7 +104,7 @@ public final class Converters {
     /**
      * @author Marco Olivieri
      * Converts from a String to List<String>
-     * @param String value of categories separeted from ;
+     * @param value of categories separeted from ;
      * @return the corresponding List<String> object, null if value is null
      */
     @TypeConverter

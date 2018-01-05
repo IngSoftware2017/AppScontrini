@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import database.MissionEntity;
 
@@ -18,7 +20,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
     Context context;
     String path = "";
-    int pos = 0;
+    int missionID = 0;
     List<MissionEntity> missions;
 
     public MissionAdapterDB(Context context, int textViewResourceId,
@@ -42,7 +44,17 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         title.setText(c.getName());
         location.setText(c.getLocation());
         convertView.setTag(c.getID());
-        Log.d("Mission", ""+c.getStartMission());
+        Log.d("MissionStartBadFormat", ""+c.getStartDate());
+        //Lazzarin :blocco per convertire in formato più leggibile la data
+        Date start=c.getStartDate();
+        SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
+        String startDate=tr.format(start);
+        Date finish=c.getEndDate();
+        String finishDate=tr.format(finish);
+        Log.d("missionStart", startDate);
+        Log.d("missionEnd",finishDate);
+
+
 
         //Dal Maso
         //Sets a default background color for the mission's card
@@ -63,23 +75,11 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                pos = Integer.parseInt(v.getTag().toString());
-                //path = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-                //File directory = new File(path);
-                //File[] files = directory.listFiles();
-                Intent startMissionView = new Intent(context, BillActivity.class);
-                //Variables.getInstance().setCurrentMissionDir(files[pos].getPath());
-                String name = "";
-                for(int i = 0; i < missions.size(); i++){
-                    if(missions.get(i).getID() == pos){
-                        name = missions.get(i).getName();
-                    }
-                }
-                Log.d("MissionName", name);
-                startMissionView.putExtra("missionName", name);
-                startMissionView.putExtra("missionID", pos);
-                ((MissionActivity)context).startActivityForResult(startMissionView, 1);
-            }//onClick
+                missionID = Integer.parseInt(v.getTag().toString());
+                Intent startTicketsView = new Intent(context, BillActivity.class);
+                startTicketsView.putExtra("missionID", missionID);
+                ((MissionActivity)context).startActivityForResult(startTicketsView, 1);
+            }
         });
 
         return convertView;
