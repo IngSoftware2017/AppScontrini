@@ -45,7 +45,7 @@ public class ExcelExport extends ExportManager {
 
     private File file;
     HSSFWorkbook workbook; //Excel document
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH.mm.ss");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
 
     /**
      * @author Marco Olivieri
@@ -62,7 +62,7 @@ public class ExcelExport extends ExportManager {
         persons = database.getAllPerson();
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String fileName = "export" + sdf.format(timestamp);
+        String fileName = "export_" + sdf.format(timestamp)+".xlsx";
         file = new File(pathLocation, fileName);
 
         workbook = new HSSFWorkbook();

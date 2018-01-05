@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //ExportManager e = new CSVExport(DB,context.getExternalFilesDir(null));
                 //ExportManager e = new CSVExport(DB,getFilesDir().getAbsolutePath());
-                ExportManager e = new CSVExport(DB,Environment.getExternalStorageDirectory() + "/ExportDB");
+                ExportManager e = new CSVExport(DB,Environment.getExternalStorageDirectory().getPath() + "/ExportDB");
                 boolean export = e.export();
             }
         });
