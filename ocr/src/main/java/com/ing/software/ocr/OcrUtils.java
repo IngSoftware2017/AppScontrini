@@ -87,7 +87,7 @@ public class OcrUtils {
      * @param photo original photo. Not null.
      * @return preferred ratio defined in ProbGrid, -1 if something went wrong
      */
-     public static String getPreferredGrid(@NonNull Bitmap photo) {
+    public static String getPreferredGrid(@NonNull Bitmap photo) {
         double width = photo.getWidth();
         double heigth = photo.getHeight();
         String preferredRatio = "-1";
@@ -153,10 +153,10 @@ public class OcrUtils {
                 float diff2 = Math.abs(center2 - centerPoint);
                 if (Math.round(diff1 - diff2) == 0) {
                     if (Math.round(center1 - center2) == 0)
-						return -1; //same center
-					else //return the one on top
-						return Math.round(center1 - center2);
-				}
+                        return -1; //same center
+                    else //return the one on top
+                        return Math.round(center1 - center2);
+                }
                 return Math.round(diff1 - diff2);
             }
         });
@@ -343,7 +343,7 @@ public class OcrUtils {
             if(distanceNow == 0)
                 break;
             start++;
-            }
+        }
 
         return minDistance;
     }

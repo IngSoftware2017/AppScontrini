@@ -4,28 +4,35 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.Size;
+import android.util.Pair;
+import android.util.SizeF;
 import android.util.SparseArray;
-
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.android.gms.vision.text.*;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.regex.Matcher;
+
+import com.ing.software.common.*;
 import com.ing.software.ocr.OcrObjects.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import static com.ing.software.common.CommonUtils.size;
+import static java.util.Collections.*;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
+import static java.lang.Math.*;
 
 /**
  * Class containing different methods to analyze a picture
  * @author Michelon
  * @author Zaglia
  */
-class OcrAnalyzer {
+public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
@@ -59,7 +66,7 @@ class OcrAnalyzer {
      * @param frame Bitmap used to create an OcrResult. Not null.
      * @return OcrResult containing raw data to be further analyzed.
      */
-    OcrResult analyze(@NonNull Bitmap frame){
+    OcrResult analyze(Bitmap frame){
         //cropping must be used somewhere else (if used with textRecognizer). Can be used here if using opencv
         //frame = getCroppedPhoto(frame, context);
         mainImage = new RawImage(frame);
@@ -296,5 +303,189 @@ class OcrAnalyzer {
         int top = borders[1];
         int bottom = borders[3];
         return OcrUtils.cropImage(photo, left, top, right, bottom);
+    }
+
+
+
+
+
+    // Extended rectangle vertical multiplier
+    private static final double EXT_RECT_V_MUL = 3;
+
+    /**
+     * This function runs the ocr detection on the given bitmap.
+     * @param bm input bitmap
+     * @param ocrEngine TextRecognizer
+     * @return list of TextLine
+     * @author Riccardo Zaglia
+     */
+    private static List<TextLine> bitmapToLines(Bitmap bm, TextRecognizer ocrEngine) {
+        SparseArray<TextBlock> blocks = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
+        List<TextLine> lines = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++)
+            for (Text txt : blocks.valueAt(i).getComponents())
+                lines.add(new TextLine((Line)txt));
+        return lines;
+    }
+
+    /**
+     * Choose the TextLine that most probably contains the amount string.
+     * Criteria: AMOUNT_MATCHER score; character size; higher in the photo
+     * @param lines list of TextLines. Can be empty
+     * @return TextLine with higher score. Can be null if no match is found.
+     * @author Riccardo Zaglia
+     */
+    // todo: find most meaningful way to combine score criteria.
+    private static TextLine findAmountString(List<TextLine> lines, SizeF bmSize) {
+        TextLine bestLine = null;
+        double bestScore = 0;
+        for (TextLine line : lines) {
+            double score = max(Stream.of(AMOUNT_MATCHERS).map(M -> M.match(line)).toList());
+            score *= line.charWidth() + line.charHeight();
+            score *= 1. - line.centerY() / bmSize.getHeight();
+            if (score > bestScore) {
+                bestLine = line;
+                bestScore = score;
+            }
+        }
+        return bestLine;
+    }
+
+    /**
+     * Get a strip rectangle where the amount price should be found.
+     * @param amountStr amount string line.
+     * @param bmSize bitmap size.
+     * @return RectF rectangle in bitmap space.
+     * @author Riccardo Zaglia
+     */
+    @NonNull
+    private static RectF getAmountStripRect(TextLine amountStr, SizeF bmSize) {
+        double halfHeight = amountStr.charHeight() * EXT_RECT_V_MUL / 2.;
+        // here I account that the amount number could be in the same TextLine as the amount string.
+        // I use the center of the TextLine as a left boundary.
+        return new RectF((float)amountStr.centerX(), (float)(amountStr.centerY() - halfHeight),
+                bmSize.getWidth(), (float)(amountStr.centerY() + halfHeight));
+    }
+
+    private static Bitmap getAmountStrip(ImageProcessor imgProc, TextLine amountStr, RectF srcRect) {
+        return imgProc.undistortedSubregion(srcRect,
+                srcRect.width() / srcRect.height() * CHAR_ASPECT_RATIO / amountStr.charAspectRatio());
+    }
+
+    /**
+     * Choose the TextLine that most probably contains the amount price and return it as a BigDecimal.
+     * Criteria: lower distance from center of strip; least character size difference from amount string
+     * @param lines all lines contained inside amount strip.
+     * @param amountStr amount string line.
+     * @param srcStripSize amount strip size in the original bitmap space.
+     * @param dstStripSize actual amount strip size.
+     * @return BigDecimal containing price, or null if no price found.
+     */
+    // todo: find most meaningful way to combine score criteria.
+    // todo: reject false positives adding a lower limit to the score > 0.
+    @Nullable
+    private static BigDecimal findAmountPrice(
+            List<TextLine> lines,
+            TextLine amountStr,
+            SizeF srcStripSize,
+            SizeF dstStripSize) {
+        double dstAmountStrWidth = amountStr.charWidth() * dstStripSize.getWidth() / srcStripSize.getWidth();
+        double dstAmountStrHeight = amountStr.charHeight() * dstStripSize.getHeight() / srcStripSize.getHeight();
+
+        String priceStr = null;
+        double bestScore = 0;
+        for (TextLine line : lines) {
+            Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
+            boolean matched = matcher.find();
+            if (!matched) {
+                matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numConcatDot());
+                matched = matcher.find();
+            }
+            if (matched) {
+                double score = 1 - abs(1 - 2 * line.centerY() / dstStripSize.getHeight());
+                score *= 2 - abs(1 - line.charWidth() / dstAmountStrWidth)
+                        - abs(1 - line.charHeight() / dstAmountStrHeight);
+                if (score > bestScore) {
+                    bestScore = score;
+                    priceStr = matcher.group();
+                }
+            }
+        }
+        return priceStr != null ? new BigDecimal(priceStr) : null;
+    }
+
+    /**
+     * TEMPORARY
+     */
+    //Todo: extract day, month, year using group()
+    private static List<Pair<String, TextLine>> findAllDateStrings(List<TextLine> lines) {
+        List<Pair<String, TextLine>> dateStrings = new ArrayList<>();
+        for (TextLine line : lines) {
+            String lineMatch = null;
+            for (Word w : line.words()) {
+                Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
+                if (matcher.find()) {
+                    lineMatch = matcher.group(); // get first group -> entire regex match
+                    // use matcher.group("day") or "month" or "year" to get respective strings
+                    break;
+                }
+            }
+            // It's better to avoid word concatenation because it could match a wrong date.
+            // Ex: 1/1/20 14:30 -> 1/1/2014:30
+            if (lineMatch != null)
+                dateStrings.add(new Pair<>(lineMatch, line));
+        }
+        return dateStrings;
+    }
+
+    private static Date findDate(List<TextLine> lines) {
+        return null; // stub
+    }
+
+    /**
+     * Extract a Ticket from an ImageProcessor loaded with a bitmap.
+     * @param imgProc ImagePreprocessor with at least an image assigned (corners can be set manually).
+     * @return Ticket containing any information found, and/or a list of errors occurred.
+     * @author Riccardo Zaglia
+     */
+    // not tested
+    // todo: integrate schemer and other heuristics
+    public synchronized Ticket analyzeTicket(@NonNull ImageProcessor imgProc) {
+        Ticket ticket = new Ticket();
+        ticket.errors = new ArrayList<>();
+        ticket.rectangle = imgProc.getCorners();
+
+        Bitmap bm = imgProc.undistortForOCR();
+        if (bm == null) {
+            ticket.errors.add(TicketError.INVALID_PROCESSOR);
+            return ticket;
+        }
+        List<TextLine> lines = bitmapToLines(bm, ocrEngine);
+
+        //find amount
+        TextLine amountStr = findAmountString(lines, size(bm));
+        if (amountStr != null) {
+            RectF srcStripRect = getAmountStripRect(amountStr, size(bm));
+            Bitmap amountStrip = getAmountStrip(imgProc, amountStr, srcStripRect);
+            List<TextLine> amountLines = bitmapToLines(amountStrip, ocrEngine);
+            ticket.amount = findAmountPrice(amountLines, amountStr, size(srcStripRect), size(amountStrip));
+        }
+        if (ticket.amount == null)
+            ticket.errors.add(TicketError.AMOUNT_NOT_FOUND);
+
+        ticket.date = findDate(lines);
+        if (ticket.date == null)
+            ticket.errors.add(TicketError.DATE_NOT_FOUND);
+
+        return ticket;
+    }
+
+    /**
+     * Asynchronous version of analyzeTicket(imgProc). The ticket is passed by the callback parameter.
+     * @param imgProc ImagePreprocessor
+     * @param ticketCb Callback
+     */
+    public void analyzeTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<Ticket> ticketCb) {
+        new Thread(() -> ticketCb.accept(analyzeTicket(imgProc))).start();
     }
 }

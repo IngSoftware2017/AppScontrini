@@ -35,15 +35,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     api project(':common')
-    implementation 'com.ing.software:opencv-android:1.0.0'
+    api 'com.ing.software:opencv-android:1.0.0'
     implementation 'com.google.android.gms:play-services-vision:11.8.0'
 }
 
-task copyDataset(type: Copy){
-    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
-        exclude '**/desktop.ini' //desktop.ini files break AssetManager
-    }
-    into "${projectDir}/src/androidTest/assets"
-}
-
-tasks.preBuild.dependsOn('copyDataset')
+//task copyDataset(type: Copy){
+//    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
+//        exclude '**/desktop.ini' //desktop.ini files break AssetManager
+//    }
+//    into "${projectDir}/src/androidTest/assets"
+//}
+//
+//tasks.preBuild.dependsOn('copyDataset')
