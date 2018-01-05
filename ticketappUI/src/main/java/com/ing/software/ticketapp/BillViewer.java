@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
@@ -32,6 +30,7 @@ import database.DataManager;
 import database.TicketEntity;
 
 import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
+
 
 public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
@@ -229,9 +228,14 @@ public class BillViewer extends AppCompatActivity {
         ticket.setFileUri(toCropUri);
 
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
-        imgView.setImageBitmap(bitmap);
+        //BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        //Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
+        //imgView.setImageBitmap(bitmap);
+        Glide
+                .with(context)
+                .load(toCropUri.toString().substring(7))
+                .thumbnail(0.1f)
+                .into(imgView);
     }//cropPhoto
 }
 
