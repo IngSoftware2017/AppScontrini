@@ -85,7 +85,7 @@ public class AddNewPerson extends AppCompatActivity {
                 //Start billActivity
                 Bundle bundle = new Bundle();
 
-                Intent startMissionView = new Intent(context, MissionActivity.class);
+                Intent startMissionView = new Intent(context, MissionsTabbed.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startMissionView.putExtra("personID", (int) personID);
                 startMissionView.putExtra("personName", name);
