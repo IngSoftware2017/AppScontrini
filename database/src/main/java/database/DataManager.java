@@ -285,7 +285,7 @@ public class DataManager {
      * Gets only the active missions. Those ones that weren't repaid
      * @return List<MissionEntity> not null with all active missions
      */
-    List<MissionEntity> getActiveMission(){
+    public List<MissionEntity> getActiveMission(){
         return database.ticketDao().getActiveMission();
     }
 
@@ -296,7 +296,7 @@ public class DataManager {
      * @param personId Long not null, the person's id
      * @return List<MissionEntity> not null with all active missions of the specific person
      */
-    List<MissionEntity> getActiveMissionForPerson(long personId){
+    public List<MissionEntity> getActiveMissionForPerson(long personId){
         return database.ticketDao().getActiveMissionForPerson(personId);
     }
 
