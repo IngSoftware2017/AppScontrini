@@ -6,6 +6,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
+import android.provider.SyncStateContract;
 
 import java.util.Date;
 import java.util.List;
@@ -145,6 +146,14 @@ public interface DAO {
      */
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
+
+    /**
+     * @author Marco Olivieri
+     * Executes a SELECT of all the PersonEntity in the database in alphabetical order
+     * @return List<PersonEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_LAST_NAME + "ASC")
+    List<PersonEntity> getAllPersonOrder();
 
     //SELECT FROM ID
 

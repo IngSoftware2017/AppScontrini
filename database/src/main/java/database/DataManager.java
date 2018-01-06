@@ -151,6 +151,16 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonOrder(){
+        return database.ticketDao().getAllPersonOrder();
+    }
+
+    /**
      * Return a list of the tickets associate to a specific Mission
      *
      * @param id identifier of the Mission
