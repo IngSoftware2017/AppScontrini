@@ -153,7 +153,7 @@ public interface DAO {
      * Executes a SELECT of all the PersonEntity in the database in alphabetical order
      * @return List<PersonEntity>
      */
-    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_LAST_NAME + "ASC")
+    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_LAST_NAME + " ASC")
     List<PersonEntity> getAllPersonOrder();
 
     //SELECT FROM ID
