@@ -32,7 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.ocr.ImagePreprocessor;
+import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -585,7 +585,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Bitmap testBmp = getBitmapFromFile(file);
             receiver.send(STATUS_RUNNING, bundle);
             ocrManager.initialize(this);
-            ImagePreprocessor preproc = new ImagePreprocessor(testBmp);
+            ImageProcessor preproc = new ImageProcessor(testBmp);
             preproc.findTicket(false, err -> {
                     ocrManager.getTicket(preproc, result -> {
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
