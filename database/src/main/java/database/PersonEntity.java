@@ -55,6 +55,7 @@ public class PersonEntity {
      * @param academicTitle Academic Title of the person
      * @param email Person's email
      */
+    @Ignore
     public PersonEntity(String name, String lastName, String academicTitle, String email, Uri foto) {
         this.name = name;
         this.lastName = lastName;
