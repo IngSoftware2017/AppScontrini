@@ -5,7 +5,7 @@ android {
     buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.example.nicoladalmaso.gruppo1"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -38,8 +38,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile project(':database')
-    compile project(':common')
-    compile project(':ocr')
+    implementation project(':ocr')
     compile 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.ing.software:opencv-android:1.0.0'
     compile 'com.android.support:appcompat-v7:26.1.0'

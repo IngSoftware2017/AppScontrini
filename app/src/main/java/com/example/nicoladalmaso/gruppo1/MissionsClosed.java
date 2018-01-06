@@ -84,6 +84,5 @@ public class MissionsClosed extends Fragment {
         else{
             noMissions.setVisibility(View.INVISIBLE);
         }
-
     }
 }

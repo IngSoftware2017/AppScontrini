@@ -3,6 +3,7 @@ package database;
 import android.content.Context;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -150,6 +151,16 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonOrder(){
+        return database.ticketDao().getAllPersonOrder();
+    }
+
+    /**
      * Return a list of the tickets associate to a specific Mission
      *
      * @param id identifier of the Mission
@@ -215,6 +226,97 @@ public class DataManager {
         return totAmount;
     }
 
+    /**Created by Federico Taschin
+     *Executes a SELECT query for a given TicketEntity id
+     *@param id int, the id of the TicketEntity
+     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
+     */
+    public TicketEntity getTicket(int id){
+        return database.ticketDao().getTicket(id);
+    }
+
+    /**Created by Federico Taschin
+     * Gets all the TicketEntity with the given date
+     * @param date Date not null, the date of the ticket
+     * @return List<TicketEntity> not null with all TicketEntity with the given date
+     */
+    public List<TicketEntity> getTicketWithDate(Date date){
+        return database.ticketDao().getTicketWithDate(date);
+    }
+
+    /**Created by Federico Taschin
+     * Gets all TicketEntity with the given category
+     * @param category String not null, category to be searched
+     * @return List<TicketEntity> not null with all TicketEntity with the given category
+     */
+    public List<TicketEntity> getTicketWithCategory(String category){
+        return database.ticketDao().getTicketWithCategory(category);
+    }
+
+    /**Created by Federico Taschin
+     * Gets all the MissionEntity with the given start date
+     * @param startDate not null, the start date of the mission to be searched
+     * @return List<MissionEntity> with all MissionEntity with the given start date
+     */
+    public List<MissionEntity> getMissionWithStartDate(Date startDate){
+        return database.ticketDao().getMissionWithStartDate(startDate);
+    }
+
+    /**Created by Federico Taschin
+     * Gets all the MissionEntity with the given end date
+     * @param endDate not null, the end date of the mission to be searched
+     * @return List<MissionEntity> with all MissionEntity with the given end date
+     */
+    public List<MissionEntity> getMissionWithEndDate(Date endDate){
+        return database.ticketDao().getMissionWithEndDate(endDate);
+    }
+
+    /**Created by Federico Taschin
+     * Gets all the MissionEntity with the given location
+     * @param location not null, the location of the mission to be searched
+     * @return List<MissionEntity> not null with all MissionEntity with the given location
+     */
+    public List<MissionEntity> getMissionWithLocation(String location){
+        return database.ticketDao().getMissionWithLocation(location);
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions. Those ones that weren't repaid
+     * @return List<MissionEntity> not null with all active missions
+     */
+    List<MissionEntity> getActiveMission(){
+        return database.ticketDao().getActiveMission();
+    }
+
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * @param personId Long not null, the person's id
+     * @return List<MissionEntity> not null with all active missions of the specific person
+     */
+    List<MissionEntity> getActiveMissionForPerson(long personId){
+        return database.ticketDao().getActiveMissionForPerson(personId);
+    }
+
+    /**Created by Federico Taschin
+     * Gets all the PersonEntity with the given name
+     * @param name String not null
+     * @return List<PersonEntity> not null, with all PersonEntity with the given name
+     */
+    public List<PersonEntity> getPersonWithName(String name){
+        return database.ticketDao().getPersonWithName(name);
+    }
+
+    /**Created by Federico Taschin
+     * Gets all the PersonEntity with the given last name
+     * @param lastName String not null
+     * @return List<PersonEntity> not null, with all PersonEntity with the given last name
+     */
+    public List<PersonEntity> getPersonWithLastName(String lastName){
+        return database.ticketDao().getPersonWithLastName(lastName);
+    }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null

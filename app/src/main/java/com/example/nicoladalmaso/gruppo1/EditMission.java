@@ -115,8 +115,8 @@ public class EditMission extends AppCompatActivity {
                     else
                         Log.d("formato data inserita","corretto");
 
-                    thisMission.setStartMission(format.parse(start));
-                    thisMission.setEndMission(format.parse(finish));
+                    thisMission.setStartDate(format.parse(start));
+                    thisMission.setEndDate(format.parse(finish));
 
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -148,8 +148,8 @@ public class EditMission extends AppCompatActivity {
 
         txtMissionName.setText(thisMission.getName());
         txtMissionLocation.setText(thisMission.getLocation());
-        txtMissionStart.setText(formatter.format(thisMission.getStartMission()));
-        txtMissionEnd.setText(formatter.format(thisMission.getEndMission()));
+        txtMissionStart.setText(formatter.format(thisMission.getStartDate()));
+        txtMissionEnd.setText(formatter.format(thisMission.getEndDate()));
         chkIsClosed.setChecked(thisMission.isRepay());
     }
 }

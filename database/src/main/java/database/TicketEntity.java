@@ -19,13 +19,13 @@ import java.util.List;
 
 @Entity(tableName = Constants.TICKET_TABLE_NAME,
         foreignKeys = @ForeignKey(entity = MissionEntity.class,
-                parentColumns = Constants.MISSION_PRIMARY_KEY_NAME,
+                parentColumns = Constants.MISSION_PRIMARY_KEY,
                 childColumns = Constants.MISSION_CHILD_COLUMNS))
 @TypeConverters(Converters.class) // automatic converters for database correct type
 
 public class TicketEntity {
 
-    @ColumnInfo(name = Constants.TICKET_PRIMARY_KEY_NAME)
+    @ColumnInfo(name = Constants.TICKET_PRIMARY_KEY)
     @PrimaryKey(autoGenerate = true)
     private long ID;
     private Uri fileUri;
@@ -34,6 +34,7 @@ public class TicketEntity {
     private Date date;
     private String title;
     private List<String> category;
+    private float[] corners;
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
@@ -62,6 +63,7 @@ public class TicketEntity {
         this.shop = shop;
         this.title = title;
         this.missionID = missionID;
+        corners = new float[8];
     }
 
     /**
@@ -170,6 +172,25 @@ public class TicketEntity {
      */
     public void setMissionID(int missionID) {
         this.missionID = missionID;
+    }
+
+
+    /**
+     * Returns the corners of the ticket
+     * 8 float point of the rectangle coordinate
+     * @return corners
+     */
+    public float[] getCorners() {
+        return corners;
+    }
+
+    /**
+     * Sets corners of the ticket
+     * Must be an array of 8 elements: the rectangle coordinate of the ticket
+     * @param corners
+     */
+    public void setCorners(float[] corners) {
+        this.corners = corners;
     }
 
 

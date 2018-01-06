@@ -20,8 +20,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.ing.software.common.Ticket;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;

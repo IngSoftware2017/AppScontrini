@@ -29,8 +29,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.ocr.DataAnalyzer;
-import com.ing.software.ocr.ImagePreprocessor;
+
+import com.ing.software.common.Ticket;
+import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -71,6 +72,7 @@ public class BillActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
+
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
@@ -408,16 +410,18 @@ public class BillActivity extends AppCompatActivity {
             originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
-            //TODO: OCR HERE
+
+            ImageProcessor imgProc = new ImageProcessor(imageToSave);
+            Ticket result = ocrManager.getTicket(imgProc);
+
             TicketEntity ticket = new TicketEntity();
             ticket.setDate(Calendar.getInstance().getTime());
             ticket.setFileUri(uri);
-            ticket.setAmount(BigDecimal.valueOf(10000).movePointLeft(2));
+            ticket.setAmount(result.amount);
             ticket.setShop("Pam Padova");
             ticket.setTitle("Scontrino ");
             ticket.setMissionID(missionID);
             DB.addTicket(ticket);
-
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
@@ -512,5 +516,10 @@ public class BillActivity extends AppCompatActivity {
         else{
             fab.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -151,8 +151,8 @@ public class AddNewMission extends AppCompatActivity{
 
 
 
-                    miss.setStartMission(format.parse(start));
-                    miss.setEndMission(format.parse(finish));
+                    miss.setStartDate(format.parse(start));
+                    miss.setEndDate(format.parse(finish));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

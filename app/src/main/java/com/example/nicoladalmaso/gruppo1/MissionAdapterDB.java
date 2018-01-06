@@ -54,12 +54,12 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         title.setText(c.getName());
         location.setText(c.getLocation());
         convertView.setTag(c.getID());
-        Log.d("MissionStartBadFormat", ""+c.getStartMission());
+        Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data
-        Date start=c.getStartMission();
+        Date start=c.getStartDate();
         SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
         String startDate=tr.format(start);
-        Date finish=c.getEndMission();
+        Date finish=c.getEndDate();
         String finishDate=tr.format(finish);
         Log.d("missionStart", startDate);
         Log.d("missionEnd",finishDate);

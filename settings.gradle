@@ -1,1 +1,1 @@
-include ':app', ':ocr', ':common', ':database'
+include ':app', ':database', ':ocr', ':opencvtestapp', ':common', ':ocrtestapp'
