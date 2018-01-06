@@ -38,7 +38,6 @@ public class PersonEntity {
     public PersonEntity() {
     }
 
-    @Ignore
     /**
      * Parametric constructor
      *
@@ -60,7 +59,9 @@ public class PersonEntity {
      * @param lastName Last Name of the person
      * @param academicTitle Academic Title of the person
      * @param email Person's email
+     * @param foto Uri of Person's foto
      */
+    @Ignore
     public PersonEntity(String name, String lastName, String academicTitle, String email, Uri foto) {
         this.name = name;
         this.lastName = lastName;
