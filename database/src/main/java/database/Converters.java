@@ -118,4 +118,44 @@ public final class Converters {
             return list;
         }
     }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a float[] to a String for db
+     * @param corners array of corners
+     * @return the corresponding String object, null if value is null
+     */
+    @TypeConverter
+    public String toString(float[] corners) {
+        if (corners == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<corners.length; i++)
+                s+=corners[i]+";";
+            return s;
+        }
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a String to List<String>
+     * @param value of categories separeted from ;
+     * @return the corresponding List<String> object, null if value is null
+     */
+    @TypeConverter
+    public float[] toArrayOfCorners(String value) {
+        if (value == null)
+            return null;
+        else
+        {
+            float[] corners = new float[8];
+            String[] s_corners = value.split(";");
+            for (int i=0; i<corners.length; i++) {
+                corners[i]=Float.parseFloat(s_corners[i]);
+            }
+            return corners;
+        }
+    }
 }
