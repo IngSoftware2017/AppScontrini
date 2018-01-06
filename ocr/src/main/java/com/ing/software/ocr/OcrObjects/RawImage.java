@@ -47,39 +47,68 @@ public class RawImage {
 
     /**
      * Must be called only once.
-     * @param texts
+     * @param texts list of rawTexts. Not null.
      */
-    public void setRects(List<RawText> texts) {
+    public void setRects(@NonNull List<RawText> texts) {
         allTexts = texts;
         extendedRect = OcrUtils.getMaxRectBorders(texts);
         averageRectHeight = checkAverageHeight(texts);
     }
 
+    /**
+     * Must call setRects() before.
+     * @return rect containing all rawTexts
+     */
     public Rect getExtendedRect() {
         return extendedRect;
     }
 
+    /**
+     * Must call setRects() before.
+     * @return average height of rawTexts
+     */
     public double getAverageRectHeight() {
         return averageRectHeight;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return list of Intro RawTexts
+     */
     public List<RawText> getPossibleIntro() {
         return possibleIntro;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return list of Products RawTexts
+     */
     public List<RawText> getPossibleProducts() {
         return possibleProducts;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return list of Prices RawTexts
+     */
     public List<RawText> getPossiblePrices() {
         return possiblePrices;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return list of Conclusion RawTexts
+     */
     public List<RawText> getPossibleConclusion() {
         return possibleConclusion;
     }
 
-    private double checkAverageHeight(List<RawText> texts) {
+    /**
+     * Finds the average height in a list of rects
+     * @param texts list of rawTexts. Not null.
+     * @return average height
+     */
+    private double checkAverageHeight(@NonNull List<RawText> texts) {
         double average = 0;
         for (RawText text : texts) {
             average += text.getBoundingBox().height();
@@ -87,6 +116,10 @@ public class RawImage {
         return average/texts.size();
     }
 
+    /**
+     * Keeps a list of all rawTexts divided by tag.
+     * Must be used only once and after setRects() has been called and tags have been set.
+     */
     public void textFitter() {
         for (RawText text : allTexts) {
             if (text.getTags().contains(INTRODUCTION_TAG))

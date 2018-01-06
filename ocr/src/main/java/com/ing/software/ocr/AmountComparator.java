@@ -269,7 +269,7 @@ class AmountComparator {
                 flagHasSubtotal(possibleSubTotal);
             }
             //now we may have the same value of decodedAmount, or its double (=*2)
-            if (hasAmount() && decodedAmount.compareTo(halfProductSum) == 0) {
+            if (hasAmount()) {
                 if (decodedAmount.compareTo(halfProductSum) == 0) {
                     OcrUtils.log(3, "analyzePrices", "List of prices/2 equals decoded amount");
                     flagHasPriceList(halfProductSum);
@@ -459,7 +459,7 @@ class AmountComparator {
     /**
      * @author Michelon
      * @date 10-12-17
-     * Retrieves all texts from products on the same 'column' as amount
+     * Retrieves all texts from products on the same 'column' as amount. Stricter than the simple list of prices.
      * @param amountText RawText containing possible amount. Not null.
      * @param products   List of RawTexts containing products (both name and price). Not null.
      * @return Ordered list of texts above or under amount with distance from amount (positive = above)

@@ -129,22 +129,22 @@ class OcrSchemer {
     }
 
     /**
-     * Find column where center of rawText is, dividing the image in 3 parts
+     * Find column where center of rawText is, dividing the maximized rect in a defined number of parts parts
      * @param text target text. Not null.
      * @return 0,1,2 according to position
      */
     static private int getPosition(@NonNull RawText text) {
-        int width = text.getRawImage().getWidth();
-        /*
-        int position = Math.round(text.getBoundingBox().centerX())*13/width;
+        //int width = text.getRawImage().getWidth();
+        Rect maxRect = text.getRawImage().getExtendedRect();
+        int width = maxRect.width();
+        int position = (text.getBoundingBox().centerX() - maxRect.left)*13/width;
         if (0<=position && position<=4)
             return 0;
         else if (position<=9)
             return 1;
         else
             return 2;
-        */
-        return Math.round(text.getBoundingBox().centerX())*3/width;
+        //return Math.round(text.getBoundingBox().centerX())*3/width;
     }
 
     /**

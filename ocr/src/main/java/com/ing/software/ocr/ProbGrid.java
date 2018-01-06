@@ -1,6 +1,10 @@
 package com.ing.software.ocr;
 
+import android.support.annotation.NonNull;
+
 import com.ing.software.ocr.OcrObjects.RawText;
+
+import static com.ing.software.ocr.OcrVars.HEIGHT_LIST_MULTIPLIER;
 
 /**
  * Static class containing grids for probability regions (WIP)
@@ -16,13 +20,13 @@ public class ProbGrid {
     public static final int[] dateBlockConclusion = new int[] {15, 10, 10, 5, 5, 10, 5, 5, 10, 10};
 
     /**
-     * Get probability to contain amount considering rect height
-     * @param text
-     * @return
+     * Get probability considering rect height
+     * @param text source rawText. Not null.
+     * @return score
      */
-    public static double getAmountProbRectHeight(RawText text) {
+    public static double getRectHeightScore(@NonNull RawText text) {
         double average = text.getRawImage().getAverageRectHeight();
         double diff = text.getBoundingBox().height() - average;
-        return diff/average*100;
-}
+        return diff/average*HEIGHT_LIST_MULTIPLIER;
+    }
 }

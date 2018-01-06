@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
@@ -21,6 +20,7 @@ import com.annimon.stream.function.Consumer;
 
 import static com.ing.software.ocr.AmountComparator.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
+import static com.ing.software.ocr.OcrVars.*;
 
 /*
 */
@@ -111,6 +111,8 @@ public class OcrManager {
         List<RawText> prices = result.getRawImage().getPossiblePrices();
         //First level, if we have a string from "AMOUNT_STRINGS[]" we try to decode a value on the same height and if necessary fix it
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
+        if (ticket.amount == null)
+            ticket.amount = analyzeAlternativeAmount(prices);
         ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
         long endTime = System.nanoTime();
         double duration = ((double) (endTime - startTime)) / 1000000000;
@@ -214,10 +216,33 @@ public class OcrManager {
 
     /**
      * We have no valid amount from string search. Try to decode the amount only from products prices.
-     * @param texts
-     * @return
+     * @param texts List of prices
+     * @return possible amount. Null if nothing found.
      */
-    private static List<RawGridResult> analyzeAlternativeAmount(List<RawText> texts) {
-        return null;
+    private static BigDecimal analyzeAlternativeAmount(List<RawText> texts) {
+        if (texts.size() == 0)
+            return null;
+        OcrUtils.log(2, "AlternativeAmount", "No amount was found, use brute search");
+        RawText currentText = texts.get(0);
+        for (RawText text : texts) {
+            if (text.getAmountProbability() > currentText.getAmountProbability() && OcrUtils.isPossiblePriceNumber(text.getValue()) < NUMBER_MIN_VALUE)
+                currentText = text;
+        }
+        if (OcrUtils.isPossiblePriceNumber(currentText.getValue()) < NUMBER_MIN_VALUE)
+            return null; //If no rawText pass the above if, we still have a valid text in currentText, so we must recheck it
+        OcrUtils.log(2, "AlternativeAmount", "Possible amount is: " + currentText.getValue());
+        BigDecimal amount = DataAnalyzer.analyzeAmount(currentText.getValue());
+        if (amount == null) {
+            OcrUtils.log(2, "AlternativeAmount", "No decoded value");
+            return null;
+        }
+        AmountComparator amountComparator = new AmountComparator(currentText, amount);
+        //check against list of products and cash + change
+        List<RawGridResult> possiblePrices = getPricesList(currentText, texts);
+        amountComparator.analyzePrices(possiblePrices);
+        amountComparator.analyzeTotals(possiblePrices);
+        amount = amountComparator.getBestAmount();
+        OcrUtils.log(2, "AlternativeAmount", "Maximized amount is: " + amount.toString());
+        return amount;
     }
 }

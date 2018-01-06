@@ -120,7 +120,7 @@ public class RawText implements Comparable<RawText>, Text {
         else if (tags.contains(CONCLUSION_TAG))
             probability = ProbGrid.amountBlockConclusion[position];
         log(8,"RawText.getAmountProb", "Amount Probability from grid is " + probability);
-        probability += ProbGrid.getAmountProbRectHeight(this);
+        probability += ProbGrid.getRectHeightScore(this);
         return probability;
     }
 
