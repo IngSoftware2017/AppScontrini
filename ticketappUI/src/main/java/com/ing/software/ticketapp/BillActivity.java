@@ -112,6 +112,20 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         ocrManager.release();
     }
 
+    /**PICCOLO
+     * Method that is run when the activity is resumed.
+     * it hides the button for adding tickets if the mission is closed, else it shows it.
+     */
+    public void onResume(){
+        super.onResume();
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
+    }
+
     /** Dal Maso
      * Setting toolbar delete button and style from /res/menu
      * @param menu
@@ -181,6 +195,12 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 pickImageFromGallery();
             }
         });
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
     }
 
     /** Dal Maso
@@ -501,6 +521,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         }
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
+        String noBillsError=getResources().getString(R.string.noBills);
+        if(!thisMission.isRepay())
+            noBillsError+=getResources().getString(R.string.noBillsOpen);
+        noBills.setText(noBillsError);
         if(count == 0){
             noBills.setVisibility(View.VISIBLE);
         }

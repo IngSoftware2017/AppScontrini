@@ -51,7 +51,7 @@ public class MissionsTabbed extends AppCompatActivity {
         thisPerson = DB.getPerson(personID);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(thisPerson.getName());
+        toolbar.setTitle(thisPerson.getName()+" "+thisPerson.getLastName());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
