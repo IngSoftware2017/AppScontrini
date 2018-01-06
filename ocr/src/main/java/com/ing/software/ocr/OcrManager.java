@@ -153,7 +153,7 @@ public class OcrManager {
         List<RawGridResult> possiblePrices = getPricesList(amountText, products);
         amountComparator.analyzePrices(possiblePrices);
         amountComparator.analyzeTotals(possiblePrices);
-        amount = amountComparator.getBestAmount();
+        amount = amountComparator.getBestAmount(0);
         return amount;
     }
 
@@ -218,7 +218,6 @@ public class OcrManager {
      * We have no valid amount from string search. Try to decode the amount only from products prices.
      * @param texts List of prices
      * @return possible amount. Null if nothing found.
-     * todo: vai al meglio di 2 almeno, o prendi troppi sbagliati
      */
     private static BigDecimal analyzeAlternativeAmount(List<RawText> texts) {
         if (texts.size() == 0)
@@ -252,8 +251,11 @@ public class OcrManager {
         List<RawGridResult> possiblePrices = getPricesList(currentText, texts);
         amountComparator.analyzePrices(possiblePrices);
         amountComparator.analyzeTotals(possiblePrices);
-        amount = amountComparator.getBestAmount();
-        OcrUtils.log(2, "AlternativeAmount", "Maximized amount is: " + amount.toString());
+        amount = amountComparator.getBestAmount(1);
+        if (amount != null)
+            OcrUtils.log(2, "AlternativeAmount", "Maximized amount is: " + amount.toString());
+        else
+            OcrUtils.log(2, "AlternativeAmount", "No amount found.");
         return amount;
     }
 }
