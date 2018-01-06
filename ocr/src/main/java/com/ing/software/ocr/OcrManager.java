@@ -218,17 +218,28 @@ public class OcrManager {
      * We have no valid amount from string search. Try to decode the amount only from products prices.
      * @param texts List of prices
      * @return possible amount. Null if nothing found.
+     * todo: vai al meglio di 2 almeno, o prendi troppi sbagliati
      */
     private static BigDecimal analyzeAlternativeAmount(List<RawText> texts) {
         if (texts.size() == 0)
             return null;
         OcrUtils.log(2, "AlternativeAmount", "No amount was found, use brute search");
-        RawText currentText = texts.get(0);
-        for (RawText text : texts) {
-            if (text.getAmountProbability() > currentText.getAmountProbability() && OcrUtils.isPossiblePriceNumber(text.getValue()) < NUMBER_MIN_VALUE)
+        RawText currentText = null;
+        int i = 0;
+        while (currentText == null && i < texts.size()) {
+            RawText text = texts.get(i);
+            if (OcrUtils.isPossiblePriceNumber(text.getValue()) < NUMBER_MIN_VALUE_ALTERNATIVE) {
                 currentText = text;
+            }
+            ++i;
         }
-        if (OcrUtils.isPossiblePriceNumber(currentText.getValue()) < NUMBER_MIN_VALUE)
+        while (i < texts.size()) {
+            RawText text = texts.get(i);
+            if (text.getAmountProbability() > currentText.getAmountProbability() && OcrUtils.isPossiblePriceNumber(text.getValue()) < NUMBER_MIN_VALUE_ALTERNATIVE)
+                currentText = text;
+            ++i;
+        }
+        if (currentText == null)
             return null; //If no rawText pass the above if, we still have a valid text in currentText, so we must recheck it
         OcrUtils.log(2, "AlternativeAmount", "Possible amount is: " + currentText.getValue());
         BigDecimal amount = DataAnalyzer.analyzeAmount(currentText.getValue());
