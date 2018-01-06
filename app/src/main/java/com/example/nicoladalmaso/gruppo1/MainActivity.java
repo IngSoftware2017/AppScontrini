@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Dal Maso adapted by Elardo
+     * Dal Maso adapted by Stefano Elardo
      * Setting toolbar buttons and style from /res/menu
      * @param menu
      * @return success flag
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Elardo
+     * Stefano Elardo
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
