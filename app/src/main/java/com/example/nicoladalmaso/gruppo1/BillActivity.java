@@ -202,6 +202,14 @@ public class BillActivity extends AppCompatActivity {
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         listView.setAdapter(adapter);
+        Log.d("DEBUGTICKET","addToList(): "+t.getAmount());
+    }
+
+    public void refreshList(){
+        list = DB.getTicketsForMission(missionID);
+        ListView listView = (ListView)findViewById(R.id.list1);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        listView.setAdapter(adapter);
     }
 
     /** Dal Maso (Using Lazzarin code)
@@ -333,6 +341,7 @@ public class BillActivity extends AppCompatActivity {
                     deleteTempFiles();
                     waitDB();
                     clearAllImages();
+                    Log.d("DEBUGTICKET","onActivityResult{CASE REQUEST_TAKE_PHOTO}");
                     printAllTickets();
                     break;
 
@@ -345,6 +354,7 @@ public class BillActivity extends AppCompatActivity {
                         savePickedFile(btm);
                         waitDB();
                         clearAllImages();
+                        Log.d("DEBUGTICKET","onActivityResult{CASE PICK_PHOTO_FOR_AVATAR}");
                         printAllTickets();
                     }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
@@ -444,11 +454,12 @@ public class BillActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    addToList(ticketEntity);
+                    refreshList();
                 }
             });
         });
     }
+
 
 
     /**PICCOLO
@@ -491,7 +502,7 @@ public class BillActivity extends AppCompatActivity {
         TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
-            Log.d("Ticket_ID", ""+ticketList.get(i).getID());
+            Log.d("DEBUGTICKET", "ADDED IN printAllTickets()");
             addToList(ticketList.get(i));
             count++;
         }
