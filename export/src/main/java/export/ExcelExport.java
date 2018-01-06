@@ -34,7 +34,7 @@ public class ExcelExport extends ExportManager {
     private final String TAG = "EXCEL_EXPORT";
 
     //Header CSV file
-    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
+    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
     private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
@@ -142,6 +142,9 @@ public class ExcelExport extends ExportManager {
 
             HSSFCell cell7 = irow.createCell(7);
             cell7.setCellValue(new HSSFRichTextString(String.valueOf(t.getFileUri())));
+
+            HSSFCell cell8 = irow.createCell(8);
+            cell8.setCellValue(new HSSFRichTextString(cornersToString(t.getCorners())));
         }
     }
 
@@ -161,6 +164,24 @@ public class ExcelExport extends ExportManager {
             String s="";
             for (int i=0; i<list.size(); i++)
                 s+=list.get(i)+"/";
+            return s;
+        }
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a float[] to a String for db
+     * @param corners, float[] of the rectangle coordinates
+     * @return the corresponding String object, null if value is null
+     */
+    public String cornersToString(float[] corners) {
+        if (corners == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<corners.length; i++)
+                s+=corners[i]+";";
             return s;
         }
     }

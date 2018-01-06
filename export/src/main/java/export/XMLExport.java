@@ -135,6 +135,9 @@ public class XMLExport extends ExportManager {
                 serializer.startTag(null, "Uri");
                 serializer.text(String.valueOf(t.getFileUri()));
                 serializer.endTag(null, "Uri");
+                serializer.startTag(null, "Corners");
+                serializer.text(cornersToString(t.getCorners()));
+                serializer.endTag(null, "Corners");
             }
             serializer.endTag(null,"Ticket");
 
@@ -159,6 +162,24 @@ public class XMLExport extends ExportManager {
             String s="";
             for (int i=0; i<list.size(); i++)
                 s+=list.get(i)+",";
+            return s;
+        }
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a float[] to a String for db
+     * @param corners, float[] of the rectangle coordinates
+     * @return the corresponding String object, null if value is null
+     */
+    public String cornersToString(float[] corners) {
+        if (corners == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<corners.length; i++)
+                s+=corners[i]+";";
             return s;
         }
     }

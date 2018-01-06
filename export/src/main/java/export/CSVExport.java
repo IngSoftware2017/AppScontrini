@@ -26,7 +26,7 @@ public class CSVExport extends ExportManager {
     private final String NEW_LINE_SEPARATOR = "\n";
 
     //Header CSV file
-    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
+    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
     private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
@@ -115,6 +115,8 @@ public class CSVExport extends ExportManager {
                 fileTickets.append(String.valueOf(t.getMissionID()));
                 fileTickets.append(SEMICOLON_DELIMITER);
                 fileTickets.append(String.valueOf(t.getFileUri()));
+                fileTickets.append(SEMICOLON_DELIMITER);
+                fileTickets.append(cornersToString(t.getCorners()));
                 fileTickets.append(NEW_LINE_SEPARATOR);
             }
         }
@@ -142,6 +144,25 @@ public class CSVExport extends ExportManager {
             return s;
         }
     }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a float[] to a String for db
+     * @param corners, float[] of the rectangle coordinates
+     * @return the corresponding String object, null if value is null
+     */
+    public String cornersToString(float[] corners) {
+        if (corners == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<corners.length; i++)
+                s+=corners[i]+";";
+            return s;
+        }
+    }
+
 
     /**
      * @author Marco Olivieri
