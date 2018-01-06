@@ -126,6 +126,9 @@ public class BillViewer extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.editticket_menu, menu);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(false); //remove back button, or redo ocr doesn't work
         return true;
     }
 
