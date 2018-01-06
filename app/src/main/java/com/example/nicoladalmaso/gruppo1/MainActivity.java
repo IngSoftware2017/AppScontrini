@@ -14,6 +14,9 @@ import android.graphics.Color;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.net.Uri;
 import android.os.Environment;
@@ -56,10 +59,39 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle(getString(R.string.titlePeople));
+        //setTitle(getString(R.string.titlePeople));
         setContentView(R.layout.activity_main);
         initialize();
         printAllPeople();
+    }
+
+    /**
+     * Dal Maso adapted by Elardo
+     * Setting toolbar buttons and style from /res/menu
+     * @param menu
+     * @return success flag
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_menu, menu);
+        return true;
+    }
+
+    /**
+     * Elardo
+     * Catch events on toolbar
+     * @param item object on the toolbar
+     * @return flag of success
+     *
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_infoDB){
+            Intent intent = new Intent(getApplicationContext(),com.example.nicoladalmaso.gruppo1.ReportDB.class);
+            startActivity(intent);
+        }
+        return true;
     }
 
     /** Dal Maso
