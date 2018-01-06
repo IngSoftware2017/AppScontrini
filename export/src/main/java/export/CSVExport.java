@@ -28,7 +28,7 @@ public class CSVExport extends ExportManager {
     //Header CSV file
     private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
-    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE";
+    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
     //TablesEntity of db
     private List<TicketEntity> tickets;
@@ -201,6 +201,10 @@ public class CSVExport extends ExportManager {
                 filePersons.append(p.getLastName());
                 filePersons.append(SEMICOLON_DELIMITER);
                 filePersons.append(p.getAcademicTitle());
+                filePersons.append(SEMICOLON_DELIMITER);
+                filePersons.append((p.getEmail()));
+                filePersons.append(SEMICOLON_DELIMITER);
+                filePersons.append(String.valueOf(p.getFoto()));
                 filePersons.append(NEW_LINE_SEPARATOR);
             }
         }

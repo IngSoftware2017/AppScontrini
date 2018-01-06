@@ -228,6 +228,12 @@ public class XMLExport extends ExportManager {
                 serializer.startTag(null, "AcademicTitle");
                 serializer.text(p.getAcademicTitle());
                 serializer.endTag(null, "AcademicTitle");
+                serializer.startTag(null, "Email");
+                serializer.text(p.getEmail());
+                serializer.endTag(null, "Email");
+                serializer.startTag(null, "Foto");
+                serializer.text(String.valueOf(p.getFoto()));
+                serializer.endTag(null, "Foto");
             }
             serializer.endTag(null,"Person");
 

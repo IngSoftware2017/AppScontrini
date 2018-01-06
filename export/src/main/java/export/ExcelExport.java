@@ -36,7 +36,7 @@ public class ExcelExport extends ExportManager {
     //Header CSV file
     private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
-    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE";
+    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
     //TablesEntity of db
     private List<TicketEntity> tickets;
@@ -246,6 +246,12 @@ public class ExcelExport extends ExportManager {
 
             HSSFCell cell3 = irow.createCell(3);
             cell3.setCellValue(new HSSFRichTextString(p.getAcademicTitle()));
+
+            HSSFCell cell4 = irow.createCell(4);
+            cell4.setCellValue(new HSSFRichTextString(p.getEmail()));
+
+            HSSFCell cell5 = irow.createCell(5);
+            cell5.setCellValue(new HSSFRichTextString(String.valueOf(p.getFoto())));
 
         }
     }
