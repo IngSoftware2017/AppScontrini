@@ -115,6 +115,61 @@ public class DistanceStringUnitTest {
         assertEquals(6, r);
     }
 
+    @Test
+    public void SubstringDistanceMaxTest1() throws Exception {
+
+        String a = "i";
+        String b = "Totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a,b,max);
+
+        assertEquals(3, r);
+    }
+
+    @Test
+    public void SubstringDistanceMaxTest2() throws Exception {
+
+        String a = "Tot";
+        String b = "Totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a,b,max);
+
+        assertEquals(3, r);
+    }
+
+    @Test
+    public void SubstringDistanceMaxTest3() throws Exception {
+
+        String a = "Tota";
+        String b = "Totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a,b,max);
+
+        assertEquals(2, r);
+    }
+
+    @Test
+    public void SubstringDistanceMaxTest4() throws Exception {
+
+        String a = "uu";
+        String b = "Totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("levDistance", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,a,b,max);
+
+        assertEquals(3, r);
+    }
 
     @Test
     public void maxLengthStringsTest1() throws Exception {
@@ -330,6 +385,96 @@ public class DistanceStringUnitTest {
 
     }
 
+    @Test
+    public void haveSubstringMax1() throws Exception {
+
+        String text = "tot";
+        String substring = "totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring,max);
+
+        assertEquals(3, r);
+
+    }
+
+    @Test
+    public void haveSubstringMax2() throws Exception {
+
+        String text = "to";
+        String substring = "totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring,max);
+
+        assertEquals(3, r);
+
+    }
+
+    @Test
+    public void haveSubstringMax3() throws Exception {
+
+        String text = "totale";
+        String substring = "totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring,max);
+
+        assertEquals(0, r);
+
+    }
+
+    @Test
+    public void haveSubstringMax4() throws Exception {
+
+        String text = "i";
+        String substring = "totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring,max);
+
+        assertEquals(3, r);
+
+    }
+
+    @Test
+    public void haveSubstringMax5() throws Exception {
+
+        String text = "Tatola";
+        String substring = "totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring,max);
+
+        assertEquals(3, r);
+
+    }
+
+    @Test
+    public void haveSubstringMax6() throws Exception {
+
+        String text = "Tatol";
+        String substring = "totale";
+        Integer max = 3;
+
+        Method method = OcrUtils.class.getDeclaredMethod("findSubstring", String.class, String.class, Integer.class);
+        method.setAccessible(true);
+        int r = (int)method.invoke(null,text,substring,max);
+
+        assertEquals(3, r);
+
+    }
+
 
 
     @Test
@@ -479,7 +624,7 @@ public class DistanceStringUnitTest {
         Date r = (Date) method.invoke(null,a);
 
         String stringToFind = "3-10-17";
-        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(stringToFind);
+        Date date = new SimpleDateFormat("dd-MM-yy").parse(stringToFind);
 
         assertEquals(date, r);
     }
@@ -526,11 +671,11 @@ public class DistanceStringUnitTest {
     @Test
     public void GetFormatDateTest1() throws Exception {
 
-        String a = "10-9-2017";
-        String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy"};
-        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class, String[].class);
+
+        String a = "10-9-17";
+        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class);
         method.setAccessible(true);
-        Date r = (Date) method.invoke(null,a,expectedPattern);
+        Date r = (Date) method.invoke(null,a);
 
         String stringToFind = "10-9-2017";
         Date date = new SimpleDateFormat("dd-MM-yyyy").parse(stringToFind);
@@ -541,11 +686,10 @@ public class DistanceStringUnitTest {
     @Test
     public void GetFormatDateTest2() throws Exception {
 
-        String a = "10/9/2017";
-        String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy"};
-        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class, String[].class);
+        String a = "10/9/17";
+        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class);
         method.setAccessible(true);
-        Date r = (Date) method.invoke(null,a,expectedPattern);
+        Date r = (Date) method.invoke(null,a);
 
         String stringToFind = "10/9/2017";
         Date date = new SimpleDateFormat("dd/MM/yyyy").parse(stringToFind);
@@ -557,15 +701,32 @@ public class DistanceStringUnitTest {
     public void GetFormatDateTest3() throws Exception {
 
         String a = "10.09.2017";
-        String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy"};
-        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class, String[].class);
+
+        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class);
         method.setAccessible(true);
-        Date r = (Date) method.invoke(null,a,expectedPattern);
+        Date r = (Date) method.invoke(null,a);
 
         String stringToFind = "10.9.2017";
         Date date = new SimpleDateFormat("dd.MM.yyyy").parse(stringToFind);
 
         assertEquals(date, r);
+    }
+
+
+    @Test
+    public void GetFormatDateTest4() throws Exception {
+
+        String a = "10.09.17";
+        Method method = DataAnalyzer.class.getDeclaredMethod("parseDate", String.class);
+        method.setAccessible(true);
+        Date r = (Date) method.invoke(null,a);
+
+        String stringToFind = "10.9.17";
+        Date date = new SimpleDateFormat("dd.MM.yy").parse(stringToFind);
+
+        assertEquals(date, r);
+
+
     }
 
 

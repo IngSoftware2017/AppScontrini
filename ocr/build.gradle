@@ -6,7 +6,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0 Aoi Tori"
+        versionName "1.4.0 Vampire Kyun"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -37,15 +37,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     api project(':common')
-    implementation 'com.ing.software:opencv-android:1.0.0'
+    api 'com.ing.software:opencv-android:1.0.0'
     implementation 'com.google.android.gms:play-services-vision:11.8.0'
 }
 
-task copyDataset(type: Copy){
-    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
-        exclude '**/desktop.ini' //desktop.ini files break AssetManager
-    }
-    into "${projectDir}/src/androidTest/assets"
-}
-
-tasks.preBuild.dependsOn('copyDataset')
+//task copyDataset(type: Copy){
+//    from(System.getenv('GDRIVE').toString() + '/Ingegneria del Software/DataSet') {
+//        exclude '**/desktop.ini' //desktop.ini files break AssetManager
+//    }
+//    into "${projectDir}/src/androidTest/assets"
+//}
+//
+//tasks.preBuild.dependsOn('copyDataset')

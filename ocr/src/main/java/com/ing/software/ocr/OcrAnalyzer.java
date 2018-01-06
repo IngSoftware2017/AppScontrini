@@ -4,28 +4,35 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.Size;
+import android.util.Pair;
+import android.util.SizeF;
 import android.util.SparseArray;
-
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.android.gms.vision.text.*;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.regex.Matcher;
+
+import com.ing.software.common.*;
 import com.ing.software.ocr.OcrObjects.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import static com.ing.software.common.CommonUtils.size;
+import static java.util.Collections.*;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
+import static java.lang.Math.*;
 
 /**
  * Class containing different methods to analyze a picture
  * @author Michelon
  * @author Zaglia
  */
-class OcrAnalyzer {
+public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private final int targetPrecision = 130; //Should be passed with image. todo

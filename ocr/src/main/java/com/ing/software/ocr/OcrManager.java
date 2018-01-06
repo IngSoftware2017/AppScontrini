@@ -10,11 +10,13 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.common.Ticket;
+import com.ing.software.common.TicketError;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.annimon.stream.function.Consumer;
@@ -23,8 +25,6 @@ import static com.ing.software.ocr.AmountComparator.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
 import static com.ing.software.ocr.OcrVars.*;
 
-/*
-*/
 /**
  * Class to control ocr analysis
  * <p> This class is thread-safe. </p>
@@ -61,28 +61,57 @@ public class OcrManager {
     }
 
     /**
-     * Get a Ticket from an ImagePreprocessor. Some fields of the new ticket can be null.
-     * @param preprocessor ImagePreprocessor. Not null.
-     * @param ticketCb     callback to get the ticket. Not null.
+     * Get a Ticket from an ImageProcessor. Some fields of the new ticket can be null.
+     * <p> Possible errors inside Ticket.errors can be: </p>
+     * <ul> INVALID_STATE: this OcrManager has not been properly initialized. </ul>
+     * <ul> INVALID_PROCESSOR: the ImageProcessor passed as parameter is not valid. </ul>
+     * <ul> AMOUNT_NOT_FOUND: the amount has not been found. </ul>
+     * <ul> DATE_NOT_FOUND: the date has not been found. </ul>
+     * @param imgProc ImageProcessor which has been set an image. Not null.
+     * @return Ticket. Never null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
-    public void getTicket(@NonNull ImagePreprocessor preprocessor, @NonNull Consumer<Ticket> ticketCb) {
-        new Thread(() -> {
-            synchronized (this) {
-                if (!operative)
-                    return;
-                long startTime = System.nanoTime();
-                Bitmap bm = preprocessor.undistort(0.05);
-                //bm = scaleBitmap(bm); //for tests
-                OcrResult result = analyzer.analyze(bm);
-                ticketCb.accept(getTicketFromResult(result));
-                long endTime = System.nanoTime();
-                double duration = ((double) (endTime - startTime)) / 1000000000;
-                OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
-            }
-        }).start();
+    public synchronized Ticket getTicket(@NonNull ImageProcessor imgProc) {
+        Ticket ticket = new Ticket();
+        ticket.errors = new ArrayList<>();
+        ticket.rectangle = imgProc.getCorners();
+        if (!operative) {
+            ticket.errors.add(TicketError.INVALID_STATE);
+            return ticket;
+        }
+
+        long startTime = System.nanoTime();
+        Bitmap frame = imgProc.undistortForOCR();
+        if (frame == null) {
+            ticket.errors.add(TicketError.INVALID_PROCESSOR);
+            return ticket;
+        }
+        OcrResult result = analyzer.analyze(frame);
+        Ticket newTicket = getTicketFromResult(result);
+        long endTime = System.nanoTime();
+        double duration = ((double) (endTime - startTime)) / 1000000000;
+        OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+
+        ticket.amount = newTicket.amount;
+        ticket.date = newTicket.date;
+        if (ticket.amount == null)
+            ticket.errors.add(TicketError.AMOUNT_NOT_FOUND);
+        if (ticket.date == null)
+            ticket.errors.add(TicketError.DATE_NOT_FOUND);
+        return ticket;
+    }
+
+    /**
+     * Asynchronous version of getTicket(imgProc). The ticket is passed by the callback parameter.
+     * @param imgProc ImageProcessor which has been set an image. Not null.
+     * @param ticketCb callback to get the ticket. Not null.
+     *
+     * @author Riccardo Zaglia
+     */
+    public void getTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<Ticket> ticketCb) {
+        new Thread(() -> ticketCb.accept(getTicket(imgProc))).start();
     }
 
     /**
@@ -112,7 +141,7 @@ public class OcrManager {
         List<RawText> prices = result.getRawImage().getPossiblePrices();
         //First level, if we have a string from "AMOUNT_STRINGS[]" we try to decode a value on the same height and if necessary fix it
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
-        if (ticket.amount == null)
+        if (ticket.amount == null) //Takes all prices from schemas and use probability to find the amount (needs at least one hit to accept the value)
             ticket.amount = analyzeAlternativeAmount(prices);
         ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
         long endTime = System.nanoTime();
@@ -154,7 +183,7 @@ public class OcrManager {
         List<RawGridResult> possiblePrices = getPricesList(amountText, products);
         amountComparator.analyzePrices(possiblePrices);
         amountComparator.analyzeTotals(possiblePrices);
-        amount = amountComparator.getBestAmount();
+        amount = amountComparator.getBestAmount(0);
         return amount;
     }
 
@@ -219,7 +248,6 @@ public class OcrManager {
      * We have no valid amount from string search. Try to decode the amount only from products prices.
      * @param texts List of prices
      * @return possible amount. Null if nothing found.
-     * todo: vai al meglio di 2 almeno, o prendi troppi sbagliati
      */
     private static BigDecimal analyzeAlternativeAmount(List<RawText> texts) {
         if (texts.size() == 0)
@@ -253,8 +281,11 @@ public class OcrManager {
         List<RawGridResult> possiblePrices = getPricesList(currentText, texts);
         amountComparator.analyzePrices(possiblePrices);
         amountComparator.analyzeTotals(possiblePrices);
-        amount = amountComparator.getBestAmount();
-        OcrUtils.log(2, "AlternativeAmount", "Maximized amount is: " + amount.toString());
+        amount = amountComparator.getBestAmount(1);
+        if (amount != null)
+            OcrUtils.log(2, "AlternativeAmount", "Maximized amount is: " + amount.toString());
+        else
+            OcrUtils.log(2, "AlternativeAmount", "No amount found.");
         return amount;
     }
 }
