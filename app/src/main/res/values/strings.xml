@@ -61,5 +61,10 @@
     <string name="text_activeMission">Missioni attive:</string>
     <string name="text_closeMission">Missioni già rimborsate:</string>
     <string name="text_ticket">Scontrini totali:</string>
+    <string name="ticket_count_text">Scontrini presenti nella missione:</string>
+    <string name="mission_total_text">Spese totali missione:</string>
+
+    <string name="menu_modify_mission">Modifica</string>
+    <string name="menu_mission_summary">Informazioni</string>
 </resources>
 

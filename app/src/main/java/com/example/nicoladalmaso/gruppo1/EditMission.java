@@ -20,9 +20,11 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.TicketEntity;
 
 /**
  * Created by Francesco on 03/01/2018.
@@ -38,6 +40,8 @@ public class EditMission extends AppCompatActivity {
     TextView txtMissionEnd;
     TextView txtMissionLocation;
     CheckBox chkIsClosed;
+    TextView txtCount;
+    TextView txtMissionTotal;
 
     //TODO: poter cambiare persona?
     @Override
@@ -55,6 +59,9 @@ public class EditMission extends AppCompatActivity {
         txtMissionStart=(TextView)findViewById(R.id.input_missionEditStart);
         txtMissionEnd=(TextView)findViewById(R.id.input_missionEditFinish);
         chkIsClosed=(CheckBox)findViewById(R.id.check_isRepaid);
+        txtCount=(TextView)findViewById(R.id.ticket_count);
+        txtMissionTotal=(TextView)findViewById(R.id.mission_total);
+
 
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionEditStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionEditFinish);
@@ -151,5 +158,16 @@ public class EditMission extends AppCompatActivity {
         txtMissionStart.setText(formatter.format(thisMission.getStartDate()));
         txtMissionEnd.setText(formatter.format(thisMission.getEndDate()));
         chkIsClosed.setChecked(thisMission.isRepay());
+        List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);
+        txtCount.setText(Integer.toString(ticketList.size()));
+        BigDecimal totale=new BigDecimal(0);
+        for(int i=0; i<ticketList.size(); i++){
+            totale=totale.add(ticketList.get(i).getAmount());
+        }
+        //TODO hardcoded strings must be removed
+        if (ticketList.size()==0)
+            txtMissionTotal.setText("Nessuno scontrino");
+        else
+            txtMissionTotal.setText("€" + totale.toString());
     }
 }
