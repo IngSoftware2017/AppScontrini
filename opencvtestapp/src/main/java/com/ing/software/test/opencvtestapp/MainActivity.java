@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         MatOfPoint ptsMat = new MatOfPoint(cvPts.toArray(new Point[4]));
         return Collections.singletonList(ptsMat);
     }
-
+/*
     static void drawTextLines(Mat img, List<TextLine> lines, Scalar wordBgColor) throws Exception {
         for (TextLine line : lines) {
             polylines(img, pts2mat(line.corners()), true, RED, LINE_THICK);
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+*/
     /**
      * Draw text on a Bitmap.
      * @param bm input bitmap
@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
 
                 imgProc.findTicket(false);
                 Bitmap textLinesBm = invoke(imgProc, "undistortForOCR");
-
+/*
                 //find amount
                 List<TextLine> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
                 TextLine amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
                     drawTextLines(mat, amountLines, BLUE);
                     showMat(mat);
                 }
-
+*/
                 imageIdx++;
             }
         });

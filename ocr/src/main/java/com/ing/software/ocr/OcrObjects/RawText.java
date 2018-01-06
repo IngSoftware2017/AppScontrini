@@ -26,7 +26,6 @@ public class RawText implements Comparable<RawText> {
     private RectF rectText;
     private String detection;
     private RawImage rawImage;
-    private TextLine line;
 
     /**
      * Constructor
@@ -38,12 +37,6 @@ public class RawText implements Comparable<RawText> {
         rectText = new RectF(text.getBoundingBox());
         this.detection = text.getValue();
         this.rawImage = rawImage;
-        if (text instanceof Line)
-            line = new TextLine((Line)text);
-    }
-    
-    public TextLine asTextLine() {
-        return line;
     }
 
     /**
