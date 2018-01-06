@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,16 +9,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import database.DataManager;
+import database.MissionEntity;
 import database.PersonEntity;
 
 public class AddNewPerson extends AppCompatActivity {
 
     Context context;
     public DataManager DB;
+    TextView missionStart;
+    TextView missionFinish;
+    int personID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,10 +36,9 @@ public class AddNewPerson extends AppCompatActivity {
         getSupportActionBar().setElevation(0);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        setTitle(getResources().getString(R.string.newPerson));
+        setTitle(context.getString(R.string.newPerson));
         setContentView(R.layout.activity_add_new_person);
     }
-
     /** Dal Maso
      * Setting toolbar buttons and style from /res/menu
      * @param menu
@@ -37,7 +47,7 @@ public class AddNewPerson extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addmission_menu, menu);
+        inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
 
@@ -52,7 +62,7 @@ public class AddNewPerson extends AppCompatActivity {
         Intent intent = new Intent();
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_addMission:
+            case R.id.action_confirm:
                 //read input text
                 EditText editName =(EditText)findViewById(R.id.input_personName);
                 EditText editLastName = (EditText)findViewById(R.id.input_personLastName);
@@ -82,10 +92,10 @@ public class AddNewPerson extends AppCompatActivity {
                 //Start billActivity
                 Bundle bundle = new Bundle();
 
-                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
+                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startMissionView.putExtra(IntentCodes.INTENT_PERSON_ID_CODE, (int) personID);
-                startMissionView.putExtra(IntentCodes.INTENT_PERSON_NAME_CODE, name);
+                startMissionView.putExtra("personID", (int) personID);
+                startMissionView.putExtra("personName", name);
                 context.startActivity(startMissionView);
                 setResult(RESULT_OK, intent);
                 finish();

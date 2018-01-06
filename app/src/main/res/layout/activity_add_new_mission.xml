@@ -33,7 +33,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
                 android:textColor="#FFF"
-                android:textSize="22dp" />
+                android:textSize="22dp"
+                android:singleLine="true"/>
 
         </android.support.design.widget.TextInputLayout>
 
@@ -53,6 +54,7 @@
                 android:layout_height="60dp"
                 android:hint="@string/location"
                 android:textColor="#FFF"
+                android:singleLine="true"
                 android:textSize="22dp" />
 
         </android.support.design.widget.TextInputLayout>

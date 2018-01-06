@@ -38,6 +38,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile project(':database')
+    compile project(':common')
+    compile project(':ocr')
     compile 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.ing.software:opencv-android:1.0.0'
     compile 'com.android.support:appcompat-v7:26.1.0'
@@ -48,5 +50,4 @@ dependencies {
     compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.android.support:recyclerview-v7:26.1.0'
     testCompile "org.mockito:mockito-core:2.+"
-    compile project(path: ':ocr')
 }

@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initialize(){
         DB = new DataManager(this.getApplicationContext());
-        FloatingActionButton fab = findViewById(R.id.fab_addPerson);
+        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
@@ -138,5 +138,4 @@ public class MainActivity extends AppCompatActivity {
             addToList(people.get(i));
         }
     }
-
 }

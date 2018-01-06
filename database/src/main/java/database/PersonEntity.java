@@ -38,6 +38,7 @@ public class PersonEntity {
     public PersonEntity() {
     }
 
+    @Ignore
     /**
      * Parametric constructor
      *

@@ -4,7 +4,6 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -29,16 +28,16 @@ public class AppUtilities {
             Log.d("dateOriginStart",start);
 
             Log.d("dateOriginFinish",finish);
-            Date in=basicFormat.parse(start);
-            Date out=basicFormat.parse(finish);
+            Date in = basicFormat.parse(start);
+            Date out = basicFormat.parse(finish);
 
-            String newIn=formatCheck.format(in);
+            String newIn = formatCheck.format(in);
             Log.d("dataModificataIn",newIn);
-            String newOut=formatCheck.format(out);
+            String newOut = formatCheck.format(out);
             Log.d("dataModificataOut",newOut);
-            int before=Integer.parseInt(newIn);
-            int then=Integer.parseInt(newOut);
-            if(before<=then)
+            int before = Integer.parseInt(newIn);
+            int then = Integer.parseInt(newOut);
+            if(before <= then)
                 return true;
 
         } catch (ParseException e) {
@@ -46,23 +45,36 @@ public class AppUtilities {
         }
         return false;
     }
-
     /**
-     * Sets the right date format
-     * @param input date to change format
-     * @return string date in format dd/mm/yyyy
-     *
-     * @author matteo.mascotto
-     */
-    public String dateToStandardFormat(Date input) {
+          * Lazzarin
+          * Method written to fix a bug of Android's DatePicker that save the date with month before the selected month.(When this bug will be eliminated, simply we'll
+          * don't use this method)
+          * @param date on format dd/MM/yyyy
+          * @return date with +1 about Month, on format dd/MM/yyyy
+          */
+    public static String addMonth(String date)
+    {        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
+                String newDate="00000000";
+        try
+         {
+                Log.d("dateOrigin",date);
+                Date in = basicFormat.parse(date);
+                newDate = formatCheck.format(in);
+                Log.d("formatoData",newDate);
+                int temp = Integer.parseInt(newDate); // on this format, month is in the hundreds order
+                Log.d("meseAggiunto",temp+"");
+                newDate = temp+"";
+                in = formatCheck.parse(newDate);
+                newDate = basicFormat.format(in);
+                Log.d("formatoDataRestituito",newDate);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(input);
-
-        int year = calendar.get(calendar.YEAR);
-        int month = 1 + calendar.get(calendar.MONTH);
-        int day = calendar.get(calendar.DATE);
-
-        return day + "/" + month + "/" + year;
+        }
+        catch(ParseException e){
+            Log.d("Error","Wrong date format");
+        }
+        return newDate;
     }
+
+
 }

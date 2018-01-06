@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
  */
 
 public class AddNewMissionTest {
-    AppUtilities test=new  AppUtilities();
+
     @Test
     public void checkDateTest()
     {
@@ -25,7 +25,7 @@ public class AddNewMissionTest {
                         String start=day+"/"+month+"/"+year;
                         day++;
                         String finish=day+"/"+month+"/"+year;
-                        assertEquals(true,test.checkDate(start,finish));
+                        assertEquals(true,AppUtilities.checkDate(start,finish));
                     }
                     day=01;
                     month++;
@@ -46,7 +46,7 @@ public class AddNewMissionTest {
                     String finish=day+"/"+month+"/"+year;
                     day+=3;
                     String start=day+"/"+month+"/"+year;
-                    assertEquals(false,test.checkDate(start,finish));
+                    assertEquals(false,AppUtilities.checkDate(start,finish));
                 }
                 day=01;
                 month++;

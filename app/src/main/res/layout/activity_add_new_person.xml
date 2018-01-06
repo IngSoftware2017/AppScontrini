@@ -28,6 +28,7 @@
             android:theme="@style/TextLabel">
 
             <EditText
+                android:singleLine="true"
                 android:id="@+id/input_personName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,6 +49,7 @@
             android:theme="@style/TextLabel">
 
             <EditText
+                android:singleLine="true"
                 android:id="@+id/input_personLastName"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -95,6 +97,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/input_personAcademicTitle"
+                        android:singleLine="true"
                         android:hint="Titolo accademico" />
                 </android.support.design.widget.TextInputLayout>
 

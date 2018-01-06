@@ -9,9 +9,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabItem;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,11 +24,12 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.common.Ticket;
+import com.ing.software.ocr.DataAnalyzer;
 import com.ing.software.ocr.ImagePreprocessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -37,8 +38,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -55,11 +54,6 @@ public class BillActivity extends AppCompatActivity {
     public List<TicketEntity> list = new LinkedList<TicketEntity>();
     public Uri photoURI;
     public boolean isFabOpen = false;
-    static final int REQUEST_TAKE_PHOTO = 1;
-    public static final int PICK_PHOTO_FOR_AVATAR = 2;
-    static final String FILE_PROVIDER_AUTHORITY ="com.example.android.fileprovider" ;
-    static final String FILENAME_PREFIX = "JPEG_";
-    static final String FILENAME_SUFFIX = "_";
     String tempPhotoPath;
     Integer missionID;
     MissionEntity thisMission;
@@ -67,32 +61,31 @@ public class BillActivity extends AppCompatActivity {
     String root;
     public DataManager DB;
     OcrManager ocrManager;
-    int sleep = 2000;
-    final int MISSION_MOD = 1;
-    final String DEBUGTICKET = "DEBUGTICKET";
+
+    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int PICK_PHOTO_FOR_AVATAR = 2;
+    static final int TICKET_MOD = 4;
+    static final int MISSION_MOD = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        DB = new DataManager(context);
 
         Intent intent = getIntent();
-        missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID_CODE);
+        missionID = intent.getExtras().getInt("missionID");
         thisMission = DB.getMission(missionID);
         setTitle(thisMission.getName());
 
-        /*Federico Taschin
-         * OCR initialization
-         */
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
                 //On first run vision library will be downloaded
-                Toast.makeText(this, R.string.downloading_library, Toast.LENGTH_LONG).show();
-                Thread.sleep(sleep);
+                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -126,14 +119,12 @@ public class BillActivity extends AppCompatActivity {
             case (R.id.action_deleteMission):
                 deleteMission();
                 break;
-
             case (R.id.action_editMission):
-                //Open EditMission Activity
+                //TODO: modifica la missione
                 Intent editMission = new Intent(context, com.example.nicoladalmaso.gruppo1.EditMission.class);
-                editMission.putExtra("missionID", missionID);
+                editMission.putExtra("missionID", thisMission.getID());
                 startActivityForResult(editMission, MISSION_MOD);
                 break;
-
             default:
                 setResult(RESULT_OK, intent);
                 finish();
@@ -171,6 +162,12 @@ public class BillActivity extends AppCompatActivity {
                 pickImageFromGallery();
             }
         });
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
     }
 
     /** Dal Maso
@@ -256,7 +253,9 @@ public class BillActivity extends AppCompatActivity {
              Log.d("IOException","error using createImageFile method");
             }
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,FILE_PROVIDER_AUTHORITY,photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
                 takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
             }
@@ -330,9 +329,7 @@ public class BillActivity extends AppCompatActivity {
                 case(REQUEST_TAKE_PHOTO):
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
-                    Uri photoUri = savePickedFile(bitmapPhoto);
-                    Ticket ticket = getTicket(bitmapPhoto);
-                    saveTicket(ticket, photoUri);
+                    savePickedFile(bitmapPhoto);
                     deleteTempFiles();
                     waitDB();
                     clearAllImages();
@@ -345,9 +342,7 @@ public class BillActivity extends AppCompatActivity {
                     photoURI = data.getData();
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                        Uri photoGalleryUri = savePickedFile(btm);
-                        Ticket ticket1 = getTicket(btm);
-                        saveTicket(ticket1, photoGalleryUri);
+                        savePickedFile(btm);
                         waitDB();
                         clearAllImages();
                         printAllTickets();
@@ -355,6 +350,7 @@ public class BillActivity extends AppCompatActivity {
                         Log.d("Foto da galleria", "ERROR");
                     }
                     break;
+
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
@@ -363,7 +359,14 @@ public class BillActivity extends AppCompatActivity {
                     printAllTickets();
                     break;
 
-                case(4):
+                case (TICKET_MOD):
+                    clearAllImages();
+                    printAllTickets();
+                    break;
+
+                case (MISSION_MOD):
+                    thisMission = DB.getMission(missionID);
+                    setTitle(thisMission.getName());
                     clearAllImages();
                     printAllTickets();
                     break;
@@ -388,13 +391,13 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-    /** Dal Maso (Modified by Federico Taschin)
+    /** Dal Maso
      * Save the bitmap passed
      * @param imageToSave bitmap to save
      */
-    private Uri savePickedFile(Bitmap imageToSave) {
+    private void savePickedFile(Bitmap imageToSave) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = FILENAME_PREFIX + timeStamp + FILENAME_SUFFIX;
+        String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";
         File file = new File(root, fname);
         File originalPhoto = new File(root,fname+"orig");
@@ -405,6 +408,15 @@ public class BillActivity extends AppCompatActivity {
             originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
+            //TODO: OCR HERE
+            TicketEntity ticket = new TicketEntity();
+            ticket.setDate(Calendar.getInstance().getTime());
+            ticket.setFileUri(uri);
+            ticket.setAmount(BigDecimal.valueOf(10000).movePointLeft(2));
+            ticket.setShop("Pam Padova");
+            ticket.setTitle("Scontrino ");
+            ticket.setMissionID(missionID);
+            DB.addTicket(ticket);
 
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
@@ -413,11 +425,9 @@ public class BillActivity extends AppCompatActivity {
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
             outOriginal.flush();
             outOriginal.close();
-            return uri;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     /**PICCOLO
@@ -466,50 +476,16 @@ public class BillActivity extends AppCompatActivity {
         }
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
+        String noBillsError=getResources().getString(R.string.noBills);
+        if(!thisMission.isRepay())
+            noBillsError+=getResources().getString(R.string.noBillsOpen);
+        noBills.setText(noBillsError);
         if(count == 0){
             noBills.setVisibility(View.VISIBLE);
         }
         else{
             noBills.setVisibility(View.INVISIBLE);
         }
-    }
-
-    /**
-     * Wait the ocr thread to analyze the image
-     * Taschin Federico
-     * @param photo
-     * @return
-     */
-    public synchronized Ticket getTicket(Bitmap photo) {
-        Ticket ticket = new Ticket();
-        ticket.date = Calendar.getInstance().getTime();
-        ImagePreprocessor preproc = new ImagePreprocessor();
-        preproc.setImage(photo);
-        preproc.findTicket(false, errs -> {
-            // handle here all errors inside errs.
-            ocrManager.getTicket(preproc, result -> {
-                ticket.amount = result.amount;
-            });
-        });
-        return ticket;
-    }
-
-
-
-    /**
-     * Taschin Federico
-     * @param ticket
-     * @param photoPath
-     */
-    public void saveTicket(Ticket ticket, Uri photoPath){
-        TicketEntity ticketEntity = new TicketEntity();
-        ticketEntity.setAmount(ticket.amount);
-        ticketEntity.setDate(ticket.date);
-        ticketEntity.setFileUri(photoPath);
-        ticketEntity.setShop("Pam Padova");
-        ticketEntity.setTitle("Scontrino ");
-        ticketEntity.setMissionID(missionID);
-        DB.addTicket(ticketEntity);
     }
 
     /**PICCOLO_Edit by Dal Maso
@@ -524,9 +500,17 @@ public class BillActivity extends AppCompatActivity {
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
 
-    @Override
-    protected void onDestroy() {
-        ocrManager.release();
-        super.onDestroy();
+    /**PICCOLO
+     * Method that is run when the activity is resumed.
+     * it hides the button for adding tickets if the mission is closed, else it shows it.
+     */
+    public void onResume(){
+        super.onResume();
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
     }
 }

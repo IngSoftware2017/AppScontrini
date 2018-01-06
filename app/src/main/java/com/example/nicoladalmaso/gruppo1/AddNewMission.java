@@ -34,21 +34,13 @@ import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 
-/**
- *
- * Modified: Check if there's some correct date value into the Begin and End mission
- * @author matteo.mascotto on 03/01/2018
- */
 public class AddNewMission extends AppCompatActivity{
 
     Context context;
     public DataManager DB;
     TextView missionStart;
     TextView missionFinish;
-    int personID;
-    final String START_DATEPICKER_TAG = "startDatePicker";
-    final String FINISH_DATEPICKER_TAG = "finishDatePicker";
-    final String DATE_FORMAT ="dd/MM/yyyy";
+    int personID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +49,11 @@ public class AddNewMission extends AppCompatActivity{
         setTitle(getString(R.string.newMission));
         setContentView(R.layout.activity_add_new_mission);
 
+        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        DB = new DataManager(context);
 
         Intent intent = getIntent();
-        personID = intent.getExtras().getInt(IntentCodes.INTENT_PERSON_ID_CODE);
+        personID = intent.getExtras().getInt("person");
         Log.d("PersonIDAddMission", ""+personID);
 
         initializeComponents();
@@ -75,14 +67,14 @@ public class AddNewMission extends AppCompatActivity{
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
-                newFragment.show(getFragmentManager(), START_DATEPICKER_TAG);
+                newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
-                newFragment.show(getFragmentManager(), FINISH_DATEPICKER_TAG);
+                newFragment.show(getFragmentManager(), "finishDatePicker");
             }
         });
     }
@@ -95,7 +87,7 @@ public class AddNewMission extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addmission_menu, menu);
+        inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
 
@@ -110,12 +102,15 @@ public class AddNewMission extends AppCompatActivity{
         // Handle item selection
         Intent intent = new Intent();
         switch (item.getItemId()) {
-            case R.id.action_addMission:
+            case R.id.action_confirm:
                 //read input text
                 EditText editName =(EditText)findViewById(R.id.input_missionName);
                 EditText editLocation = (EditText)findViewById(R.id.input_missionLocation);
                 String name = editName.getText().toString();
                 String location = editLocation.getText().toString();
+                String startDate=(String) missionStart.getText();
+                String finishDate=(String) missionFinish.getText();
+                Log.d("marsadenadata",startDate);
 
                 if ((name == null) || name.replaceAll(" ","").equals("")) {
                     Toast.makeText(context, getResources().getString(R.string.toast_missionNoName), Toast.LENGTH_SHORT).show();
@@ -125,28 +120,27 @@ public class AddNewMission extends AppCompatActivity{
                     Toast.makeText(context, getResources().getString(R.string.toast_missionNoLocation), Toast.LENGTH_SHORT).show();
                     return false;
                 }
+                if((startDate==null) ||startDate.equals(getResources().getString(R.string.dateStart))) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_noDataStart), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if((finishDate==null) || finishDate.equals(getResources().getString(R.string.dateFinish))) {
+                    Toast.makeText(context, getResources().getString(R.string.toast_noDataFinish), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
 
                 MissionEntity miss = new MissionEntity();
                 miss.setName(name);
                 miss.setPersonID(personID);
                 miss.setLocation(location);
+                miss.setRepay(false);
 
-                SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
 
-                    String start=(String) missionStart.getText();
-                    String finish=(String) missionFinish.getText();
+                    String start=AppUtilities.addMonth(startDate);
 
-                    // If there's no date insert as start or end it return an error
-                    if (start == getResources().getString(R.string.dateStart)) {
-                        Toast.makeText(context, getResources().getString(R.string.toast_errorDateStart), Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                    if (finish == getResources().getString(R.string.dateFinish)) {
-                        Toast.makeText(context, getResources().getString(R.string.toast_errorDateEnd), Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-
+                    String finish=AppUtilities.addMonth(finishDate);
                     if(!AppUtilities.checkDate(start,finish)) {
                         Log.d("formato data inserita", "errato");
                         Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
@@ -172,8 +166,8 @@ public class AddNewMission extends AppCompatActivity{
 
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startImageView.putExtra(IntentCodes.INTENT_MISSION_ID_CODE, (int) missionID);
-                startImageView.putExtra(IntentCodes.INTENT_MISSION_NAME_CODE, miss.getName());
+                startImageView.putExtra("missionID", (int) missionID);
+                startImageView.putExtra("missionName", miss.getName());
                 context.startActivity(startImageView);
                 setResult(RESULT_OK, intent);
                 finish();

@@ -11,21 +11,26 @@
     <string name="action_deleteMission">Elimina missione</string>
     <string name="action_deletePerson">Elimina persona</string>
     <string name="billTitle">Il tuo scontrino</string>
+    <string name="add">Aggiungi</string>
     <string name="name">Nome</string>
     <string name="shop">Negozio</string>
     <string name="total">Totale</string>
     <string name="date">Data</string>
     <string name="location">Luogo</string>
-    <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
-    <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
-    <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + iniziare</string>
+    <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + per iniziare</string>
+    <string name="noMissionsClosed">Nessuna missione chiusa</string>
+    <string name="noBills">Nessun scontrino disponibile</string>
+    <string name="noBillsOpen">\nClicca sul pulsante + per iniziare</string>
+    <string name="noAcademicTitle">Nessun titolo accademico</string>
+    <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + per iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
+    <string name="Open">Aperte</string>
+    <string name="Closed">Chiuse</string>
     <!--lazzarin-->
     <string name="newMission">Nuova missione</string>
     <string name="newPerson">Nuova persona</string>
     <string name="deleteMissionToast">Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati</string>
-    <string name="deletePersonToast">Sei sicuro di voler eliminare la persona?\nTutte le missioni verranno eliminate</string>
     <string name="buttonDelete">Elimina</string>
     <string name="cancel">Annulla</string>
     <string name="deleteTicketToast">Sei sicuro di voler eliminare lo scontrino?</string>
@@ -37,12 +42,19 @@
     <string name="toast_personNoName">Nome persona mancante</string>
     <string name="toast_missionNoLocation">Luogo missione mancante</string>
     <string name="toast_personNoLastName">Cognome persona mancante</string>
-    <string name="toast_errorDate">La data di fine precede \nquella di inizio</string>
-    <string name="toast_errorDateStart">Inserire una data di inizio</string>
-    <string name="toast_errorDateEnd">Inserire una data di fine</string>
-    <string name="editPerson">Modifica persona</string>
-    <string name="editMission">Modifica missione</string>
-    <!--taschin-->
-    <string name="mission_title">- Missioni</string>
-    <string name="downloading_library">Downloading library...</string>
+    <string name="toast_errorDate">Inizio > Fine</string>
+    <string name="toast_noDataStart">Data di inizio mancante</string>
+    <string name="toast_noDataFinish">Data di fine mancante</string>
+    <!--Piccolo-->
+    <string name="text_isRepaid">La missione è stata archiviata?</string>
+    <string name="title_activity_missions_tabbed">MissionsTabbed</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <!--Mantovan-->
+    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
+    <string name="delete_title_person">Cancellazione</string>
 </resources>
+

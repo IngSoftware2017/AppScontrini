@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import database.MissionEntity;
 
@@ -52,7 +54,16 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         title.setText(c.getName());
         location.setText(c.getLocation());
         convertView.setTag(c.getID());
-        Log.d("Mission", ""+c.getStartDate());
+        Log.d("MissionStartBadFormat", ""+c.getStartDate());
+        //Lazzarin :blocco per convertire in formato più leggibile la data
+        Date start=c.getStartDate();
+        SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
+        String startDate=tr.format(start);
+        Date finish=c.getStartDate();
+        String finishDate=tr.format(finish);
+        Log.d("missionStart", startDate);
+        Log.d("missionEnd",finishDate);
+
 
         //Dal Maso
         //Sets a default background color for the mission's card
@@ -76,7 +87,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 missionID = Integer.parseInt(v.getTag().toString());
                 Intent startTicketsView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startTicketsView.putExtra("missionID", missionID);
-                ((MissionActivity)context).startActivityForResult(startTicketsView, 1);
+                ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);
             }
         });
 
