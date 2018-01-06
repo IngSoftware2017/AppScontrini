@@ -174,7 +174,6 @@ public class TicketEntity {
         this.missionID = missionID;
     }
 
-
     /**
      * Returns the corners of the ticket
      * 8 float point of the rectangle coordinate
