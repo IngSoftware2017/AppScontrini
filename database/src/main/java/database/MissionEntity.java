@@ -1,6 +1,5 @@
 package database;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import android.arch.persistence.room.ColumnInfo;
@@ -24,7 +23,7 @@ import android.net.Uri;
                 onDelete = ForeignKey.CASCADE))
 @TypeConverters(Converters.class) // automatic converters for database correct type
 
-public class MissionEntity implements Serializable{
+public class MissionEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = Constants.MISSION_PRIMARY_KEY)
@@ -32,6 +31,8 @@ public class MissionEntity implements Serializable{
     private Date startDate;
     private Date endDate;
     private String location;
+
+    @ColumnInfo(name = Constants.MISSION_FIELD_REPAID)
     private boolean isRepay;
     private Uri excel;
     private String name;

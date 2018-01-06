@@ -36,7 +36,7 @@ public class TicketEntity {
     private List<String> category;
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
-    private long missionID;
+    private int missionID;
 
     @Ignore
     /**
@@ -55,7 +55,7 @@ public class TicketEntity {
      * @param title name given
      * @param missionID code of the mission
      */
-    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, long missionID) {
+    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
         this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
@@ -160,7 +160,7 @@ public class TicketEntity {
      * Returns the mission id of this ticket
      * @return missionID
      */
-    public long getMissionID() {
+    public int getMissionID() {
         return missionID;
     }
 
@@ -168,7 +168,7 @@ public class TicketEntity {
      * Sets mission id of this TicketEntity
      * @param missionID
      */
-    public void setMissionID(long missionID) {
+    public void setMissionID(int missionID) {
         this.missionID = missionID;
     }
 

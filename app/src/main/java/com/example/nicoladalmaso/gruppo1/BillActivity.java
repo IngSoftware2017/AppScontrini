@@ -69,6 +69,7 @@ public class BillActivity extends AppCompatActivity {
     OcrManager ocrManager;
     int sleep = 2000;
     final int MISSION_MOD = 1;
+    final String DEBUGTICKET = "DEBUGTICKET";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,9 @@ public class BillActivity extends AppCompatActivity {
         thisMission = DB.getMission(missionID);
         setTitle(thisMission.getName());
 
+        /*Federico Taschin
+         * OCR initialization
+         */
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
@@ -252,9 +256,7 @@ public class BillActivity extends AppCompatActivity {
              Log.d("IOException","error using createImageFile method");
             }
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        FILE_PROVIDER_AUTHORITY,
-                        photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this,FILE_PROVIDER_AUTHORITY,photoFile);
                 takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
             }
@@ -483,41 +485,16 @@ public class BillActivity extends AppCompatActivity {
         ticket.date = Calendar.getInstance().getTime();
         ImagePreprocessor preproc = new ImagePreprocessor();
         preproc.setImage(photo);
-        SimpleMonitor monitor = new SimpleMonitor(ticket);
         preproc.findTicket(false, errs -> {
             // handle here all errors inside errs.
             ocrManager.getTicket(preproc, result -> {
                 ticket.amount = result.amount;
-                monitor.notifyActivity();
             });
         });
-        while (ticket.amount==null){
-                monitor.waitTicket();
-        }
         return ticket;
     }
 
-    /**
-     * Federico Taschin
-     */
-    class SimpleMonitor{
-        Ticket ticket;
-        public SimpleMonitor(Ticket ticket){
-            this.ticket = ticket;
-        }
-        public synchronized void waitTicket(){
-            while (ticket.amount==null){
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        public synchronized void notifyActivity(){
-            notifyAll();
-        }
-    }
+
 
     /**
      * Taschin Federico

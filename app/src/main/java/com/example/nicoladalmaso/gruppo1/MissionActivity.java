@@ -63,7 +63,7 @@ public class MissionActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
-                addMission.putExtra("person", personID);
+                addMission.putExtra(IntentCodes.INTENT_PERSON_ID_CODE, personID);
                 Log.d("PersonID", ""+personID);
                 startActivityForResult(addMission, 1);
             }

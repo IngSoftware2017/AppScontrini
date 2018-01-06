@@ -13,12 +13,22 @@ import java.util.List;
  */
 
 public class DataManager {
+    private static DataManager dataManager;
     private Database database; //Database object. All operations on the database pass through this
                                      //Queries are defined in the DAO interface
 
     public DataManager(Context context){
         //receives the instance of the database
         database = Database.getAppDatabase(context);
+    }
+
+    public static DataManager getInstance(Context context){
+        if(dataManager ==null){
+            dataManager = new DataManager(context);
+            return dataManager;
+        }else{
+            return dataManager;
+        }
     }
 
     /** Adds a ticketEntity into the database
@@ -141,6 +151,16 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonOrder(){
+        return database.ticketDao().getAllPersonOrder();
+    }
+
+    /**
      * Return a list of the tickets associate to a specific Mission
      *
      * @param id identifier of the Mission
@@ -258,6 +278,26 @@ public class DataManager {
      */
     public List<MissionEntity> getMissionWithLocation(String location){
         return database.ticketDao().getMissionWithLocation(location);
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions. Those ones that weren't repaid
+     * @return List<MissionEntity> not null with all active missions
+     */
+    List<MissionEntity> getActiveMission(){
+        return database.ticketDao().getActiveMission();
+    }
+
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * @param personId Long not null, the person's id
+     * @return List<MissionEntity> not null with all active missions of the specific person
+     */
+    List<MissionEntity> getActiveMissionForPerson(long personId){
+        return database.ticketDao().getActiveMissionForPerson(personId);
     }
 
     /**Created by Federico Taschin
