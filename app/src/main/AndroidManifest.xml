@@ -70,6 +70,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.nicoladalmaso.gruppo1.MainActivity" />
         </activity>
+        <activity android:name=".ReportDB"></activity>
     </application>
 
 </manifest>

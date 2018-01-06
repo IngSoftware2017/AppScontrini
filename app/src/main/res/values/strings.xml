@@ -56,5 +56,10 @@
     <!--Mantovan-->
     <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
+    <!--Olivieri-->
+    <string name="text_numPerson">Persone presenti:</string>
+    <string name="text_activeMission">Missioni attive:</string>
+    <string name="text_closeMission">Missioni già rimborsate:</string>
+    <string name="text_ticket">Scontrini totali:</string>
 </resources>
 
