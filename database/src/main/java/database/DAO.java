@@ -6,9 +6,11 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
+import android.provider.SyncStateContract;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletionService;
 
 
 /**
@@ -146,6 +148,14 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
+    /**
+     * @author Marco Olivieri
+     * Executes a SELECT of all the PersonEntity in the database in alphabetical order
+     * @return List<PersonEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_LAST_NAME + " ASC")
+    List<PersonEntity> getAllPersonOrder();
+
     //SELECT FROM ID
 
     /**
@@ -239,6 +249,16 @@ public interface DAO {
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = 'FALSE' ")
     List<MissionEntity> getActiveMission();
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * @param personId Long not null, the person's id
+     * @return List<MissionEntity> not null with all active missions of the specific person
+     */
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = 'FALSE' AND "
+            + Constants.PERSON_CHILD_COLUMNS + " =:personId")
+    List<MissionEntity> getActiveMissionForPerson(long personId);
 
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name

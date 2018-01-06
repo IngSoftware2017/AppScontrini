@@ -151,6 +151,16 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonOrder(){
+        return database.ticketDao().getAllPersonOrder();
+    }
+
+    /**
      * Return a list of the tickets associate to a specific Mission
      *
      * @param id identifier of the Mission
@@ -277,6 +287,17 @@ public class DataManager {
      */
     List<MissionEntity> getActiveMission(){
         return database.ticketDao().getActiveMission();
+    }
+
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * @param personId Long not null, the person's id
+     * @return List<MissionEntity> not null with all active missions of the specific person
+     */
+    List<MissionEntity> getActiveMissionForPerson(long personId){
+        return database.ticketDao().getActiveMissionForPerson(personId);
     }
 
     /**Created by Federico Taschin

@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -31,6 +30,7 @@ import database.DataManager;
 import database.TicketEntity;
 
 import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
+
 
 public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
@@ -107,9 +107,14 @@ public class BillViewer extends AppCompatActivity {
 
         //Full image view
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
-        imgView.setImageBitmap(bitmap);
+        //BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        //Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
+        //imgView.setImageBitmap(bitmap);
+        Glide
+                .with(context)
+                .load(ticketPath)
+                .thumbnail(0.1f)
+                .into(imgView);
     }
 
     /** Dal Maso
@@ -121,6 +126,9 @@ public class BillViewer extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.editticket_menu, menu);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(false); //remove back button, or redo ocr doesn't work
         return true;
     }
 
@@ -223,9 +231,14 @@ public class BillViewer extends AppCompatActivity {
         ticket.setFileUri(toCropUri);
 
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
-        imgView.setImageBitmap(bitmap);
+        //BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        //Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
+        //imgView.setImageBitmap(bitmap);
+        Glide
+                .with(context)
+                .load(toCropUri.toString().substring(7))
+                .thumbnail(0.1f)
+                .into(imgView);
     }//cropPhoto
 }
 

@@ -1,24 +1,17 @@
 package com.ing.software.ticketapp;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.theartofdev.edmodo.cropper.CropImage;
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.math.RoundingMode;
@@ -35,14 +28,14 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
     Context context;
     String path = "";
-    int ticketID = 0;
-    int missionID;
+    private int ticketID = 0;
+    private int missionID;
     DataManager DB;
-    List<TicketEntity> t = new ArrayList<TicketEntity>();
+    private List<TicketEntity> t = new ArrayList<TicketEntity>();
 
     //Dal Maso, adapter declare
-    public CustomAdapter(Context context, int textViewResourceId,
-                         List<TicketEntity> objects, int missionID, DataManager DB) {
+    CustomAdapter(Context context, int textViewResourceId,
+                  List<TicketEntity> objects, int missionID, DataManager DB) {
         super(context, textViewResourceId, objects);
         this.context = context;
         this.missionID = missionID;
@@ -51,12 +44,16 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         Log.d("MISSION", ""+missionID);
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+
 
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.cardview, null);
+        if (null == convertView) {
+            convertView = inflater.inflate(R.layout.cardview, parent, false);
+        }
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
@@ -77,14 +74,22 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         }
 
         //Ticket image bitmap set
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
-        img.setImageBitmap(bitmap);
+        //BitmapFactory.Options options = new BitmapFactory.Options();
+        //options.inPreferredConfig = ARGB_8888;
+        //Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
+        //img.setImageBitmap(bitmap);
 
         convertView.setTag(c.getID());
 
         //Dal Maso
+
+
+        Glide
+                .with(context)
+                .load(photo.getAbsolutePath())
+                .thumbnail(0.1f)
+                .into(img);
+
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 ticketID = Integer.parseInt(v.getTag().toString());
@@ -104,6 +109,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                 }
             }//onClick
         });
+
         return convertView;
     }
 }

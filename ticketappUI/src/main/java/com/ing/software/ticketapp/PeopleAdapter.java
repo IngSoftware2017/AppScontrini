@@ -35,15 +35,26 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         convertView = inflater.inflate(R.layout.person_card, null);
         TextView name = (TextView)convertView.findViewById(R.id.personName);
 
+        TextView title=(TextView)convertView.findViewById(R.id.personAcademicTitle);
         PersonEntity person = getItem(position);
         name.setText(person.getName() + " " + person.getLastName());
+        String academicTitle = person.getAcademicTitle();
+        if ((academicTitle == null) || academicTitle.replaceAll(" ","").equals("")) {
+            title.setText(context.getString(R.string.noAcademicTitle));
+        }
+        else {
+            title.setText(person.getAcademicTitle());
+        }
         convertView.setTag(person.getID());
 
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                Intent startMissionsView = new Intent(context, MissionActivity.class);
+                /*Intent startMissionsView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
                 startMissionsView.putExtra("personID", Integer.parseInt(v.getTag().toString()));
-                ((MainActivity)context).startActivityForResult(startMissionsView, 1);
+                ((MainActivity)context).startActivityForResult(startMissionsView, 1);*/
+                Intent missionTab = new Intent(context, MissionsTabbed.class);
+                missionTab.putExtra("personID", Integer.parseInt(v.getTag().toString()));
+                ((MainActivity)context).startActivityForResult(missionTab, 1);
             }
         });
 

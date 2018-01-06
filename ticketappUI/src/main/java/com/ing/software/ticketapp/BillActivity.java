@@ -32,7 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.ocr.ImagePreprocessor;
+import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -112,6 +112,20 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         ocrManager.release();
     }
 
+    /**PICCOLO
+     * Method that is run when the activity is resumed.
+     * it hides the button for adding tickets if the mission is closed, else it shows it.
+     */
+    public void onResume(){
+        super.onResume();
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
+    }
+
     /** Dal Maso
      * Setting toolbar delete button and style from /res/menu
      * @param menu
@@ -181,6 +195,12 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 pickImageFromGallery();
             }
         });
+        if(thisMission.isRepay()) {
+            fab.setVisibility(View.INVISIBLE);
+        }
+        else{
+            fab.setVisibility(View.VISIBLE);
+        }
     }
 
     /** Dal Maso
@@ -343,6 +363,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
+                    if(bitmapPhoto!=null) {
+                        bitmapPhoto.recycle();
+                        bitmapPhoto=null;
+                    }
                     deleteTempFiles();
                     waitDB();
                     clearAllImages();
@@ -497,6 +521,10 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         }
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
+        String noBillsError=getResources().getString(R.string.noBills);
+        if(!thisMission.isRepay())
+            noBillsError+=getResources().getString(R.string.noBillsOpen);
+        noBills.setText(noBillsError);
         if(count == 0){
             noBills.setVisibility(View.VISIBLE);
         }
@@ -581,7 +609,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Bitmap testBmp = getBitmapFromFile(file);
             receiver.send(STATUS_RUNNING, bundle);
             ocrManager.initialize(this);
-            ImagePreprocessor preproc = new ImagePreprocessor(testBmp);
+            ImageProcessor preproc = new ImageProcessor(testBmp);
             preproc.findTicket(false, err -> {
                     ocrManager.getTicket(preproc, result -> {
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
