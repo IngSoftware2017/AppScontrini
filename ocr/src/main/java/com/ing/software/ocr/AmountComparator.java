@@ -230,7 +230,7 @@ class AmountComparator {
      */
     void analyzePrices(@NonNull List<RawGridResult> possiblePrices) {
         BigDecimal decodedAmount = getAmount();
-        int maxDistance = 2; //only 2 miss in amount detection
+        int productsCounter = 1; //number of products in list
         //above amount we can have all prices and a subtotal, so first sum all products with distance > 0
         if (possiblePrices.size() == 0 || possiblePrices.get(0).getPercentage() < 0)
             return;
@@ -255,6 +255,7 @@ class AmountComparator {
                 if (adder != null) {
                     productsSum = productsSum.add(adder);
                     possibleSubTotal = adder; //this way when i exit the while i'll have in possibleSubTotal last value analyzed
+                    productsCounter++;
                 }
             } else {
                 OcrUtils.log(3, "analyzePrices", "Not a valid number: " + productPrice);
@@ -279,14 +280,15 @@ class AmountComparator {
                 } else {
                     flagHasPriceList(productsSum);
                 }
-            } else if (possibleSubTotal != null){ //amount is null
+            }
+            if (possibleSubTotal != null && productsCounter > 2){ //amount is null and we have more than 2 products
                 if (possibleSubTotal.compareTo(halfProductSum) == 0) {
                     OcrUtils.log(3, "analyzePrices", "List of prices/2 equals subtotal");
                     flagHasPriceList(halfProductSum);
                 } else {
                     flagHasPriceList(productsSum);
                 }
-            } else { //amount and possibleSubtotal are null
+            } else if (!hasAmount()){ //amount and possibleSubtotal are null
                 flagHasPriceList(productsSum); //just add it
             }
         }
@@ -430,11 +432,12 @@ class AmountComparator {
                 if (hasSubtotal() && hasPriceList()) {
                     boolean subtotalPrices = subtotal.compareTo(prices) == 0;
                     boolean subtotalAmount = subtotal.compareTo(amount) == 0;
-                    if (subtotalPrices) { //Probably if both subtotal and cash are the same amount is wrong
+                    if (subtotalPrices) { //Probably if both subtotal and pricelist are the same amount is wrong. Actually this may be misleading
+                        //if we have a bunch of '0'. Better not to rely too much on subtotal + pricelist
                         if (subtotalAmount) {
                             OcrUtils.log(2, "getBestAmount", "Three equal values found: (subtotal, pricelist, amount)");
                             OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                            return subtotal;
+                            return amount;
                         } else if (minHit < 2) {
                             OcrUtils.log(2, "getBestAmount", "Two equal values found: (subtotal, pricelist)");
                             OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());

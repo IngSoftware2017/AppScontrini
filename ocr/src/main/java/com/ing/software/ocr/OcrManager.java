@@ -111,7 +111,7 @@ public class OcrManager {
         List<RawText> prices = result.getRawImage().getPossiblePrices();
         //First level, if we have a string from "AMOUNT_STRINGS[]" we try to decode a value on the same height and if necessary fix it
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
-        if (ticket.amount == null)
+        if (ticket.amount == null) //Takes all prices from schemas and use probability to find the amount (needs at least one hit to accept the value)
             ticket.amount = analyzeAlternativeAmount(prices);
         ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
         long endTime = System.nanoTime();
