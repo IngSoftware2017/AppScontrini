@@ -67,9 +67,11 @@ public class AddNewPerson extends AppCompatActivity {
                 EditText editName =(EditText)findViewById(R.id.input_personName);
                 EditText editLastName = (EditText)findViewById(R.id.input_personLastName);
                 EditText editAcademicTitle = (EditText)findViewById(R.id.input_personAcademicTitle);
+                EditText editEmail = (EditText)findViewById(R.id.input_personEmail);
                 String name = editName.getText().toString();
                 String lastName = editLastName.getText().toString();
                 String academicTitle = editAcademicTitle.getText().toString();
+                String email = editEmail.getText().toString();
 
                 if ((name == null) || name.replaceAll(" ","").equals("")) {
                     Toast.makeText(context, getResources().getString(R.string.toast_personNoName), Toast.LENGTH_SHORT).show();
@@ -84,6 +86,7 @@ public class AddNewPerson extends AppCompatActivity {
                 person.setName(name);
                 person.setLastName(lastName);
                 person.setAcademicTitle(academicTitle);
+                person.setEmail(email);
 
 
                 long personID = DB.addPerson(person);
