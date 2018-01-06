@@ -289,6 +289,17 @@ public class DataManager {
         return database.ticketDao().getActiveMission();
     }
 
+
+    /**
+     * @author Marco Olivieri
+     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * @param personId Long not null, the person's id
+     * @return List<MissionEntity> not null with all active missions of the specific person
+     */
+    List<MissionEntity> getActiveMissionForPerson(long personId){
+        return database.ticketDao().getActiveMissionForPerson(personId);
+    }
+
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name
      * @param name String not null
