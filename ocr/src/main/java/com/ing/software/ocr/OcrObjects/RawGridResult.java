@@ -40,7 +40,13 @@ public class RawGridResult implements Comparable<RawGridResult>{
 
     @Override
     public int compareTo(@NonNull RawGridResult rawGridResult) {
-        return (int) (rawGridResult.getPercentage() - getPercentage());
+        double diff = rawGridResult.getPercentage() - getPercentage();
+        if (diff > 0)
+            return 1;
+        else if (diff < 0)
+            return -1;
+        else
+            return (int) diff;
     }
 
     @Override

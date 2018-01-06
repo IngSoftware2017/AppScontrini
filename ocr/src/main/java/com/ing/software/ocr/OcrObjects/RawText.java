@@ -89,6 +89,8 @@ public class RawText implements Comparable<RawText>, Text {
     }
 
     public void setTagPosition(double position) {
+        if (position>0.9)
+            position = 0.9; //pezza in attesa di capire dove sta il bug
         this.position = (int)(position*10);
     }
 

@@ -267,7 +267,7 @@ class AmountComparator {
             BigDecimal halfProductSum = productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP);
             //Check if my subtotal is the same as total, or if amount is null
             //if (possibleSubTotal != null && (!hasAmount() || decodedAmount.compareTo(possibleSubTotal) == 0)) {
-            if (possibleSubTotal != null) {
+            if (possibleSubTotal != null && productsCounter > 2) {
                 //Accept the value
                 OcrUtils.log(3, "analyzePrices", "Subtotal is: " + possibleSubTotal.toString());
                 flagHasSubtotal(possibleSubTotal);
@@ -515,12 +515,14 @@ class AmountComparator {
                         return subtotal;
                     }
                 }
+                /* //don't accept one value, only if it's amount
                 if (hasSubtotal() && minHit < 1) {
                     return subtotal;
                 } else if (hasCash() && minHit < 1) {
                     return cash;
                 } else if (minHit < 1)
                     return prices;
+                    */
             }
         } else if (hasAmount() && minHit < 1) {
             return getAmount();
@@ -558,7 +560,7 @@ class AmountComparator {
      * @return true if product is in the same column (extended by percentage) as amount
      */
     private static boolean isProductPrice(@NonNull RawText amount, @NonNull RawText product) {
-        int percentage = 50;
+        int percentage = 60;
         Rect extendedRect = OcrUtils.extendRect(amount.getBoundingBox(), 0, percentage);
         Rect productRect = product.getBoundingBox();
         return (extendedRect.left < productRect.left) && (extendedRect.right > productRect.right);

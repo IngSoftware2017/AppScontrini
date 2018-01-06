@@ -494,7 +494,7 @@ class DataAnalyzer {
         String token3 = "";
         Integer numberOfSymbols = 0;
         String finalDate = "";
-        String[] formats;
+        String[] formats = null;
 
 
 
@@ -521,17 +521,23 @@ class DataAnalyzer {
         }
 
         //convert string to integer and get last two digit
-        int token1Number = ((Integer.parseInt(token1))%100);    //probably is day
-        int token2Number = ((Integer.parseInt(token2))%100);    //probably is month
-        int token3Number; //probably is year
-        if(token3.length()==4) //if this token have 4 character
-        {
-            token3Number = Integer.parseInt(token3);
-            formats = new String[] {"dd-MM-yyyy","MM-dd-yyyy"};
-        }
-        else {
-            token3Number = ((Integer.parseInt(token3)) % 100);
-            formats = new String[] {"dd-MM-yy", "MM-dd-yy"};
+        int token1Number = -1;
+        int token2Number = -1;
+        int token3Number = -1;
+        try {
+            token1Number = ((Integer.parseInt(token1))%100);    //probably is day
+            token2Number = ((Integer.parseInt(token2))%100);    //probably is month
+            if(token3.length()==4) //if this token have 4 character
+            {
+                token3Number = Integer.parseInt(token3);
+                formats = new String[] {"dd-MM-yyyy","MM-dd-yyyy"};
+            }
+            else {
+                token3Number = ((Integer.parseInt(token3)) % 100);
+                formats = new String[] {"dd-MM-yy", "MM-dd-yy"};
+            }
+        } catch (NumberFormatException e) {
+            return null;
         }
 
         if((token1Number >= 1 && token1Number <= 12) && (token2Number >= 1 && token2Number <= 12))
