@@ -52,7 +52,7 @@ public class MissionsTabbed extends AppCompatActivity {
         setContentView(R.layout.activity_missions_tabbed);
 
         Intent intent = getIntent();
-        personID = intent.getExtras().getInt("personID");
+        personID = intent.getExtras().getInt(IntentCodes.INTENT_PERSON_ID);
         DB = new DataManager(this);
         thisPerson = DB.getPerson(personID);
 
@@ -104,7 +104,7 @@ public class MissionsTabbed extends AppCompatActivity {
             case (R.id.action_editPerson):
                 //Open Edit Person Activity
                 Intent editPerson = new Intent(this, com.example.nicoladalmaso.gruppo1.EditPerson.class);
-                editPerson.putExtra("personID", personID);
+                editPerson.putExtra(IntentCodes.INTENT_PERSON_ID, personID);
                 startActivityForResult(editPerson, PERSON_MOD);
                 break;
 
@@ -164,7 +164,7 @@ public class MissionsTabbed extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
-            bundle.putInt("personID", personID);
+            bundle.putInt(IntentCodes.INTENT_PERSON_ID, personID);
             switch(position){
                 case 0:
                     missionsOpen.setArguments(bundle);

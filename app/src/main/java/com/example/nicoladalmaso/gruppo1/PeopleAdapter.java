@@ -33,8 +33,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
     String path = "";
     List<PersonEntity> persons;
 
-    public PeopleAdapter(Context context, int textViewResourceId,
-                          List<PersonEntity> objects) {
+    public PeopleAdapter(Context context, int textViewResourceId, List<PersonEntity> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
         persons = objects;
@@ -65,7 +64,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
                 startMissionsView.putExtra("personID", Integer.parseInt(v.getTag().toString()));
                 ((MainActivity)context).startActivityForResult(startMissionsView, 1);*/
                 Intent missionTab = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
-                missionTab.putExtra("personID", Integer.parseInt(v.getTag().toString()));
+                missionTab.putExtra(IntentCodes.INTENT_PERSON_ID, Integer.parseInt(v.getTag().toString()));
                 ((MainActivity)context).startActivityForResult(missionTab, 1);
             }
         });
