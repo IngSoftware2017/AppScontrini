@@ -34,9 +34,10 @@ public class TicketEntity {
     private Date date;
     private String title;
     private List<String> category;
+    private float[] corners;
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
-    private long missionID;
+    private int missionID;
 
     @Ignore
     /**
@@ -55,13 +56,14 @@ public class TicketEntity {
      * @param title name given
      * @param missionID code of the mission
      */
-    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, long missionID) {
+    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
         this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
         this.shop = shop;
         this.title = title;
         this.missionID = missionID;
+        corners = new float[8];
     }
 
     /**
@@ -160,7 +162,7 @@ public class TicketEntity {
      * Returns the mission id of this ticket
      * @return missionID
      */
-    public long getMissionID() {
+    public int getMissionID() {
         return missionID;
     }
 
@@ -168,8 +170,27 @@ public class TicketEntity {
      * Sets mission id of this TicketEntity
      * @param missionID
      */
-    public void setMissionID(long missionID) {
+    public void setMissionID(int missionID) {
         this.missionID = missionID;
+    }
+
+
+    /**
+     * Returns the corners of the ticket
+     * 8 float point of the rectangle coordinate
+     * @return corners
+     */
+    public float[] getCorners() {
+        return corners;
+    }
+
+    /**
+     * Sets corners of the ticket
+     * Must be an array of 8 elements: the rectangle coordinate of the ticket
+     * @param corners
+     */
+    public void setCorners(float[] corners) {
+        this.corners = corners;
     }
 
 

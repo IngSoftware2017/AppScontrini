@@ -41,5 +41,20 @@ public abstract class ExportManager {
         Log.d(TAG, "Folder created: "+ String.valueOf(check));
     }
 
+    /**
+     * @author Marco Olivieri
+     *
+     * Export of all the db AppScontrini
+     * @return boolean - if the exportation is ok
+     */
     public abstract boolean export();
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Export only the specific mission with the relative tickets
+     * @param missionID
+     * @return boolean - if the exportation is ok
+     */
+    public abstract boolean export(long missionID);
 }

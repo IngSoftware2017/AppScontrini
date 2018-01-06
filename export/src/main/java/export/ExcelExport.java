@@ -96,6 +96,40 @@ public class ExcelExport extends ExportManager {
         }
     }
 
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Implementation of the extended abstract class ExportManager
+     * Writes the specific mission with relative tickets in separeted sheet of the workbook.
+     * Than it creates the complete document of the exportation db
+     * @param missionId - the specific mission
+     * @return boolean - if the exportation is ok
+     */
+    public boolean export(long missionId){
+
+        workbook = new HSSFWorkbook();
+        MissionEntity m = database.getMission(missionId);
+        missions.clear();
+        missions.add(m);
+        tickets = database.getTicketsForMission(missionId);
+
+        writeTickets();
+        writeMissions();
+
+        try{
+            FileOutputStream fos = new FileOutputStream(file);
+            workbook.write(fos);
+            fos.flush();
+            fos.close();
+            return true;
+        }
+        catch (IOException e){
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+    }
+
     /**
      * @author Marco Olivieri
      *

@@ -103,6 +103,52 @@ public class XMLExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
+     * Implementation of the extended abstract class ExportManager
+     * Writes the specific mission with relative tickets in a XML file
+     * Than it creates the file
+     * @param missionId - the specific mission
+     * @return boolean - if the exportation is ok
+     */
+    public boolean export(long missionId){
+
+        MissionEntity m = database.getMission(missionId);
+        missions.clear();
+        missions.add(m);
+        tickets = database.getTicketsForMission(missionId);
+
+        try{
+            file.createNewFile();
+            FileOutputStream fos = new FileOutputStream(file);
+            serializer = Xml.newSerializer();
+            serializer.setOutput(fos, "UTF-8");
+            serializer.startDocument(null, Boolean.valueOf(true));
+
+            serializer.startTag(null,"Database");
+            serializer.startTag(null,"Tables");
+
+            writeTickets();
+            writeMissions();
+
+            serializer.endTag(null,"Tables");
+            serializer.endTag(null,"Database");
+
+
+            serializer.endDocument();
+            serializer.flush();
+            fos.close();
+            return true;
+        }
+        catch (IOException e){
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+    }
+
+
+
+    /**
+     * @author Marco Olivieri
+     *
      * Writes in xmlSerializer all the tickets
      * @throws IOException
      */

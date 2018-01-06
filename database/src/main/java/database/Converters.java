@@ -12,9 +12,9 @@ import java.util.List;
 /**
  * Created by Federico Taschin on 12/11/2017.
  * This class defines the converters for the database. In fact, the Room library cannot handle Date, BigDecimal and Uri objects.
- * Therefore, we defined these methods that transform those objects into objects that the Database can handle. 
- * For instance, we defined the dateToTimeStamp(Date date) method. When the Database has to write a Date object, it uses the 
- * dateToTimeStamp(Date date) method to cast it to a Long object (that the Database can read). Conversely, when the Database needs 
+ * Therefore, we defined these methods that transform those objects into objects that the Database can handle.
+ * For instance, we defined the dateToTimeStamp(Date date) method. When the Database has to write a Date object, it uses the
+ * dateToTimeStamp(Date date) method to cast it to a Long object (that the Database can read). Conversely, when the Database needs
  * to read a Date object, it reads a Long and then it cast it to Date with the fromTimestamp(Long value) method.
  * These methods are automatically called by the Room library since they're annotated with @TypeConverter.
  */
@@ -54,7 +54,7 @@ public final class Converters {
     /**
      * Converts from BigDecimal to double
      * @param BigDecimal value to be converted
-    * @return Double with the correspondent value, null if value is null
+     * @return Double with the correspondent value, null if value is null
      */
     @TypeConverter
     public Double bigDecimalToDoouble(BigDecimal value){
@@ -62,10 +62,10 @@ public final class Converters {
     }
 
     /**
-    * Converts from Uri to String
-    * @param Uri uri to be converted
-    * @return String with the Uri path, null if Uri is null
-    */
+     * Converts from Uri to String
+     * @param Uri uri to be converted
+     * @return String with the Uri path, null if Uri is null
+     */
     @TypeConverter
     public String toString(Uri uri){
         return uri == null ? null: uri.getPath();
@@ -73,10 +73,10 @@ public final class Converters {
     }
 
     /**
-    * Converts from String to Uri
-    * @param String path to be converted
-    * @return Uri with the given path, null if path is null
-    */
+     * Converts from String to Uri
+     * @param String path to be converted
+     * @return Uri with the given path, null if path is null
+     */
     @TypeConverter
     public Uri toUri(String path){
         return path == null ? null : Uri.fromFile(new File(path));
@@ -116,6 +116,46 @@ public final class Converters {
             String[] arrayList = value.split(";");
             List<String> list = Arrays.asList(arrayList);
             return list;
+        }
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a float[] to a String for db
+     * @param float[] array of corners
+     * @return the corresponding String object, null if value is null
+     */
+    @TypeConverter
+    public String toString(float[] corners) {
+        if (corners == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<corners.length; i++)
+                s+=corners[i]+";";
+            return s;
+        }
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a String to List<String>
+     * @param String value of categories separeted from ;
+     * @return the corresponding List<String> object, null if value is null
+     */
+    @TypeConverter
+    public float[] toArrayOfCorners(String value) {
+        if (value == null)
+            return null;
+        else
+        {
+            float[] corners = new float[8];
+            String[] s_corners = value.split(";");
+            for (int i=0; i<corners.length; i++) {
+                corners[i]=Float.parseFloat(s_corners[i]);
+            }
+            return corners;
         }
     }
 }

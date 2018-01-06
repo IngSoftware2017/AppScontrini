@@ -84,6 +84,38 @@ public class CSVExport extends ExportManager {
         }
     }
 
+    /**
+     * @author Marco Olivieri
+     *
+     * Implementation of the extended abstract class ExportManager
+     * Create a CSV file export for the specific mission with relative tickets
+     * @param missionId - the specific mission
+     * @return boolean - if the exportation is ok
+     */
+    public boolean export(long missionId){
+        MissionEntity m = database.getMission(missionId);
+        missions.clear();
+        missions.add(m);
+        tickets = database.getTicketsForMission(missionId);
+        try {
+
+            FileWriter fileTickets = new FileWriter(folder + "/tickets.csv");
+            fileTickets = writeTickets(fileTickets);
+            fileTickets.flush();
+            fileTickets.close();
+
+            FileWriter fileMissions = new FileWriter(folder + "/missions.csv");
+            fileMissions = writeMissions(fileMissions);
+            fileMissions.flush();
+            fileMissions.close();
+
+            return true;
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+    }
+
 
     /**
      * @author Marco Olivieri
