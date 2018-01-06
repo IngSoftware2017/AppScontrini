@@ -24,20 +24,15 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.ing.software.common.Ticket;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -122,7 +117,7 @@ public class BillActivity extends AppCompatActivity {
             case (R.id.action_editMission):
                 //TODO: modifica la missione
                 Intent editMission = new Intent(context, com.example.nicoladalmaso.gruppo1.EditMission.class);
-                editMission.putExtra("missionID", thisMission.getID());
+                editMission.putExtra(IntentCodes.INTENT_MISSION_ID, thisMission.getID());
                 startActivityForResult(editMission, MISSION_MOD);
                 break;
             default:
@@ -393,12 +388,12 @@ public class BillActivity extends AppCompatActivity {
      * Thread sleep for 1 second for right tickets real-time vision
      */
     public void waitDB(){
-        try {
+        /*try {
             Log.i("Waiting db", "Going to sleep");
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        e.printStackTrace();
+        }*/
     }
 
     /** Dal Maso
@@ -454,6 +449,7 @@ public class BillActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d("DEBUGTICKET0","LIST REFRESHED");
                     refreshList();
                 }
             });

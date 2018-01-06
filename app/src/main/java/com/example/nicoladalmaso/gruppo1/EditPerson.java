@@ -26,10 +26,11 @@ public class EditPerson extends AppCompatActivity{
     int personID;
     Context context;
     PersonEntity thisPerson;
-    String personName = "", personLastName = "", personAcademicTitle = "";
+    String personName = "", personLastName = "", personAcademicTitle = "", email = "";
     TextView txtName;
     TextView txtLastName;
     TextView txtAcademicTitle;
+    TextView txtEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,7 @@ public class EditPerson extends AppCompatActivity{
                 thisPerson.setName(txtName.getText().toString());
                 thisPerson.setLastName(txtLastName.getText().toString());
                 thisPerson.setAcademicTitle(txtAcademicTitle.getText().toString());
+                thisPerson.setEmail(txtEmail.getText().toString());
                 DB.updatePerson(thisPerson);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -99,7 +101,8 @@ public class EditPerson extends AppCompatActivity{
         personName = thisPerson.getName();
         personLastName = thisPerson.getLastName();
         personAcademicTitle = thisPerson.getAcademicTitle();
-        Log.d("DBPerson",personID+" "+personName+" "+personLastName);
+        email = thisPerson.getEmail();
+        Log.d("DBPerson",personID+" "+personName+" "+personLastName+" "+email);
         //set those values to the edittext
     }
 
@@ -110,8 +113,10 @@ public class EditPerson extends AppCompatActivity{
         txtName = (TextView)findViewById(R.id.input_personEditName);
         txtLastName = (TextView)findViewById(R.id.input_personEditLastName);
         txtAcademicTitle = (TextView)findViewById(R.id.input_personEditAcademicTitle);
+        txtEmail = (TextView)findViewById(R.id.input_personEmail);
         txtName.setText(personName);
         txtLastName.setText(personLastName);
         txtAcademicTitle.setText(personAcademicTitle);
+        txtEmail.setText(email);
     }
 }
