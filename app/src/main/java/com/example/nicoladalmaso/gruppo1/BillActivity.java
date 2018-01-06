@@ -29,8 +29,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.ocr.DataAnalyzer;
-import com.ing.software.ocr.ImagePreprocessor;
+import com.ing.software.common.Ticket;
+import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -76,7 +76,7 @@ public class BillActivity extends AppCompatActivity {
         context = this.getApplicationContext();
 
         Intent intent = getIntent();
-        missionID = intent.getExtras().getInt("missionID");
+        missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
         setTitle(thisMission.getName());
 
@@ -408,16 +408,13 @@ public class BillActivity extends AppCompatActivity {
             originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
-            //TODO: OCR HERE
             TicketEntity ticket = new TicketEntity();
             ticket.setDate(Calendar.getInstance().getTime());
             ticket.setFileUri(uri);
-            ticket.setAmount(BigDecimal.valueOf(10000).movePointLeft(2));
             ticket.setShop("Pam Padova");
             ticket.setTitle("Scontrino ");
             ticket.setMissionID(missionID);
             DB.addTicket(ticket);
-
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
@@ -425,10 +422,34 @@ public class BillActivity extends AppCompatActivity {
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
             outOriginal.flush();
             outOriginal.close();
+            Log.d("DEBUGOCR","STARTING OCR ANALYSIS");
+            startOcrAnalysis(imageToSave, ticket);
+            Log.d("DEBUGOCR","OCR ANALYSIS STARTED");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    /** Federico Taschin
+     * Starts the OCR analysis of the bitmap. When the resuly is ready, it updates the database and the activity is refreshed
+     * @param bitmap not null, image to be analyzed
+     * @param ticketEntity the object related to the image
+     */
+    public void startOcrAnalysis(Bitmap bitmap, TicketEntity ticketEntity){
+        ImageProcessor processor = new ImageProcessor(bitmap);
+        ocrManager.getTicket(processor, result -> {
+            Log.d("DEBUGOCR","RESULT IS READY");
+            ticketEntity.setAmount(result.amount);
+            DB.updateTicket(ticketEntity);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    addToList(ticketEntity);
+                }
+            });
+        });
+    }
+
 
     /**PICCOLO
      * Method that clears the screen from the images
@@ -513,4 +534,11 @@ public class BillActivity extends AppCompatActivity {
             fab.setVisibility(View.VISIBLE);
         }
     }
+
+    @Override
+    public void onDestroy(){
+        ocrManager.release();
+        super.onDestroy();
+    }
+
 }

@@ -1,12 +1,15 @@
 package com.ing.software.ocr;
 
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
@@ -16,6 +19,9 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
+
+import java.text.ParseException;
+
 
 
 /**
@@ -393,6 +399,7 @@ public class DataAnalyzer {
         else
             //Returns the absolute value of the distance by subtracting the minimum character
             return Math.abs(minCharaterDate-minDistance);
+
     }
 
 
@@ -403,12 +410,15 @@ public class DataAnalyzer {
      * @param text The text to find the date
      * @return date or null if the date is not there
      */
-    static String getDate(String text) {
+    static Date getDate(String text) {
         if (text.length() == 0)
             return null;
 
+        Date date = null;
+
         //Possible date formats
         String[] formatDate = {"xx/xxxx/xx", "xxxx/xx/xx","xx/xx/xxxx", "xx-xxxx-xx", "xxxx-xx-xx","xx-xx-xxxx","xx.xxxx.xx","xxxx.xx.xx" ,"xx.xx.xxxx"};
+
 
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
@@ -456,10 +466,98 @@ public class DataAnalyzer {
         }
 
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
-        if(minDistance>=10)
-            return null;
-        else
-            return dataSearch;
+        if(minDistance<10)
+        {
+            date = parseDate(dataSearch);
+        }
+        return date;
 
+
+    }
+
+    /**
+     * @author Salvagno
+     *
+     * @param dateString An input date string.
+     * @return A Date (java.util.Date) reference. The reference will be null if
+     *         we could not match any of the known formats.
+     */
+    public static Date parseDate(String dateString)
+    {
+        Date date = null;
+        Locale locale = new Locale("US");
+
+        //prendo i tre pezzi della stringa data
+        char[] string = dateString.toCharArray();
+        String token1 = "";
+        String token2 = "";
+        String token3 = "";
+        Integer numberOfSymbols = 0;
+        String finalDate = "";
+        String[] formats;
+
+
+
+        for (char c : string) {
+            if (c == '-' || c == '.' || c == '/')
+            {
+                numberOfSymbols ++;
+                finalDate=finalDate+'-';
+            }
+            else
+            {
+                finalDate=finalDate+c;
+
+                if(numberOfSymbols == 0)
+                    token1 = token1+c;
+                else if(numberOfSymbols == 1)
+                    token2 = token2+c;
+                else if(numberOfSymbols == 2)
+                    token3 = token3+c;
+                else
+                    return null;
+            }
+
+        }
+
+        //convert string to integer and get last two digit
+        int token1Number = ((Integer.parseInt(token1))%100);    //probably is day
+        int token2Number = ((Integer.parseInt(token2))%100);    //probably is month
+        int token3Number; //probably is year
+        if(token3.length()==4) //if this token have 4 character
+        {
+            token3Number = Integer.parseInt(token3);
+            formats = new String[] {"dd-MM-yyyy","MM-dd-yyyy"};
+        }
+        else {
+            token3Number = ((Integer.parseInt(token3)) % 100);
+            formats = new String[] {"dd-MM-yy", "MM-dd-yy"};
+        }
+
+        if((token1Number >= 1 && token1Number <= 12) && (token2Number >= 1 && token2Number <= 12))
+            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
+        else if(token2Number > 12)
+            dateString = String.valueOf(token2Number)+'-'+String.valueOf(token1Number)+'-'+String.valueOf(token3Number);
+        else
+            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
+
+        for (int i = 0; i < formats.length; i++)
+        {
+            String format = formats[i];
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format,locale);
+            try
+            {
+                // parse() will throw an exception if the given dateString doesn't match
+                // the current format
+                date = dateFormat.parse(dateString);
+                break;
+            }
+            catch(ParseException e)
+            {
+                // don't do anything. just let the loop continue.
+            }
+        }
+
+        return date;
     }
 }

@@ -4,18 +4,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.Size;
+import android.util.Pair;
+import android.util.SizeF;
 import android.util.SparseArray;
-
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
-import com.ing.software.ocr.OcrObjects.*;
+import com.google.android.gms.vision.text.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import com.ing.software.ocr.OcrObjects.*;
 
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
@@ -25,7 +25,7 @@ import static com.ing.software.ocr.OcrVars.*;
  * @author Michelon
  * @author Zaglia
  */
-class OcrAnalyzer {
+public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
@@ -59,7 +59,7 @@ class OcrAnalyzer {
      * @param frame Bitmap used to create an OcrResult. Not null.
      * @return OcrResult containing raw data to be further analyzed.
      */
-    OcrResult analyze(@NonNull Bitmap frame){
+    OcrResult analyze(Bitmap frame){
         //cropping must be used somewhere else (if used with textRecognizer). Can be used here if using opencv
         //frame = getCroppedPhoto(frame, context);
         mainImage = new RawImage(frame);
