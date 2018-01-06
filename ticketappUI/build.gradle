@@ -10,7 +10,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 2
-        versionName "1.3.1 Arcadia-Bossa Nova"
+        versionName "1.4.0 Kyun! Vampire Girl"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
