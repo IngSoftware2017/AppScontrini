@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.common.Ref;
-import com.ing.software.ocr.ImagePreprocessor;
+import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
 
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     bundle.putString(IMAGE_RECEIVED, aFile.getName());
                     receiver.send(STATUS_RUNNING, bundle);
 
-                    ImagePreprocessor preproc = new ImagePreprocessor(testBmp);
+                    ImageProcessor preproc = new ImageProcessor(testBmp);
                     preproc.findTicket(false, err -> {
                         //String rectString = (err.isEmpty() ? "found" : "not found");
                         //OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);

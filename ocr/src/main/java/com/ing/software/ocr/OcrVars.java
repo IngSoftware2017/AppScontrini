@@ -1,5 +1,15 @@
 package com.ing.software.ocr;
 
+import android.util.Pair;
+
+
+import static java.util.Collections.*;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static java.util.Arrays.*;
+import static java.util.regex.Pattern.compile;
+
 /**
  * List of static vars used in Ocr
  * todo: describe what these values are
