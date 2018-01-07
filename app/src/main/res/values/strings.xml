@@ -66,5 +66,6 @@
 
     <string name="menu_modify_mission">Modifica</string>
     <string name="menu_mission_summary">Informazioni</string>
+    <string name="export_db_button">Esporta database</string>
 </resources>
 

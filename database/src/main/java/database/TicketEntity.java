@@ -176,7 +176,7 @@ public class TicketEntity {
     }
 
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the corners of the ticket
      * 8 float point of the rectangle coordinate
      * @return corners
@@ -185,7 +185,7 @@ public class TicketEntity {
         return corners;
     }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets corners of the ticket
      * Must be an array of 8 elements: the rectangle coordinate of the ticket
      * @param corners
@@ -194,10 +194,17 @@ public class TicketEntity {
         this.corners = corners;
     }
 
+    /**Created by Federico Taschin
+     * @return insertion date (not null) of the ticket
+     */
     public Date getInsertionDate() {
         return insertionDate;
     }
 
+    /**Created by Federico Taschin
+     *
+     * @param insertionDate
+     */
     public void setInsertionDate(Date insertionDate) {
         this.insertionDate = insertionDate;
     }
