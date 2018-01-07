@@ -1,6 +1,7 @@
 package com.ing.software.ocr;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -11,7 +12,6 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
 import com.ing.software.ocr.OcrObjects.RawText;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -52,6 +52,7 @@ public class OcrUtils {
      * @param photo original photo. Not null.
      * @return array of int where int[0] = left border, int[1] = top border, int[2] = right border, int[3] = bottom border
      */
+    @Deprecated
     static int[] getRectBorders(@NonNull List<TextBlock> orderedTextBlocks, @NonNull RawImage photo) {
         int numberOfBorders = 4; //it's a rect
         int[] borders = new int[numberOfBorders];
@@ -83,31 +84,6 @@ public class OcrUtils {
 
     /**
      * @author Michelon
-     * Get preferred grid according to height/width ratio
-     * @param photo original photo. Not null.
-     * @return preferred ratio defined in ProbGrid, -1 if something went wrong
-     */
-     public static String getPreferredGrid(@NonNull Bitmap photo) {
-        double width = photo.getWidth();
-        double heigth = photo.getHeight();
-        String preferredRatio = "-1";
-        if (width <= 0 || heigth <= 0)
-            return preferredRatio;
-        double ratio = heigth/width;
-        List<Double> availableRatios = new ArrayList<>(ProbGrid.gridMap.keySet());
-        double diff = Double.MAX_VALUE;
-        for(Double testRatio : availableRatios) {
-            if (Math.abs(testRatio-ratio)<diff) {
-                diff = Math.abs(testRatio - ratio);
-                preferredRatio = ProbGrid.gridMap.get(testRatio);
-            }
-        }
-        log(2,"OcrUtils.getPrefGrid","Ratio is: " + ratio + " Grid is: " + preferredRatio + " Diff is: " + diff);
-        return preferredRatio;
-    }
-
-    /**
-     * @author Michelon
      * Order a list of TextBlock from top to bottom, left to right
      * @param textBlocks original list. Not null.
      * @return ordered list
@@ -120,9 +96,8 @@ public class OcrUtils {
                 int diffLefts = block1.getBoundingBox().left - block2.getBoundingBox().left;
                 int diffBottoms = block1.getBoundingBox().bottom - block2.getBoundingBox().bottom;
                 int diffRights = block1.getBoundingBox().right - block2.getBoundingBox().right;
-                if (diffTops != 0) {
+                if (diffTops != 0)
                     return diffTops;
-                }
                 else if (diffLefts != 0)
                     return diffLefts;
                 else if (diffBottoms != 0)
@@ -136,28 +111,27 @@ public class OcrUtils {
 
     /**
      * @author Michelon
+     * @date 18-12-2017
      * Order a list of rawText following its distance (of its center) from the center of another rect.
      * Order is based only on y coordinate.
      * @param rawTexts original list. Not null.
      * @param sourceRect Rect from which check the distance
      * @return ordered list
      */
-    static List<RawText> orderRawTextFromRect(@NonNull List<RawText> rawTexts, final RectF sourceRect) {
+    static List<RawText> orderRawTextFromRect(@NonNull List<RawText> rawTexts, final Rect sourceRect) {
         Collections.sort(rawTexts, new Comparator<RawText>() {
             @Override
             public int compare(RawText text1, RawText text2) {
-                float centerPoint = sourceRect.centerY();
-                float center1 = text1.getRect().centerY();
-                float center2 = text2.getRect().centerY();
-                float diff1 = Math.abs(center1 - centerPoint);
-                float diff2 = Math.abs(center2 - centerPoint);
-                if (Math.round(diff1 - diff2) == 0) {
-                    if (Math.round(center1 - center2) == 0)
-						return -1; //same center
-					else //return the one on top
-						return Math.round(center1 - center2);
+                int centerPoint = sourceRect.centerY();
+                int center1 = text1.getBoundingBox().centerY();
+                int center2 = text2.getBoundingBox().centerY();
+                int diff1 = Math.abs(center1 - centerPoint);
+                int diff2 = Math.abs(center2 - centerPoint);
+                if (diff1 - diff2 == 0) {
+                    //same distance from center, return one on top
+                    return center1 - center2;
 				}
-                return Math.round(diff1 - diff2);
+                return diff1 - diff2;
             }
         });
         return rawTexts;
@@ -167,15 +141,15 @@ public class OcrUtils {
      * @author Michelon
      * Extends the width of a rect to the max allowed for chosen photo
      * @param rect source rect. Not null.
-     * @param photo source photo (to get max width). Not null.
+     * @param photo source rawImage (to get max width). Not null.
      * @return rect with max width
      */
-    static RectF getExtendedRect(@NonNull RectF rect, @NonNull RawImage photo) {
-        float top = rect.top;
-        float bottom = rect.bottom;
-        float left = 0;
-        float right = photo.getWidth();
-        RectF rectF = new RectF(left, top, right, bottom);
+    static Rect extendWidthFromPhoto(@NonNull Rect rect, @NonNull RawImage photo) {
+        int top = rect.top;
+        int bottom = rect.bottom;
+        int left = 0;
+        int right = photo.getWidth();
+        Rect rectF = new Rect(left, top, right, bottom);
         log(6,"OcrUtils.getExtendRect","Extended rect: left " + rectF.left + " top: "
                 + rectF.top + " right: " + rectF.right + " bottom: " + rectF.bottom);
         return rectF;
@@ -261,6 +235,51 @@ public class OcrUtils {
 
     /**
      * @author Salvagno
+     * Returns the distance of Levenshtein between two strings | S | e | T |.
+     * The Levenshtein distance is a string metric for measuring the difference between two sequences.
+     * Informally, the Levenshtein distance between two words is the minimum number of single-character
+     * edits (insertions, deletions or substitutions) required to change one word into the other.
+     * The distance is an integer between 0 and the maximum length of the two strings.
+     * If only one string is null then return -1
+     * If the distance exceeds the maximum input distance, the function stops and returns the maximum value
+     *
+     * @param S The first string to be compared
+     * @param T The second string to be compared
+     * @param max maximum distance accepted
+     * @return distance between two strings or the maximum value if it has been exceeded
+     */
+    static int levDistance(String S, String T, Integer max)
+    {
+        if(S == null || T == null)
+            return -1;
+
+        int i, j;
+        final int n = S.length(), m = T.length();
+        int L[][] = new int[n+1][m+1];
+        for ( i=0; i<n+1; i++ ) {
+            for ( j=0; j<m+1; j++ ) {
+                if ( i==0 || j==0 ) {
+                    L[i][j] = maxLengthStrings(i, j);
+                } else {
+                    L[i][j] = minLengthStrings(L[i-1][j] + 1, L[i][j-1] + 1,
+                            L[i-1][j-1] + (S.charAt(i-1) != T.charAt(j-1) ? 1 : 0) );
+                }
+
+                if(L[n][m] > max)
+                {
+                    return max;
+                }
+
+
+            }
+
+        }
+
+        return L[n][m];
+    }
+
+    /**
+     * @author Salvagno
      * Check if there is a substring in the text
      * The text is subdivided into tokens and each token is checked
      * If only one string is null then return -1
@@ -276,19 +295,6 @@ public class OcrUtils {
             return -1;
         int minDistance = substring.length();
         int subLength = minDistance;
-
-        /*
-        //Splits the string into tokens
-        String[] pack = text.split("\\s");
-
-        for (String p: pack){
-                //Convert string to uppercase
-                int distanceNow = levDistance(p.toUpperCase(), substring.toUpperCase());
-                if (distanceNow < minDistance)
-                    minDistance = distanceNow;
-
-        }
-        */
 
         //Analyze the text by removing the spaces
         String text_w_o_space =  text.replace(" ", "");
@@ -311,83 +317,161 @@ public class OcrUtils {
             if(distanceNow == 0)
                 break;
             start++;
-            }
+        }
 
         return minDistance;
     }
 
-    /**
-     * @author Michelon
-     * Extends width of rect according to percentage
-     * @param originalRect rect containing amount
-     * @param percentage   percentage of the width of the rect to extend. Int >0
-     * @return extended rect
-     */
-    static RectF partialExtendWidthRect(RectF originalRect, int percentage) {
-        float width = originalRect.width();
-        float left = originalRect.left - (width * percentage / 200);
-        if (left <0)
-            left = 0;
-        float right = originalRect.right + (width * percentage / 200);
-        return new RectF(left, originalRect.top, right, originalRect.bottom);
-    }
 
     /**
-     * @author Michelon
-     * Extends height of rect according to percentage
-     * @param originalRect rect containing amount
-     * @param percentage   percentage of the height of the rect to extend. Int >0
-     * @return extended rect
+     * @author Salvagno
+     * Check if there is a substring in the text
+     * The text is subdivided into tokens and each token is checked
+     * If only one string is null then return -1
+     * If the token length is less than 2 then returns -1
+     * If the distance exceeds the maximum input distance, returns the maximum value
+     *
+     * @param text The text to be compared
+     * @param substring The second string to be compared
+     * @param max maximum distance accepted
+     * @return the slightest difference between strings and text
      */
-    static RectF partialExtendHeightRect(RectF originalRect, int percentage) {
-        float height = originalRect.height();
-        float top = originalRect.top - (height * percentage / 200);
-        if (top < 0)
-            top = 0;
-        float bottom = originalRect.bottom + (height * percentage / 200);
-        return new RectF(originalRect.left, top, originalRect.right, bottom);
+    public static int findSubstring(String text, String substring, Integer max)
+    {
+        if(text == null || substring == null || text.length() == 0)
+            return -1;
+
+        int minDistance = substring.length();
+        int subLength = minDistance;
+
+        //Analyze the text by removing the spaces
+        String text_w_o_space =  text.replace(" ", "");
+        //If the text is smaller than the searched string, invert the strings
+        if(text_w_o_space.length() < minDistance)
+        {
+            String temp_text = text_w_o_space;
+            text_w_o_space = substring;
+            substring = temp_text;
+        }
+
+        //Search a piece of string as long as the length of the searched string in the text
+        int start=0;
+        for (int finish = subLength; finish<=(text_w_o_space.length()); finish++) {
+            String token = text_w_o_space.substring( start, finish);
+            int distanceNow = levDistance(token.toUpperCase(), substring.toUpperCase(), max);
+            if (distanceNow < minDistance)
+                minDistance = distanceNow;
+            //Lucky case
+            if(distanceNow == 0)
+                break;
+            //maximum value accepted
+            if(distanceNow >= max)
+                break;
+
+            start++;
+        }
+
+        return minDistance;
     }
+
+
 
     /**
      * @author Michelon
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
+     * Or extending of chosen pixels on both sides (if param is negative)
      * Note: Min value for top and left is 0
-     * todo: revise method to include both height and width extension (with different values to replace also the two above
      * @param rect source rect. Not null
-     * @param percent chosen percentage. Int >= 0
+     * @param percentHeight chosen percentage for height. \pixels if negative
+     * @param percentWidth chosen percentage for width. \pixels if negative
      * @return new extended rectangle
      */
-    static RectF extendRect(@NonNull RectF rect, @IntRange(from = 0) int percent) {
-        float extendedHeight = rect.height()*percent/100;
-        float extendedWidth = rect.width()*percent/100;
-        float left = rect.left - extendedWidth/2;
+    static Rect extendRect(@NonNull Rect rect, int percentHeight, int percentWidth) {
+        int top;
+        int bottom;
+        int right;
+        int left;
+        if (percentHeight > 0) {
+            int extendedHeight = rect.height() * percentHeight / 100;
+            top = rect.top - extendedHeight / 2;
+            bottom = rect.bottom + extendedHeight/2;
+        } else {
+            top = rect.top - Math.abs(percentHeight);
+            bottom = rect.bottom + Math.abs(percentHeight);
+        }
+        if (percentWidth > 0) {
+            int extendedWidth = rect.width() * percentWidth / 100;
+            left = rect.left - extendedWidth / 2;
+            right = rect.right + extendedWidth/2;
+        } else {
+            left = rect.left - Math.abs(percentWidth);
+            right = rect.right + Math.abs(percentWidth);
+        }
         if (left<0)
             left = 0;
-        float top = rect.top - extendedHeight/2;
         if (top < 0)
             top = 0;
         //Doesn't matter if bottom and right are outside the photo
-        float right = rect.right + extendedWidth/2;
-        float bottom = rect.bottom + extendedHeight/2;
-        return new RectF(left, top, right, bottom);
+        return new Rect(left, top, right, bottom);
     }
 
     /**
      * @author Michelon
-     * @date 9-12-17
-     * Check if a string may be a number. Removes spaces, 's', 'S', '.' before analysis.
+     * @date 26-12-17
+     * Check if a string may be a number.
+     * Removes spaces, 'S', 'O','o', '.', ',' before analysis.
+     * If string is longer than maxlength default is Integer.MAX_VALUE (allowed numbers up to nn.nnn,nn)
+     * return is decreased if one '.' or ',' is present, increased if more than one are present.
      * @param s string to analyze
-     * @return true if more than half (included) of the chars in the string are numbers
-     */
-    static boolean isPossibleNumber(String s) {
+     * @return Integer.MAX_VALUE if less than 2/3 of the string are not numbers; number of non-digit chars (*0.5 if special (see above))/length
+	 */
+    static double isPossiblePriceNumber(String s) {
         int counter = 0;
-        s = s.replaceAll(" ", "").replaceAll("\\.", "")
-                .replaceAll("s", "").replaceAll("S", ""); //sometimes '5' are recognized as 's'
+        s = s.replaceAll(" ", "");
+        int initialLength = s.length();
+        int reducedLength = 0;
+        if (s.contains(".") || s.contains(","))
+            ++reducedLength;
+        int maxLength = 8; //Assume we can't have prices longer than 8 chars (so nn.nnn,nn)
+        s = s.replaceAll(",", "").replaceAll("O", "") //sometimes '0' are recognized as 'O'
+                .replaceAll("o", "").replaceAll("\\.", "").replaceAll("S", ""); //sometimes '5' are recognized as 'S'
+        if (s.length() >= maxLength)
+            return Integer.MAX_VALUE;
         for (int i = 0; i < s.length(); ++i) {
             if (Character.isDigit(s.charAt(i)))
                 ++counter;
         }
-        return counter >= s.length()/2;
+        reducedLength += s.length();
+        //return counter >= Math.round((double)s.length()*3/4);
+        if (counter < Math.round((double)s.length()*2/3))
+            return Integer.MAX_VALUE;
+        return ((initialLength - reducedLength)*0.5 + s.length() - counter)/reducedLength;
     }
 
+    /**
+     * @author Michelon
+     * Get rect containing all rawTexts detected
+     * @param rawTexts texts detected. Not null.
+     * @return Rect containing all rects passed
+     */
+    public static Rect getMaxRectBorders(@NonNull List<RawText> rawTexts) {
+        //Extreme borders for chosen photo (will be overwritten in foreach)
+        if (rawTexts.size() == 0)
+            return null;
+        int left = rawTexts.get(0).getRawImage().getWidth();
+        int right = 0;
+        int top = rawTexts.get(0).getRawImage().getHeight();
+        int bottom = 0;
+        for (RawText rawText : rawTexts) {
+            if (rawText.getBoundingBox().left<left)
+                left = rawText.getBoundingBox().left;
+            if (rawText.getBoundingBox().right>right)
+                right = rawText.getBoundingBox().right;
+            if (rawText.getBoundingBox().bottom>bottom)
+                bottom = rawText.getBoundingBox().bottom;
+            if (rawText.getBoundingBox().top<top)
+                top = rawText.getBoundingBox().top;
+        }
+        return new Rect(left, top, right, bottom);
+    }
 }

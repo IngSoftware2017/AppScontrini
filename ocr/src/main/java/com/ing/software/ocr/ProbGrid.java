@@ -1,102 +1,32 @@
 package com.ing.software.ocr;
 
+import android.support.annotation.NonNull;
 
-import java.util.HashMap;
+import com.ing.software.ocr.OcrObjects.RawText;
+
+import static com.ing.software.ocr.OcrVars.HEIGHT_LIST_MULTIPLIER;
 
 /**
  * Static class containing grids for probability regions (WIP)
- * Note: these grids are note definitive yet
- * More ratios are going to be added for next step
- * As soon as the OcrSchemer will be ready this class will be Deprecated
  * @author Michelon
  */
 public class ProbGrid {
 
-    private static final int GRIDCOUNT = 2; //number of grids
-    private static final String RATIO16x9 = "16x9";
-    private static final String RATIO16x7 = "16x7";
-    static HashMap<Double, String> gridMap = new HashMap<>(GRIDCOUNT);
-    public static HashMap<String, Integer[][]> amountMap = new HashMap<>(GRIDCOUNT);
-    public static HashMap<String, Integer[][]> dateMap = new HashMap<>(GRIDCOUNT);
-    private static final Integer[][] AmountGrid16x9 = {
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {10, 10, 10, 0, 0, 0, 0, 0, 0},
-            {20, 20, 10, 5, 0, 0, 0, 0, 0},
-            {20, 20, 10, 5, 0, 0, 0, 0, 0},
-            {20, 20, 10, 5, 0, 0, 0, 0, 0},
-            {20, 20, 10, 5, 0, 0, 0, 0, 0},
-            {30, 30, 20, 10, 0, 0, 0, 0, 0},
-            {40, 50, 40, 10, 0, 0, 0, 0, 0},
-            {40, 50, 40, 20, 0, 0, 0, 0, 0},
-            {60, 70, 60, 40, 20, 0, 0, 0, 0},
-            {60, 70, 60, 40, 10, 0, 0, 0, 0},
-            {30, 40, 30, 10, 0, 0, 0, 0, 0},
-            {10, 20, 20, 10, 0, 0, 0, 0, 0},
-            {10, 5, 5, 0, 0, 0, 0, 0, 0}
-    };
-    private static final Integer[][] AmountGrid16x7 = {
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {10, 10, 10, 0, 0, 0, 0},
-            {20, 20, 10, 0, 0, 0, 0},
-            {20, 20, 10, 0, 0, 0, 0},
-            {20, 20, 10, 0, 0, 0, 0},
-            {20, 20, 10, 0, 0, 0, 0},
-            {30, 30, 10, 0, 0, 0, 0},
-            {40, 40, 10, 0, 0, 0, 0},
-            {40, 40, 10, 0, 0, 0, 0},
-            {70, 50, 10, 0, 0, 0, 0},
-            {70, 50, 10, 0, 0, 0, 0},
-            {40, 30, 20, 0, 0, 0, 0},
-            {20, 20, 10, 0, 0, 0, 0},
-            {10, 10, 0, 0, 0, 0, 0}
-    };
-    private static final Integer[][] DateGrid16x9 = {
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {5, 5, 5, 5, 5, 5, 5, 5, 5},
-            {5, 5, 5, 5, 5, 5, 5, 5, 5},
-            {5, 5, 5, 5, 5, 5, 5, 5, 5},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {5, 5, 5, 5, 5, 5, 5, 5, 5},
-            {10, 20, 30, 30, 30, 20, 10, 10, 5},
-            {20, 40, 50, 40, 40, 40, 30, 20, 10},
-            {20, 40, 50, 50, 40, 40, 30, 20, 10},
-            {20, 40, 50, 40, 40, 30, 30, 20, 10},
-            {10, 10, 10, 10, 10, 10, 10, 10, 10}
-    };
-    private static final Integer[][] DateGrid16x7 = {
-            {0, 0, 0, 0, 0, 0, 0},
-            {5, 5, 5, 5, 5, 5, 5},
-            {5, 5, 5, 5, 5, 5, 5},
-            {5, 5, 5, 5, 5, 5, 5},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0},
-            {5, 5, 5, 5, 5, 5, 5},
-            {10, 20, 30, 30, 30, 10, 5},
-            {20, 40, 50, 40, 40, 20, 10},
-            {20, 40, 50, 50, 40, 20, 10},
-            {20, 40, 50, 40, 40, 20, 10},
-            {10, 10, 10, 10, 10, 10, 10}
-    };
+    public static final int[] amountBlockIntroduction = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    public static final int[] amountBlockProducts = new int[] {0, 0, 0, 5, 5, 10, 15, 20, 15, 10};
+    public static final int[] amountBlockConclusion = new int[] {5, 5, 0, 0, 0, 0, 0, 0, 0, 0};
+    public static final int[] dateBlockIntroduction = new int[] {0, 0, 0, 0, 0, 5, 5, 10, 15, 15};
+    public static final int[] dateBlockProducts = new int[] {10, 5, 0, 0, 0, 0, 0, 5, 15, 15};
+    public static final int[] dateBlockConclusion = new int[] {15, 10, 10, 5, 5, 10, 5, 5, 10, 10};
 
-    static {
-        gridMap.put((double)16/9, RATIO16x9);
-        gridMap.put((double)16/7, RATIO16x7);
-        amountMap.put(RATIO16x9, AmountGrid16x9);
-        amountMap.put(RATIO16x7, AmountGrid16x7);
-        dateMap.put(RATIO16x9, DateGrid16x9);
-        dateMap.put(RATIO16x7, DateGrid16x7);
+    /**
+     * Get probability considering rect height
+     * @param text source rawText. Not null.
+     * @return score
+     */
+    public static double getRectHeightScore(@NonNull RawText text) {
+        double average = text.getRawImage().getAverageRectHeight();
+        double diff = text.getBoundingBox().height() - average;
+        return diff/average*HEIGHT_LIST_MULTIPLIER;
     }
 }

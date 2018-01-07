@@ -19,22 +19,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.common.Ref;
-import com.ing.software.common.Ticket;
+import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrUtils;
-import com.ing.software.ocr.OnTicketReadyListener;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 
 import static com.ing.software.ocrtestapp.StatusVars.*;
+import static com.ing.software.ocrtestapp.StatusVars.DATE_RECEIVED;
 
 /**
  * This class analyze all pics in folder 'sdcard/TestOCR' for now it does not handle errors
@@ -141,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 //Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                 //        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
                 s = "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
-                        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds";
+                        "\nDate is: " + resultData.getString(DATE_RECEIVED);
                 break;
             case STATUS_ERROR:
                 /* Handle the error */
@@ -151,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 break;
             case STATUS_AVERAGE:
                 s = "\n\nAVERAGE TIME: " + resultData.getString(DURATION_RECEIVED) + " seconds\n";
-
+                break;
         }
         tv.append(s);
         //scrollView.addView(tv);
@@ -163,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
      */
     private String getDate() {
         Calendar cal = Calendar.getInstance();
-        return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(cal.getTime());
+        return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.US).format(cal.getTime());
     }
 
     /**
@@ -225,9 +227,13 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     OcrUtils.log(1, "OcrHandler", "_____________________________________________________");
                     bundle.putString(IMAGE_RECEIVED, aFile.getName());
                     receiver.send(STATUS_RUNNING, bundle);
-                    ocrAnalyzer.getTicket(testBmp, new OnTicketReadyListener() {
-                        @Override
-                        public void onTicketReady(Ticket result) {
+
+                    ImageProcessor preproc = new ImageProcessor(testBmp);
+                    preproc.findTicket(false, err -> {
+                        //String rectString = (err.isEmpty() ? "found" : "not found");
+                        //OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);
+                        //bundle.putString(RECTANGLE_RECEIVED, rectString);
+                        ocrAnalyzer.getTicket(preproc, result -> {
                             OcrUtils.log(1, "OcrHandler", "Detection complete");
                             long endTime = System.nanoTime();
                             double duration = ((double) (endTime - startTime)) / 1000000000;
@@ -236,15 +242,24 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                                 OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
                                 bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
                                 bundle.putString(DURATION_RECEIVED, duration + "");
-                                receiver.send(STATUS_FINISHED, bundle);
                             } else {
                                 OcrUtils.log(1, "OcrHandler", "No amount found");
                                 bundle.putString(AMOUNT_RECEIVED, "Not found.");
                                 bundle.putString(DURATION_RECEIVED, duration + "");
-                                receiver.send(STATUS_FINISHED, bundle);
                             }
+                            if (result.date != null) {
+                                OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
+                                DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                                String formattedDate = df.format(result.date);
+                                OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
+                                bundle.putString(DATE_RECEIVED, formattedDate);
+                            } else {
+                                OcrUtils.log(1, "OcrHandler", "No date found");
+                                bundle.putString(DATE_RECEIVED, "Not found.");
+                            }
+                            receiver.send(STATUS_FINISHED, bundle);
                             sem.release();
-                        }
+                        });
                     });
                     try {
                         sem.acquire();

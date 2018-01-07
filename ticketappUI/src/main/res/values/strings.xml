@@ -1,0 +1,65 @@
+
+
+<resources>
+    <string name="app_name">TicketManager</string>
+
+    <string name="title_activity_collapse">Collapse</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="action_addMission">Aggiungi missione</string>
+    <string name="action_editTicket">Modifica scontrino</string>
+    <string name="action_editMission">Modifica missione</string>
+    <string name="action_editPerson">Modifica persona</string>
+    <string name="action_deleteMission">Elimina missione</string>
+    <string name="action_deletePerson">Elimina persona</string>
+    <string name="billTitle">Il tuo scontrino</string>
+    <string name="add">Aggiungi</string>
+    <string name="name">Nome</string>
+    <string name="shop">Negozio</string>
+    <string name="total">Totale</string>
+    <string name="date">Data</string>
+    <string name="location">Luogo</string>
+    <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + per iniziare</string>
+    <string name="noMissionsClosed">Nessuna missione chiusa</string>
+    <string name="noBills">Nessun scontrino disponibile</string>
+    <string name="noBillsOpen">\nClicca sul pulsante + per iniziare</string>
+    <string name="noAcademicTitle">Nessun titolo accademico</string>
+    <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + per iniziare</string>
+    <string name="dateStart">Data inizio</string>
+    <string name="dateFinish">Data fine</string>
+    <string name="newMission">Nuova missione</string>
+    <string name="deleteMissionToast">Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati</string>
+    <string name="buttonDelete">Elimina</string>
+    <string name="cancel">Annulla</string>
+    <string name="deleteTicketToast">Sei sicuro di voler eliminare lo scontrino?</string>
+    <string name="titleMission">Missioni</string>
+    <string name="defaultDescription">Nessuna descrizione</string>
+    <string name="deleteTitle">Cancellazione</string>
+    <string name="description">Description</string>
+    <string name="edit_ticket">Edit ticket</string>
+    <string name="alert_invalid_amount_title">Error</string>
+    <string name="alert_invalid_amount_mess">Invalid amount</string>
+    <string name="authority">com.ing.software.ticketapp.fileprovider</string>
+    <string name="newPerson">Nuova persona</string>
+    <string name="titlePeople">Persone</string>
+    <string name="toast_missionNoName">Nome missione mancante</string>
+    <string name="toast_personNoName">Nome persona mancante</string>
+    <string name="toast_missionNoLocation">Luogo missione mancante</string>
+    <string name="toast_personNoLastName">Cognome persona mancante</string>
+    <string name="no_amount">No amount found</string>
+    <string name="toast_errorDate">Inizio > Fine</string>
+    <string name="toast_noDataStart">Data di inizio mancante</string>
+    <string name="toast_noDataFinish">Data di fine mancante</string>
+    <string name="text_isRepaid">La missione è stata archiviata?</string>
+    <string name="title_activity_missions_tabbed">MissionsTabbed</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
+    <string name="delete_title_person">Cancellazione</string>
+    <string name="Open">Aperte</string>
+    <string name="Closed">Chiuse</string>
+
+</resources>
