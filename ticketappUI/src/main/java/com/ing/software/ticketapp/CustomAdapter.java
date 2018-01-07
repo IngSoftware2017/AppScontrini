@@ -67,12 +67,12 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         //Amount text fixes
         String amount = "";
         if(c.getAmount() == null){
-            amount = "Prezzo non rilevato";
+            amount = context.getString(R.string.no_amount);
             tot.setText(amount);
         }
         else {
             amount = c.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
-            tot.setText("Totale: "+amount+"€");
+            tot.setText(context.getString(R.string.total_with_numb, amount));
         }
 
         //Ticket image bitmap set

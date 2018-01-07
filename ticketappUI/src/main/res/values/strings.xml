@@ -64,5 +64,6 @@
     <string name="Closed">Closed</string>
     <string name="no_date">No date found</string>
     <string name="downloading_library">Downloading library.\nPlease, wait…</string>
+    <string name="total_with_numb">Total : %s</string>
 
 </resources>
