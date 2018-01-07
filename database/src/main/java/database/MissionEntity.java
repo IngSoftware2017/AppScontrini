@@ -33,7 +33,7 @@ public class MissionEntity {
     private String location;
 
     @ColumnInfo(name = Constants.MISSION_FIELD_REPAID)
-    private boolean isRepay;
+    private boolean isRepay=false;
     private Uri excel;
     private String name;
 

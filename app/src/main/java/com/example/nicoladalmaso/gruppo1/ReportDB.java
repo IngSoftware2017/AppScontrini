@@ -3,6 +3,7 @@ package com.example.nicoladalmaso.gruppo1;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ public class ReportDB extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         getSupportActionBar().setElevation(0);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_report_db);
         setTitle("Report DB");
 
@@ -43,7 +45,20 @@ public class ReportDB extends AppCompatActivity {
         txtCloseMission=(TextView)findViewById(R.id.msgNumCloseMission);
         txtNumTicket=(TextView)findViewById(R.id.msgNumTicket);
 
-        inizializeValues();
+        initializeValues();
+    }
+
+    /**
+     * @author Elardo Stefano
+     * Catch events on toolbar
+     * @param item object on the toolbar
+     * @return flag of success
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //toolbar is empty, handle only the return arrow which close the activity
+        finish();
+        return true;
     }
 
     /**
@@ -51,18 +66,21 @@ public class ReportDB extends AppCompatActivity {
      * Inizializes all fields with db numbers
      */
 
-    private void inizializeValues(){
+    private void initializeValues(){
         List<PersonEntity> person = DB.getAllPerson();
-        txtNumPerson.setText(txtNumPerson.getText()+" "+ String.valueOf(person.size()+1));
+        txtNumPerson.setText(txtNumPerson.getText()+" "+ String.valueOf(person.size()));
 
-        List<MissionEntity> activeMission = DB.getActiveMission();
-        txtActiveMission.setText(txtActiveMission.getText()+" "+ String.valueOf(activeMission.size()+1));
+        List<MissionEntity> activeMission = DB.getMissionRepaid(false);
+        txtActiveMission.setText(txtActiveMission.getText()+" "+ String.valueOf(activeMission.size()));
 
-        List<MissionEntity> allMission = DB.getAllMission();
-        int closeMission = allMission.size()-activeMission.size();
-        txtCloseMission.setText(txtCloseMission.getText()+" "+ closeMission);
+        //List<MissionEntity> allMission = DB.getAllMission();
+        //MissionEntity m = allMission.get(0);
+        //boolean repaid = m.isRepay();
+        //int closeM = allMission.size()-activeMission.size();
+        List<MissionEntity> closeMission = DB.getMissionRepaid(true);
+        txtCloseMission.setText(txtCloseMission.getText()+" "+ String.valueOf(closeMission.size()));
 
         List<TicketEntity> ticket = DB.getAllTickets();
-        txtNumTicket.setText(txtNumTicket.getText()+" "+ String.valueOf(ticket.size()+1));
+        txtNumTicket.setText(txtNumTicket.getText()+" "+ String.valueOf(ticket.size()));
     }
 }
