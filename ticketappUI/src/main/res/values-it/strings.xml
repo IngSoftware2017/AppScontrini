@@ -38,6 +38,8 @@
     <string name="edit_ticket">Modifica scontrino</string>
     <string name="alert_invalid_amount_title">Errore</string>
     <string name="alert_invalid_amount_mess">Prezzo non valido</string>
+    <string name="alert_invalid_date_title">Errore</string>
+    <string name="alert_invalid_date_mess">Data non valida</string>
     <string name="newPerson">Nuova persona</string>
     <string name="titlePeople">Persone</string>
     <string name="toast_missionNoName">Nome missione mancante</string>

@@ -39,6 +39,8 @@
     <string name="edit_ticket">Edit ticket</string>
     <string name="alert_invalid_amount_title">Error</string>
     <string name="alert_invalid_amount_mess">Invalid amount</string>
+    <string name="alert_invalid_date_title">Error</string>
+    <string name="alert_invalid_date_mess">Invalid date</string>
     <string name="newPerson">New person</string>
     <string name="titlePeople">People</string>
     <string name="toast_missionNoName">Please, insert a name for the mission</string>

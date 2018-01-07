@@ -25,11 +25,13 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/fabCrop"
+            android:layout_alignParentBottom="true"
             android:layout_gravity="end"
+            android:layout_marginBottom="12dp"
             android:layout_marginStart="20dp"
             app:srcCompat="@drawable/ic_clear_white_24px" />
 
+        <!--
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabCrop"
             android:layout_width="56dp"
@@ -38,17 +40,18 @@
             android:layout_alignParentEnd="true"
             android:layout_gravity="end"
             android:layout_marginBottom="12dp"
-            android:layout_marginEnd="13dp"
+            android:layout_marginEnd="138dp"
             app:backgroundTint="#D81B60"
             app:srcCompat="@drawable/ic_content_cut_white_24px" />
+        -->
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabOcr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/fabCrop"
-            android:layout_marginEnd="14dp"
-            android:layout_toStartOf="@+id/fabCrop"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/fabDelete"
+            android:layout_marginEnd="21dp"
             android:clickable="true"
             android:src="@android:drawable/ic_menu_view" />
 

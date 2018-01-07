@@ -47,7 +47,6 @@ import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -368,7 +367,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                         bitmapPhoto=null;
                     }
                     deleteTempFiles();
-                    waitDB();
+                    //waitDB();
                     clearAllImages();
                     printAllTickets();
                     break;
@@ -380,7 +379,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                         savePickedFile(btm);
-                        waitDB();
+                        //waitDB();
                         clearAllImages();
                         printAllTickets();
                     }catch (Exception e){
@@ -390,7 +389,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                    waitDB();
+                    //waitDB();
                     clearAllImages();
                     printAllTickets();
                     break;
@@ -412,6 +411,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         } else if (resultCode == REDO_OCR) {
             long ticketID = Long.parseLong(data.getStringExtra("ticketID"));
             TicketEntity ticket = DB.getTicket(ticketID);
+            Log.d("TICKETID_REDO_OCR", "ID received in bill activity is: " + ticketID);
             Uri bitmapUri = ticket.getFileUri();
             String fname = getFileName(bitmapUri);
             //DB.deleteTicket(ticketID);
@@ -421,7 +421,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             intent.putExtra("receiver", mReceiver);
             intent.putExtra("image", fname);
             intent.putExtra("root", root);
-            intent.putExtra(TICKET_ID, ticketID);
+            intent.putExtra(TICKET_ID, String.valueOf(ticketID));
             startService(intent);
         }
     }
@@ -429,6 +429,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     /** Dal Maso
      * Thread sleep for 1 second for right tickets real-time vision
      */
+    /*
     public void waitDB(){
         try {
             Log.i("Waiting db", "Going to sleep");
@@ -437,6 +438,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             e.printStackTrace();
         }
     }
+    */
 
     /** Dal Maso
      * Save the bitmap passed
@@ -480,6 +482,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
      * Method that clears the screen from the images
      */
     public void clearAllImages(){
+        list = new LinkedList<>();
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         adapter.clear();
@@ -513,7 +516,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     public void printAllTickets(){
         List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
         Log.d("Tickets", ticketList.toString());
-        TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
             Log.d("Ticket_ID", ""+ticketList.get(i).getID());
@@ -534,6 +536,14 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         }
     }
 
+    void printSingleTicket(TicketEntity t) {
+        if (list.size() == 0) {
+            TextView noBills = (TextView)findViewById(R.id.noBills);
+            noBills.setVisibility(View.INVISIBLE);
+        }
+        addToList(t);
+    }
+
     /**PICCOLO_Edit by Dal Maso
      * Method that lets the user crop the photo
      * @param toCrop photo's index
@@ -551,6 +561,15 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         switch (resultCode) {
             case STATUS_RUNNING:
                 //Toast.makeText(this, "Starting img ", Toast.LENGTH_SHORT).show();
+                //show new photo, but set amount and date to null
+                if (resultData.getString(IMAGE_RECEIVED) != null) {
+                    Uri uri = Uri.fromFile(new File(resultData.getString(ROOT_RECEIVED), resultData.getString(IMAGE_RECEIVED)));
+                    Log.d("TICKETID_REDO_OCR", "ID received in service (start) is: " + resultData.getString(TICKET_ID));
+                    if (resultData.getString(TICKET_ID) == null) {
+                        //photo is not present, add an image, will be remove once clearAllImages will be called
+                        printSingleTicket(new TicketEntity(uri, null, null, null, null, missionID));
+                    }
+                }
                 break;
             case STATUS_FINISHED:
                 //Toast.makeText(this, "Amount is: " + resultData.getString(AMOUNT_RECEIVED) + "\nDate is: "
@@ -570,8 +589,9 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     } catch (ParseException e) {
                         //Nada
                     }
-                    if (date == null)
-                        date = Calendar.getInstance().getTime();
+                    //if (date == null)
+                    //    date = Calendar.getInstance().getTime();
+                    Log.d("TICKETID_REDO_OCR", "ID received in service (finished) is: " + resultData.getString(TICKET_ID));
                     if (resultData.getString(TICKET_ID) != null) {
                         try {
                             long ticketID = Long.parseLong(resultData.getString(TICKET_ID));

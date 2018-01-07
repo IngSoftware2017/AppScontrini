@@ -58,25 +58,27 @@ public class BillViewer extends AppCompatActivity {
 
         initialize();
 
-        fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
+        //fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
         fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
         fabOcr = findViewById(R.id.fabOcr);
+        /*
         fabCrop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 cropPhoto(ticketId);
            }//onClick
         });
+        */
         fabDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deleteTicket(ticketId);
-                finish();
             }//onClick
         });
         fabOcr.setOnClickListener(view -> {
             Intent intent = new Intent();
-            intent.putExtra("ticketID", "" + ticketId);
+            intent.putExtra("ticketID", String.valueOf(ticketId));
+            Log.d("TICKETID_REDO_OCR", "ID is: " + ticketId);
             setResult(REDO_OCR, intent);
             finish();
         });
@@ -139,9 +141,11 @@ public class BillViewer extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.editticket_menu, menu);
+        /*
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(false); //remove back button, or redo ocr doesn't work
+            */
         return true;
     }
 
@@ -192,6 +196,13 @@ public class BillViewer extends AppCompatActivity {
                     break;
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent mIntent = new Intent();
+        setResult(RESULT_OK, mIntent);
+        super.onBackPressed();
     }
 
 

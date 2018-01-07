@@ -32,6 +32,7 @@ public class EditTicket extends AppCompatActivity {
     TextView txtAmount;
     TextView txtShop;
     TextView txtDate;
+    AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,12 @@ public class EditTicket extends AppCompatActivity {
         setContentView(R.layout.activity_edit_ticket);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(EditTicket.this, android.R.style.Theme_Material_Light_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(EditTicket.this);
+        }
+
 
         //Get data from parent view
         setTicketValues();
@@ -76,29 +83,34 @@ public class EditTicket extends AppCompatActivity {
                 try {
                     thisTicket.setDate(format.parse(txtDate.getText().toString()));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    if (!txtDate.getText().toString().replaceAll(" ", "").equals("")) {
+                        builder.setTitle(getString(R.string.alert_invalid_date_title))
+                                .setMessage(R.string.alert_invalid_date_mess)
+                                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                                    // do nothing
+                                })
+                                .show();
+                        break;
+                    }
                 }
                 thisTicket.setShop(txtShop.getText().toString());
                 try {
                     thisTicket.setAmount(new BigDecimal(txtAmount.getText().toString().replaceAll(",", ".").replaceAll(" ", "")));
                 } catch (NumberFormatException e) {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(EditTicket.this, android.R.style.Theme_Material_Light_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(EditTicket.this);
+                    if (!txtAmount.getText().toString().replaceAll(" ", "").equals("")) {
+                        builder.setTitle(getString(R.string.alert_invalid_amount_title))
+                                .setMessage(R.string.alert_invalid_amount_mess)
+                                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                                    // do nothing
+                                })
+                                .show();
+                        break;
                     }
-                    builder.setTitle(getString(R.string.alert_invalid_amount_title))
-                            .setMessage(R.string.alert_invalid_amount_mess)
-                            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                                // do nothing
-                            })
-                            .show();
                 }
                 DB.updateTicket(thisTicket);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
-                //finish();
+                finish();
                 break;
 
             default:
@@ -115,7 +127,8 @@ public class EditTicket extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
-        ticketDate = thisTicket.getDate().toString();
+        if (thisTicket.getDate() != null)
+            ticketDate = thisTicket.getDate().toString();
         if (thisTicket.getAmount() != null)
             ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
         ticketShop = thisTicket.getShop();
