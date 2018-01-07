@@ -244,21 +244,23 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions. Those ones that weren't repaid
-     * @return List<MissionEntity> not null with all active missions
+     * Gets only active or repaid missions.
+     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
+     * @return List<MissionEntity> not null with all active or repaid missions.
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = 'FALSE' ")
-    List<MissionEntity> getActiveMission();
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid")
+    List<MissionEntity> getMissionRepaid(boolean repaid);
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * Gets only active or repaid missions of a specific person.
+     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
      * @param personId Long not null, the person's id
-     * @return List<MissionEntity> not null with all active missions of the specific person
+     * @return List<MissionEntity> not null all active or repaid missions of the specific person
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = 'FALSE' AND "
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid AND "
             + Constants.PERSON_CHILD_COLUMNS + " =:personId")
-    List<MissionEntity> getActiveMissionForPerson(long personId);
+    List<MissionEntity> getMissionRepaidForPerson(boolean repaid, long personId);
 
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name

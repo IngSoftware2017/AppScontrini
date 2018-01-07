@@ -282,22 +282,25 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions. Those ones that weren't repaid
-     * @return List<MissionEntity> not null with all active missions
+     * Gets only active or repaid missions.
+     *
+     * @param repaid, boolean - true if you want mission repaid, false if you want active mission.
+     * @return List<MissionEntity> not null with all active or repaid missions.
      */
-    public List<MissionEntity> getActiveMission(){
-        return database.ticketDao().getActiveMission();
+    public List<MissionEntity> getMissionRepaid(boolean repaid){
+        return database.ticketDao().getMissionRepaid(repaid);
     }
 
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * Gets only active or repaid missions of a specific person.
+     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
      * @param personId Long not null, the person's id
-     * @return List<MissionEntity> not null with all active missions of the specific person
+     * @return List<MissionEntity> not null all active or repaid missions of the specific person
      */
-    public List<MissionEntity> getActiveMissionForPerson(long personId){
-        return database.ticketDao().getActiveMissionForPerson(personId);
+    public List<MissionEntity> getMissionRepaidForPerson(boolean repaid, long personId){
+        return database.ticketDao().getMissionRepaidForPerson(repaid, personId);
     }
 
     /**Created by Federico Taschin
