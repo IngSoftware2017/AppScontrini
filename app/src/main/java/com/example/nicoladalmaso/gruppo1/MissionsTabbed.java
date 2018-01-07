@@ -138,7 +138,7 @@ public class MissionsTabbed extends AppCompatActivity {
 
                 case (PERSON_MOD):
                     thisPerson = DB.getPerson(personID);
-                    toolbar.setTitle(thisPerson.getName());
+                    toolbar.setTitle(thisPerson.getName() + " " + thisPerson.getLastName());
                     break;
 
                 default:

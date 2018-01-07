@@ -35,6 +35,8 @@ import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import org.opencv.android.OpenCVLoader;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -81,6 +83,7 @@ public class BillActivity extends AppCompatActivity {
         missionID = intent.getExtras().getInt("missionID");
         thisMission = DB.getMission(missionID);
         setTitle(thisMission.getName());
+
 
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
@@ -521,5 +524,6 @@ public class BillActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ocrManager.release();
     }
 }

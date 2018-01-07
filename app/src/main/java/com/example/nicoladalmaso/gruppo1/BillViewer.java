@@ -94,7 +94,11 @@ public class BillViewer extends AppCompatActivity {
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
         ticketShop = thisTicket.getShop();
-        ticketAmount = thisTicket.getAmount().toString();
+        if(thisTicket.getAmount() == null){
+            ticketAmount = "";
+        }
+        else
+            ticketAmount = thisTicket.getAmount().toString();
 
         //Title
         setTitle(ticketTitle);
@@ -107,7 +111,7 @@ public class BillViewer extends AppCompatActivity {
 
         //Total price
         TextView billPrice = (TextView)findViewById(R.id.billTotal);
-        billPrice.setText(ticketAmount+" €");
+        billPrice.setText(ticketAmount);
 
         //Shop
         TextView billShop = (TextView)findViewById(R.id.billShop);
