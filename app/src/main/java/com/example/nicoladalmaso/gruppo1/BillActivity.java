@@ -15,6 +15,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +28,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ing.software.common.Ticket;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -58,6 +58,7 @@ public class BillActivity extends AppCompatActivity {
     public DataManager DB;
     OcrManager ocrManager;
     HashMap<Integer,Bitmap> bitmaps = new HashMap<>();
+    int screenWIdth;
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int PICK_PHOTO_FOR_AVATAR = 2;
@@ -80,6 +81,10 @@ public class BillActivity extends AppCompatActivity {
         missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
         setTitle(thisMission.getName());
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        screenWIdth = metrics.widthPixels;
 
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
@@ -200,7 +205,7 @@ public class BillActivity extends AppCompatActivity {
     public void addToList(TicketEntity t){
         list.add(t);
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, screenWIdth);
         adapter.setBitmaps(bitmaps);
         listView.setAdapter(adapter);
         Log.d("DEBUGTICKET","addToList(): "+t.getAmount());
@@ -214,26 +219,33 @@ public class BillActivity extends AppCompatActivity {
         list = DB.getTicketsForMission(missionID);
         Log.d("TICKETDEBUG","LIST SIZE: "+list.size());
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
-        setBitmaps();
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, screenWIdth);
+        //I decided to replace my bitmap caching management with that of Picasso library
+        //setBitmaps();
         adapter.setBitmaps(bitmaps);
         listView.setAdapter(adapter);
     }
 
-    /** Created by FEDERICO TASCHIN
+    /**
+     * !!!!! REPLACED WITH PICASSO LIBRARY !!!!!!!
+     * Created by FEDERICO TASCHIN
      *  Scales the bitmaps and adds all those that aren't in memory already to the HashMap.
      */
     public void setBitmaps(){
        for(int i = 0; i<list.size(); i++){
            TicketEntity ticketEntity = list.get(i);
            if(!bitmaps.containsKey(new Integer((int)ticketEntity.getID()))){
+
                BitmapFactory.Options options = new BitmapFactory.Options();
                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                Bitmap bitmap = BitmapFactory.decodeFile(ticketEntity.getFileUri().getPath(), options);
-               int nh = (int) (bitmap.getHeight() * (512.0 / bitmap.getWidth()));
-               Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 512, nh, true);
+
+               DisplayMetrics displayMetrics = new DisplayMetrics();
+               this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+               double width = displayMetrics.widthPixels/2;
+               int nh = (int) (bitmap.getHeight() * (width/ bitmap.getWidth()));
+               Bitmap scaled = Bitmap.createScaledBitmap(bitmap, (int)width, nh, true);
                bitmaps.put((int)ticketEntity.getID(),scaled);
-               Log.d("TICKETDEBUG","ADDING BITMAP"+ticketEntity.getFileUri().getPath());
            }
        }
     }
@@ -365,7 +377,7 @@ public class BillActivity extends AppCompatActivity {
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
                     deleteTempFiles();
-                    clearAllImages();
+                    //clearAllImages();
                     long time = System.currentTimeMillis();
                     printAllTickets();
                     Log.d("TICKETDEBUG","TIME TAKEN: "+((System.currentTimeMillis()-time)/1000));
@@ -378,7 +390,7 @@ public class BillActivity extends AppCompatActivity {
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                         savePickedFile(btm);
-                        clearAllImages();
+                        //clearAllImages();
                         Log.d("DEBUGTICKET","onActivityResult{CASE PICK_PHOTO_FOR_AVATAR}");
                         printAllTickets();
                     }catch (Exception e){
@@ -431,6 +443,7 @@ public class BillActivity extends AppCompatActivity {
         if(originalPhoto.exists())
             originalPhoto.delete();
         try {
+            long time = System.currentTimeMillis();
             FileOutputStream out = new FileOutputStream(file);
             TicketEntity ticket = new TicketEntity();
             ticket.setDate(Calendar.getInstance().getTime());
@@ -446,12 +459,14 @@ public class BillActivity extends AppCompatActivity {
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
             outOriginal.flush();
             outOriginal.close();
-
+            long time1 = System.currentTimeMillis();
             startOcrAnalysis(imageToSave, ticket);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     /** Federico Taschin
      * Starts the OCR analysis of the bitmap. When the resuly is ready, it updates the database and the activity is refreshed
@@ -481,7 +496,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, screenWIdth);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);

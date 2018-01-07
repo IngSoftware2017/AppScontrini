@@ -1,39 +1,25 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ing.software.common.Ticket;
 import com.squareup.picasso.Picasso;
-import com.theartofdev.edmodo.cropper.CropImage;
+import com.squareup.picasso.Transformation;
 
 import java.io.File;
-import java.net.URI;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import database.DataManager;
 import database.TicketEntity;
 
 /**
@@ -48,18 +34,18 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
     String path = "";
     int ticketID = 0;
     int missionID;
-    DataManager DB;
+    //DataManager DB;
     List<TicketEntity> t = new ArrayList<TicketEntity>();
     HashMap<Integer, Bitmap> bitmaps = new HashMap<>();
+    int screenWidth;
 
     //Dal Maso, adapter declare
-    public CustomAdapter(Context context, int textViewResourceId,
-                         List<TicketEntity> objects, int missionID, DataManager DB) {
+    public CustomAdapter(Context context, int textViewResourceId, List<TicketEntity> objects, int missionID, int screenWidth) {
         super(context, textViewResourceId, objects);
         this.context = context;
         this.missionID = missionID;
-        this.DB = new DataManager(context);
         this.t = objects;
+        this.screenWidth= screenWidth;
         Log.d("MISSION", ""+missionID);
     }
 
@@ -72,7 +58,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         TextView tot = (TextView)convertView.findViewById(R.id.description);
 
         TicketEntity c = getItem(position);
-        File photo = new File(c.getFileUri().toString().substring(7));
         ticketTitle.setText(c.getTitle());
 
         //Amount text fixes
@@ -86,9 +71,11 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText("Totale: "+amount+"€");
         }
 
+        //Bitmap image = bitmaps.get(new Integer((int)c.getID()));
+        //img.setImageBitmap(image);
 
-        Bitmap image = bitmaps.get(new Integer((int)c.getID()));
-        img.setImageBitmap(image);
+        //Picasso.with(context).load(c.getFileUri()).transform(new ScaleTransform(screenWidth)).into(img);
+        Picasso.with(context).load(c.getFileUri()).fit().centerCrop().into(img);
         //For next ticket manages
         convertView.setTag(c.getID());
 
@@ -124,5 +111,24 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         this.bitmaps = bitmaps;
     }
 
+    /** Created by FEDERICO TASCHIN
+     *
+     */
+    public class ScaleTransform implements Transformation {
+        int width;
+        public ScaleTransform(int width){
+            this.width = width;
+        }
+        @Override public Bitmap transform(Bitmap source) {
+            int height = (int)(source.getHeight() * ((double)width/ source.getWidth()));
+            Bitmap result = Bitmap.createBitmap(source, 0, 0, width, height);
+            if (result != source) {
+                source.recycle();
+            }
+            return result;
+        }
+
+        @Override public String key() { return "square()"; }
+    }
 
 }
