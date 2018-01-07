@@ -64,6 +64,7 @@ public class BillActivity extends AppCompatActivity {
     String root;
     public DataManager DB;
     OcrManager ocrManager;
+    CustomAdapter adapter;
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int PICK_PHOTO_FOR_AVATAR = 2;
@@ -202,10 +203,9 @@ public class BillActivity extends AppCompatActivity {
     /** Dal Maso
      * Add new ticket to the list
      */
-    public void addToList(TicketEntity t){
-        list.add(t);
+    public void addToList(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         listView.setAdapter(adapter);
     }
 
@@ -336,7 +336,6 @@ public class BillActivity extends AppCompatActivity {
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
                     deleteTempFiles();
-                    waitDB();
                     clearAllImages();
                     printAllTickets();
                     break;
@@ -348,7 +347,6 @@ public class BillActivity extends AppCompatActivity {
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                         savePickedFile(btm);
-                        waitDB();
                         clearAllImages();
                         printAllTickets();
                     }catch (Exception e){
@@ -359,7 +357,6 @@ public class BillActivity extends AppCompatActivity {
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                    waitDB();
                     clearAllImages();
                     printAllTickets();
                     break;
@@ -381,18 +378,6 @@ public class BillActivity extends AppCompatActivity {
                     printAllTickets();
                     break;
             }
-        }
-    }
-
-    /** Dal Maso
-     * Thread sleep for 1 second for right tickets real-time vision
-     */
-    public void waitDB(){
-        try {
-            Log.i("Waiting db", "Going to sleep");
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -442,7 +427,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void clearAllImages(){
         ListView listView = (ListView)findViewById(R.id.list1);
-        CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         adapter.clear();
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
@@ -472,15 +457,17 @@ public class BillActivity extends AppCompatActivity {
      *  Print all tickets, get it from DB
      */
     public void printAllTickets(){
+        list.clear();
         List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
         Log.d("Tickets", ticketList.toString());
         TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
+            list.add(ticketList.get(i));
             Log.d("Ticket_ID", ""+ticketList.get(i).getID());
-            addToList(ticketList.get(i));
             count++;
         }
+        addToList();
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
         String noBillsError=getResources().getString(R.string.noBills);

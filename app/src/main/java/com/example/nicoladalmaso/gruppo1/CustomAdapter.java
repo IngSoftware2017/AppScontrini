@@ -3,6 +3,7 @@ package com.example.nicoladalmaso.gruppo1;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -20,8 +21,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.theartofdev.edmodo.cropper.CropImage;
 
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -83,10 +85,12 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText("Totale: "+amount+"€");
         }
 
+
         //Ticket image bitmap set
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
+        bitmap = Bitmap.createScaledBitmap(bitmap, parent.getWidth()/3, parent.getHeight()/3,true);
         img.setImageBitmap(bitmap);
 
         //For next ticket manages
@@ -115,4 +119,10 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         return convertView;
     }
 
+    private byte[] bitmapToByte(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
+    }
 }
