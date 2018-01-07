@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
@@ -27,6 +26,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ing.software.common.Ticket;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -36,9 +37,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import database.DataManager;
 import database.MissionEntity;
 import database.TicketEntity;
@@ -56,12 +57,17 @@ public class BillActivity extends AppCompatActivity {
     String root;
     public DataManager DB;
     OcrManager ocrManager;
+    HashMap<Integer,Bitmap> bitmaps = new HashMap<>();
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int PICK_PHOTO_FOR_AVATAR = 2;
     static final int TICKET_MOD = 4;
     static final int MISSION_MOD = 5;
 
+    /** Modified by Federico Taschin
+     *  Creates the activity that displays the tickets of the selected mission. Istantiates the OCR module.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +91,6 @@ public class BillActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
         initializeComponents();
     }
 
@@ -196,15 +201,41 @@ public class BillActivity extends AppCompatActivity {
         list.add(t);
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        adapter.setBitmaps(bitmaps);
         listView.setAdapter(adapter);
         Log.d("DEBUGTICKET","addToList(): "+t.getAmount());
     }
 
+    /** Cereated by FEDERICO TASCHIN
+     *  Refresh the listView by reading the tickets from the database and recreating the adapter
+     *  Images aren't readed if they're already in the memory
+     */
     public void refreshList(){
         list = DB.getTicketsForMission(missionID);
+        Log.d("TICKETDEBUG","LIST SIZE: "+list.size());
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        setBitmaps();
+        adapter.setBitmaps(bitmaps);
         listView.setAdapter(adapter);
+    }
+
+    /** Created by FEDERICO TASCHIN
+     *  Scales the bitmaps and adds all those that aren't in memory already to the HashMap.
+     */
+    public void setBitmaps(){
+       for(int i = 0; i<list.size(); i++){
+           TicketEntity ticketEntity = list.get(i);
+           if(!bitmaps.containsKey(new Integer((int)ticketEntity.getID()))){
+               BitmapFactory.Options options = new BitmapFactory.Options();
+               options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+               Bitmap bitmap = BitmapFactory.decodeFile(ticketEntity.getFileUri().getPath(), options);
+               int nh = (int) (bitmap.getHeight() * (512.0 / bitmap.getWidth()));
+               Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 512, nh, true);
+               bitmaps.put((int)ticketEntity.getID(),scaled);
+               Log.d("TICKETDEBUG","ADDING BITMAP"+ticketEntity.getFileUri().getPath());
+           }
+       }
     }
 
     /** Dal Maso (Using Lazzarin code)
@@ -312,7 +343,7 @@ public class BillActivity extends AppCompatActivity {
     }
 
 
-    /** Dal Maso
+    /** Dal Maso modified by FEDERICO TASCHIN
      * Catch intent results
      * @param requestCode action number
      * @param resultCode intent result code
@@ -334,10 +365,10 @@ public class BillActivity extends AppCompatActivity {
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
                     deleteTempFiles();
-                    waitDB();
                     clearAllImages();
-                    Log.d("DEBUGTICKET","onActivityResult{CASE REQUEST_TAKE_PHOTO}");
+                    long time = System.currentTimeMillis();
                     printAllTickets();
+                    Log.d("TICKETDEBUG","TIME TAKEN: "+((System.currentTimeMillis()-time)/1000));
                     break;
 
                 //Dal Maso
@@ -347,7 +378,6 @@ public class BillActivity extends AppCompatActivity {
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                         savePickedFile(btm);
-                        waitDB();
                         clearAllImages();
                         Log.d("DEBUGTICKET","onActivityResult{CASE PICK_PHOTO_FOR_AVATAR}");
                         printAllTickets();
@@ -359,7 +389,6 @@ public class BillActivity extends AppCompatActivity {
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                    waitDB();
                     clearAllImages();
                     printAllTickets();
                     break;
@@ -384,20 +413,10 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-    /** Dal Maso
-     * Thread sleep for 1 second for right tickets real-time vision
-     */
-    public void waitDB(){
-        /*try {
-            Log.i("Waiting db", "Going to sleep");
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        e.printStackTrace();
-        }*/
-    }
 
-    /** Dal Maso
-     * Save the bitmap passed
+    /** Dal Maso, modified by FEDERICO TASCHIN
+     * Saves the given bitmap, sets its path in the TicketEntity object and inserts it in the database.
+     * Starts the OCR analysis
      * @param imageToSave bitmap to save
      */
     private void savePickedFile(Bitmap imageToSave) {
@@ -427,9 +446,8 @@ public class BillActivity extends AppCompatActivity {
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
             outOriginal.flush();
             outOriginal.close();
-            Log.d("DEBUGOCR","STARTING OCR ANALYSIS");
+
             startOcrAnalysis(imageToSave, ticket);
-            Log.d("DEBUGOCR","OCR ANALYSIS STARTED");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -440,7 +458,7 @@ public class BillActivity extends AppCompatActivity {
      * @param bitmap not null, image to be analyzed
      * @param ticketEntity the object related to the image
      */
-    public void startOcrAnalysis(Bitmap bitmap, TicketEntity ticketEntity){
+    private void startOcrAnalysis(Bitmap bitmap, TicketEntity ticketEntity){
         ImageProcessor processor = new ImageProcessor(bitmap);
         ocrManager.getTicket(processor, result -> {
             Log.d("DEBUGOCR","RESULT IS READY");
@@ -489,26 +507,19 @@ public class BillActivity extends AppCompatActivity {
     }
 
 
-    /** Dal Maso
-     *  Print all tickets, get it from DB
+    /** Dal Maso, Modified by Federico TAschin
+     *  Calls the refreshList() method. If the list is empty, it displays a message
      */
     public void printAllTickets(){
-        List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
-        Log.d("Tickets", ticketList.toString());
-        TicketEntity t;
-        int count = 0;
-        for(int i = 0; i < ticketList.size(); i++){
-            Log.d("DEBUGTICKET", "ADDED IN printAllTickets()");
-            addToList(ticketList.get(i));
-            count++;
-        }
+        refreshList();
+
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
         String noBillsError=getResources().getString(R.string.noBills);
         if(!thisMission.isRepay())
             noBillsError+=getResources().getString(R.string.noBillsOpen);
         noBills.setText(noBillsError);
-        if(count == 0){
+        if(list.isEmpty()){
             noBills.setVisibility(View.VISIBLE);
         }
         else{

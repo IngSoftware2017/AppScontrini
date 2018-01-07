@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ing.software.common.Ticket;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import database.DataManager;
@@ -47,6 +50,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
     int missionID;
     DataManager DB;
     List<TicketEntity> t = new ArrayList<TicketEntity>();
+    HashMap<Integer, Bitmap> bitmaps = new HashMap<>();
 
     //Dal Maso, adapter declare
     public CustomAdapter(Context context, int textViewResourceId,
@@ -61,11 +65,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.cardview, null);
-
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
@@ -85,12 +86,9 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText("Totale: "+amount+"€");
         }
 
-        //Ticket image bitmap set
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
-        img.setImageBitmap(bitmap);
 
+        Bitmap image = bitmaps.get(new Integer((int)c.getID()));
+        img.setImageBitmap(image);
         //For next ticket manages
         convertView.setTag(c.getID());
 
@@ -116,5 +114,15 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         });
         return convertView;
     }
+
+
+    /** Taschin Federico
+     * Sets the HashMap with the bitmaps to be displayed
+     * @param bitmaps not null, contains the Bitmap objects that have to be displayed in the list
+     */
+    public void setBitmaps(HashMap<Integer,Bitmap> bitmaps){
+        this.bitmaps = bitmaps;
+    }
+
 
 }
