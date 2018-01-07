@@ -284,7 +284,7 @@ public class DataManager {
      * @author Marco Olivieri
      * Gets only active or repaid missions.
      *
-     * @param repaid, boolean - true if you want mission repaid, false if you want active mission.
+     * @param repaid, boolean not null - true if you want mission repaid, false if you want active mission.
      * @return List<MissionEntity> not null with all active or repaid missions.
      */
     public List<MissionEntity> getMissionRepaid(boolean repaid){
@@ -295,7 +295,7 @@ public class DataManager {
     /**
      * @author Marco Olivieri
      * Gets only active or repaid missions of a specific person.
-     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
+     * @param repaid, boolean not null - true if you want mission repaid, false if you want active mission
      * @param personId Long not null, the person's id
      * @return List<MissionEntity> not null all active or repaid missions of the specific person
      */
