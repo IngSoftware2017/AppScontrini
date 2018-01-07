@@ -5,9 +5,11 @@
       <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
       <module fileurl="file://$PROJECT_DIR$/ocr/ocr.iml" filepath="$PROJECT_DIR$/ocr/ocr.iml" />
       <module fileurl="file://$PROJECT_DIR$/ocrtestapp/ocrtestapp.iml" filepath="$PROJECT_DIR$/ocrtestapp/ocrtestapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/opencvtestapp/opencvtestapp.iml" filepath="$PROJECT_DIR$/opencvtestapp/opencvtestapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ticketappUI/ticketappUI.iml" filepath="$PROJECT_DIR$/ticketappUI/ticketappUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/ticketappUI/ticketappUI.iml" filepath="$PROJECT_DIR$/ticketappUI/ticketappUI.iml" />
     </modules>
   </component>
