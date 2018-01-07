@@ -26,6 +26,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URI;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText(amount);
         }
         else {
-            amount = c.getAmount().toString();
+            amount = new DecimalFormat("#.##").format(c.getAmount()).toString();
             tot.setText("Totale: "+amount+"€");
         }
 

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -103,7 +104,10 @@ public class EditTicket extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
-        ticketAmount = thisTicket.getAmount().toString();
+        if(thisTicket.getAmount() == null)
+            ticketAmount = "Nessun prezzo rilevato";
+        else
+            ticketAmount = new DecimalFormat("#.##").format(thisTicket.getAmount()).toString();
         ticketShop = thisTicket.getShop();
 
         //set those values to the edittext

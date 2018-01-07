@@ -65,6 +65,7 @@ public class BillActivity extends AppCompatActivity {
     public DataManager DB;
     OcrManager ocrManager;
     CustomAdapter adapter;
+    ListView listView;
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int PICK_PHOTO_FOR_AVATAR = 2;
@@ -143,6 +144,7 @@ public class BillActivity extends AppCompatActivity {
      *  Manage all animations and catch onclick events about FloatingActionButtons
      */
     public void initializeComponents(){
+        listView = (ListView)findViewById(R.id.list1);
         printAllTickets();
         fab = (FloatingActionButton)findViewById(R.id.fab);
         fab1 = (FloatingActionButton)findViewById(R.id.fab1);
@@ -204,7 +206,6 @@ public class BillActivity extends AppCompatActivity {
      * Add new ticket to the list
      */
     public void addToList(){
-        ListView listView = (ListView)findViewById(R.id.list1);
         adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
         listView.setAdapter(adapter);
     }
@@ -336,7 +337,6 @@ public class BillActivity extends AppCompatActivity {
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
                     savePickedFile(bitmapPhoto);
                     deleteTempFiles();
-                    clearAllImages();
                     printAllTickets();
                     break;
 
@@ -347,7 +347,6 @@ public class BillActivity extends AppCompatActivity {
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                         savePickedFile(btm);
-                        clearAllImages();
                         printAllTickets();
                     }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
@@ -357,24 +356,20 @@ public class BillActivity extends AppCompatActivity {
                 //Dal Maso
                 //Resize management
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                    clearAllImages();
                     printAllTickets();
                     break;
 
                 case (TICKET_MOD):
-                    clearAllImages();
                     printAllTickets();
                     break;
 
                 case (MISSION_MOD):
                     thisMission = DB.getMission(missionID);
                     setTitle(thisMission.getName());
-                    clearAllImages();
                     printAllTickets();
                     break;
 
                 default:
-                    clearAllImages();
                     printAllTickets();
                     break;
             }
@@ -398,16 +393,27 @@ public class BillActivity extends AppCompatActivity {
             originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
             ImageProcessor imgProc = new ImageProcessor(imageToSave);
             Ticket result = ocrManager.getTicket(imgProc);
 
             TicketEntity ticket = new TicketEntity();
-            ticket.setDate(Calendar.getInstance().getTime());
+
+            if(result.date == null)
+                ticket.setDate(Calendar.getInstance().getTime());
+            else
+                ticket.setDate(result.date);
+            
             ticket.setFileUri(uri);
             ticket.setAmount(result.amount);
-            ticket.setShop("Pam Padova");
-            ticket.setTitle("Scontrino ");
+            ticket.setShop("None");
+
+            if(result.title == null)
+                ticket.setTitle("Scontrino");
+            else
+                ticket.setTitle(result.title);
+
             ticket.setMissionID(missionID);
             DB.addTicket(ticket);
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -421,17 +427,6 @@ public class BillActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-    /**PICCOLO
-     * Method that clears the screen from the images
-     */
-    public void clearAllImages(){
-        ListView listView = (ListView)findViewById(R.id.list1);
-        adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
-        adapter.clear();
-        adapter.notifyDataSetChanged();
-        listView.setAdapter(adapter);
-    }//clearAllImages
 
 
     /** Dal Maso

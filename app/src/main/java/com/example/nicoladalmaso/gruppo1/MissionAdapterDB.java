@@ -18,9 +18,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import database.DataManager;
 import database.MissionEntity;
 
 /**
@@ -33,12 +36,14 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
     String path = "";
     int missionID = 0;
     List<MissionEntity> missions;
+    DataManager DB;
 
     public MissionAdapterDB(Context context, int textViewResourceId,
                           List<MissionEntity> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
         missions = objects;
+        DB = new DataManager(context);
     }
 
     @Override
@@ -49,10 +54,12 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         CardView card = (CardView)convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
+        TextView total = (TextView)convertView.findViewById(R.id.missionTotal);
 
         MissionEntity c = getItem(position);
         title.setText(c.getName());
         location.setText(c.getLocation());
+        total.setText(new DecimalFormat("#.##").format(DB.getTotalAmountForMission(c.getID())).toString()+" €");
         convertView.setTag(c.getID());
         Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data

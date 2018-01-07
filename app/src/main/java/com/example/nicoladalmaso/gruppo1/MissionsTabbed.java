@@ -130,9 +130,7 @@ public class MissionsTabbed extends AppCompatActivity {
             switch (requestCode) {
 
                 case (MISSION_MOD):
-                    missionsOpen.clearAllMissions();
                     missionsOpen.printAllMissions();
-                    missionsClosed.clearAllMissions();
                     missionsClosed.printAllMissions();
                     break;
 
@@ -142,9 +140,7 @@ public class MissionsTabbed extends AppCompatActivity {
                     break;
 
                 default:
-                    missionsOpen.clearAllMissions();
                     missionsOpen.printAllMissions();
-                    missionsClosed.clearAllMissions();
                     missionsClosed.printAllMissions();
                     break;
             }

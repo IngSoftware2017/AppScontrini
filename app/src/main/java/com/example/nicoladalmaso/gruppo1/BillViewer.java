@@ -33,6 +33,7 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,7 +64,6 @@ public class BillViewer extends AppCompatActivity {
         setContentView(R.layout.activity_bill_viewer);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-
         initialize();
 
         fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
@@ -95,10 +95,10 @@ public class BillViewer extends AppCompatActivity {
         ticketDate = thisTicket.getDate().toString();
         ticketShop = thisTicket.getShop();
         if(thisTicket.getAmount() == null){
-            ticketAmount = "";
+            ticketAmount = "Nessun prezzo rilevato";
         }
         else
-            ticketAmount = thisTicket.getAmount().toString();
+            ticketAmount = new DecimalFormat("#.##").format(thisTicket.getAmount()).toString();
 
         //Title
         setTitle(ticketTitle);
