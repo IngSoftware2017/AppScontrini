@@ -26,7 +26,8 @@ public class AddNewPerson extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setElevation(0);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setElevation(0);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
         setTitle(context.getString(R.string.newPerson));

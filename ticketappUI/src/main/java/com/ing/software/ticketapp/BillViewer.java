@@ -25,6 +25,9 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import database.DataManager;
 import database.TicketEntity;
@@ -33,7 +36,7 @@ import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
 
 
 public class BillViewer extends AppCompatActivity {
-    public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
+    public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit, fabOcr;
     public DataManager DB;
     int ticketId;
     Context context;
@@ -57,20 +60,25 @@ public class BillViewer extends AppCompatActivity {
 
         fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
         fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
+        fabOcr = findViewById(R.id.fabOcr);
         fabCrop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 cropPhoto(ticketId);
-                Intent intent = new Intent();
-                intent.putExtra("ticketID", "" + ticketId);
-                setResult(REDO_OCR, intent);
            }//onClick
         });
         fabDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deleteTicket(ticketId);
+                finish();
             }//onClick
+        });
+        fabOcr.setOnClickListener(view -> {
+            Intent intent = new Intent();
+            intent.putExtra("ticketID", "" + ticketId);
+            setResult(REDO_OCR, intent);
+            finish();
         });
     }
 
@@ -81,7 +89,12 @@ public class BillViewer extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
-        ticketDate = thisTicket.getDate().toString();
+        if (thisTicket.getDate() != null) {
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+            String formattedDate = df.format(thisTicket.getDate());
+            ticketDate = formattedDate;
+        } else
+            ticketDate = getString(R.string.no_date);
         ticketShop = thisTicket.getShop();
         if (thisTicket.getAmount() != null)
             ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
@@ -204,7 +217,7 @@ public class BillViewer extends AppCompatActivity {
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
-                }
+                } //todo log error
             }
         });
         builder.setNegativeButton(this.getString(R.string.cancel), new DialogInterface.OnClickListener() {

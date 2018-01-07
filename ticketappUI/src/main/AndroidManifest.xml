@@ -30,7 +30,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="@string/authority"
+            android:authorities="com.ing.software.ticketapp.fileprovider"
             android:enabled="true"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -71,7 +71,7 @@
             android:name=".EditMission"
             android:parentActivityName=".BillActivity" />
         <service
-            android:name=".BillActivity$TestService"
+            android:name=".BillActivity$OcrService"
             android:exported="false"/>
     </application>
 

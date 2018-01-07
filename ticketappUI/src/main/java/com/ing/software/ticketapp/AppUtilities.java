@@ -5,6 +5,7 @@ import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Cristian on 02/01/2018.
@@ -20,8 +21,8 @@ public class AppUtilities {
      */
     public static boolean checkDate(String start, String finish)
     {
-        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+        SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd", Locale.US);
         try {
 
 
@@ -53,8 +54,8 @@ public class AppUtilities {
           * @return date with +1 about Month, on format dd/MM/yyyy
           */
     public static String addMonth(String date)
-    {        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
-                SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
+    {        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd", Locale.US);
                 String newDate="00000000";
         try
          {
