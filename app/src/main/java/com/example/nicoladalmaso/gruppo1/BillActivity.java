@@ -42,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
 import database.TicketEntity;
 
 public class BillActivity extends AppCompatActivity {
@@ -80,7 +81,8 @@ public class BillActivity extends AppCompatActivity {
         Intent intent = getIntent();
         missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
-        setTitle(thisMission.getName());
+        PersonEntity person = DB.getPerson(thisMission.getPersonID());
+        setTitle(person.getName()+" "+person.getLastName()+": "+thisMission.getName());
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
