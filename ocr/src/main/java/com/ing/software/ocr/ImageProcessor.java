@@ -380,6 +380,7 @@ public class ImageProcessor {
             double xDiff = line[0] - line[2], yDiff = line[1] - line[3];
             double length = sqrt(xDiff * xDiff + yDiff * yDiff);
             int sector = (int)((atan(yDiff / xDiff) + PI / 2.) * SECTORS / PI);
+            accumulator[mod(sector, SECTORS)] += length;
             // to mitigate aliasing, contribute also to sector + 1 and sector - 1.
             accumulator[mod(sector + 1, SECTORS)] += length * 0.99;
             accumulator[mod(sector - 1, SECTORS)] += length * 0.99;
