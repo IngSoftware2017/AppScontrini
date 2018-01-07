@@ -1,6 +1,7 @@
 package database;
 
 import android.content.Context;
+import android.widget.ListView;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -319,6 +320,14 @@ public class DataManager {
      */
     public List<PersonEntity> getPersonWithLastName(String lastName){
         return database.ticketDao().getPersonWithLastName(lastName);
+    }
+
+    /**Created by Federico Taschin
+     * All tickets ordered by the date of their insertion into the database
+     * @return List<TicketEntity> of all TicketEntity
+     */
+    public List<TicketEntity> getTicketForMissionOrderedByInsertionDate(int missionId){
+        return database.ticketDao().getTicketsForMissionOrderedByDate(missionId);
     }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity

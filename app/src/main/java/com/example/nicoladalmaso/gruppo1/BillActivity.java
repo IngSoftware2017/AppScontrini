@@ -216,7 +216,7 @@ public class BillActivity extends AppCompatActivity {
      *  Images aren't readed if they're already in the memory
      */
     public void refreshList(){
-        list = DB.getTicketsForMission(missionID);
+        list = DB.getTicketForMissionOrderedByInsertionDate(missionID);
         Log.d("TICKETDEBUG","LIST SIZE: "+list.size());
         ListView listView = (ListView)findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, screenWIdth);
@@ -451,6 +451,7 @@ public class BillActivity extends AppCompatActivity {
             ticket.setShop("Pam Padova");
             ticket.setTitle("Scontrino ");
             ticket.setMissionID(missionID);
+            ticket.setInsertionDate(Calendar.getInstance().getTime());
             DB.addTicket(ticket);
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();

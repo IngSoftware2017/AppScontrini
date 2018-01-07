@@ -6,7 +6,9 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
+import android.content.Context;
 import android.provider.SyncStateContract;
+import android.widget.ListView;
 
 import java.util.Date;
 import java.util.List;
@@ -277,4 +279,7 @@ public interface DAO {
      */
     @Query("SELECT * FROM "+Constants.PERSON_TABLE_NAME+" WHERE "+Constants.PERSON_FIELD_LAST_NAME+" =:lastName")
     List<PersonEntity> getPersonWithLastName(String lastName);
+
+    @Query("SELECT * FROM "+ Constants.TICKET_TABLE_NAME+" WHERE " + Constants.MISSION_CHILD_COLUMNS +"= :missionId ORDER BY "+Constants.TICKET_INSERTION_DATE+" DESC")
+    List<TicketEntity> getTicketsForMissionOrderedByDate(int missionId);
 }

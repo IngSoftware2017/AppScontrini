@@ -35,6 +35,7 @@ public class TicketEntity {
     private String title;
     private List<String> category;
     private float[] corners;
+    private Date insertionDate;
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
@@ -193,6 +194,13 @@ public class TicketEntity {
         this.corners = corners;
     }
 
+    public Date getInsertionDate() {
+        return insertionDate;
+    }
+
+    public void setInsertionDate(Date insertionDate) {
+        this.insertionDate = insertionDate;
+    }
 
     /**
      * Returns a String with TicketEntity data formatted as follows:
