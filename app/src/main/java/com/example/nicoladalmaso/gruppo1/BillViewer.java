@@ -99,7 +99,8 @@ public class BillViewer extends AppCompatActivity {
         }else{
             ticketAmount = noFound;
         }
-        if(thisTicket.getShop()== null)
+        String emptyString = "";
+        if(thisTicket.getShop().equals(emptyString))
             ticketShop=noFound;
         else
             ticketShop = thisTicket.getShop();
