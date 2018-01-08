@@ -4,7 +4,9 @@ import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.List;
@@ -26,6 +28,7 @@ public class ReportDB extends AppCompatActivity {
     TextView txtActiveMission;
     TextView txtCloseMission;
     TextView txtNumTicket;
+    Spinner exportSpiner;
 
     //@author Marco Olivieri
     @Override
@@ -82,5 +85,8 @@ public class ReportDB extends AppCompatActivity {
 
         List<TicketEntity> ticket = DB.getAllTickets();
         txtNumTicket.setText(txtNumTicket.getText()+" "+ String.valueOf(ticket.size()));
+
+        exportSpiner = findViewById(R.id.export_spinner);
+        //ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this,R.layout.support_simple_spinner_dropdown_item,);
     }
 }
