@@ -78,7 +78,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         //Amount text fixes
         String amount = "";
         if(c.getAmount() == null){
-            amount = "Prezzo non rilevato";
+            amount = "Nessun valore trovato";
             tot.setText(amount);
         }
         else {

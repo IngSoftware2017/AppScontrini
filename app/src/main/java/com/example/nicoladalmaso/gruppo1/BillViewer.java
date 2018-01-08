@@ -95,7 +95,7 @@ public class BillViewer extends AppCompatActivity {
         ticketDate = thisTicket.getDate().toString();
         ticketShop = thisTicket.getShop();
         if(thisTicket.getAmount() == null){
-            ticketAmount = "Nessun prezzo rilevato";
+            ticketAmount = "Nessun valore trovato";
         }
         else
             ticketAmount = new DecimalFormat("#.##").format(thisTicket.getAmount()).toString();
