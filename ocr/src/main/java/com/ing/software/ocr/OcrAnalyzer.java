@@ -2,7 +2,7 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
@@ -35,7 +35,6 @@ import static java.lang.Math.*;
 public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
-    private RawImage mainImage;
     private final int targetPrecision = 130; //Should be passed with image. todo
 
 
@@ -66,23 +65,31 @@ public class OcrAnalyzer {
      * @param frame Bitmap used to create an OcrResult. Not null.
      * @return OcrResult containing raw data to be further analyzed.
      */
-    OcrResult analyze(Bitmap frame){
-        //cropping must be used somewhere else (if used with textRecognizer). Can be used here if using opencv
-        //frame = getCroppedPhoto(frame, context);
-        mainImage = new RawImage(frame);
+    OcrResult analyze(@NonNull Bitmap frame){
+        RawImage mainImage = new RawImage(frame);
 
         //ocrEngine analysis
+        long startTime = System.nanoTime();
         SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(frame).build());
-
+        long endTime = System.nanoTime();
+        double duration = ((double) (endTime - startTime)) / 1000000000;
+        OcrUtils.log(1, "DETECTOR: ", "EXECUTION TIME: "+ duration + " seconds");
+        long startTime2 = System.nanoTime();
         List<RawText> rawOrigTexts = orderBlocks(mainImage, tempArray);
+        mainImage.setRects(rawOrigTexts); //save rect configuration in rawimage
+        OcrSchemer.prepareScheme(rawOrigTexts);
+        mainImage.textFitter(); //save configuration from prepareScheme in rawimage
         listEverything(rawOrigTexts);
         List<RawStringResult> valuedTexts = new ArrayList<>();
         for (String amountString : AMOUNT_STRINGS) {
-        	valuedTexts.addAll(searchContinuousString(rawOrigTexts, amountString));
+        	valuedTexts.addAll(searchContinuousString(rawOrigTexts, amountString)); //contains texts which match amountString
         }
-        valuedTexts = searchContinuousStringExtended(rawOrigTexts, valuedTexts, targetPrecision);
+        valuedTexts = searchContinuousStringExtended(rawOrigTexts, valuedTexts, targetPrecision); //add possible amounts to source string
         List<RawGridResult> dateList = getDateList(rawOrigTexts);
-        return new OcrResult(valuedTexts, dateList, getProductPrices(rawOrigTexts));
+        long endTime2 = System.nanoTime();
+        double duration2 = ((double) (endTime2 - startTime2)) / 1000000000;
+        OcrUtils.log(1, "OCR ANALYZER: ", "EXECUTION TIME: "+ duration2 + " seconds");
+        return new OcrResult(valuedTexts, dateList, mainImage);
     }
 
     /**
@@ -90,11 +97,33 @@ public class OcrAnalyzer {
      * @param texts List of texts. Not null.
      */
     private static void listEverything(@NonNull List<RawText> texts) {
-        if (IS_DEBUG_ENABLED)
+        if (IS_DEBUG_ENABLED) {
             for (RawText text : texts) {
-                OcrUtils.log(2, "FULL LIST: ", text.getDetection());
-                OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
+                //OcrUtils.log(2, "FULL LIST: ", text.getValue());
+                //OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
             }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
+            for (RawText text : texts) {
+                if (text.getTags().contains(INTRODUCTION_TAG))
+                    OcrUtils.log(2, "introduction", text.getValue());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRODUCTS");
+            for (RawText text : texts) {
+                if (text.getTags().contains(PRODUCTS_TAG))
+                    OcrUtils.log(2, "products", text.getValue());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRICES");
+            for (RawText text : texts) {
+                if (text.getTags().contains(PRICES_TAG))
+                    OcrUtils.log(2, "prices", text.getValue());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nCONCLUSION");
+            for (RawText text : texts) {
+                if (text.getTags().contains(CONCLUSION_TAG))
+                    OcrUtils.log(2, "conclusion", text.getValue());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################");
+        }
     }
 
     /**
@@ -106,13 +135,12 @@ public class OcrAnalyzer {
      * @return list of ordered RawTexts
      */
     private static List<RawText> orderBlocks(@NonNull RawImage photo, @NonNull SparseArray<TextBlock> origTextBlocks) {
-        log(2,"OcrAnalyzer.analyzeST:" , "Preferred grid is: " + photo.getGrid());
         List<TextBlock> newOrderedTextBlocks = new ArrayList<>();
         for (int i = 0; i < origTextBlocks.size(); i++) {
             newOrderedTextBlocks.add(origTextBlocks.valueAt(i));
         }
         newOrderedTextBlocks = OcrUtils.orderTextBlocks(newOrderedTextBlocks);
-        log(2,"OcrAnalyzer.analyzeST:" , "New Blocks ordered");
+        log(3,"OcrAnalyzer.analyzeST:" , "New Blocks ordered");
         List<RawText> rawTexts = new ArrayList<>();
         for (TextBlock textBlock : newOrderedTextBlocks) {
             for (Text currentText : textBlock.getComponents()) {
@@ -138,9 +166,9 @@ public class OcrAnalyzer {
                 break;
         }
         if (targetText != null) {
-            log(3,"OcrAnalyzer.analyzeBFS", "Found first target string: "+ testString + " \nat: " + targetText.getDetection());
-            log(5,"OcrAnalyzer.analyzeBFS", "Target text is at (left, top, right, bottom): "+ targetText.getRect().left + "; "
-                    + targetText.getRect().top + "; " + targetText.getRect().right + "; "+ targetText.getRect().bottom + ".");
+            log(5,"OcrAnalyzer.analyzeBFS", "Found first target string: "+ testString + " \nat: " + targetText.getValue());
+            log(9,"OcrAnalyzer.analyzeBFS", "Target text is at (left, top, right, bottom): "+ targetText.getBoundingBox().left + "; "
+                    + targetText.getBoundingBox().top + "; " + targetText.getBoundingBox().right + "; "+ targetText.getBoundingBox().bottom + ".");
         }
         return targetText;
     }
@@ -163,10 +191,10 @@ public class OcrAnalyzer {
         if (targetTextList.size() >0 && IS_DEBUG_ENABLED) {
             for (RawStringResult stringText : targetTextList) {
                 RawText text = stringText.getSourceText();
-                log(3,"OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getDetection()
+                log(5,"OcrAnalyzer", "Found target string: " + testString + " \nat: " + text.getValue()
                         + " with distance: " + stringText.getDistanceFromTarget());
-                log(5,"OcrAnalyzer", "Target text is at (left, top, right, bottom): " + text.getRect().left
-                        + "; " + text.getRect().top + "; " + text.getRect().right + "; " + text.getRect().bottom + ".");
+                log(9,"OcrAnalyzer", "Target text is at (left, top, right, bottom): " + text.getBoundingBox().left
+                        + "; " + text.getBoundingBox().top + "; " + text.getBoundingBox().right + "; " + text.getBoundingBox().bottom + ".");
             }
         }
         return targetTextList;
@@ -175,7 +203,7 @@ public class OcrAnalyzer {
     /**
      * @author Michelon
      * From a list of RawTexts, retrieves also RawTexts with similar distance from top and bottom of the photo.
-     * 'Similar' is defined by precision. See {@link OcrUtils getExtendedRect()} for details.
+     * 'Similar' is defined by precision. See {@link OcrUtils extendWidthFromPhoto()} for details.
      * @param rawTexts list of RawBlocks from original photo. Not null.
      * @param targetStringList list of target RawTexts. Not null.
      * @param precision precision to extend rect. See OcrUtils.extendRect()
@@ -195,11 +223,11 @@ public class OcrAnalyzer {
         for (RawText rawText : rawTexts) {
             for (RawStringResult singleResult : results) {
                 RawText rawTextSource = singleResult.getSourceText();
-                log(4,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getDetection());
-                RectF newRect = OcrUtils.extendRect(OcrUtils.getExtendedRect(rawTextSource.getRect(), rawTextSource.getRawImage()), precision);
+                log(6,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getValue());
+                Rect newRect = OcrUtils.extendRect(rawTextSource.getBoundingBox(), precision, -rawTextSource.getRawImage().getWidth()); //negative width to use pixels
                 if (rawText.isInside(newRect)) {
                     singleResult.addDetectedTexts(rawText);
-                    log(3,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getDetection());
+                    log(5,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getValue());
                 }
                 else
                     log(7,"OcrAnalyzer.SCSE", "Nothing found"); //Nothing in this block
@@ -209,15 +237,15 @@ public class OcrAnalyzer {
             log(2,"OcrAnalyzer", "Nothing found ");
         }
         else if (IS_DEBUG_ENABLED){
-            log(2,"OcrAnalyzer", "Final list: " + results.size());
+            log(4,"OcrAnalyzer", "Final list: " + results.size());
             for (RawStringResult rawStringResult : results) {
-                List<RawText> textList = rawStringResult.getDetectedTexts();
+                List<RawGridResult> textList = rawStringResult.getDetectedTexts();
                 if (textList == null)
                     log(3,"OcrAnalyzer.SCSE", "Value not found.");
                 else {
-                    for (RawText rawText : textList) {
-                        log(3,"OcrAnalyzer.SCSE", "Value: " + rawText.getDetection());
-                        log(3,"OcrAnalyzer.SCSE", "Source: " + rawStringResult.getSourceText().getDetection());
+                    for (RawGridResult rawText : textList) {
+                        log(4,"OcrAnalyzer.SCSE", "Value: " + rawText.getText().getValue());
+                        log(4,"OcrAnalyzer.SCSE", "Source: " + rawStringResult.getSourceText().getValue());
                     }
                 }
             }
@@ -248,13 +276,14 @@ public class OcrAnalyzer {
      * @param texts list of texts. Not null.
      * @return list of texts on right side of receipt
      */
+    @Deprecated
     private static List<RawText> getProductPrices(@NonNull List<RawText> texts) {
         //blocks = OcrSchemer.findBlocksOnLeft(blocks);
         texts = OcrSchemer.findTextsOnRight(texts);
         if (IS_DEBUG_ENABLED)
             //for (RawBlock block : blocks)
                 for (RawText text : texts)
-                    OcrUtils.log(3,"getProductPrices", "Product found: " + text.getDetection());
+                    OcrUtils.log(5,"getProductPrices", "Product found: " + text.getValue());
         return texts;
     }
 
