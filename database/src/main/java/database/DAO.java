@@ -150,11 +150,19 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Executes a SELECT of all the PersonEntity in the database in alphabetical order
+     * Executes a SELECT of all the PersonEntity with last name in the database in alphabetical order
      * @return List<PersonEntity>
      */
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_LAST_NAME + " ASC")
     List<PersonEntity> getAllPersonOrder();
+
+    /**
+     * @author Marco Olivieri
+     * Executes a SELECT of all the PersonEntity with name in the database in alphabetical order
+     * @return List<PersonEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_NAME + " ASC")
+    List<PersonEntity> getAllPersonNameOrder();
 
     //SELECT FROM ID
 
@@ -259,7 +267,7 @@ public interface DAO {
      * @return List<MissionEntity> not null all active or repaid missions of the specific person
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid AND "
-            + Constants.PERSON_CHILD_COLUMNS + " =:personId")
+            + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_NAME+" ASC")
     List<MissionEntity> getMissionRepaidForPerson(boolean repaid, long personId);
 
     /**Created by Federico Taschin

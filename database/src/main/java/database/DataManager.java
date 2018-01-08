@@ -161,6 +161,16 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons with name in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonNameOrder(){
+        return database.ticketDao().getAllPersonNameOrder();
+    }
+
+    /**
      * Return a list of the tickets associate to a specific Mission
      *
      * @param id identifier of the Mission
@@ -222,7 +232,8 @@ public class DataManager {
         List<TicketEntity> tickets = getTicketsForMission(id);
         BigDecimal totAmount = BigDecimal.ZERO;
         for(int i=0; i<tickets.size(); i++)
-            totAmount = totAmount.add(tickets.get(i).getAmount());
+            if(tickets.get(i).getAmount() != null)
+                totAmount = totAmount.add(tickets.get(i).getAmount());
         return totAmount;
     }
 
