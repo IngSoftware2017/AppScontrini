@@ -53,6 +53,16 @@
     <string name="tab_text_3">Tab 3</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_Ticket">Scontrino</string>
+    <string name="string_NoShop">None</string>
+    <string name="string_NoAmount">Nessun valore trovato</string>
+    <string name="string_Total">Totale: </string>
+    <string name="string_Euros">€</string>
+    <string name="title_EditPerson">Modifica persona</string>
+    <string name="title_EditTicket">Modifica scontrino</string>
+    <string name="title_EditMission">Modifica missione</string>
+    <string name="hint_LastName">Cognome</string>
+    <string name="hint_AcademicTitle">Titolo accademico</string>
     <!--Mantovan-->
     <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>

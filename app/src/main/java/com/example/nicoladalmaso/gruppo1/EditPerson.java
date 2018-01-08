@@ -35,8 +35,7 @@ public class EditPerson extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
-        //TODO: use string.xml
-        setTitle("Modifica persona");
+        setTitle(context.getString(R.string.title_EditPerson));
         setContentView(R.layout.activity_edit_person);
 
         context = this.getApplicationContext();
@@ -70,7 +69,6 @@ public class EditPerson extends AppCompatActivity{
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_confirm:
-                //TODO set the right intent
                 thisPerson.setName(txtName.getText().toString());
                 thisPerson.setLastName(txtLastName.getText().toString());
                 thisPerson.setAcademicTitle(txtAcademicTitle.getText().toString());

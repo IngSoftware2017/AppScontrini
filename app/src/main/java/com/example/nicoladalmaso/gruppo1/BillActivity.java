@@ -407,10 +407,10 @@ public class BillActivity extends AppCompatActivity {
             
             ticket.setFileUri(uri);
             ticket.setAmount(result.amount);
-            ticket.setShop("None");
+            ticket.setShop(context.getString(R.string.string_NoShop));
 
             if(result.title == null)
-                ticket.setTitle("Scontrino");
+                ticket.setTitle(context.getString(R.string.title_Ticket));
             else
                 ticket.setTitle(result.title);
 

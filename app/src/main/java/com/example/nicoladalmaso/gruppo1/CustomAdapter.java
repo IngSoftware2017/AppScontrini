@@ -83,7 +83,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         //Amount text fixes
         String amount = "";
         if(c.getAmount() == null || c.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
-            amount = "Nessun valore trovato";
+            amount = context.getString(R.string.string_NoAmount);
             tot.setText(amount);
         }
         else {

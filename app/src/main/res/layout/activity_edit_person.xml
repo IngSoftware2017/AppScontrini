@@ -51,7 +51,7 @@
                 android:id="@+id/input_personEditLastName"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:hint="Cognome"
+                android:hint="@string/hint_LastName"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
 
@@ -95,7 +95,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/input_personEditAcademicTitle"
-                        android:hint="Titolo accademico"
+                        android:hint="@string/hint_AcademicTitle"
                         android:singleLine="true"/>
                 </android.support.design.widget.TextInputLayout>
 
