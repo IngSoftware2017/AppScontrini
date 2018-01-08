@@ -17,9 +17,7 @@ import database.TicketEntity;
  * This class defines the methods to export db datas in CSV file with semicolon delimiter
  */
 
-public class CSVExport extends ExportManager {
-
-    private final String TAG = "CSV_EXPORT";
+public class CSVExport extends Export {
 
     //Delimiter used in CSV file
     private final String SEMICOLON_DELIMITER = ";";
@@ -37,14 +35,12 @@ public class CSVExport extends ExportManager {
 
     /**
      * @author Marco Olivieri
-     *
      * Costructor
      * @param database, DataManager - the instance of AppScontrini db
      * @param pathLocation, String - path directory to save exportation files
      */
     public CSVExport(DataManager database, String pathLocation){
         super(database, pathLocation);
-
         tickets = database.getAllTickets();
         missions = database.getAllMission();
         persons = database.getAllPerson();
@@ -54,12 +50,11 @@ public class CSVExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Implementation of the extended abstract class ExportManager
+     * Implementation of the extended abstract class Export
      * Create a CSV file export for each tables entities of database
      * @return boolean - if the exportation is ok
      */
     public boolean export() {
-
         try {
 
             FileWriter fileTickets = new FileWriter(folder + "/tickets.csv");
@@ -87,7 +82,7 @@ public class CSVExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Implementation of the extended abstract class ExportManager
+     * Implementation of the extended abstract class Export
      * Create a CSV file export for the specific mission with relative tickets
      * @param missionId - the specific mission
      * @return boolean - if the exportation is ok
