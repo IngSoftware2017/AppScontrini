@@ -39,9 +39,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_gravity="end"
-            android:layout_marginBottom="12dp"
-            android:layout_marginEnd="138dp"
-            app:backgroundTint="#D81B60"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="88dp"
             app:srcCompat="@drawable/ic_content_cut_white_24px" />
         -->
 

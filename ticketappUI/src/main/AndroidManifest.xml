@@ -5,18 +5,19 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
 
     <application
         android:allowBackup="true"
-        android:largeHeap="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/MainTheme">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,37 +43,49 @@
         <activity
             android:name=".BillViewer"
             android:parentActivityName=".BillActivity"
-            android:theme="@style/AppTheme.ActionBar.Transparent" />
+            android:theme="@style/BillTheme.ActionBar.Transparent" />
         <activity
             android:name=".BillActivity"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionsTabbed"
+            android:theme="@style/BillTheme" />
         <activity
             android:name=".AddNewMission"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionsTabbed"
+            android:theme="@style/MissionTheme" />
         <activity
             android:name=".EditTicket"
-            android:parentActivityName=".BillViewer" />
+            android:parentActivityName=".BillViewer"
+            android:theme="@style/BillTheme" />
         <activity
             android:name=".MissionsTabbed"
             android:label="@string/title_activity_missions_tabbed"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/MissionTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".AddNewPerson"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/MainTheme" />
+
         <activity
             android:name=".EditPerson"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionsTabbed"
+            android:theme="@style/MainTheme" />
         <activity
             android:name=".EditMission"
-            android:parentActivityName=".BillActivity" />
+            android:parentActivityName=".BillActivity"
+            android:theme="@style/MissionTheme" />
+
         <service
             android:name=".BillActivity$OcrService"
             android:exported="false"/>
+        <activity
+            android:name=".CropActivity"
+            android:parentActivityName=".BillActivity"
+            android:theme="@style/CropTheme" />
     </application>
 
 </manifest>
