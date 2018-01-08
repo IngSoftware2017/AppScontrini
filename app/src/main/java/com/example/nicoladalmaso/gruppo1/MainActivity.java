@@ -48,6 +48,7 @@ import database.MissionEntity;
 import database.PersonEntity;
 import export.CSVExport;
 import export.ExportManager;
+import export.XMLExport;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //ExportManager e = new CSVExport(DB,context.getExternalFilesDir(null));
                 //ExportManager e = new CSVExport(DB,getFilesDir().getAbsolutePath());
-                ExportManager e = new CSVExport(DB,Environment.getExternalStorageDirectory() + "/ExportDB");
+                ExportManager e = new XMLExport(DB,Environment.getExternalStorageDirectory().getPath() + File.separator + "ExportDB");
                 boolean export = e.export();
             }
         });

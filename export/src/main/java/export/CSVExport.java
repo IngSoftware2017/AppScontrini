@@ -26,9 +26,9 @@ public class CSVExport extends ExportManager {
     private final String NEW_LINE_SEPARATOR = "\n";
 
     //Header CSV file
-    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
+    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
-    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE";
+    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
     //TablesEntity of db
     private List<TicketEntity> tickets;
@@ -84,6 +84,38 @@ public class CSVExport extends ExportManager {
         }
     }
 
+    /**
+     * @author Marco Olivieri
+     *
+     * Implementation of the extended abstract class ExportManager
+     * Create a CSV file export for the specific mission with relative tickets
+     * @param missionId - the specific mission
+     * @return boolean - if the exportation is ok
+     */
+    public boolean export(long missionId){
+        MissionEntity m = database.getMission(missionId);
+        missions.clear();
+        missions.add(m);
+        tickets = database.getTicketsForMission(missionId);
+        try {
+
+            FileWriter fileTickets = new FileWriter(folder + "/tickets.csv");
+            fileTickets = writeTickets(fileTickets);
+            fileTickets.flush();
+            fileTickets.close();
+
+            FileWriter fileMissions = new FileWriter(folder + "/missions.csv");
+            fileMissions = writeMissions(fileMissions);
+            fileMissions.flush();
+            fileMissions.close();
+
+            return true;
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+    }
+
 
     /**
      * @author Marco Olivieri
@@ -115,6 +147,8 @@ public class CSVExport extends ExportManager {
                 fileTickets.append(String.valueOf(t.getMissionID()));
                 fileTickets.append(SEMICOLON_DELIMITER);
                 fileTickets.append(String.valueOf(t.getFileUri()));
+                fileTickets.append(SEMICOLON_DELIMITER);
+                fileTickets.append(cornersToString(t.getCorners()));
                 fileTickets.append(NEW_LINE_SEPARATOR);
             }
         }
@@ -142,6 +176,25 @@ public class CSVExport extends ExportManager {
             return s;
         }
     }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a float[] to a String for db
+     * @param corners, float[] of the rectangle coordinates
+     * @return the corresponding String object, null if value is null
+     */
+    public String cornersToString(float[] corners) {
+        if (corners == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<corners.length; i++)
+                s+=corners[i]+";";
+            return s;
+        }
+    }
+
 
     /**
      * @author Marco Olivieri
@@ -201,6 +254,10 @@ public class CSVExport extends ExportManager {
                 filePersons.append(p.getLastName());
                 filePersons.append(SEMICOLON_DELIMITER);
                 filePersons.append(p.getAcademicTitle());
+                filePersons.append(SEMICOLON_DELIMITER);
+                filePersons.append((p.getEmail()));
+                filePersons.append(SEMICOLON_DELIMITER);
+                filePersons.append(String.valueOf(p.getFoto()));
                 filePersons.append(NEW_LINE_SEPARATOR);
             }
         }

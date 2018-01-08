@@ -34,9 +34,9 @@ public class ExcelExport extends ExportManager {
     private final String TAG = "EXCEL_EXPORT";
 
     //Header CSV file
-    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
+    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
-    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE";
+    private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
     //TablesEntity of db
     private List<TicketEntity> tickets;
@@ -45,7 +45,7 @@ public class ExcelExport extends ExportManager {
 
     private File file;
     HSSFWorkbook workbook; //Excel document
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH.mm.ss");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
 
     /**
      * @author Marco Olivieri
@@ -62,10 +62,8 @@ public class ExcelExport extends ExportManager {
         persons = database.getAllPerson();
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String fileName = "export" + sdf.format(timestamp);
+        String fileName = "export_" + sdf.format(timestamp)+".xlsx";
         file = new File(pathLocation, fileName);
-
-        workbook = new HSSFWorkbook();
     }
 
 
@@ -79,9 +77,45 @@ public class ExcelExport extends ExportManager {
      */
     public boolean export(){
 
+        workbook = new HSSFWorkbook();
+
         writeTickets();
         writeMissions();
         writePersons();
+
+        try{
+            FileOutputStream fos = new FileOutputStream(file);
+            workbook.write(fos);
+            fos.flush();
+            fos.close();
+            return true;
+        }
+        catch (IOException e){
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+    }
+
+
+    /**
+     * @author Marco Olivieri
+     *
+     * Implementation of the extended abstract class ExportManager
+     * Writes the specific mission with relative tickets in separeted sheet of the workbook.
+     * Than it creates the complete document of the exportation db
+     * @param missionId - the specific mission
+     * @return boolean - if the exportation is ok
+     */
+    public boolean export(long missionId){
+
+        workbook = new HSSFWorkbook();
+        MissionEntity m = database.getMission(missionId);
+        missions.clear();
+        missions.add(m);
+        tickets = database.getTicketsForMission(missionId);
+
+        writeTickets();
+        writeMissions();
 
         try{
             FileOutputStream fos = new FileOutputStream(file);
@@ -142,6 +176,9 @@ public class ExcelExport extends ExportManager {
 
             HSSFCell cell7 = irow.createCell(7);
             cell7.setCellValue(new HSSFRichTextString(String.valueOf(t.getFileUri())));
+
+            HSSFCell cell8 = irow.createCell(8);
+            cell8.setCellValue(new HSSFRichTextString(cornersToString(t.getCorners())));
         }
     }
 
@@ -161,6 +198,24 @@ public class ExcelExport extends ExportManager {
             String s="";
             for (int i=0; i<list.size(); i++)
                 s+=list.get(i)+"/";
+            return s;
+        }
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a float[] to a String for db
+     * @param corners, float[] of the rectangle coordinates
+     * @return the corresponding String object, null if value is null
+     */
+    public String cornersToString(float[] corners) {
+        if (corners == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<corners.length; i++)
+                s+=corners[i]+";";
             return s;
         }
     }
@@ -246,6 +301,12 @@ public class ExcelExport extends ExportManager {
 
             HSSFCell cell3 = irow.createCell(3);
             cell3.setCellValue(new HSSFRichTextString(p.getAcademicTitle()));
+
+            HSSFCell cell4 = irow.createCell(4);
+            cell4.setCellValue(new HSSFRichTextString(p.getEmail()));
+
+            HSSFCell cell5 = irow.createCell(5);
+            cell5.setCellValue(new HSSFRichTextString(String.valueOf(p.getFoto())));
 
         }
     }
