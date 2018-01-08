@@ -35,10 +35,10 @@ public class EditPerson extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
-        setTitle(context.getString(R.string.title_EditPerson));
+        context = this.getApplicationContext();
+        setTitle(context.getString(R.string.action_editPerson));
         setContentView(R.layout.activity_edit_person);
 
-        context = this.getApplicationContext();
         DB = new DataManager(context);
 
         //Get data from parent view

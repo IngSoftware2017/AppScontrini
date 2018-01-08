@@ -41,10 +41,10 @@ public class EditTicket extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
+        context = this.getApplicationContext();
         setTitle(context.getString(R.string.title_EditTicket));
         setContentView(R.layout.activity_edit_ticket);
         DB = new DataManager(this.getApplicationContext());
-        context = this.getApplicationContext();
 
         //Get data from parent view
         setTicketValues();

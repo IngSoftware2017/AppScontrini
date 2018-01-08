@@ -46,10 +46,10 @@ public class EditMission extends AppCompatActivity {
 
         getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_edit_mission);
+        context = this.getApplicationContext();
         setTitle(context.getString(R.string.title_EditMission));
 
         DB = new DataManager(this.getApplicationContext());
-        context = this.getApplicationContext();
         txtMissionName=(TextView)findViewById(R.id.input_missionEditName);
         txtMissionLocation=(TextView)findViewById(R.id.input_missionEditLocation);
         txtMissionStart=(TextView)findViewById(R.id.input_missionEditStart);
