@@ -89,15 +89,17 @@ public class EditTicket extends AppCompatActivity {
                  *
                  * Check entry amount
                  */
+
                 int count = 0;
                 String amount = txtAmount.getText().toString();
-                for(int i = 0; i < amount.length();i++){
+                for(int i = 0; i < amount.length(); i++){
                     char character = amount.charAt(i);
                     String letter = character + "";
                     if(letter.equals(".")){
                         count++;
                     }
                 }
+
                 if(count > 0 && amount.length() - count == 0){ //Point (>1) and not number
                     Toast.makeText(context, getResources().getString(R.string.toast_multiPoint_noNumber), Toast.LENGTH_SHORT).show();
                     break;
