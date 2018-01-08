@@ -113,6 +113,7 @@ public class RawImage {
         for (RawText text : texts) {
             average += text.getBoundingBox().height();
         }
+        OcrUtils.log(3, "RawImage", "AVERAGE RECT HEIGHT is: " +average/texts.size());
         return average/texts.size();
     }
 

@@ -180,8 +180,8 @@ public class OcrManager {
         AmountComparator amountComparator = new AmountComparator(amountText, amount);
         //check against list of products and cash + change
         List<RawGridResult> possiblePrices = getPricesList(amountText, products);
-        amountComparator.analyzePrices(possiblePrices);
         amountComparator.analyzeTotals(possiblePrices);
+        amountComparator.analyzePrices(possiblePrices);
         amount = amountComparator.getBestAmount(0);
         return amount;
     }
@@ -278,8 +278,8 @@ public class OcrManager {
         AmountComparator amountComparator = new AmountComparator(currentText, amount);
         //check against list of products and cash + change
         List<RawGridResult> possiblePrices = getPricesList(currentText, texts);
-        amountComparator.analyzePrices(possiblePrices);
         amountComparator.analyzeTotals(possiblePrices);
+        amountComparator.analyzePrices(possiblePrices);
         amount = amountComparator.getBestAmount(1);
         if (amount != null)
             OcrUtils.log(2, "AlternativeAmount", "Maximized amount is: " + amount.toString());

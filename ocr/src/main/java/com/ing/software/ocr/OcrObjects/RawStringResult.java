@@ -4,9 +4,12 @@ package com.ing.software.ocr.OcrObjects;
 import android.support.annotation.NonNull;
 
 
+import com.ing.software.ocr.OcrUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import static com.ing.software.ocr.OcrVars.*;
 
 /**
  * Class to store results from string search
@@ -49,9 +52,11 @@ public class RawStringResult implements Comparable<RawStringResult>{
      */
     public void addDetectedTexts(@NonNull RawText detectedText) {
         targetTexts.add(detectedText);
-        double heightDiff = Math.abs(detectedText.getBoundingBox().height() - sourceText.getBoundingBox().height())/sourceText.getBoundingBox().height();
+        double heightDiff = ((double)Math.abs(detectedText.getBoundingBox().height() - sourceText.getBoundingBox().height()))/sourceText.getBoundingBox().height();
         //order in RawGridResult is from higher to lower, so we invert the order, heightDiff is between 0 and 1
-        heightDiff = (1 - heightDiff)*100;
+        OcrUtils.log(5, "addDetectedTexts", "Rect is: " + detectedText.getValue() + " height diff is: " + heightDiff);
+        heightDiff = (1 - heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;
+        OcrUtils.log(5, "addDetectedTexts", "Evaluated height diff is: " + heightDiff);
         RawGridResult singleResult = new RawGridResult(detectedText, heightDiff);
         this.detectedTexts.add(singleResult);
     }
