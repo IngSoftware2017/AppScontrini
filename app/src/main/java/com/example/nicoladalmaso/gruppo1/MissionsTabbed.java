@@ -218,6 +218,14 @@ public class MissionsTabbed extends AppCompatActivity {
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
     private void reload() {
         Intent intent = getIntent();
         finish();

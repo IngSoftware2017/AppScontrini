@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -121,9 +122,9 @@ public class BillViewer extends AppCompatActivity {
 
         //Full image view
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
-        imgView.setImageBitmap(bitmap);
+        Glide.with(context)
+                .load(ticketPath)
+                .into(imgView);
     }
 
     /** Dal Maso
@@ -237,9 +238,17 @@ public class BillViewer extends AppCompatActivity {
         ticket.setFileUri(toCropUri);
 
         ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
-        imgView.setImageBitmap(bitmap);
+        Glide.with(context)
+                .load(toCropUri.toString().substring(7))
+                .into(imgView);
     }//cropPhoto
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        finish();
+    }
 }
 

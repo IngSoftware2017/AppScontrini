@@ -504,6 +504,14 @@ public class BillActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         ocrManager.release();
