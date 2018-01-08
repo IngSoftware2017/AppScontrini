@@ -29,9 +29,7 @@ import database.TicketEntity;
  * https://poi.apache.org/download.html
  */
 
-public class ExcelExport extends ExportManager {
-
-    private final String TAG = "EXCEL_EXPORT";
+public class ExcelExport extends Export {
 
     //Header CSV file
     private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
@@ -70,7 +68,7 @@ public class ExcelExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Implementation of the extended abstract class ExportManager
+     * Implementation of the extended abstract class Export
      * Writes all tables entities in separeted sheet of the workbook.
      * Than it creates the complete document of the exportation db
      * @return boolean - if the exportation is ok
@@ -100,7 +98,7 @@ public class ExcelExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Implementation of the extended abstract class ExportManager
+     * Implementation of the extended abstract class Export
      * Writes the specific mission with relative tickets in separeted sheet of the workbook.
      * Than it creates the complete document of the exportation db
      * @param missionId - the specific mission

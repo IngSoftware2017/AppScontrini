@@ -1,53 +1,24 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import database.Constants;
-import database.DAO;
 import database.DataManager;
-import database.MissionEntity;
 import database.PersonEntity;
-import export.CSVExport;
-import export.ExportManager;
+import export.Export;
 import export.XMLExport;
 
 
@@ -106,9 +77,9 @@ public class MainActivity extends AppCompatActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ExportManager e = new CSVExport(DB,context.getExternalFilesDir(null));
-                //ExportManager e = new CSVExport(DB,getFilesDir().getAbsolutePath());
-                ExportManager e = new XMLExport(DB,Environment.getExternalStorageDirectory().getPath() + File.separator + "ExportDB");
+                //Export e = new CSVExport(DB,context.getExternalFilesDir(null));
+                //Export e = new CSVExport(DB,getFilesDir().getAbsolutePath());
+                Export e = new XMLExport(DB,Environment.getExternalStorageDirectory().getPath() + File.separator + "ExportDB");
                 boolean export = e.export();
             }
         });

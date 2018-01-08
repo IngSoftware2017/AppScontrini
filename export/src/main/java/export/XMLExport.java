@@ -27,9 +27,7 @@ import database.TicketEntity;
  * https://developer.android.com/reference/org/xmlpull/v1/XmlSerializer.html
  */
 
-public class XMLExport extends ExportManager {
-
-    private final String TAG = "XML_EXPORT";
+public class XMLExport extends Export {
 
     //TablesEntity of db
     private List<TicketEntity> tickets;
@@ -63,7 +61,7 @@ public class XMLExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Implementation of the extended abstract class ExportManager
+     * Implementation of the extended abstract class Export
      * Writes all tables entities in a XML file
      * Than it creates the file
      * @return boolean - if the exportation is ok
@@ -103,7 +101,7 @@ public class XMLExport extends ExportManager {
     /**
      * @author Marco Olivieri
      *
-     * Implementation of the extended abstract class ExportManager
+     * Implementation of the extended abstract class Export
      * Writes the specific mission with relative tickets in a XML file
      * Than it creates the file
      * @param missionId - the specific mission
