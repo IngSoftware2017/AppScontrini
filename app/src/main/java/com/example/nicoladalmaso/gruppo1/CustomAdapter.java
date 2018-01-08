@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -93,6 +94,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         //Ticket image bitmap set
         Glide.with(context)
                 .load(photo.getAbsolutePath())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .into(img);
 
         //For next ticket manages

@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -55,6 +56,7 @@ public class BillViewer extends AppCompatActivity {
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
     String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
+    ImageView imgView;
 
     //Dal Maso
     @Override
@@ -121,9 +123,12 @@ public class BillViewer extends AppCompatActivity {
         billShop.setText(ticketShop);
 
         //Full image view
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
+        imgView = (ImageView)findViewById(R.id.billImage);
+
         Glide.with(context)
                 .load(ticketPath)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .into(imgView);
     }
 
@@ -237,18 +242,11 @@ public class BillViewer extends AppCompatActivity {
                 .setOutputUri(toCropUri).start(this);
         ticket.setFileUri(toCropUri);
 
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
         Glide.with(context)
                 .load(toCropUri.toString().substring(7))
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .into(imgView);
     }//cropPhoto
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
-        finish();
-    }
 }
 
