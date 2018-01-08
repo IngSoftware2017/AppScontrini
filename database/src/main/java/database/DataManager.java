@@ -233,7 +233,8 @@ public class DataManager {
         List<TicketEntity> tickets = getTicketsForMission(id);
         BigDecimal totAmount = BigDecimal.ZERO;
         for(int i=0; i<tickets.size(); i++)
-            totAmount = totAmount.add(tickets.get(i).getAmount());
+            if(tickets.get(i).getAmount() != null)
+                totAmount = totAmount.add(tickets.get(i).getAmount());
         return totAmount;
     }
 
