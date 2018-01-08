@@ -43,6 +43,6 @@ public class  DatePickerFragment extends DialogFragment
     public void onDateSet(DatePicker view, int year, int month, int day) {
         Log.d("TextInputEditTextID", "ID: "+id+", R.id: "+R.id.input_missionStart);
         TextView textView = (TextView) getActivity().findViewById(id);
-        textView.setText(day + "/" + (month+1) + "/" + year);
+        textView.setText(day + "/" + month + "/" + year);
     }
 }

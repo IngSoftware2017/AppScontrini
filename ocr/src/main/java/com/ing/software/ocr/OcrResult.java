@@ -1,7 +1,7 @@
 package com.ing.software.ocr;
 
+import com.ing.software.ocr.OcrObjects.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
-import com.ing.software.ocr.OcrObjects.RawImage;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 import android.support.annotation.NonNull;
@@ -17,18 +17,18 @@ class OcrResult {
 
     private List<RawStringResult> amountResults;
     private List<RawGridResult> dateList;
-    private RawImage image;
+    private List<RawText> products;
 
     /**
      * Constructor
      * @param amountResults list of possible amounts. Not null.
      * @param dateList list of possible dates. Not null.
-     * @param image image of current receipt. Not null.
+     * @param products list of possible products prices. Not null.
      */
-    OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList, @NonNull RawImage image) {
+    OcrResult(@NonNull List<RawStringResult> amountResults, @NonNull List<RawGridResult> dateList, @NonNull List<RawText> products) {
         this.amountResults = amountResults;
         this.dateList = dateList;
-        this.image = image;
+        this.products = products;
     }
 
     /**
@@ -48,8 +48,8 @@ class OcrResult {
     /**
      * @return possible RawTexts where a product price is present
      */
-    RawImage getRawImage() {
-        return image;
+    List<RawText> getProducts() {
+        return products;
     }
 
     /**
@@ -62,10 +62,10 @@ class OcrResult {
         list.append("AMOUNT FOUND IN:");
         if (amountResults != null) {
             for (RawStringResult result : amountResults) {
-                List<RawText> rawTexts = result.getTargetTexts();
+                List<RawText> rawTexts = result.getDetectedTexts();
                 if (rawTexts != null) {
                     for (RawText text : rawTexts) {
-                        list.append(text.getValue()).append("\n");
+                        list.append(text.getDetection()).append("\n");
                     }
                 }
             }
@@ -73,11 +73,11 @@ class OcrResult {
         list.append("\n");
         if (dateList != null) {
             for (RawGridResult result : dateList) {
-                double probability = result.getPercentage();
-                list.append("POSSIBLE DATE: ").append(result.getText().getValue()).append(" with probability: ")
+                int probability = result.getPercentage();
+                list.append("POSSIBLE DATE: ").append(result.getText().getDetection()).append(" with probability: ")
                         .append(probability);
-                log(5,"POSSIBLE DATE: ", result.getText().getValue() + " with probability: "
-                        + probability + " and distance: " + DataAnalyzer.findDate(result.getText().getValue()));
+                log(5,"POSSIBLE DATE: ", result.getText().getDetection() + " with probability: "
+                        + probability + " and distance: " + DataAnalyzer.findDate(result.getText().getDetection()));
                 list.append("\n");
             }
         }

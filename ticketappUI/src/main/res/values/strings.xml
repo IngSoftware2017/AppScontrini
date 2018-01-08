@@ -19,14 +19,11 @@
     <string name="total">Totale</string>
     <string name="date">Data</string>
     <string name="location">Luogo</string>
-    <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + per iniziare</string>
-    <string name="noMissionsClosed">Nessuna missione chiusa</string>
-    <string name="noBills">Nessun scontrino disponibile</string>
-    <string name="noBillsOpen">\nClicca sul pulsante + per iniziare</string>
-    <string name="noAcademicTitle">Nessun titolo accademico</string>
-    <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + per iniziare</string>
+    <string name="noMissions">Nessuna missione disponibile\nClicca sul pulsante + iniziare</string>
+    <string name="noBills">Nessuno scontrino disponibile\nClicca sul pulsante + iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
+    <!--lazzarin-->
     <string name="newMission">Nuova missione</string>
     <string name="deleteMissionToast">Sei sicuro di voler eliminare la missione?\nTutti gli scontrini verranno eliminati</string>
     <string name="buttonDelete">Elimina</string>
@@ -40,6 +37,7 @@
     <string name="alert_invalid_amount_title">Error</string>
     <string name="alert_invalid_amount_mess">Invalid amount</string>
     <string name="authority">com.ing.software.ticketapp.fileprovider</string>
+    <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + iniziare</string>
     <string name="newPerson">Nuova persona</string>
     <string name="titlePeople">Persone</string>
     <string name="toast_missionNoName">Nome missione mancante</string>
@@ -59,7 +57,5 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
-    <string name="Open">Aperte</string>
-    <string name="Closed">Chiuse</string>
 
 </resources>

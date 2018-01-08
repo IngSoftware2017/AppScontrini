@@ -63,6 +63,7 @@ public class AppUtilities {
                 newDate=formatCheck.format(in);
                 Log.d("formatoData",newDate);
                 int temp=Integer.parseInt(newDate);
+                temp = temp+100; // on this format, month is in the hundreds order
                 Log.d("meseAggiunto",temp+"");
                 newDate=temp+"";
                 in=formatCheck.parse(newDate);

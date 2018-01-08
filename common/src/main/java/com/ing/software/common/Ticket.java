@@ -1,7 +1,6 @@
 package com.ing.software.common;
 
 import android.graphics.Point;
-import android.graphics.PointF;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -42,7 +41,7 @@ public class Ticket {
     /**
      * Ordered list of vertices of rectangle (first top-left, counter-clockwise)
      */
-    public List<PointF> rectangle;
+    public List<Point> rectangle;
 
     /**
      * List of errors related to the creation or manipulation of the Ticket

@@ -74,6 +74,49 @@ public class DataAnalyzerTest {
         assertEquals(0, expected.compareTo(result));
     }
 
+	/*
+    @Test
+    public void analyzeAmountMaxDouble() throws Exception {
+        String amount = "" + Double.MAX_VALUE;
+        double expected = Double.MAX_VALUE;
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
+        method.setAccessible(true);
+        BigDecimal result = (BigDecimal)method.invoke(null,amount);
+        double resultD = result.doubleValue();
+        assertEquals(expected, resultD);
+    }
+
+    @Test
+    public void analyzeAmountExpMixed() throws Exception {
+        String amount = "3E+12ii";
+        BigDecimal expected = new BigDecimal("3E+12");
+        Method method = DataAnalyzer.class.getDeclaredMethod("analyzeAmount", String.class);
+        method.setAccessible(true);
+        BigDecimal result = (BigDecimal)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void analyzeAmountMaxDoubleDirect() throws Exception {
+        String amount = "" + Double.MAX_VALUE;
+        String expected = amount;
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmount", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void analyzeAmountExponential() throws Exception {
+        String amount = "5E+2";
+        String expected = "5E+2";
+        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmount", String.class);
+        method.setAccessible(true);
+        String result = (String)method.invoke(null,amount);
+        assertEquals(expected, result);
+    }
+	*/
+
     @Test
     public void isExpNegative() throws Exception {
         String amount = "5E-2";
@@ -268,16 +311,6 @@ public class DataAnalyzerTest {
     public void deepAmount2ThreeDecimals() throws Exception {
         String amount = "2.500";
         String expected = "2.50";
-        Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
-        method.setAccessible(true);
-        String result = (String)method.invoke(null,amount);
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void analyzeSpaceLetters() throws Exception {
-        String amount = "29. Oo";
-        String expected = "29.00";
         Method method = DataAnalyzer.class.getDeclaredMethod("deepAnalyzeAmountChars", String.class);
         method.setAccessible(true);
         String result = (String)method.invoke(null,amount);

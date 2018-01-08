@@ -27,17 +27,17 @@ public class RawGridResultTests {
 
     @Test
     public void testRawDRPerc() throws Exception {
-        assertEquals(100.0, rawGridResult.getPercentage());
+        assertEquals(100, rawGridResult.getPercentage());
     }
 
     @Test
     public void testRawDRPerc2() throws Exception {
-        assertEquals(50.0, rawGridResult2.getPercentage());
+        assertEquals(50, rawGridResult2.getPercentage());
     }
 
     @Test
     public void testRawDRPerc3() throws Exception {
-        assertEquals(-20.0, rawGridResult3.getPercentage());
+        assertEquals(-20, rawGridResult3.getPercentage());
     }
 
     @Test

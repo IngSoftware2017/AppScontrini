@@ -34,7 +34,6 @@ public class TicketEntity {
     private Date date;
     private String title;
     private List<String> category;
-    private float[] corners;
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
@@ -63,7 +62,6 @@ public class TicketEntity {
         this.shop = shop;
         this.title = title;
         this.missionID = missionID;
-        corners = new float[8];
     }
 
     /**
@@ -172,25 +170,6 @@ public class TicketEntity {
      */
     public void setMissionID(int missionID) {
         this.missionID = missionID;
-    }
-
-
-    /**
-     * Returns the corners of the ticket
-     * 8 float point of the rectangle coordinate
-     * @return corners
-     */
-    public float[] getCorners() {
-        return corners;
-    }
-
-    /**
-     * Sets corners of the ticket
-     * Must be an array of 8 elements: the rectangle coordinate of the ticket
-     * @param corners
-     */
-    public void setCorners(float[] corners) {
-        this.corners = corners;
     }
 
 

@@ -1,7 +1,9 @@
 package com.ing.software.ocr;
 
 import java.math.RoundingMode;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -19,8 +21,6 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
-import static com.ing.software.ocr.OcrVars.HEIGHT_DIFF_MULTIPLIER;
-import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
 import java.text.ParseException;
 
@@ -29,6 +29,7 @@ import java.text.ParseException;
 /**
  * Class used to extract informations from raw data
  * todo: fallback, if no amount is present try to decode a possible pricelist
+ * todo: remove rectangle-probability and use block-specific-probability
  */
 class DataAnalyzer {
 
@@ -48,31 +49,27 @@ class DataAnalyzer {
             //Ignore text with invalid distance (-1) according to findSubstring() documentation
             if (stringResult.getDistanceFromTarget() > -1) {
                 RawText sourceText = stringResult.getSourceText();
-                double baseSingleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
+                int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
                 if (stringResult.getDetectedTexts() != null) {
                     //Here we order texts according to their distance (position) from source rect
-                    //List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getTargetTexts(), stringResult.getSourceText().getBoundingBox());
-                    for (RawGridResult gridResult : stringResult.getDetectedTexts()) {
-                        RawText rawText = gridResult.getText();
-                        double diffCenter = Math.abs(rawText.getBoundingBox().centerY() - sourceText.getBoundingBox().centerY());
-                        diffCenter = (sourceText.getRawImage().getHeight() - diffCenter)/sourceText.getRawImage().getHeight()* HEIGHT_DIFF_MULTIPLIER;
-                        double singleCatch = baseSingleCatch + gridResult.getPercentage() + diffCenter;
+                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getDetectedTexts(), stringResult.getSourceText().getRect());
+                    for (RawText rawText : orderedDetectedTexts) {
                         if (!rawText.equals(sourceText)) {
                             possibleResults.add(new RawGridResult(rawText, singleCatch));
-                            OcrUtils.log(3, "getPossibleAmount", "Analyzing source text: " + sourceText.getValue() +
-                                    " where target is: " + rawText.getValue() + " with decoded probability: " + singleCatch +
+                            OcrUtils.log(3, "getPossibleAmount", "Analyzing source text: " + sourceText.getDetection() +
+                                    " where target is: " + rawText.getDetection() + " with probability: " + sourceText.getAmountProbability() +
                                     " and distance: " + stringResult.getDistanceFromTarget());
                         }
                     }
                 }
             } else {
-                OcrUtils.log(3, "getPossibleAmount", "Ignoring text: " + stringResult.getSourceText().getValue());
+                OcrUtils.log(3, "getPossibleAmount", "Ignoring text: " + stringResult.getSourceText().getDetection());
             }
         }
         if (possibleResults.size() > 0) {
             /* Here we order considering their final probability to contain the amount:
             If the probability is the same, the fallback is their previous order, so based on when
-            they are inserted.
+            they are inserted (=their distance (position) from source rect).
             */
             Collections.sort(possibleResults);
         }
@@ -88,7 +85,7 @@ class DataAnalyzer {
      */
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
-        if (OcrUtils.isPossiblePriceNumber(amountString) < NUMBER_MIN_VALUE) {
+        if (OcrUtils.isPossibleNumber(amountString)) {
             try {
                 String decoded = deepAnalyzeAmountChars(amountString);
                 if (!decoded.equals(""))
@@ -468,7 +465,9 @@ class DataAnalyzer {
         //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
         if(dataSearch != null && minDistance<10)
         {
-            date = parseDate(dataSearch);
+            String[] expectedPattern = {"dd/MM/yyyy","dd-MM-yyyy","dd.MM.yyyy","MM/dd/yyyy","MM-dd-yyyy","MM.dd.yyyy"};
+            date = parseDate(dataSearch,expectedPattern);
+
         }
         return date;
 
@@ -479,73 +478,14 @@ class DataAnalyzer {
      * @author Salvagno
      *
      * @param dateString An input date string.
+     * @param formats An array of date formats that we have allowed for.
      * @return A Date (java.util.Date) reference. The reference will be null if
      *         we could not match any of the known formats.
      */
-    public static Date parseDate(String dateString)
+    public static Date parseDate(String dateString, String[] formats)
     {
         Date date = null;
         Locale locale = new Locale("US");
-
-        //prendo i tre pezzi della stringa data
-        char[] string = dateString.toCharArray();
-        String token1 = "";
-        String token2 = "";
-        String token3 = "";
-        Integer numberOfSymbols = 0;
-        String finalDate = "";
-        String[] formats = null;
-
-
-
-        for (char c : string) {
-            if (c == '-' || c == '.' || c == '/')
-            {
-                numberOfSymbols ++;
-                finalDate=finalDate+'-';
-            }
-            else
-            {
-                finalDate=finalDate+c;
-
-                if(numberOfSymbols == 0)
-                    token1 = token1+c;
-                else if(numberOfSymbols == 1)
-                    token2 = token2+c;
-                else if(numberOfSymbols == 2)
-                    token3 = token3+c;
-                else
-                    return null;
-            }
-
-        }
-
-        //convert string to integer and get last two digit
-        int token1Number = -1;
-        int token2Number = -1;
-        int token3Number = -1;
-        try {
-            token1Number = ((Integer.parseInt(token1))%100);    //probably is day
-            token2Number = ((Integer.parseInt(token2))%100);    //probably is month
-            if(token3.length()==4) //if this token have 4 character
-            {
-                token3Number = Integer.parseInt(token3);
-                formats = new String[] {"dd-MM-yyyy","MM-dd-yyyy"};
-            }
-            else {
-                token3Number = ((Integer.parseInt(token3)) % 100);
-                formats = new String[] {"dd-MM-yy", "MM-dd-yy"};
-            }
-        } catch (NumberFormatException e) {
-            return null;
-        }
-
-        if((token1Number >= 1 && token1Number <= 12) && (token2Number >= 1 && token2Number <= 12))
-            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
-        else if(token2Number > 12)
-            dateString = String.valueOf(token2Number)+'-'+String.valueOf(token1Number)+'-'+String.valueOf(token3Number);
-        else
-            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
 
         for (int i = 0; i < formats.length; i++)
         {
@@ -576,17 +516,17 @@ class DataAnalyzer {
      * @return List of possible dates ordered
      */
     static List<RawGridResult> getPossibleDates(@NonNull List<RawGridResult> dateResults) {
-        int distanceMultiplier = 20;
+        int distanceMultiplier = 15;
         List<RawGridResult> possibleResults = new ArrayList<>();
         Collections.sort(dateResults);
         for (RawGridResult gridResult : dateResults) {
             //Ignore text with invalid distance (-1) according to findDate() documentation
-            int distanceFromDate = findDate(gridResult.getText().getValue());
+            int distanceFromDate = findDate(gridResult.getText().getDetection());
             if (distanceFromDate > -1) {
-                double singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
+                int singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
                 possibleResults.add(new RawGridResult(gridResult.getText(), singleCatch));
             } else {
-                OcrUtils.log(5, "getPossibleDate", "Ignoring text: " + gridResult.getText().getValue());
+                OcrUtils.log(3, "getPossibleDate", "Ignoring text: " + gridResult.getText().getDetection());
             }
         }
         if (possibleResults.size() > 0) {

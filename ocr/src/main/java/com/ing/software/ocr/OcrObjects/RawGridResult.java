@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 
 public class RawGridResult implements Comparable<RawGridResult>{
 
-    private double percentage;
+    private int percentage;
     private RawText singleText;
 
     /**
@@ -19,7 +19,7 @@ public class RawGridResult implements Comparable<RawGridResult>{
      * @param singleText source text
      * @param percentage percentage corresponding to this text
      */
-    public RawGridResult(RawText singleText, double percentage) {
+    public RawGridResult(RawText singleText, int percentage) {
         this.percentage = percentage;
         this.singleText = singleText;
     }
@@ -27,7 +27,7 @@ public class RawGridResult implements Comparable<RawGridResult>{
     /**
      * @return percentage of this rawText
      */
-    public double getPercentage() {
+    public int getPercentage() {
         return percentage;
     }
 
@@ -40,21 +40,15 @@ public class RawGridResult implements Comparable<RawGridResult>{
 
     @Override
     public int compareTo(@NonNull RawGridResult rawGridResult) {
-        double diff = rawGridResult.getPercentage() - getPercentage();
-        if (diff > 0)
-            return 1;
-        else if (diff < 0)
-            return -1;
-        else
-            return (int) diff;
+        return  rawGridResult.getPercentage() - getPercentage();
     }
 
     @Override
     public boolean equals(@NonNull Object o) {
         if (o instanceof RawGridResult) {
             RawGridResult e2 = (RawGridResult) o;
-            return singleText.getValue().equals(e2.getText().getValue()) &&
-                    singleText.getBoundingBox().equals(e2.getText().getBoundingBox());
+            return singleText.getDetection().equals(e2.getText().getDetection()) &&
+                    singleText.getRect().equals(e2.getText().getRect());
         }
         else
             return false;

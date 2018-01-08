@@ -5,7 +5,6 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
-import android.net.Uri;
 
 /**
  * Represents one person that does some missions
@@ -23,13 +22,6 @@ public class PersonEntity {
     private String name;
     private String lastName;
     private String academicTitle;
-
-
-
-    private Uri foto;
-
-
-    private String email;
 
     @Ignore
     /**
@@ -50,24 +42,6 @@ public class PersonEntity {
         this.lastName = lastName;
         this.academicTitle = academicTitle;
 
-    }
-
-    /**
-     * Parametric constructor
-     *
-     * @param name Name of the person
-     * @param lastName Last Name of the person
-     * @param academicTitle Academic Title of the person
-     * @param email Person's email
-     * @param foto Uri of Person's foto
-     */
-    @Ignore
-    public PersonEntity(String name, String lastName, String academicTitle, String email, Uri foto) {
-        this.name = name;
-        this.lastName = lastName;
-        this.academicTitle = academicTitle;
-        this.email = email;
-        this.foto = foto;
     }
 
     /**
@@ -133,38 +107,6 @@ public class PersonEntity {
      */
     public void setAcademicTitle(String academicTitle) {
         this.academicTitle = academicTitle;
-    }
-
-    /**
-     * Returns person's email
-     * @return email
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Sets person's email
-     * @param email not null
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-     * Returns person's foto
-     * @return foto, Uri
-     */
-    public Uri getFoto() {
-        return foto;
-    }
-
-    /**
-     * Sets person's foto
-     * @param foto, Uri not null
-     */
-    public void setFoto(Uri foto) {
-        this.foto = foto;
     }
 
 }

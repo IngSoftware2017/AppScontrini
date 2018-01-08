@@ -11,7 +11,8 @@ import java.util.PriorityQueue;
  * Sorted data structure (descending order) used to select best k elements.
  * @author Riccardo Zaglia
  */
-public class Podium<T extends Comparable<T>> {
+public class Podium<T extends Comparable<?>> { // T is incompatible with partially specialized classes,
+                                               // I have to use Comparable<?> instead of Comparable<T>
     private int tgtSize = 0;
     private PriorityQueue<T> pq = null;
     // NB: the first element is the lowest/worst one

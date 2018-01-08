@@ -16,7 +16,7 @@ public class Reflect {
      * Invoke a static or non static method (with any access level) of a class.
      *
      * @param clazz A class instance or class type. Not null
-     * @param method Method name. Not null
+     * @param methodName Method name. Not null
      * @param params List of arguments of the method. They can be null.
      * @param <T> return type of the method.
      * @return return value of the method or void.
@@ -30,7 +30,7 @@ public class Reflect {
      *                    * exception raised inside method.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T invoke(@NonNull Object clazz, @NonNull String method, Object... params) throws Exception {
+    public static <T> T invoke(@NonNull Object clazz, @NonNull String methodName, Object... params) throws Exception {
         //get type of parameters, or null if null
         List<Class<?>> givenParamTypes = new ArrayList<>();
         for (Object param : params)
@@ -39,9 +39,9 @@ public class Reflect {
         boolean isType = clazz instanceof Class<?>;
         Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
 
-        for (Method m : classType.getDeclaredMethods()) {
-            Class<?>[] methodParamTypes = m.getParameterTypes();
-            if (m.getName().equals(method)
+        for (Method method : classType.getDeclaredMethods()) {
+            Class<?>[] methodParamTypes = method.getParameterTypes();
+            if (method.getName().equals(methodName)
                     && methodParamTypes.length == givenParamTypes.size()) {
 
                 boolean paramsMatch = true;
@@ -63,8 +63,8 @@ public class Reflect {
                             || got == null || need.isAssignableFrom(got);
                 }
                 if (paramsMatch) {
-                    m.setAccessible(true);
-                    return (T)m.invoke(isType ? null : clazz, params);
+                    method.setAccessible(true);
+                    return (T)method.invoke(isType ? null : clazz, params);
                 }
             }
         }

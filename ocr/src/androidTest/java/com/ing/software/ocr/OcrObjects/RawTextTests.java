@@ -25,7 +25,7 @@ public class RawTextTests {
 
     @Test
     public void testrawTextValue() throws Exception {
-        assertEquals("Value", rawText.getValue());
+        assertEquals("Value", rawText.getDetection());
     }
 
     @Test

@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,8 +17,7 @@ public class RawStringResult implements Comparable<RawStringResult>{
     private RawText sourceText;
     private String sourceString;
     private int distanceFromTarget;
-    private List<RawText> targetTexts = new ArrayList<>();
-    private List<RawGridResult> detectedTexts = new ArrayList<>();
+    private List<RawText> detectedTexts = null;
 
     /**
      * Constructor. Set source rawText and its distance from target string
@@ -38,9 +36,10 @@ public class RawStringResult implements Comparable<RawStringResult>{
      * @param detectedTexts list of rawTexts detected. Not null.
      */
     public void addDetectedTexts(@NonNull List<RawText> detectedTexts) {
-        targetTexts.addAll(detectedTexts);
-        for (RawText text : detectedTexts)
-            addDetectedTexts(text);
+        if (this.detectedTexts == null)
+            this.detectedTexts = detectedTexts;
+        else
+            this.detectedTexts.addAll(detectedTexts);
     }
 
     /**
@@ -48,16 +47,9 @@ public class RawStringResult implements Comparable<RawStringResult>{
      * @param detectedText rawText detected. Not null.
      */
     public void addDetectedTexts(@NonNull RawText detectedText) {
-        targetTexts.add(detectedText);
-        double heightDiff = Math.abs(detectedText.getBoundingBox().height() - sourceText.getBoundingBox().height())/sourceText.getBoundingBox().height();
-        //order in RawGridResult is from higher to lower, so we invert the order, heightDiff is between 0 and 1
-        heightDiff = (1 - heightDiff)*100;
-        RawGridResult singleResult = new RawGridResult(detectedText, heightDiff);
-        this.detectedTexts.add(singleResult);
-    }
-
-    public List<RawText> getTargetTexts() {
-        return targetTexts;
+        if (this.detectedTexts == null)
+            this.detectedTexts = new ArrayList<>();
+        this.detectedTexts.add(detectedText);
     }
 
     public RawText getSourceText() {
@@ -68,8 +60,7 @@ public class RawStringResult implements Comparable<RawStringResult>{
         return distanceFromTarget;
     }
 
-    public List<RawGridResult> getDetectedTexts() {
-        Collections.sort(detectedTexts);
+    public List<RawText> getDetectedTexts() {
         return detectedTexts;
     }
 

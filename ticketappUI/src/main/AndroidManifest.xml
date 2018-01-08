@@ -45,28 +45,22 @@
             android:theme="@style/AppTheme.ActionBar.Transparent" />
         <activity
             android:name=".BillActivity"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionActivity" />
         <activity
             android:name=".AddNewMission"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionActivity" />
         <activity
             android:name=".EditTicket"
             android:parentActivityName=".BillViewer" />
         <activity
-            android:name=".MissionsTabbed"
-            android:label="@string/title_activity_missions_tabbed"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
+            android:name=".MissionActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".AddNewPerson"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".EditPerson"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionActivity" />
         <activity
             android:name=".EditMission"
             android:parentActivityName=".BillActivity" />

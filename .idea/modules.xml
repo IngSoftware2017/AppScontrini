@@ -3,10 +3,17 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
+      <module fileurl="file://$PROJECT_DIR$/database/AppScontrini-database.iml" filepath="$PROJECT_DIR$/database/AppScontrini-database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocr/AppScontrini-ocr.iml" filepath="$PROJECT_DIR$/ocr/AppScontrini-ocr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocrtestapp/AppScontrini-ocrtestapp.iml" filepath="$PROJECT_DIR$/ocrtestapp/AppScontrini-ocrtestapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opencvtestapp/AppScontrini-opencvtestapp.iml" filepath="$PROJECT_DIR$/opencvtestapp/AppScontrini-opencvtestapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ticketappUI/AppScontrini-ticketappUI.iml" filepath="$PROJECT_DIR$/ticketappUI/AppScontrini-ticketappUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
       <module fileurl="file://$PROJECT_DIR$/ocr/ocr.iml" filepath="$PROJECT_DIR$/ocr/ocr.iml" />
       <module fileurl="file://$PROJECT_DIR$/ocrtestapp/ocrtestapp.iml" filepath="$PROJECT_DIR$/ocrtestapp/ocrtestapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/opencvtestapp/opencvtestapp.iml" filepath="$PROJECT_DIR$/opencvtestapp/opencvtestapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ticketappUI/ticketappUI.iml" filepath="$PROJECT_DIR$/ticketappUI/ticketappUI.iml" />
     </modules>
   </component>
 </project>
