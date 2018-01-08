@@ -31,6 +31,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.ing.software.common.Ticket;
+import com.ing.software.ocr.ImageProcessor;
+import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -40,6 +43,7 @@ import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -230,7 +234,8 @@ public class BillViewer extends AppCompatActivity {
     }//deleteTicket
 
     /**PICCOLO
-     * Method that lets the user crop and/or rotate the original photo
+     * Method that lets the user crop and/or rotate the original photo, once the crop is confirmed,
+     * the ocr is run to get data that it couldn't have red the first time
      * @param id the id of the TicketEntity in the db
      */
     private void cropPhoto(long id) {
@@ -241,7 +246,35 @@ public class BillViewer extends AppCompatActivity {
         CropImage.activity(originalUri)
                 .setOutputUri(toCropUri).start(this);
         ticket.setFileUri(toCropUri);
+        //RUNS THE OCR ONCE MORE
+        OcrManager ocrManager = new OcrManager();
+        while (ocrManager.initialize(this) != 0) { // 'this' is the context
+            try {
+                //On first run vision library will be downloaded
+                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Bitmap ocrImage= BitmapFactory.decodeFile(toCropUri.toString().substring(7));
+        ImageProcessor imgProc = new ImageProcessor(ocrImage);
+        Ticket result = ocrManager.getTicket(imgProc);
+        Log.d("OCR",result.amount+", "+result.date);
+        if(result.date == null)
+            ticket.setDate(Calendar.getInstance().getTime());
+        else
+            ticket.setDate(result.date);
+        ticket.setAmount(result.amount);
+        ticket.setShop(context.getString(R.string.string_NoShop));
 
+        if(result.title == null)
+            ticket.setTitle(context.getString(R.string.title_Ticket));
+        else
+            ticket.setTitle(result.title);
+        DB.updateTicket(ticket);
+        ocrManager.release();
+        //
         Glide.with(context)
                 .load(toCropUri.toString().substring(7))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
