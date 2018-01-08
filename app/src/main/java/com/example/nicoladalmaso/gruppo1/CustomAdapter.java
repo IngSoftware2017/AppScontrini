@@ -25,6 +25,8 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -77,7 +79,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
         //Amount text fixes
         String amount = "";
-        if(c.getAmount() == null){
+        if(c.getAmount() == null || c.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
             amount = "Nessun valore trovato";
             tot.setText(amount);
         }

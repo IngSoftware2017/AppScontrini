@@ -33,6 +33,8 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,7 +96,7 @@ public class BillViewer extends AppCompatActivity {
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
         ticketShop = thisTicket.getShop();
-        if(thisTicket.getAmount() == null){
+        if(thisTicket.getAmount() == null || thisTicket.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
             ticketAmount = "Nessun valore trovato";
         }
         else
