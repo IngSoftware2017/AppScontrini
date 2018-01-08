@@ -230,7 +230,6 @@ class AmountComparator {
      */
     void analyzePrices(@NonNull List<RawGridResult> possiblePrices) {
         BigDecimal decodedAmount = getAmount();
-        int productsCounter = 1; //number of products in list
         //above amount we can have all prices and a subtotal, so first sum all products with distance > 0
         if (possiblePrices.size() == 0 || possiblePrices.get(0).getPercentage() < 0)
             return;
@@ -255,45 +254,37 @@ class AmountComparator {
                 if (adder != null) {
                     productsSum = productsSum.add(adder);
                     possibleSubTotal = adder; //this way when i exit the while i'll have in possibleSubTotal last value analyzed
-                    productsCounter++;
                 }
             } else {
-                OcrUtils.log(3, "analyzePrices", "Not a valid number: " + productPrice);
+                OcrUtils.log(4, "analyzePrices", "Not a valid number: " + productPrice);
             }
-            OcrUtils.log(3, "analyzePrices", "List of prices, new total value is: " + productsSum.toString());
+            OcrUtils.log(4, "analyzePrices", "List of prices, new total value is: " + productsSum.toString());
             ++index;
         }
         if (productsSum != null) {
             BigDecimal halfProductSum = productsSum.divide(new BigDecimal(2).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP);
-            //Check if my subtotal is the same as total, or if amount is null
-            //if (possibleSubTotal != null && (!hasAmount() || decodedAmount.compareTo(possibleSubTotal) == 0)) {
-            if (possibleSubTotal != null && productsCounter > 2) {
-                //Accept the value
+            //Check if my subtotal is the same as total, or if it equals cash or cash - change
+            //Must be quite strict with subtotal as it may break everything
+            if (possibleSubTotal != null) {
+                if (hasAmount() && decodedAmount.compareTo(possibleSubTotal) == 0) {
+                    flagHasSubtotal(possibleSubTotal);
+                } else if (hasCash()) {
+                    if (possibleSubTotal.compareTo(getCash()) == 0)
+                        flagHasSubtotal(possibleSubTotal);
+                    else if (hasChange() && possibleSubTotal.compareTo(getCash().subtract(getChange())) == 0)
+                        flagHasSubtotal(possibleSubTotal);
+                }
                 OcrUtils.log(3, "analyzePrices", "Subtotal is: " + possibleSubTotal.toString());
-                flagHasSubtotal(possibleSubTotal);
             }
             //now we may have the same value of decodedAmount, or its double (=*2)
-            if (hasAmount()) {
-                if (decodedAmount.compareTo(halfProductSum) == 0) {
-                    OcrUtils.log(3, "analyzePrices", "List of prices/2 equals decoded amount");
-                    flagHasPriceList(halfProductSum);
-                } else {
-                    flagHasPriceList(productsSum);
-                }
-            }
-            if (possibleSubTotal != null && productsCounter > 2){ //amount is null and we have more than 2 products
-                if (possibleSubTotal.compareTo(halfProductSum) == 0) {
-                    OcrUtils.log(3, "analyzePrices", "List of prices/2 equals subtotal");
-                    flagHasPriceList(halfProductSum);
-                } else {
-                    flagHasPriceList(productsSum);
-                }
-            } else if (!hasAmount()){ //amount and possibleSubtotal are null
-                flagHasPriceList(productsSum); //just add it
-            }
+            if (hasAmount() && decodedAmount.compareTo(halfProductSum) == 0) {
+                OcrUtils.log(3, "analyzePrices", "List of prices/2 equals decoded amount");
+                flagHasPriceList(halfProductSum);
+            } else
+                flagHasPriceList(productsSum);
         }
         if (getPriceList() != null)
-            OcrUtils.log(2, "analyzePrices", "List of prices, final value is: " + getPriceList().toString());
+            OcrUtils.log(3, "analyzePrices", "List of prices, final value is: " + getPriceList().toString());
     }
 
     /**
@@ -306,7 +297,6 @@ class AmountComparator {
      */
     void analyzeTotals(@NonNull List<RawGridResult> possiblePrices) {
         BigDecimal decodedAmount = getAmount();
-        int maxDistance = 2; //only 2 miss in amount detection
         //under amount we accept only 'contante' and 'resto' (if present)
         BigDecimal cash = null;
         BigDecimal change = null;
@@ -351,6 +341,7 @@ class AmountComparator {
                     OcrUtils.log(3, "analyzeTotals", "Cash diffs from decoded amount");
                 }
                 if (change != null) {
+                    /*
                     BigDecimal cashSubChange = cash.subtract(change);
                     if (cashSubChange.compareTo(decodedAmount) == 0) {
                         flagHasChange(change);
@@ -366,6 +357,8 @@ class AmountComparator {
                             OcrUtils.log(3, "analyzeTotals", "subtotal equals cash - change");
                         }
                     }
+                    */
+                    flagHasChange(change);
                 }
             } else {
                 //amount is null: add both cash and change
@@ -399,22 +392,28 @@ class AmountComparator {
      *               1 = two equal values
      *               2 = three equal values
      * @return BigDecimal containing the probable amount
-     * todo: it's quite a mess now...
+     * Note: subtotal and pricelist are never compared as there are some situations where it may lead to wrong results
+     * (last product equals the sum of all those before)
      */
     BigDecimal getBestAmount(@IntRange (from = 0, to = 2) int minHit) {
         if (getPrecision() > 0) {
             //analyze all possible cases
             BigDecimal subtotal = getSubTotal();
-            BigDecimal cash = null;
+            BigDecimal cash = getCash();
+            BigDecimal cashMChange = null;
             BigDecimal prices = getPriceList();
             BigDecimal amount = getAmount();
-            if (hasCash() && !hasChange())
-                cash = getCash();
-            else if (hasCash()) {
-                cash = getCash().subtract(getChange());
+            if (hasCash() && hasChange()) {
+                cashMChange = getCash().subtract(getChange());
             }
-            if (hasAmount()) { //return if find 2 or 3 equal values
+            if (hasAmount()) { //return if finds 2 or 3 equal values
                 if (hasPriceList() && hasCash()) {
+                    boolean cashChangePrices = false;
+                    boolean cashChangeAmount = false;
+                    if (hasChange()) {
+                        cashChangePrices = cashMChange.compareTo(prices) == 0;
+                        cashChangeAmount = cashMChange.compareTo(amount) == 0;
+                    }
                     boolean cashPrices = cash.compareTo(prices) == 0;
                     boolean cashAmount = cash.compareTo(amount) == 0;
                     if (cashPrices) {//Probably if both pricelist and cash are the same amount is wrong
@@ -427,8 +426,19 @@ class AmountComparator {
                             OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
                             return cash;
                         }
+                    } else if (cashChangePrices) {
+                        if (cashChangeAmount) {
+                            OcrUtils.log(2, "getBestAmount", "Three equal values found: (cash-change, pricelist, amount)");
+                            OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
+                            return cashMChange;
+                        } else if (minHit < 2) {
+                            OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash-change, pricelist)");
+                            OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
+                            return cashMChange;
+                        }
                     }
                 }
+                /*
                 if (hasSubtotal() && hasPriceList()) {
                     boolean subtotalPrices = subtotal.compareTo(prices) == 0;
                     boolean subtotalAmount = subtotal.compareTo(amount) == 0;
@@ -445,7 +455,15 @@ class AmountComparator {
                         }
                     }
                 }
+                */
                 if (hasSubtotal() && hasCash()) {
+                    boolean cashChangeSubtotal = false;
+                    boolean cashChangeAmount = false;
+                    if (hasChange()) {
+                        cashChangeSubtotal = cashMChange.compareTo(subtotal) == 0;
+                        cashChangeAmount = cashMChange.compareTo(amount) == 0;
+                    }
+
                     boolean cashSubtotal = cash.compareTo(subtotal) == 0;
                     boolean cashAmount = cash.compareTo(amount) == 0;
                     if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
@@ -458,71 +476,60 @@ class AmountComparator {
                             OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
                             return subtotal;
                         }
+                    } else if (cashChangeSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
+                        if (cashChangeAmount) {
+                            OcrUtils.log(2, "getBestAmount", "Three equal values found: (cash-change, subtotal, amount)");
+                            OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
+                            return subtotal;
+                        } else if (minHit < 2) {
+                            OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash-change, subtotal)");
+                            OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
+                            return subtotal;
+                        }
                     }
                 } //here minHit must be 0 or 1
                 if (minHit == 1) {
                     if ((hasCash() && cash.compareTo(amount) == 0) || (hasPriceList() && prices.compareTo(amount) == 0)
-                            || (hasSubtotal() && subtotal.compareTo(amount) == 0)) {
+                            || (hasSubtotal() && subtotal.compareTo(amount) == 0) || (hasChange() && cashMChange.compareTo(amount) == 0)) {
                         OcrUtils.log(2, "getBestAmount", "Two equal values found. Return amount.");
                         return amount;
                     }
-                } else //minHit is 0
+                } else if (minHit == 0)//minHit is 0
                     return amount;
             } else { //amount is null
-                if (hasCash() && hasSubtotal() && hasPriceList()) {
-                    boolean cashPrices = cash.compareTo(prices) == 0;
-                    boolean subtotalPrices = subtotal.compareTo(prices) == 0;
-                    boolean cashSubtotal = cash.compareTo(subtotal) == 0;
-                    if (cashPrices && subtotalPrices) {
-                        OcrUtils.log(2, "getBestAmount", "Three equal values found: (cash, pricelist, subtotal)");
-                        OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                        return cash;
-                    } else if (cashPrices && minHit < 2) {
-                        OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash, pricelist)");
-                        OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                        return cash;
-                    } else if (subtotalPrices && minHit < 2) {
-                        OcrUtils.log(2, "getBestAmount", "Two equal values found: (subtotal, pricelist)");
-                        OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                        return subtotal;
-                    } else if (cashSubtotal && minHit < 2) {
-                        OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash, subtotal)");
-                        OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
-                        return cash;
-                    }
-                }
                 if (hasPriceList() && hasCash() && minHit < 2) {
+                    boolean cashChangePrices = false;
+                    if (hasChange()) {
+                        cashChangePrices = cashMChange.compareTo(prices) == 0;
+                    }
                     boolean cashPrices = cash.compareTo(prices) == 0;
                     if (cashPrices) {//Probably if both pricelist and cash are the same amount is wrong
                         OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash, pricelist)");
                         OcrUtils.log(2, "getBestAmount", "New amount is: " + cash.toString());
                         return cash;
-                    }
-                }
-                if (hasSubtotal() && hasPriceList() && minHit < 2) {
-                    boolean subtotalPrices = subtotal.compareTo(prices) == 0;
-                    if (subtotalPrices) { //Probably if both subtotal and cash are the same amount is wrong
-                        OcrUtils.log(2, "getBestAmount", "Two equal values found: (subtotal, pricelist)");
-                        OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
-                        return subtotal;
+                    } else if (cashChangePrices) {
+                        OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash-change, pricelist)");
+                        OcrUtils.log(2, "getBestAmount", "New amount is: " + cashMChange.toString());
+                        return cashMChange;
                     }
                 }
                 if (hasSubtotal() && hasCash() && minHit < 2) {
+                    boolean cashChangeSubtotal = false;
+                    if (hasChange()) {
+                        cashChangeSubtotal = cashMChange.compareTo(subtotal) == 0;
+                    }
+
                     boolean cashSubtotal = cash.compareTo(subtotal) == 0;
                     if (cashSubtotal) { //Probably if both subtotal and cash are the same amount is wrong
                         OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash, subtotal)");
                         OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
                         return subtotal;
+                    } else if (cashChangeSubtotal) {
+                        OcrUtils.log(2, "getBestAmount", "Two equal values found: (cash-change, subtotal)");
+                        OcrUtils.log(2, "getBestAmount", "New amount is: " + subtotal.toString());
+                        return subtotal;
                     }
                 }
-                /* //don't accept one value, only if it's amount
-                if (hasSubtotal() && minHit < 1) {
-                    return subtotal;
-                } else if (hasCash() && minHit < 1) {
-                    return cash;
-                } else if (minHit < 1)
-                    return prices;
-                    */
             }
         } else if (hasAmount() && minHit < 1) {
             return getAmount();

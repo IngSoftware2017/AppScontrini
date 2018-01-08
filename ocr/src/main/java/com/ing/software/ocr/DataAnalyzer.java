@@ -19,7 +19,8 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Size;
 
 import static com.ing.software.ocr.OcrUtils.levDistance;
-import static com.ing.software.ocr.OcrVars.HEIGHT_DIFF_MULTIPLIER;
+import static com.ing.software.ocr.OcrUtils.log;
+import static com.ing.software.ocr.OcrVars.HEIGHT_CENTER_DIFF_MULTIPLIER;
 import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
 import java.text.ParseException;
@@ -55,7 +56,8 @@ class DataAnalyzer {
                     for (RawGridResult gridResult : stringResult.getDetectedTexts()) {
                         RawText rawText = gridResult.getText();
                         double diffCenter = Math.abs(rawText.getBoundingBox().centerY() - sourceText.getBoundingBox().centerY());
-                        diffCenter = (sourceText.getRawImage().getHeight() - diffCenter)/sourceText.getRawImage().getHeight()* HEIGHT_DIFF_MULTIPLIER;
+                        diffCenter = (sourceText.getBoundingBox().height() - diffCenter)/sourceText.getBoundingBox().height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
+                        log(4,"AmountProb(DataAn)", "Base is: " + baseSingleCatch + " | grid is: "+ gridResult.getPercentage() + " | diff in center is: " + diffCenter);
                         double singleCatch = baseSingleCatch + gridResult.getPercentage() + diffCenter;
                         if (!rawText.equals(sourceText)) {
                             possibleResults.add(new RawGridResult(rawText, singleCatch));

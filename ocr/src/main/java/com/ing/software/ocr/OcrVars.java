@@ -29,7 +29,8 @@ public class OcrVars {
     public static final String CONCLUSION_TAG = "conclusion"; //tag for rawtext on bottom of the receipt
     static final double NUMBER_MIN_VALUE = 0.4; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber()
     static final double NUMBER_MIN_VALUE_ALTERNATIVE = 0.1; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber(). Used in alternative search
-    static final int HEIGHT_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in alignment between the center of two rects
+    static final int HEIGHT_CENTER_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in alignment between the center of two rects in dataAnalyzer
     static final int HEIGHT_LIST_MULTIPLIER = 80; //Multiplier used while analyzing difference between average height of rects and a specific rect. Used in ProbGrid.getRectHeightScore()
+    public static final int HEIGHT_SOURCE_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in height between source and target rect (total with it's price)
 
 }
