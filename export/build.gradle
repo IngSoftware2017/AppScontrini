@@ -34,5 +34,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     application project(':app')
     compile project(path: ':database')
-    implementation files('libs/poi-3.7.jar')
+    compile group: 'org.apache.poi', name: 'poi', version: '3.9'
 }
