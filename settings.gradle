@@ -1,2 +1,2 @@
 
-include ':app', ':database', ':ocr', ':common'
+include ':app', ':database', ':ocr', ':common', ':export'
