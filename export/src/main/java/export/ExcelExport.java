@@ -31,8 +31,6 @@ import database.TicketEntity;
 
 public class ExcelExport extends Export {
 
-    private final String TAG = "EXCEL_EXPORT";
-
     //Header CSV file
     private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
     private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";

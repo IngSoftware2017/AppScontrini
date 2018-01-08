@@ -3,7 +3,6 @@ package export;
 import android.util.Log;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import database.DataManager;
 
@@ -16,10 +15,11 @@ import database.DataManager;
 
 public abstract class Export {
 
-    private final String TAG = "EXPORT_MANAGER";
+    public final String TAG = "EXPORT_MANAGER";
+
     File folder;
-    DataManager database;
-    String pathLocation;
+    protected DataManager database;
+    private String pathLocation;
 
 
     /**

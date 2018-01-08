@@ -19,8 +19,6 @@ import database.TicketEntity;
 
 public class CSVExport extends Export {
 
-    private final String TAG = "CSV_EXPORT";
-
     //Delimiter used in CSV file
     private final String SEMICOLON_DELIMITER = ";";
     private final String NEW_LINE_SEPARATOR = "\n";
@@ -37,14 +35,12 @@ public class CSVExport extends Export {
 
     /**
      * @author Marco Olivieri
-     *
      * Costructor
      * @param database, DataManager - the instance of AppScontrini db
      * @param pathLocation, String - path directory to save exportation files
      */
     public CSVExport(DataManager database, String pathLocation){
         super(database, pathLocation);
-
         tickets = database.getAllTickets();
         missions = database.getAllMission();
         persons = database.getAllPerson();
@@ -59,7 +55,6 @@ public class CSVExport extends Export {
      * @return boolean - if the exportation is ok
      */
     public boolean export() {
-
         try {
 
             FileWriter fileTickets = new FileWriter(folder + "/tickets.csv");

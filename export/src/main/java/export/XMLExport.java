@@ -29,8 +29,6 @@ import database.TicketEntity;
 
 public class XMLExport extends Export {
 
-    private final String TAG = "XML_EXPORT";
-
     //TablesEntity of db
     private List<TicketEntity> tickets;
     private List<MissionEntity> missions;
