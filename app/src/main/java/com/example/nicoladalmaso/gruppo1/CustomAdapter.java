@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
@@ -88,13 +90,10 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText("Totale: "+amount+"€");
         }
 
-
         //Ticket image bitmap set
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
-        bitmap = Bitmap.createScaledBitmap(bitmap, parent.getWidth()/3, parent.getHeight()/3,true);
-        img.setImageBitmap(bitmap);
+        Glide.with(context)
+                .load(photo.getAbsolutePath())
+                .into(img);
 
         //For next ticket manages
         convertView.setTag(c.getID());
@@ -120,12 +119,5 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             }//onClick
         });
         return convertView;
-    }
-
-    private byte[] bitmapToByte(Bitmap bitmap){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        return byteArray;
     }
 }
