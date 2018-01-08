@@ -52,7 +52,7 @@
             android:layout_alignTop="@+id/fabDelete"
             android:layout_marginEnd="21dp"
             android:clickable="true"
-            android:src="@android:drawable/ic_menu_view" />
+            android:src="@drawable/ic_action_scan" />
 
     </RelativeLayout>
 

@@ -37,7 +37,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
 
         TextView title=(TextView)convertView.findViewById(R.id.personAcademicTitle);
         PersonEntity person = getItem(position);
-        name.setText(person.getName() + " " + person.getLastName());
+        name.setText(context.getString(R.string.simple_space, person.getName(), person.getLastName()));
         String academicTitle = person.getAcademicTitle();
         if ((academicTitle == null) || academicTitle.replaceAll(" ","").equals("")) {
             title.setText(context.getString(R.string.noAcademicTitle));

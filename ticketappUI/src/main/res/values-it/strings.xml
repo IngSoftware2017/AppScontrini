@@ -63,5 +63,5 @@
     <string name="Closed">Chiuse</string>
     <string name="no_date">Nessuna data trovata</string>
     <string name="downloading_library">Download libreria in corso, attendi…</string>
-    <string name="total_with_numb">Totale : %s</string>
+    <string name="total_with_numb">Totale: %s</string>
 </resources>
