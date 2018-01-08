@@ -1,0 +1,40 @@
+language: android
+sudo: required
+env:
+ global:
+ - ANDROID_API=25
+ - EMULATOR_API=24
+ - ANDROID_BUILD_TOOLS=26.0.2
+ - GDRIVE=GDrive
+before_install:
+ - chmod +x gradlew
+ - chmod +x download_dataset.sh
+ - # export GDRIVE='GDrive'
+ - bash download_dataset.sh
+ - ls -lR
+ - echo "GDrive path is $GDRIVE"
+ - echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
+ - echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+before_script:
+- echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API
+- echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API
+- android list targets | grep -E '^id:' | awk -F '"' '{$1=""; print $2}' # list all targets
+- echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
+- emulator -avd test -no-window -partition-size 1024 -no-boot-anim -screen no-touch &
+- android-wait-for-emulator
+- adb shell input keyevent 82 &
+jdk:
+  - oraclejdk8
+android:
+  components:
+    - tools
+    - platform-tools
+    - tools
+    - extra-android-support
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - build-tools-$ANDROID_BUILD_TOOLS
+    - android-$ANDROID_API
+    - android-$EMULATOR_API
+notifications:
+  email: false
