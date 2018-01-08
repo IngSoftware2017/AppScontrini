@@ -47,7 +47,7 @@
             android:layout_marginRight="16dp"
             android:clickable="true"
             android:visibility="invisible"
-            app:backgroundTint="#8E24AA"
+            app:backgroundTint="@color/colorFAB2"
             app:srcCompat="@mipmap/ic_image_white_24dp" />
 
         <android.support.design.widget.FloatingActionButton
@@ -60,7 +60,7 @@
             android:layout_marginRight="16dp"
             android:clickable="true"
             android:visibility="invisible"
-            app:backgroundTint="#D81B60"
+            app:backgroundTint="@color/colorFAB1"
             app:srcCompat="@drawable/camera" />
 
         <android.support.design.widget.FloatingActionButton
