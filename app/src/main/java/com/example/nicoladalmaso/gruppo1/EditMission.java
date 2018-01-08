@@ -159,15 +159,23 @@ public class EditMission extends AppCompatActivity {
         txtMissionEnd.setText(formatter.format(thisMission.getEndDate()));
         chkIsClosed.setChecked(thisMission.isRepay());
         List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);
+
+        //Elardo mission summary
         txtCount.setText(Integer.toString(ticketList.size()));
-        BigDecimal totale=new BigDecimal(0);
+        BigDecimal totale = new BigDecimal(0);
+        boolean unreadableTicket=false;
         for(int i=0; i<ticketList.size(); i++){
-            totale=totale.add(ticketList.get(i).getAmount());
+            if (ticketList.get(i).getAmount()== null){
+                unreadableTicket=true;
+            }
+            else
+                totale=totale.add(ticketList.get(i).getAmount());
         }
-        //TODO hardcoded strings must be removed
         if (ticketList.size()==0)
-            txtMissionTotal.setText("Nessuno scontrino");
+            txtMissionTotal.setText(getResources().getString(R.string.noBills));
+        else if (unreadableTicket)
+            txtMissionTotal.setText(getResources().getString(R.string.unreadable_ticket));
         else
-            txtMissionTotal.setText("€" + totale.toString());
+            txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + totale.toString());
     }
 }
