@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.ing.software.ticketapp.FullImageActivity"
+    tools:showIn="@layout/activity_full_image">
+
+
+    <ImageView
+        android:id="@+id/full_image"
+        android:layout_width="292dp"
+        android:layout_height="363dp"
+        app:srcCompat="@drawable/common_full_open_on_phone"
+        tools:layout_editor_absoluteX="47dp"
+        tools:layout_editor_absoluteY="53dp" />
+</android.support.constraint.ConstraintLayout>

@@ -5,15 +5,16 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
 
     <application
         android:allowBackup="true"
-        android:largeHeap="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -64,9 +65,15 @@
         <activity
             android:name=".EditMission"
             android:parentActivityName=".BillActivity" />
+
         <service
             android:name=".BillActivity$TestService"
-            android:exported="false"/>
+            android:exported="false" />
+
+        <activity
+            android:name=".FullImageActivity"
+            android:label="@string/title_activity_full_image"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

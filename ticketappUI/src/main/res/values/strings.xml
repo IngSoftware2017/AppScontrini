@@ -1,5 +1,3 @@
-
-
 <resources>
     <string name="app_name">TicketManager</string>
 
@@ -57,5 +55,6 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
+    <string name="title_activity_full_image">FullImageActivity</string>
 
 </resources>
