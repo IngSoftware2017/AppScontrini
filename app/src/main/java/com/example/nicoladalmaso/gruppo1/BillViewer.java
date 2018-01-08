@@ -51,7 +51,7 @@ public class BillViewer extends AppCompatActivity {
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
     String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
-    String noAmountFound = "Non trovato";
+    String noFound = "Non trovato";
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +97,12 @@ public class BillViewer extends AppCompatActivity {
         if(thisTicket.getAmount() !=null) {
             ticketAmount = thisTicket.getAmount().toString();
         }else{
-            ticketAmount = noAmountFound;
+            ticketAmount = noFound;
         }
+        if(thisTicket.getShop()== null)
+            ticketShop=noFound;
+        else
+            ticketShop = thisTicket.getShop();
 
         //Title
         setTitle(ticketTitle);
