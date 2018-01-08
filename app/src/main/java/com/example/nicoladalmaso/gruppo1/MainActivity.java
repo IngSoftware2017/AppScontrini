@@ -156,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
      * get all missions from the DB and print
      */
     public void printAllPeople(){
-        List<PersonEntity> people = DB.getAllPerson();
+        //List<PersonEntity> people = DB.getAllPerson();
+        List<PersonEntity> people = DB.getAllPersonNameOrder();
         TextView noPeople = (TextView)findViewById(R.id.noPeople);
         if(people.size() == 0){
             noPeople.setVisibility(View.VISIBLE);

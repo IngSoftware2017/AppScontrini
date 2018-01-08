@@ -2,12 +2,18 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
+      <module fileurl="file://$PROJECT_DIR$/App.iml" filepath="$PROJECT_DIR$/App.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\App\AppScontrini.iml" filepath="D:\MARCO\Android\GitHub\App\AppScontrini.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\App\app\app.iml" filepath="D:\MARCO\Android\GitHub\App\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\App\common\common.iml" filepath="D:\MARCO\Android\GitHub\App\common\common.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\App\database\database.iml" filepath="D:\MARCO\Android\GitHub\App\database\database.iml" />
       <module fileurl="file://$PROJECT_DIR$/export/export.iml" filepath="$PROJECT_DIR$/export/export.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\App\export\export.iml" filepath="D:\MARCO\Android\GitHub\App\export\export.iml" />
       <module fileurl="file://$PROJECT_DIR$/ocr/ocr.iml" filepath="$PROJECT_DIR$/ocr/ocr.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\App\ocr\ocr.iml" filepath="D:\MARCO\Android\GitHub\App\ocr\ocr.iml" />
     </modules>
   </component>
 </project>

@@ -153,12 +153,22 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Return a list of the all Persons in alphabetical order
+     * Return a list of the all Persons with last name in alphabetical order
      *
      * @return List<PersonEntity>
      */
     public List<PersonEntity> getAllPersonOrder(){
         return database.ticketDao().getAllPersonOrder();
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons with name in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonNameOrder(){
+        return database.ticketDao().getAllPersonNameOrder();
     }
 
     /**
@@ -223,7 +233,8 @@ public class DataManager {
         List<TicketEntity> tickets = getTicketsForMission(id);
         BigDecimal totAmount = BigDecimal.ZERO;
         for(int i=0; i<tickets.size(); i++)
-            totAmount = totAmount.add(tickets.get(i).getAmount());
+            if(tickets.get(i).getAmount() != null)
+                totAmount = totAmount.add(tickets.get(i).getAmount());
         return totAmount;
     }
 

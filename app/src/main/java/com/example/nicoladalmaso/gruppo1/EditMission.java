@@ -11,8 +11,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,8 @@ public class EditMission extends AppCompatActivity {
     CheckBox chkIsClosed;
     TextView txtCount;
     TextView txtMissionTotal;
+    Button btnExport;
+    Spinner spnrExport;
 
     //TODO: poter cambiare persona?
     @Override
@@ -61,6 +65,8 @@ public class EditMission extends AppCompatActivity {
         chkIsClosed=(CheckBox)findViewById(R.id.check_isRepaid);
         txtCount=(TextView)findViewById(R.id.ticket_count);
         txtMissionTotal=(TextView)findViewById(R.id.mission_total);
+        btnExport=(Button)findViewById(R.id.export_button);
+        spnrExport=(Spinner)findViewById(R.id.export_spinner);
 
 
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionEditStart);
@@ -158,24 +164,24 @@ public class EditMission extends AppCompatActivity {
         txtMissionStart.setText(formatter.format(thisMission.getStartDate()));
         txtMissionEnd.setText(formatter.format(thisMission.getEndDate()));
         chkIsClosed.setChecked(thisMission.isRepay());
-        List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);
 
         //Elardo mission summary
+        List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);
         txtCount.setText(Integer.toString(ticketList.size()));
-        BigDecimal totale = new BigDecimal(0);
+        BigDecimal total = new BigDecimal(0);
         boolean unreadableTicket=false;
         for(int i=0; i<ticketList.size(); i++){
             if (ticketList.get(i).getAmount()== null){
                 unreadableTicket=true;
             }
             else
-                totale=totale.add(ticketList.get(i).getAmount());
+                total=total.add(ticketList.get(i).getAmount());
         }
         if (ticketList.size()==0)
             txtMissionTotal.setText(getResources().getString(R.string.noBills));
         else if (unreadableTicket)
             txtMissionTotal.setText(getResources().getString(R.string.unreadable_ticket));
         else
-            txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + totale.toString());
+            txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + total.toString());
     }
 }
