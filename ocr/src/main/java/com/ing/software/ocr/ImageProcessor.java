@@ -83,7 +83,7 @@ public class ImageProcessor {
             new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
             new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
             new int[] {   0,   0, 255, 255, 255, 255, 255,   0,   0},
-            };
+    };
     private static Mat ERODE_KER; // assigned in the static block
 
     //Median kernel size
@@ -380,6 +380,7 @@ public class ImageProcessor {
             double xDiff = line[0] - line[2], yDiff = line[1] - line[3];
             double length = sqrt(xDiff * xDiff + yDiff * yDiff);
             int sector = (int)((atan(yDiff / xDiff) + PI / 2.) * SECTORS / PI);
+            accumulator[mod(sector, SECTORS)] += length;
             // to mitigate aliasing, contribute also to sector + 1 and sector - 1.
             accumulator[mod(sector + 1, SECTORS)] += length * 0.99;
             accumulator[mod(sector - 1, SECTORS)] += length * 0.99;
@@ -495,14 +496,15 @@ public class ImageProcessor {
     /**
      * Apply a perspective straightening to a Mat. The returned Mat has the same level of detail of the input Mat.
      * @param img Mat of any color
-     * @param corners MatOfPoint2f containing 4 points ordered counter-clockwise
+     * @param corners MatOfPoint2f containing 4 normalized points ordered counter-clockwise
      * @param marginMul border multiplier
      * @return undistorted Mat
      */
     private static Mat undistort(Mat img, MatOfPoint2f corners, double marginMul) {
         Mat dstImg = new Mat();
         if (corners.rows() == 4) { // at this point "corners" should have always 4 points.
-            Size sz = rectSizeSimple(corners);
+            MatOfPoint2f srcRect = scale(corners, new Size(1, 1), img.size());
+            Size sz = rectSizeSimple(srcRect);
             double m = marginMul * min(sz.width, sz.height);
 
             MatOfPoint2f dstRect = new MatOfPoint2f( // counter-clockwise
@@ -510,7 +512,7 @@ public class ImageProcessor {
                     new Point(m, sz.height + m),
                     new Point(sz.width + m, sz.height + m),
                     new Point(sz.width + m, m));
-            Mat mtx = getPerspectiveTransform(corners, dstRect);
+            Mat mtx = getPerspectiveTransform(srcRect, dstRect);
             warpPerspective(img, dstImg, mtx, new Size(sz.width + 2 * m, sz.height + 2 * m));
         }
         return dstImg;
@@ -521,7 +523,7 @@ public class ImageProcessor {
     private Mat srcImg;
     private Mat resized;
     private Mat undistorted;
-    private List<Point> corners;
+    private MatOfPoint2f corners; // normalized
     private boolean quickCorners;
 
 
@@ -529,15 +531,14 @@ public class ImageProcessor {
 
     /**
      * Undistort with a margin suitable for OCR.
-     * @return
+     * @return bitmap
      */
     synchronized Bitmap undistortForOCR() {
         if (quickCorners || corners == null || resized == null)
             if (findTicket(false).contains(TicketError.INVALID_STATE))
                 return null;
 
-        undistorted = undistort(resized, scale(new MatOfPoint2f(corners.toArray(new Point[4])),
-                srcImg.size(), resized.size()), MARGIN_MUL_OCR);
+        undistorted = undistort(resized, corners, MARGIN_MUL_OCR);
         return matToBitmap(undistorted);
     }
 
@@ -559,7 +560,7 @@ public class ImageProcessor {
 
         Mat finalImg = new Mat();
         resize(undistorted.submat((int) region.top, (int) region.bottom,
-                    (int) region.left, (int) region.right), finalImg, newSize);
+                (int) region.left, (int) region.right), finalImg, newSize);
         return matToBitmap(finalImg);
     }
 
@@ -645,12 +646,12 @@ public class ImageProcessor {
         //todo assign score and use Collections.max
         Pair<MatOfPoint2f, Double> winner = candidates.get(0).obj();
 
-        //scale up the the corners to match the scale of the original image
-        corners = scale(winner.first, resized.size(), srcImg.size()).toList();
+        //normalize the corners in the space [0, 1]^2
+        corners = scale(winner.first, resized.size(), new Size(1, 1));
         quickCorners = quick;
 
         List<TicketError> errors = new ArrayList<>();
-        if (corners.size() != 4)
+        if (corners.rows() != 4)
             errors.add(TicketError.RECT_NOT_FOUND);
         if (abs(winner.second) > 60.)
             errors.add(TicketError.CROOKED_TICKET);
@@ -678,7 +679,7 @@ public class ImageProcessor {
             return TicketError.INVALID_POINTS;
         undistorted = null;
 
-        this.corners = androidPtsToCV(corners);
+        this.corners = ptsToMat(androidPtsToCV(corners));
         quickCorners = false;
         //todo check if corners are ordered correctly
         return TicketError.NONE;
@@ -690,7 +691,7 @@ public class ImageProcessor {
      *         The corners should always be 4. Empty if error. Never null.
      */
     public synchronized List<PointF> getCorners() {
-        return corners == null ? new ArrayList<>() : cvPtsToAndroid(corners);
+        return corners == null ? new ArrayList<>() : cvPtsToAndroid(corners.toList());
     }
 
     /**
@@ -702,7 +703,7 @@ public class ImageProcessor {
     public synchronized Bitmap undistort(double marginMul) {
         if (corners == null || srcImg == null)
             return null;
-        return matToBitmap(undistort(srcImg, new MatOfPoint2f(corners.toArray(new Point[4])), marginMul));
+        return matToBitmap(undistort(srcImg, corners, marginMul));
     }
 
     /**
