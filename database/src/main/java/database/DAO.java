@@ -152,11 +152,19 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Executes a SELECT of all the PersonEntity in the database in alphabetical order
+     * Executes a SELECT of all the PersonEntity with last name in the database in alphabetical order
      * @return List<PersonEntity>
      */
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_LAST_NAME + " ASC")
     List<PersonEntity> getAllPersonOrder();
+
+    /**
+     * @author Marco Olivieri
+     * Executes a SELECT of all the PersonEntity with name in the database in alphabetical order
+     * @return List<PersonEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_NAME + " ASC")
+    List<PersonEntity> getAllPersonNameOrder();
 
     //SELECT FROM ID
 

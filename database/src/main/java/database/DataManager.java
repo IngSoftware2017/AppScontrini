@@ -153,12 +153,22 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Return a list of the all Persons in alphabetical order
+     * Return a list of the all Persons with last name in alphabetical order
      *
      * @return List<PersonEntity>
      */
     public List<PersonEntity> getAllPersonOrder(){
         return database.ticketDao().getAllPersonOrder();
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons with name in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonNameOrder(){
+        return database.ticketDao().getAllPersonNameOrder();
     }
 
     /**
