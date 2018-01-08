@@ -78,12 +78,12 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         //Amount text fixes
         String amount = "";
         if(c.getAmount() == null){
-            amount = "Nessun valore trovato";
+            amount = context.getString(R.string.string_NoAmount);
             tot.setText(amount);
         }
         else {
             amount = new DecimalFormat("#.##").format(c.getAmount()).toString();
-            tot.setText("Totale: "+amount+"€");
+            tot.setText(context.getString(R.string.string_Total)+amount+context.getString(R.string.string_Euros));
         }
 
 

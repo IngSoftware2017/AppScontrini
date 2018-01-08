@@ -41,7 +41,7 @@ public class EditTicket extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
-        setTitle("Modifica ticket");
+        setTitle(context.getString(R.string.title_EditTicket));
         setContentView(R.layout.activity_edit_ticket);
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();

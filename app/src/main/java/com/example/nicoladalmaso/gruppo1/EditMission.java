@@ -46,7 +46,7 @@ public class EditMission extends AppCompatActivity {
 
         getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_edit_mission);
-        setTitle("Modifica la missione");
+        setTitle(context.getString(R.string.title_EditMission));
 
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
@@ -121,8 +121,6 @@ public class EditMission extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                //thisMission.setStartMission(missionStart);
-                //thisMission.setEndMission(missionEnd);
                 thisMission.setRepay(chkIsClosed.isChecked());
                 DB.updateMission(thisMission);
                 Intent intent = new Intent();
