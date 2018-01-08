@@ -6,10 +6,14 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.ColumnInfo;
+import android.graphics.PointF;
 import android.net.Uri;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 
 /**
@@ -193,6 +197,32 @@ public class TicketEntity {
         this.corners = corners;
     }
 
+    /**
+     * Return the corners of the ticket.
+     * @return List of 4 points of a rectangle, ordered ordered counter-clockwise.
+     */
+    @Ignore
+    public List<PointF> getCornerPoints() {
+        float[] corners = getCorners();
+        List<PointF> pointCorners = new ArrayList<>();
+        for (int i = 0; i < 4; i++)
+            pointCorners.add(new PointF(corners[i * 2], corners[i * 2 + 1]));
+        return pointCorners;
+    }
+
+    /**
+     * Set the corners of the ticket rectangle.
+     * @param pointCorners List of 4 points a rectangle, ordered counter-clockwise.
+     */
+    @Ignore
+    public void setCornerPoints(List<PointF> pointCorners) {
+        float[] corners = new float[8];
+        for (int i = 0; i < 4; i++) {
+            corners[i * 2] = pointCorners.get(i).x;
+            corners[i * 2 + 1] = pointCorners.get(i).x;
+        }
+        setCorners(corners);
+    }
 
     /**
      * Returns a String with TicketEntity data formatted as follows:
@@ -205,5 +235,7 @@ public class TicketEntity {
     public String toString(){
         return getShop()+"\nTotale: "+getAmount();
     }
+
+
 
 }

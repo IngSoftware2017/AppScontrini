@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryMission"
         android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
@@ -20,7 +20,7 @@
             android:layout_marginTop="15dp"
             android:layout_marginLeft="60dp"
             android:layout_marginRight="10dp"
-            android:theme="@style/TextLabel">
+            android:theme="@style/TextLabelMissionTheme">
 
             <EditText
                 android:id="@+id/input_missionEditName"
@@ -40,7 +40,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="60dp"
             android:layout_marginRight="10dp"
-            android:theme="@style/TextLabel">
+            android:theme="@style/TextLabelMissionTheme">
 
             <EditText
                 android:id="@+id/input_missionEditLocation"
