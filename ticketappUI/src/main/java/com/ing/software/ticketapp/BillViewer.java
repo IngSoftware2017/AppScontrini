@@ -60,10 +60,8 @@ public class BillViewer extends AppCompatActivity {
         fabCrop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                cropPhoto(ticketId);
-                Intent intent = new Intent();
-                intent.putExtra("ticketID", "" + ticketId);
-                setResult(REDO_OCR, intent);
+                //cropPhoto(ticketId);
+                showPhoto(ticketId);
            }//onClick
         });
         fabDelete.setOnClickListener(new View.OnClickListener() {
@@ -240,5 +238,11 @@ public class BillViewer extends AppCompatActivity {
                 .thumbnail(0.1f)
                 .into(imgView);
     }//cropPhoto
+
+    private void showPhoto(long id) {
+        Intent intent = new Intent(this, CropActivity.class);
+        intent.putExtra("ID", id);
+        startActivity(intent);
+    }
 }
 

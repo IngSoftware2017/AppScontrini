@@ -85,8 +85,8 @@
 
         <activity
             android:name=".CropActivity"
-            android:parentActivityName=".BillActivity"
-            android:theme="@style/CropTheme" />
+            android:parentActivityName=".BillViewer"
+            android:theme="@style/CropTheme"/>
     </application>
 
 </manifest>
