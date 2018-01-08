@@ -26,7 +26,7 @@ public class ReportDB extends AppCompatActivity {
     TextView txtActiveMission;
     TextView txtCloseMission;
     TextView txtNumTicket;
-    Spinner exportSpiner;
+    Spinner exportSpinner;
 
     //@author Marco Olivieri
     @Override
@@ -84,7 +84,7 @@ public class ReportDB extends AppCompatActivity {
         List<TicketEntity> ticket = DB.getAllTickets();
         txtNumTicket.setText(txtNumTicket.getText()+" "+ String.valueOf(ticket.size()));
 
-        exportSpiner = findViewById(R.id.export_spinner);
+        exportSpinner = findViewById(R.id.export_spinner);
 
     }
 }
