@@ -269,7 +269,7 @@ public interface DAO {
      * @return List<MissionEntity> not null all active or repaid missions of the specific person
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid AND "
-            + Constants.PERSON_CHILD_COLUMNS + " =:personId")
+            + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_NAME+" ASC")
     List<MissionEntity> getMissionRepaidForPerson(boolean repaid, long personId);
 
     /**Created by Federico Taschin

@@ -31,6 +31,7 @@ public final class Constants {
         public static final String MISSION_FIELD_END_DATE = "endDate";
         public static final String MISSION_FIELD_LOCATION = "location";
         public static final String MISSION_FIELD_REPAID = "isRepay";
+        public static final String MISSION_FIELD_NAME = "name";
         //Person's constants
         public static final String PERSON_PRIMARY_KEY = "ID";
         public static final String PERSON_FIELD_NAME = "name";

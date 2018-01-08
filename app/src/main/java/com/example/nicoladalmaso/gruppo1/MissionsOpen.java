@@ -86,19 +86,23 @@ public class MissionsOpen extends Fragment {
 
     /** Dal Maso
      * get all missions from the DB and print
+     *
+     * Modify by Marco Olivieri: get active mission in alphabetical order by sql query
      */
     public void printAllMissions(){
-        List<MissionEntity> missions = DB.getMissionsForPerson(personID);
-        int count = 0;
+        //List<MissionEntity> missions = DB.getMissionsForPerson(personID);
+        //int count = 0;
+        List<MissionEntity> missions = DB.getMissionRepaidForPerson(false, personID);
         TextView noMissions = (TextView)rootView.findViewById(R.id.noMissions);
         for (int i = 0; i < missions.size(); i++)
         {
-            if(!missions.get(i).isRepay()){
+            //if(!missions.get(i).isRepay()){
                 addToListDB(missions.get(i));
-                count++;
-            }
+                //count++;
+            //}
         }
-        if(count == 0){
+        //if(count == 0){
+        if(missions.size() == 0){
             noMissions.setVisibility(View.VISIBLE);
         }
         else{

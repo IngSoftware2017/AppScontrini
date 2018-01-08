@@ -66,19 +66,23 @@ public class MissionsClosed extends Fragment {
 
     /** Dal Maso
      * get all missions from the DB and print
+     *
+     * Modify by Marco Olivieri: get repaid mission in alphabetical order by sql query
      */
     public void printAllMissions(){
-        List<MissionEntity> missions = DB.getMissionsForPerson(personID);
+        //List<MissionEntity> missions = DB.getMissionsForPerson(personID);
+        //int count = 0;
+        List<MissionEntity> missions = DB.getMissionRepaidForPerson(true, personID);
         TextView noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
-        int count = 0;
         for (int i = 0; i < missions.size(); i++)
         {
-            if(missions.get(i).isRepay()) {
-                count++;
+            //if(missions.get(i).isRepay()) {
+                //count++;
                 addToListDB(missions.get(i));
-            }
+            //}
         }
-        if(count == 0){
+        //if(count == 0){
+        if(missions.size() == 0){
             noMissions.setVisibility(View.VISIBLE);
         }
         else{
