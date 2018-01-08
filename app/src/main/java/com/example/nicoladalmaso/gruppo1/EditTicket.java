@@ -103,7 +103,7 @@ public class EditTicket extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
-        ticketAmount = thisTicket.getAmount().toString();
+        ticketAmount = thisTicket.getAmount()==null? "":thisTicket.getAmount().toString();
         ticketShop = thisTicket.getShop();
 
         //set those values to the edittext

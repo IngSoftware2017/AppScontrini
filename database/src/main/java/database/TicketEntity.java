@@ -30,9 +30,9 @@ public class TicketEntity {
     private long ID;
     private Uri fileUri;
     private BigDecimal amount;
-    private String shop;
+    private String shop="";
     private Date date;
-    private String title;
+    private String title="";
     private List<String> category;
     private float[] corners;
     private Date insertionDate;

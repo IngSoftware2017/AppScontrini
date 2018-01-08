@@ -577,4 +577,10 @@ public class BillActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        printAllTickets();
+    }
 }

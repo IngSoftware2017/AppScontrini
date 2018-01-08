@@ -239,5 +239,6 @@ public class BillViewer extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
         imgView.setImageBitmap(bitmap);
     }//cropPhoto
+
 }
 
