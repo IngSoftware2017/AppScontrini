@@ -72,5 +72,6 @@
     <string name="unreadable_ticket">(Alcuni scontrini non hanno un importo leggibile)</string>
     <string name="export_activity_name">Seleziona una cartella</string>
     <string name="export_share_text">Vuoi condividere i file esportati?</string>
+    <string name="export_mission_button">Esporta missione</string>
 </resources>
 
