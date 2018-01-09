@@ -68,4 +68,5 @@
     <string name="academic_title">Titolo accademico</string>
     <string name="ticket">Scontrino</string>
     <string name="zero_amount">0.00</string>
+    <string name="redoing_ocr">Scan in corso, per favore attendi.</string>
 </resources>

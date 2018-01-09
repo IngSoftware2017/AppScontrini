@@ -120,7 +120,15 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         if(thisMission.isRepay()) {
             fab.setVisibility(View.INVISIBLE);
         }
-        else{
+        else {
+            if(isFabOpen){
+                fab.startAnimation(rotate_backward);
+                fab1.startAnimation(fab_close);
+                fab2.startAnimation(fab_close);
+                fab1.setClickable(false);
+                fab2.setClickable(false);
+                isFabOpen = false;
+            }
             fab.setVisibility(View.VISIBLE);
         }
     }
@@ -417,6 +425,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             //DB.deleteTicket(ticketID);
             Log.d("###################", "#####################################");
             Log.d("Image_file_name", "is: " + fname);
+            Toast.makeText(context, getResources().getString(R.string.redoing_ocr), Toast.LENGTH_LONG).show();
             Intent intent = new Intent(BillActivity.this, OcrService.class);
             intent.putExtra("receiver", mReceiver);
             intent.putExtra("image", fname);
