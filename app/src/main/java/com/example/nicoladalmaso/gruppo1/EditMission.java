@@ -197,14 +197,17 @@ public class EditMission extends AppCompatActivity {
         //Elardo mission summary
         List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);
         txtCount.setText(Integer.toString(ticketList.size()));
-        BigDecimal total = new BigDecimal(0);
+        Double total= 0.0;
         boolean unreadableTicket=false;
         for(int i=0; i<ticketList.size(); i++){
             if (ticketList.get(i).getAmount()== null){
                 unreadableTicket=true;
             }
-            else
-                total=total.add(ticketList.get(i).getAmount());
+            else{
+                Double amount = ticketList.get(i).getAmount().doubleValue();
+                total+=amount;
+            }
+
         }
         if (ticketList.size()==0)
             txtMissionTotal.setText(getResources().getString(R.string.noBills));
