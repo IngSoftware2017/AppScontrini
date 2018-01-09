@@ -33,7 +33,7 @@ import export.ExportTypeNotSupportedException;
 import export.ExportedFile;
 
 /**
- * @author Marco Olivieri on 06/01/2018
+ * @author Marco Olivieri on 06/01/2018 modified by Federico Taschin
  */
 
 public class ReportDB extends AppCompatActivity {
@@ -50,7 +50,7 @@ public class ReportDB extends AppCompatActivity {
     Button exportButton;
     ExportManager manager;
 
-    //@author Marco Olivieri
+    //@author Marco Olivieri and Federico Taschin
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

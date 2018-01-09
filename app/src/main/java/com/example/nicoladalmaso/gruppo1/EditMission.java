@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -18,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,7 +29,11 @@ import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
 import database.TicketEntity;
+import export.ExportManager;
+import export.ExportTypeNotSupportedException;
+import export.ExportedFile;
 
 /**
  * Created by Francesco on 03/01/2018.
@@ -36,6 +43,7 @@ public class EditMission extends AppCompatActivity {
     public DataManager DB;
     long missionID;
     MissionEntity thisMission;
+    PersonEntity person;
     Context context;
     TextView txtMissionName;
     TextView txtMissionStart;
@@ -46,6 +54,8 @@ public class EditMission extends AppCompatActivity {
     TextView txtMissionTotal;
     Button btnExport;
     Spinner spnrExport;
+    File defaultOutputPath;
+    ExportManager manager;
 
     //TODO: poter cambiare persona?
     @Override
@@ -83,6 +93,24 @@ public class EditMission extends AppCompatActivity {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
+            }
+        });
+
+        defaultOutputPath = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        manager = new ExportManager(DB, defaultOutputPath.getPath());
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
+        spnrExport.setAdapter(spinnerAdapter);
+
+        btnExport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    ExportedFile exported = manager.exportMission(missionID,(String) spnrExport.getSelectedItem());
+                    EmailBuilder.createEmail().to(person.getEmail()).attachFile(exported.file).sendEmail(EditMission.this);
+                    exported.file.delete();
+                } catch (ExportTypeNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -158,6 +186,7 @@ public class EditMission extends AppCompatActivity {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         missionID = (int) intent.getExtras().getLong("missionID");
         thisMission = DB.getMission(missionID);
+        person = DB.getPerson(thisMission.getPersonID());
 
         txtMissionName.setText(thisMission.getName());
         txtMissionLocation.setText(thisMission.getLocation());
