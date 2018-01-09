@@ -590,14 +590,14 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     BigDecimal amount = null;
                     try {
                         amount = new BigDecimal(resultData.getString(AMOUNT_RECEIVED)).setScale(2, RoundingMode.HALF_UP);
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException | NullPointerException e) {
                         //No valid amount
                     }
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
                     Date date = null;
                     try {
                         date = dateFormat.parse(resultData.getString(DATE_RECEIVED));
-                    } catch (ParseException e) {
+                    } catch (ParseException | NullPointerException e) {
                         //Nada
                     }
                     //if (date == null)
@@ -619,7 +619,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                                 ticket.setCornerPoints(corners);
                             }
                             DB.updateTicket(ticket);
-                        } catch (NumberFormatException e) {
+                        } catch (NumberFormatException | NullPointerException e) {
                             //Nada
                         }
                     } else {
@@ -662,24 +662,26 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         protected void onHandleIntent(final Intent workIntent) {
             OcrUtils.log(1, "OcrService", "Entering service");
             final ResultReceiver receiver = workIntent.getParcelableExtra("receiver");
-            final Bundle bundle = new Bundle();
+            final Bundle bundleRec = new Bundle();
             String root = workIntent.getStringExtra("root");
             String name = workIntent.getStringExtra("image");
             String ticketID = workIntent.getStringExtra(TICKET_ID);
-            bundle.putString(ROOT_RECEIVED, root);
-            bundle.putString(IMAGE_RECEIVED, name);
-            bundle.putString(TICKET_ID, ticketID);
+            bundleRec.putString(ROOT_RECEIVED, root);
+            bundleRec.putString(IMAGE_RECEIVED, name);
+            bundleRec.putString(TICKET_ID, ticketID);
             File file = new File(root, name);
             Bitmap testBmp = getBitmapFromFile(file);
-            receiver.send(STATUS_RUNNING, bundle);
+            receiver.send(STATUS_RUNNING, bundleRec);
             ocrManager.initialize(this);
             List<PointF> corners = new ArrayList<>();
             if (ticketID == null) {//new image, not crop
                 ImageProcessor alphaPreproc = new ImageProcessor(testBmp);
                 alphaPreproc.findTicket(false);
-                corners = alphaPreproc.getCorners();
+                corners.addAll(alphaPreproc.getCorners());
             } else
-                corners = DataManager.getInstance(this).getTicket(Long.parseLong(ticketID)).getCornerPoints();
+                corners.addAll(DataManager.getInstance(this).getTicket(Long.parseLong(ticketID)).getCornerPoints());
+            Log.d("CORNERS: ", corners.get(0) + "" + corners.get(1) + corners.get(2) + corners.get(3));
+            Log.d("BITMAP: ", "Width: "+testBmp.getWidth() + "; height: " + testBmp.getHeight());
             ImageProcessor preproc = new ImageProcessor(testBmp);
             preproc.setCorners(corners);
             preproc.undistort(0, err -> {
@@ -687,32 +689,32 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     if (result.amount != null) {
                         OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
-                        bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
+                        bundleRec.putString(AMOUNT_RECEIVED, result.amount.toString());
                     } else {
                         OcrUtils.log(1, "OcrHandler", "No amount found");
-                        bundle.putString(AMOUNT_RECEIVED, NOT_FOUND);
+                        bundleRec.putString(AMOUNT_RECEIVED, NOT_FOUND);
                     }
                     if (result.date != null) {
                         DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
                         String formattedDate = df.format(result.date);
                         OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
                         OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
-                        bundle.putString(DATE_RECEIVED, formattedDate);
+                        bundleRec.putString(DATE_RECEIVED, formattedDate);
                     } else {
                         OcrUtils.log(1, "OcrHandler", "No date found");
-                        bundle.putString(DATE_RECEIVED, NOT_FOUND);
+                        bundleRec.putString(DATE_RECEIVED, NOT_FOUND);
                     }
+                        bundleRec.putFloat(CORNER1, corners.get(0).x);
+                        bundleRec.putFloat(CORNER2, corners.get(0).y);
+                        bundleRec.putFloat(CORNER3, corners.get(1).x);
+                        bundleRec.putFloat(CORNER4, corners.get(1).y);
+                        bundleRec.putFloat(CORNER5, corners.get(2).x);
+                        bundleRec.putFloat(CORNER6, corners.get(2).y);
+                        bundleRec.putFloat(CORNER7, corners.get(3).x);
+                        bundleRec.putFloat(CORNER8, corners.get(3).y);
+                        receiver.send(STATUS_FINISHED, bundleRec);
                 });
             });
-            bundle.putFloat(CORNER1, corners.get(0).x);
-            bundle.putFloat(CORNER2, corners.get(0).y);
-            bundle.putFloat(CORNER3, corners.get(1).x);
-            bundle.putFloat(CORNER4, corners.get(1).y);
-            bundle.putFloat(CORNER5, corners.get(2).x);
-            bundle.putFloat(CORNER6, corners.get(2).y);
-            bundle.putFloat(CORNER7, corners.get(3).x);
-            bundle.putFloat(CORNER8, corners.get(3).y);
-            receiver.send(STATUS_FINISHED, bundle);
             this.stopSelf();
         }
 

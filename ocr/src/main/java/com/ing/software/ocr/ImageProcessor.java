@@ -156,7 +156,7 @@ public class ImageProcessor {
      * @return List of Android points.
      */
     private static List<PointF> cvPtsToAndroid(List<Point> points) {
-        return Stream.of(points).map(p -> new PointF((int)p.x, (int)p.y)).toList();
+        return Stream.of(points).map(p -> new PointF((float)p.x, (float)p.y)).toList();
     }
 
     /**
