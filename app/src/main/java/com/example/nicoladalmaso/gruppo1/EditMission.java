@@ -107,7 +107,6 @@ public class EditMission extends AppCompatActivity {
                 try {
                     ExportedFile exported = manager.exportMission(missionID,(String) spnrExport.getSelectedItem());
                     EmailBuilder.createEmail().to(person.getEmail()).attachFile(exported.file).sendEmail(EditMission.this);
-                    exported.file.delete();
                 } catch (ExportTypeNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -209,7 +208,7 @@ public class EditMission extends AppCompatActivity {
         if (ticketList.size()==0)
             txtMissionTotal.setText(getResources().getString(R.string.noBills));
         else if (unreadableTicket)
-            txtMissionTotal.setText(getResources().getString(R.string.unreadable_ticket));
+            txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + total.toString()+" "+getResources().getString(R.string.unreadable_ticket));
         else
             txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + total.toString());
     }
