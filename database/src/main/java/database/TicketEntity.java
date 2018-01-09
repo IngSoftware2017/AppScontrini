@@ -219,7 +219,7 @@ public class TicketEntity {
         float[] corners = new float[8];
         for (int i = 0; i < 4; i++) {
             corners[i * 2] = pointCorners.get(i).x;
-            corners[i * 2 + 1] = pointCorners.get(i).x;
+            corners[i * 2 + 1] = pointCorners.get(i).y;
         }
         setCorners(corners);
     }
