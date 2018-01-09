@@ -75,19 +75,24 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         //Dal Maso
         //Sets a default background color for the mission's card
-        switch (position%4){
-            case 0:
-                card.setBackgroundColor(Color.parseColor("#1F566D"));
-                break;
-            case 1:
-                card.setBackgroundColor(Color.parseColor("#007787"));
-                break;
-            case 2:
-                card.setBackgroundColor(Color.parseColor("#950068"));
-                break;
-            case 3:
-                card.setBackgroundColor(Color.parseColor("#BC004F"));
-                break;
+        if(c.isRepay()) {
+            card.setBackgroundColor(Color.parseColor("#7c7c7c"));
+        }
+        else{
+            switch (position%4){
+                case 0:
+                    card.setBackgroundColor(Color.parseColor("#1F566D"));
+                    break;
+                case 1:
+                    card.setBackgroundColor(Color.parseColor("#007787"));
+                    break;
+                case 2:
+                    card.setBackgroundColor(Color.parseColor("#950068"));
+                    break;
+                case 3:
+                    card.setBackgroundColor(Color.parseColor("#BC004F"));
+                    break;
+            }
         }
 
         convertView.setOnClickListener(new View.OnClickListener(){
