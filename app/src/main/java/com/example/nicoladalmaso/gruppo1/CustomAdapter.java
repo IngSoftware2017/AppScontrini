@@ -67,7 +67,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText(amount);
         }
         else {
-            amount = c.getAmount().toString();
+            amount = ""+c.getAmount();
             tot.setText("Totale: "+amount+"€");
         }
 

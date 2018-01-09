@@ -81,13 +81,7 @@ public class EditTicket extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 thisTicket.setShop(txtShop.getText().toString());
-                //thisTicket.setAmount(BigDecimal.valueOf(Integer.parseInt(txtAmount.getText().toString())));
-
-                String newAmount = txtAmount.getText().toString();
-                newAmount = newAmount.replace(",",".");
-                Double a = Double.parseDouble(newAmount);
-
-                thisTicket.setAmount(BigDecimal.valueOf(a));
+                thisTicket.setAmount(BigDecimal.valueOf(Integer.parseInt(txtAmount.getText().toString())));
                 DB.updateTicket(thisTicket);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);

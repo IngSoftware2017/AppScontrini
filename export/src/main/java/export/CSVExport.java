@@ -2,8 +2,10 @@ package export;
 
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import database.DataManager;
@@ -12,7 +14,7 @@ import database.PersonEntity;
 import database.TicketEntity;
 
 /**
- * @author Marco Olivieri on 04/01/2018
+ * @author Marco Olivieri on 04/01/2018 (modified by Federico Taschin)
  *
  * This class defines the methods to export db datas in CSV file with semicolon delimiter
  */
@@ -33,6 +35,15 @@ public class CSVExport extends Export {
     private List<MissionEntity> missions;
     private List<PersonEntity> persons;
 
+    public String TICKETS_FILE_NAME="tickets.csv",MISSIONS_FILE_NAME = "missions.csv", PERSONS_FILE_NAME ="persons.csv", SINGLE_MISSION_FILE_NAME ="mission";
+    private final String csvExtension = ".csv";
+    private final String TABLE_SEPARATOR = "__________________";
+
+    File exportedTickets;
+    File exportedMissions;
+    File exportedPersons;
+
+
     /**
      * @author Marco Olivieri
      * Costructor
@@ -41,6 +52,11 @@ public class CSVExport extends Export {
      */
     public CSVExport(DataManager database, String pathLocation){
         super(database, pathLocation);
+
+        exportedTickets = new File(getExportRootDirectory(), TICKETS_FILE_NAME);
+        exportedMissions= new File(getExportRootDirectory(),MISSIONS_FILE_NAME);
+        exportedPersons = new File(getExportRootDirectory(),PERSONS_FILE_NAME);
+
         tickets = database.getAllTickets();
         missions = database.getAllMission();
         persons = database.getAllPerson();
@@ -48,67 +64,86 @@ public class CSVExport extends Export {
 
 
     /**
-     * @author Marco Olivieri
+     * @author Marco Olivieri (modified by Federico Taschin)
      *
      * Implementation of the extended abstract class Export
      * Create a CSV file export for each tables entities of database
-     * @return boolean - if the exportation is ok
+     * @return List of file files. If an error occurs, the list is empty
      */
-    public boolean export() {
+    public List<ExportedFile> export() {
+        List<ExportedFile> exportedFiles = new ArrayList<>();
         try {
-
-            FileWriter fileTickets = new FileWriter(folder + "/tickets.csv");
+            FileWriter fileTickets = new FileWriter(exportedTickets);
             fileTickets = writeTickets(fileTickets);
             fileTickets.flush();
             fileTickets.close();
 
-            FileWriter fileMissions = new FileWriter(folder + "/missions.csv");
+            FileWriter fileMissions = new FileWriter(exportedMissions);
             fileMissions = writeMissions(fileMissions);
             fileMissions.flush();
             fileMissions.close();
 
-            FileWriter filePersons = new FileWriter(folder + "/persons.csv");
+            FileWriter filePersons = new FileWriter(exportedPersons);
             filePersons = writePersons(filePersons);
             filePersons.flush();
             filePersons.close();
 
-            return true;
+            exportedFiles.add(new ExportedFile(exportedTickets, ExportedFile.FILE_CONTENT.TICKETS));
+            exportedFiles.add(new ExportedFile(exportedMissions,ExportedFile.FILE_CONTENT.MISSIONS));
+            exportedFiles.add(new ExportedFile(exportedPersons,ExportedFile.FILE_CONTENT.PERSONS));
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            return false;
+            Log.e(TAG(), e.getMessage());
         }
+        return exportedFiles;
     }
 
     /**
-     * @author Marco Olivieri
+     * @author Marco Olivieri (modified by Federico Taschin)
      *
      * Implementation of the extended abstract class Export
      * Create a CSV file export for the specific mission with relative tickets
      * @param missionId - the specific mission
-     * @return boolean - if the exportation is ok
+     * @return the Exported file (null if an error occurs)
      */
-    public boolean export(long missionId){
+    public ExportedFile export(long missionId){
         MissionEntity m = database.getMission(missionId);
         missions.clear();
         missions.add(m);
         tickets = database.getTicketsForMission(missionId);
         try {
-
-            FileWriter fileTickets = new FileWriter(folder + "/tickets.csv");
-            fileTickets = writeTickets(fileTickets);
-            fileTickets.flush();
-            fileTickets.close();
-
-            FileWriter fileMissions = new FileWriter(folder + "/missions.csv");
-            fileMissions = writeMissions(fileMissions);
-            fileMissions.flush();
-            fileMissions.close();
-
-            return true;
+            File out = new File(getExportRootDirectory(), SINGLE_MISSION_FILE_NAME+missions.get(0).getID()+csvExtension);
+            FileWriter fileWriter = new FileWriter(out);
+            fileWriter=writeMissions(fileWriter);
+            fileWriter.append(TABLE_SEPARATOR);
+            fileWriter = writeTickets(fileWriter);
+            fileWriter.flush();
+            fileWriter.close();
+            return new ExportedFile(out, ExportedFile.FILE_CONTENT.SINGLE_MISSION);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            return false;
+            Log.e(TAG(), e.getMessage());
+            return null;
         }
+    }
+
+    /** Federico Taschin
+     *
+     * @return the TAG of this type of export
+     */
+    @Override
+    public String TAG() {
+        return "csv";
+    }
+
+
+    /**
+     * Federico Taschin
+     * @param path the new path for the output file (or dir if the Export creates many files)
+     */
+    @Override
+    public void onPathChanged(String path) {
+        exportedTickets = new File(getExportRootDirectory(), TICKETS_FILE_NAME);
+        exportedMissions = new File(getExportRootDirectory(),MISSIONS_FILE_NAME);
+        exportedPersons = new File(getExportRootDirectory(),PERSONS_FILE_NAME);
     }
 
 
@@ -148,7 +183,7 @@ public class CSVExport extends Export {
             }
         }
         catch (IOException e){
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG(), e.getMessage());
         }
         return fileTickets;
     }
@@ -222,7 +257,7 @@ public class CSVExport extends Export {
             }
         }
         catch (IOException e){
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG(), e.getMessage());
         }
         return fileMissions;
     }
@@ -257,7 +292,7 @@ public class CSVExport extends Export {
             }
         }
         catch (IOException e){
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG(), e.getMessage());
         }
         return filePersons;
     }

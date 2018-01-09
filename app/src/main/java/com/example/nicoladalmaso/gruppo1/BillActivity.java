@@ -450,7 +450,7 @@ public class BillActivity extends AppCompatActivity {
             TicketEntity ticket = new TicketEntity();
             ticket.setDate(Calendar.getInstance().getTime());
             ticket.setFileUri(uri);
-            //ticket.setShop("Pam Padova");
+            ticket.setShop("Pam Padova");
             ticket.setTitle("Scontrino ");
             ticket.setMissionID(missionID);
             ticket.setInsertionDate(Calendar.getInstance().getTime());

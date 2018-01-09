@@ -70,5 +70,7 @@
     <string name="export_db_button">Esporta database</string>
     <string name="euro_string">€</string>
     <string name="unreadable_ticket">*Errori in lettura scontrini</string>
+    <string name="export_activity_name">Seleziona una cartella</string>
+    <string name="export_share_text">Vuoi condividere i file esportati?</string>
 </resources>
 

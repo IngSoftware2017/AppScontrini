@@ -1,18 +1,36 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.github.angads25.filepicker.controller.DialogSelectionListener;
+import com.github.angads25.filepicker.model.DialogConfigs;
+import com.github.angads25.filepicker.model.DialogProperties;
+import com.github.angads25.filepicker.view.FilePickerDialog;
+
+import java.io.File;
 import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 import database.TicketEntity;
+import export.ExportManager;
+import export.ExportTypeNotSupportedException;
+import export.ExportedFile;
 
 /**
  * @author Marco Olivieri on 06/01/2018
@@ -20,19 +38,22 @@ import database.TicketEntity;
 
 public class ReportDB extends AppCompatActivity {
 
+    File defaultOutputPath;
+
     public DataManager DB;
     Context context;
     TextView txtNumPerson;
     TextView txtActiveMission;
     TextView txtCloseMission;
     TextView txtNumTicket;
-    Spinner exportSpinner;
+    Spinner exportSpiner;
+    Button exportButton;
+    ExportManager manager;
 
     //@author Marco Olivieri
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getSupportActionBar().setElevation(0);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_report_db);
@@ -45,9 +66,78 @@ public class ReportDB extends AppCompatActivity {
         txtActiveMission=(TextView)findViewById(R.id.msgNumActiveMission);
         txtCloseMission=(TextView)findViewById(R.id.msgNumCloseMission);
         txtNumTicket=(TextView)findViewById(R.id.msgNumTicket);
+        exportSpiner = findViewById(R.id.export_spinner);
+        exportButton = findViewById(R.id.export_button);
+
+        //FEDERICO TASCHIN
+        //Instantiating the export manager
+        defaultOutputPath = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        manager = new ExportManager(DB, defaultOutputPath.getPath());
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
+        exportSpiner.setAdapter(spinnerAdapter);
+
+
+
+
+
+        Log.d("EXPORTDEBUG","EXPORTING");
+        exportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String selectedExportTag = (String) exportSpiner.getSelectedItem();
+                Log.d("EXPORTDEBUG","EXPORTING");
+
+                DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.DIR_SELECT;
+                properties.root = new File(DialogConfigs.DEFAULT_DIR);
+                properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
+                properties.offset = new File(DialogConfigs.DEFAULT_DIR);
+                properties.extensions = null;
+
+                FilePickerDialog dialog = new FilePickerDialog(ReportDB.this,properties);
+                dialog.setTitle(R.string.export_activity_name);
+
+                dialog.setDialogSelectionListener(new DialogSelectionListener() {
+                    @Override
+                    public void onSelectedFilePaths(String[] files) {
+                        Log.d("EXPORTDEBUG","SELECTED PATH: "+files[0]);
+                        manager.setOutputPath(files[0]);
+                        try {
+                            List<ExportedFile> exportedFiles = manager.exportDatabase(selectedExportTag);
+                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    switch (which){
+                                        case DialogInterface.BUTTON_POSITIVE:
+                                            EmailBuilder.createEmail().attachFiles(exportedFiles).sendEmail(context);
+                                            break;
+                                        case DialogInterface.BUTTON_NEGATIVE:
+                                            //No button clicked
+                                            break;
+                                    }
+                                }
+                            };
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ReportDB.this);
+                            builder.setMessage(R.string.export_share_text).setPositiveButton("Si", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show();
+                        } catch (ExportTypeNotSupportedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                dialog.show();
+
+
+            }
+        });
 
         initializeValues();
     }
+
+
 
     /**
      * @author Elardo Stefano
@@ -84,7 +174,6 @@ public class ReportDB extends AppCompatActivity {
         List<TicketEntity> ticket = DB.getAllTickets();
         txtNumTicket.setText(txtNumTicket.getText()+" "+ String.valueOf(ticket.size()));
 
-        exportSpinner = findViewById(R.id.export_spinner);
-
     }
+
 }

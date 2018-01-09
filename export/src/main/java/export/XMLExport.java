@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import database.DataManager;
@@ -18,7 +19,7 @@ import database.PersonEntity;
 import database.TicketEntity;
 
 /**
- * @author Marco Olivieri on 05/01/2018
+ * @author Marco Olivieri on 05/01/2018 (modified by Federico Taschin)
  *
  * This class defines the methods to export db datas in XML file
  *
@@ -35,6 +36,7 @@ public class XMLExport extends Export {
     private List<PersonEntity> persons;
 
     private File file;
+    private String fileName;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
     XmlSerializer serializer;
 
@@ -53,21 +55,21 @@ public class XMLExport extends Export {
         persons = database.getAllPerson();
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String fileName = "export_" + sdf.format(timestamp)+".xml";
-        file = new File(pathLocation, fileName);
+        fileName = "export_" + sdf.format(timestamp)+".xml";
+        file = new File(getExportRootDirectory(), fileName);
     }
 
 
     /**
-     * @author Marco Olivieri
+     * @author Marco Olivieri (modified by Federico Taschin)
      *
      * Implementation of the extended abstract class Export
      * Writes all tables entities in a XML file
      * Than it creates the file
-     * @return boolean - if the exportation is ok
+     * @return List of file files. If an error occurs, the list is empty
      */
-    public boolean export(){
-
+    public List<ExportedFile> export(){
+        List<ExportedFile> exportedFiles = new ArrayList<>();
         try{
             file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);
@@ -89,25 +91,27 @@ public class XMLExport extends Export {
             serializer.endDocument();
             serializer.flush();
             fos.close();
-            return true;
+            exportedFiles.add(new ExportedFile(file,ExportedFile.FILE_CONTENT.DATABASE));
+            Log.d("EXPORTDEBUG",file.exists()?"FILE CREATED":"FILE NOT CREATED");
+            Log.d("EXPORTDEBUG","PATH: "+file.getAbsolutePath());
         }
         catch (IOException e){
-            Log.e(TAG, e.getMessage());
-            return false;
+            Log.e(TAG(), e.getMessage());
         }
+        return exportedFiles;
     }
 
 
     /**
-     * @author Marco Olivieri
+     * @author Marco Olivieri (modified by Federico Taschin)
      *
      * Implementation of the extended abstract class Export
      * Writes the specific mission with relative tickets in a XML file
      * Than it creates the file
      * @param missionId - the specific mission
-     * @return boolean - if the exportation is ok
+     * @return the Exported file (null if an error occurs)
      */
-    public boolean export(long missionId){
+    public ExportedFile export(long missionId){
 
         MissionEntity m = database.getMission(missionId);
         missions.clear();
@@ -134,18 +138,36 @@ public class XMLExport extends Export {
             serializer.endDocument();
             serializer.flush();
             fos.close();
-            return true;
+            return new ExportedFile(file, ExportedFile.FILE_CONTENT.SINGLE_MISSION);
         }
         catch (IOException e){
-            Log.e(TAG, e.getMessage());
-            return false;
+            Log.e(TAG(), e.getMessage());
+            return null;
         }
     }
 
+    /**
+     * @author Federico Taschin
+     * @return the TAG for this kind of export
+     */
+    @Override
+    public String TAG() {
+        return "xml";
+    }
+
+    /**
+     * Re instantiates the output file (since the root was changed)
+     * @author Federico Taschin
+     * @param path the new root path (not used in this case)
+     */
+    @Override
+    public void onPathChanged(String path) {
+        file = new File(getExportRootDirectory(),fileName);
+    }
 
 
     /**
-     * @author Marco Olivieri
+     * @author Marco Olivieri (modified by Federico Taschin)
      *
      * Writes in xmlSerializer all the tickets
      * @throws IOException
@@ -186,7 +208,7 @@ public class XMLExport extends Export {
             serializer.endTag(null,"Ticket");
 
         }catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG(), e.getMessage());
         }
     }
 
@@ -200,7 +222,7 @@ public class XMLExport extends Export {
      */
     private String categoryToString(List<String> list) {
         if (list == null)
-            return null;
+            return "";
         else
         {
             String s="";
@@ -218,7 +240,7 @@ public class XMLExport extends Export {
      */
     public String cornersToString(float[] corners) {
         if (corners == null)
-            return null;
+            return "";
         else
         {
             String s="";
@@ -265,7 +287,7 @@ public class XMLExport extends Export {
             serializer.endTag(null,"Mission");
 
         }catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG(), e.getMessage());
         }
     }
 
@@ -303,7 +325,7 @@ public class XMLExport extends Export {
             serializer.endTag(null,"Person");
 
         }catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG(), e.getMessage());
         }
     }
 

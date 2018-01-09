@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -169,18 +168,20 @@ public class EditMission extends AppCompatActivity {
         //Elardo mission summary
         List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);
         txtCount.setText(Integer.toString(ticketList.size()));
-        BigDecimal total = DB.getTotalAmountForMission(missionID);
-        total = total.setScale(2, RoundingMode.CEILING);
+        BigDecimal total = new BigDecimal(0);
         boolean unreadableTicket=false;
         for(int i=0; i<ticketList.size(); i++){
-            if (ticketList.get(i).getAmount()== null)
+            if (ticketList.get(i).getAmount()== null){
                 unreadableTicket=true;
+            }
+            else
+                total=total.add(ticketList.get(i).getAmount());
         }
         if (ticketList.size()==0)
             txtMissionTotal.setText(getResources().getString(R.string.noBills));
+        else if (unreadableTicket)
+            txtMissionTotal.setText(getResources().getString(R.string.unreadable_ticket));
         else
             txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + total.toString());
-        if (unreadableTicket)
-            txtMissionTotal.append(" "+getResources().getString(R.string.unreadable_ticket));
     }
 }

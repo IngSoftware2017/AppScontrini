@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import database.DataManager;
@@ -21,7 +22,7 @@ import database.PersonEntity;
 import database.TicketEntity;
 
 /**
- * @author Marco Olivieri on 03/01/2018
+ * @author Marco Olivieri on 03/01/2018 (modified by Federico Taschin)
  *
  * This class defines the methods to export db datas in Excel file
  * References:
@@ -42,6 +43,7 @@ public class ExcelExport extends Export {
     private List<PersonEntity> persons;
 
     private File file;
+    String fileName;
     HSSFWorkbook workbook; //Excel document
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
 
@@ -60,52 +62,51 @@ public class ExcelExport extends Export {
         persons = database.getAllPerson();
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String fileName = "export_" + sdf.format(timestamp)+".xlsx";
+        fileName = "export_" + sdf.format(timestamp)+".xlsx";
         file = new File(pathLocation, fileName);
     }
 
 
     /**
-     * @author Marco Olivieri
+     * @author Marco Olivieri (modified by Federico Taschin)
      *
      * Implementation of the extended abstract class Export
      * Writes all tables entities in separeted sheet of the workbook.
      * Than it creates the complete document of the exportation db
-     * @return boolean - if the exportation is ok
+     * @return List of file files. If an error occurs, the list is empty
      */
-    public boolean export(){
-
+    public List<ExportedFile> export(){
+        List<ExportedFile> exportedFiles = new ArrayList<>();
         workbook = new HSSFWorkbook();
 
         writeTickets();
         writeMissions();
         writePersons();
-
         try{
             FileOutputStream fos = new FileOutputStream(file);
             workbook.write(fos);
             fos.flush();
             fos.close();
-            return true;
+            exportedFiles.add(new ExportedFile(file,ExportedFile.FILE_CONTENT.DATABASE));
+            return exportedFiles;
         }
         catch (IOException e){
-            Log.e(TAG, e.getMessage());
-            return false;
+            Log.e(TAG(), e.getMessage());
+            return exportedFiles;
         }
     }
 
 
     /**
-     * @author Marco Olivieri
+     * @author Marco Olivieri (modified by Federico Taschin)
      *
      * Implementation of the extended abstract class Export
      * Writes the specific mission with relative tickets in separeted sheet of the workbook.
      * Than it creates the complete document of the exportation db
      * @param missionId - the specific mission
-     * @return boolean - if the exportation is ok
+     * @return the ExportedFile, null if an error occurred
      */
-    public boolean export(long missionId){
-
+    public ExportedFile export(long missionId){
         workbook = new HSSFWorkbook();
         MissionEntity m = database.getMission(missionId);
         missions.clear();
@@ -120,12 +121,30 @@ public class ExcelExport extends Export {
             workbook.write(fos);
             fos.flush();
             fos.close();
-            return true;
+            return new ExportedFile(file,ExportedFile.FILE_CONTENT.SINGLE_MISSION);
         }
         catch (IOException e){
-            Log.e(TAG, e.getMessage());
-            return false;
+            Log.e(TAG(), e.getMessage());
+            return null;
         }
+    }
+
+    /**
+     * @author Federico Taschin
+     * @return the TAG for this kind of export
+     */
+    @Override
+    public String TAG() {
+        return "xls";
+    }
+
+    /**
+     * @author Federico Taschin
+     * @param path the new path for the output
+     */
+    @Override
+    void onPathChanged(String path) {
+        file= new File(getExportRootDirectory(), fileName);
     }
 
     /**
@@ -237,7 +256,7 @@ public class ExcelExport extends Export {
         }
 
         //write all one mission row
-        for (int i=0; i<tickets.size(); i++) {
+        for (int i=0; i<missions.size(); i++) {
             HSSFRow irow = secondSheet.createRow(i+1); //row 0 alredy created above
 
             MissionEntity m = missions.get(i);
