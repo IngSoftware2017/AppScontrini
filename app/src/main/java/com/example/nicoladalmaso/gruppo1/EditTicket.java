@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +9,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -131,6 +134,14 @@ public class EditTicket extends AppCompatActivity {
         txtAmount = (TextView)findViewById(R.id.input_ticketAmountMod);
         txtShop = (TextView)findViewById(R.id.input_ticketShopMod);
         txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
+        LinearLayout btnModifyDate = (LinearLayout) findViewById(R.id.btn_modify_date);
+        btnModifyDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment newFragment = new DatePickerFragment().newInstance(txtDate);
+                newFragment.show(getFragmentManager(), "startDatePicker");
+            }
+        });
 
         txtTitle.setText(ticketTitle);
         txtDate.setText(ticketDate);
