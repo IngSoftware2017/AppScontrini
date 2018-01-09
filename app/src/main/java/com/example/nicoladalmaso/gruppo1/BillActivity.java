@@ -69,6 +69,8 @@ public class BillActivity extends AppCompatActivity {
     /** Modified by Federico Taschin
      *  Creates the activity that displays the tickets of the selected mission. Istantiates the OCR module.
      * @param savedInstanceState
+     *
+     * Modify by Marco Olivieri: fixed amount error
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -66,6 +66,7 @@ public class EditTicket extends AppCompatActivity {
      * @param item object on the toolbar
      * @return flag of success
      *
+     * Modify by Marco Olivieri: fixed amount error
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

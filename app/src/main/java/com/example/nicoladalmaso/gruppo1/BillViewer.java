@@ -84,6 +84,8 @@ public class BillViewer extends AppCompatActivity {
 
     /** Dal Maso
      * Initialize components
+     *
+     * Modify by Marco Olivieri: fixed amount error
      */
     public void initialize(){
         //Get data from parent view
