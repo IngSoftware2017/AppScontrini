@@ -25,6 +25,8 @@ public class MissionsOpen extends Fragment {
     PersonEntity thisPerson;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     View rootView;
+    MissionAdapterDB adapter;
+    ListView listView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,6 +45,7 @@ public class MissionsOpen extends Fragment {
             }
         });
 
+        listView = (ListView)rootView.findViewById(R.id.listMission);
         personID = getArguments().getInt("personID", 0);
         Log.d("TAB1", ""+personID);
 
@@ -58,6 +61,11 @@ public class MissionsOpen extends Fragment {
         listMission.add(mission);
         ListView listView = (ListView)rootView.findViewById(R.id.listMission);
         MissionAdapterDB adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        listView.setAdapter(adapter);
+    }
+
+    public void addToListDB(){
+        adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
     }
 
@@ -77,16 +85,19 @@ public class MissionsOpen extends Fragment {
      * get all missions from the DB and print
      */
     public void printAllMissions(){
+        listMission.clear();
         List<MissionEntity> missions = DB.getMissionsForPerson(personID);
         int count = 0;
         TextView noMissions = (TextView)rootView.findViewById(R.id.noMissions);
         for (int i = 0; i < missions.size(); i++)
         {
             if(!missions.get(i).isRepay()){
-                addToListDB(missions.get(i));
+                listMission.add(missions.get(i));
+                //addToListDB(missions.get(i));
                 count++;
             }
         }
+        addToListDB();
         if(count == 0){
             noMissions.setVisibility(View.VISIBLE);
         }

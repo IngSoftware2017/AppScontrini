@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/MainTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,6 +28,7 @@
         </activity>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat" />
 
         <provider
@@ -43,24 +45,29 @@
         <activity
             android:name=".BillViewer"
             android:parentActivityName=".BillActivity"
-            android:theme="@style/BillTheme.ActionBar.Transparent" />
+            android:theme="@style/BillTheme.ActionBar.Transparent"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".BillActivity"
             android:parentActivityName=".MissionsTabbed"
-            android:theme="@style/BillTheme" />
+            android:theme="@style/BillTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".AddNewMission"
             android:parentActivityName=".MissionsTabbed"
-            android:theme="@style/MissionTheme" />
+            android:theme="@style/MissionTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".EditTicket"
             android:parentActivityName=".BillViewer"
-            android:theme="@style/BillTheme" />
+            android:theme="@style/BillTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MissionsTabbed"
             android:label="@string/title_activity_missions_tabbed"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/MissionTheme.NoActionBar">
+            android:theme="@style/MissionTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -68,16 +75,19 @@
         <activity
             android:name=".AddNewPerson"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/MainTheme" />
+            android:theme="@style/MainTheme"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".EditPerson"
             android:parentActivityName=".MissionsTabbed"
-            android:theme="@style/MainTheme" />
+            android:theme="@style/MainTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".EditMission"
             android:parentActivityName=".BillActivity"
-            android:theme="@style/MissionTheme" />
+            android:theme="@style/MissionTheme"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".BillActivity$OcrService"
@@ -85,7 +95,8 @@
         <activity
             android:name=".CropActivity"
             android:parentActivityName=".BillActivity"
-            android:theme="@style/CropTheme" />
+            android:theme="@style/CropTheme"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

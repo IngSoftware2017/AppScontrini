@@ -93,8 +93,7 @@ public class BillViewer extends AppCompatActivity {
         ticketTitle = thisTicket.getTitle();
         if (thisTicket.getDate() != null) {
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-            String formattedDate = df.format(thisTicket.getDate());
-            ticketDate = formattedDate;
+            ticketDate = df.format(thisTicket.getDate());
         } else
             ticketDate = getString(R.string.no_date);
         ticketShop = thisTicket.getShop();
@@ -114,7 +113,7 @@ public class BillViewer extends AppCompatActivity {
 
         //Total price
         TextView billPrice = (TextView)findViewById(R.id.billTotal);
-        billPrice.setText(ticketAmount+" €");
+        billPrice.setText(ticketAmount);
 
         //Shop
         TextView billShop = (TextView)findViewById(R.id.billShop);

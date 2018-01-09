@@ -64,4 +64,8 @@
     <string name="no_date">Nessuna data trovata</string>
     <string name="downloading_library">Download libreria in corso, attendi…</string>
     <string name="total_with_numb">Totale: %s</string>
+    <string name="surname">Cognome</string>
+    <string name="academic_title">Titolo accademico</string>
+    <string name="ticket">Scontrino</string>
+    <string name="zero_amount">0.00</string>
 </resources>

@@ -16,7 +16,7 @@ import static java.util.regex.Pattern.compile;
  */
 public class OcrVars {
 
-    static final boolean IS_DEBUG_ENABLED = true;
+    static final boolean IS_DEBUG_ENABLED = false;
     static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
     static final String[] AMOUNT_STRINGS = {"TOTAL", "IMPORTO"}; //Array of strings that contains the definition of total
     static final int MAX_STRING_DISTANCE = 3; //Max allowed distance (levDistance) between a string found in a rawtext and one from AMOUNT_STRINGS

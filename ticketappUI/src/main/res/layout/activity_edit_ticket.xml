@@ -26,6 +26,7 @@
                 android:id="@+id/input_ticketTitleMod"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
                 android:hint="@string/name"
                 android:textColor="#FFF"
                 android:textSize="23dp"
@@ -36,7 +37,7 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -72,6 +73,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/input_ticketShopMod"
+                        android:inputType="textCapSentences"
                         android:hint="@string/shop" />
                 </android.support.design.widget.TextInputLayout>
 
@@ -101,6 +103,8 @@
                     android:layout_weight="6">
 
                     <android.support.design.widget.TextInputEditText
+                        android:inputType="numberDecimal"
+                        android:digits="0123456789.,"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/input_ticketAmountMod"
@@ -123,7 +127,7 @@
                     android:minWidth="48dp"
                     android:minHeight="48dp"
                     android:layout_marginTop="3dp"
-                    app:srcCompat="@drawable/ic_date_range_black_48px"
+                    app:srcCompat="@drawable/ic_date_range_black_24px"
                     android:layout_marginLeft="11dp"
                     android:layout_marginRight="11dp"/>
 
@@ -142,6 +146,6 @@
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </RelativeLayout>
 
 </LinearLayout>

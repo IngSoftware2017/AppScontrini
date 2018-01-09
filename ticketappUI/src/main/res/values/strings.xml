@@ -64,5 +64,9 @@
     <string name="downloading_library">Downloading library.\nPlease, wait…</string>
     <string name="total_with_numb">Total: %s</string>
     <string name="simple_space">%1$s %2$s</string>
+    <string name="surname">Surname</string>
+    <string name="academic_title">Academic title</string>
+    <string name="ticket">Ticket</string>
+    <string name="zero_amount">0.00</string>
 
 </resources>

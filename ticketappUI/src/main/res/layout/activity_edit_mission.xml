@@ -26,6 +26,7 @@
                 android:id="@+id/input_missionEditName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
                 android:hint="@string/name"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
@@ -46,6 +47,7 @@
                 android:id="@+id/input_missionEditLocation"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:inputType="textCapSentences"
                 android:hint="@string/location"
                 android:textColor="#FFF"
                 android:textSize="22dp"
@@ -55,7 +57,7 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -134,15 +136,15 @@
                     android:minWidth="40dp"
                     android:layout_marginLeft="20dp"
                     android:text="@string/text_isRepaid"
-                    android:textSize="20dp"
+                    android:textSize="16dp"
                     android:singleLine="true"/>
                 <CheckBox
                     android:id="@+id/check_isRepaid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"/>
+                    android:layout_marginRight="16dp"/>
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </RelativeLayout>
 
 </LinearLayout>
