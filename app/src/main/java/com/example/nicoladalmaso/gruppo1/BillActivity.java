@@ -82,7 +82,7 @@ public class BillActivity extends AppCompatActivity {
         missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
         PersonEntity person = DB.getPerson(thisMission.getPersonID());
-        setTitle(person.getName()+" "+person.getLastName()+": "+thisMission.getName());
+        setTitle(thisMission.getName()+": "+person.getName()+" "+person.getLastName());
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
