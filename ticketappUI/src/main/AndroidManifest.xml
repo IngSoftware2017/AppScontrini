@@ -100,7 +100,6 @@
             android:name=".FullImageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:parentActivityName=".BillViewer"
-            android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme" />
     </application>
 

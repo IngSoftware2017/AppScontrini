@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -47,6 +48,7 @@ import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -609,13 +611,27 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                                 ticket.setAmount(amount);
                                 ticket.setDate(date);
                                 ticket.setFileUri(uri);
+                                List<PointF> corners = new ArrayList<>();
+                                corners.add(new PointF(resultData.getFloat(CORNER1), resultData.getFloat(CORNER2)));
+                                corners.add(new PointF(resultData.getFloat(CORNER3), resultData.getFloat(CORNER4)));
+                                corners.add(new PointF(resultData.getFloat(CORNER5), resultData.getFloat(CORNER6)));
+                                corners.add(new PointF(resultData.getFloat(CORNER7), resultData.getFloat(CORNER8)));
+                                ticket.setCornerPoints(corners);
                             }
                             DB.updateTicket(ticket);
                         } catch (NumberFormatException e) {
                             //Nada
                         }
-                    } else
-                        DB.addTicket(new TicketEntity(uri, amount, null, date, null, missionID));
+                    } else {
+                        TicketEntity ticket = new TicketEntity(uri, amount, null, date, null, missionID);
+                        List<PointF> corners = new ArrayList<>();
+                        corners.add(new PointF(resultData.getFloat(CORNER1), resultData.getFloat(CORNER2)));
+                        corners.add(new PointF(resultData.getFloat(CORNER3), resultData.getFloat(CORNER4)));
+                        corners.add(new PointF(resultData.getFloat(CORNER5), resultData.getFloat(CORNER6)));
+                        corners.add(new PointF(resultData.getFloat(CORNER7), resultData.getFloat(CORNER8)));
+                        ticket.setCornerPoints(corners);
+                        DB.addTicket(ticket);
+                    }
                     clearAllImages();
                     printAllTickets();
                 }
@@ -657,8 +673,16 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Bitmap testBmp = getBitmapFromFile(file);
             receiver.send(STATUS_RUNNING, bundle);
             ocrManager.initialize(this);
+            List<PointF> corners = new ArrayList<>();
+            if (ticketID == null) {//new image, not crop
+                ImageProcessor alphaPreproc = new ImageProcessor(testBmp);
+                alphaPreproc.findTicket(false);
+                corners = alphaPreproc.getCorners();
+            } else
+                corners = DataManager.getInstance(this).getTicket(Long.parseLong(ticketID)).getCornerPoints();
             ImageProcessor preproc = new ImageProcessor(testBmp);
-            preproc.findTicket(false, err -> {
+            preproc.setCorners(corners);
+            preproc.undistort(0, err -> {
                     ocrManager.getTicket(preproc, result -> {
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     if (result.amount != null) {
@@ -678,9 +702,17 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                         OcrUtils.log(1, "OcrHandler", "No date found");
                         bundle.putString(DATE_RECEIVED, NOT_FOUND);
                     }
-                        receiver.send(STATUS_FINISHED, bundle);
                 });
             });
+            bundle.putFloat(CORNER1, corners.get(0).x);
+            bundle.putFloat(CORNER2, corners.get(0).y);
+            bundle.putFloat(CORNER3, corners.get(1).x);
+            bundle.putFloat(CORNER4, corners.get(1).y);
+            bundle.putFloat(CORNER5, corners.get(2).x);
+            bundle.putFloat(CORNER6, corners.get(2).y);
+            bundle.putFloat(CORNER7, corners.get(3).x);
+            bundle.putFloat(CORNER8, corners.get(3).y);
+            receiver.send(STATUS_FINISHED, bundle);
             this.stopSelf();
         }
 
