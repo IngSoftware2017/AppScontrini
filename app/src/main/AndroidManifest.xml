@@ -49,19 +49,24 @@
             android:parentActivityName=".MissionsTabbed" />
         <activity
             android:name=".AddNewMission"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionsTabbed"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EditTicket"
-            android:parentActivityName=".BillViewer" />
+            android:parentActivityName=".BillViewer"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AddNewPerson"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EditPerson"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionsTabbed"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EditMission"
-            android:parentActivityName=".BillActivity" />
+            android:parentActivityName=".BillActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MissionsTabbed"
             android:label="@string/title_activity_missions_tabbed"
