@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.support.v7.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Debug;
 import android.provider.MediaStore;
@@ -72,6 +74,8 @@ public class BillViewer extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_bill_viewer);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#66000000")));
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
         initialize();
