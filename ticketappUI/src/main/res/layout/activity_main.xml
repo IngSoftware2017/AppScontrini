@@ -29,6 +29,7 @@
 
         <ListView
             android:id="@+id/listPeople"
+            android:layout_marginTop="3dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"

@@ -21,6 +21,8 @@ import java.util.List;
 import database.DataManager;
 import database.TicketEntity;
 
+import static com.ing.software.ticketapp.BillActivity.TICKET_MOD;
+
 
 //Classe utilizzata per dupplicare la view cardview all'interno della ListView
 //Dal Maso
@@ -65,12 +67,12 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         //Amount text fixes
         String amount = "";
         if(c.getAmount() == null){
-            amount = "Prezzo non rilevato";
+            amount = context.getString(R.string.no_amount);
             tot.setText(amount);
         }
         else {
             amount = c.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
-            tot.setText("Totale: "+amount+"€");
+            tot.setText(context.getString(R.string.total_with_numb, amount));
         }
 
         //Ticket image bitmap set
@@ -90,26 +92,32 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                 .thumbnail(0.1f)
                 .into(img);
 
-        convertView.setOnClickListener(new View.OnClickListener(){
-            public void onClick (View v){
-                ticketID = Integer.parseInt(v.getTag().toString());
-                for(int i = 0; i < t.size(); i++){
-                    if(t.get(i).getID() == ticketID){
-                        TicketEntity thisTicket = t.get(i);
-                        Intent startImageView = new Intent(context, BillViewer.class);
-                        File photo = new File(thisTicket.getFileUri().toString().substring(7));
+        if (!isTempPhoto(c)) {
+            convertView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    ticketID = Integer.parseInt(v.getTag().toString());
+                    for (int i = 0; i < t.size(); i++) {
+                        if (t.get(i).getID() == ticketID) {
+                            TicketEntity thisTicket = t.get(i);
+                            Intent startImageView = new Intent(context, BillViewer.class);
+                            File photo = new File(thisTicket.getFileUri().toString().substring(7));
 
-                        //Put data to next activity
-                        startImageView.putExtra("ID",thisTicket.getID());
+                            //Put data to next activity
+                            startImageView.putExtra("ID", thisTicket.getID());
 
-                        //Start new activity
-                        ((BillActivity)context).startActivityForResult(startImageView, 4);
-                        return;
+                            //Start new activity
+                            ((BillActivity) context).startActivityForResult(startImageView, TICKET_MOD);
+                            return;
+                        }
                     }
-                }
-            }//onClick
-        });
+                }//onClick
+            });
+        }
 
         return convertView;
+    }
+
+    private boolean isTempPhoto(TicketEntity e) {
+        return e.getID() == 0; //ticketEntity was initialized, but never added to the db
     }
 }

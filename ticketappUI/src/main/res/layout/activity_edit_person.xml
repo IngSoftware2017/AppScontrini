@@ -26,6 +26,7 @@
                 android:id="@+id/input_personEditName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textCapWords"
                 android:hint="@string/name"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
@@ -46,7 +47,8 @@
                 android:id="@+id/input_personEditLastName"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:hint="Cognome"
+                android:inputType="textCapWords"
+                android:hint="@string/surname"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
 
@@ -54,7 +56,7 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -90,13 +92,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/input_personEditAcademicTitle"
-                        android:hint="Titolo accademico"
+                        android:inputType="textCapSentences"
+                        android:hint="@string/academic_title"
                         android:singleLine="true"/>
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </RelativeLayout>
 
 </LinearLayout>

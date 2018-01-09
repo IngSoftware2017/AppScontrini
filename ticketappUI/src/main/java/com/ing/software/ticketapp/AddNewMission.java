@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import database.DataManager;
 import database.MissionEntity;
@@ -119,7 +120,7 @@ public class AddNewMission extends AppCompatActivity{
                 miss.setLocation(location);
                 miss.setRepay(false);
 
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
                 try {
 
                     String start=AppUtilities.addMonth(startDate);
