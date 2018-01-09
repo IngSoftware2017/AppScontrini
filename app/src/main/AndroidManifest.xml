@@ -19,7 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:largeHeap="true">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,10 +45,12 @@
         <activity
             android:name=".BillViewer"
             android:parentActivityName=".BillActivity"
-            android:theme="@style/AppTheme.ActionBar.Transparent" />
+            android:theme="@style/AppTheme.ActionBar.Transparent"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".BillActivity"
-            android:parentActivityName=".MissionsTabbed" />
+            android:parentActivityName=".MissionsTabbed"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".AddNewMission"
             android:parentActivityName=".MissionsTabbed"
@@ -71,7 +75,8 @@
             android:name=".MissionsTabbed"
             android:label="@string/title_activity_missions_tabbed"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.nicoladalmaso.gruppo1.MainActivity" />
