@@ -11,11 +11,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import database.DataManager;
 import database.MissionEntity;
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
@@ -40,6 +42,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         CardView card = (CardView) convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
+        TextView total = (TextView)convertView.findViewById(R.id.missionTotal);
         //FloatingActionButton missionDelete = (FloatingActionButton)convertView.findViewById(R.id.dltMission);
         //missionDelete.setTag(position);
         MissionEntity c = getItem(position);
@@ -55,7 +58,9 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         String finishDate=tr.format(finish);
         Log.d("missionStart", startDate);
         Log.d("missionEnd",finishDate);
-
+        DataManager dataManager = DataManager.getInstance(context);
+        if (dataManager.getTotalAmountForMission(c.getID()) != null)
+            total.setText(context.getString(R.string.total_with_numb, dataManager.getTotalAmountForMission(c.getID()).setScale(2, RoundingMode.HALF_UP)));
 
 
         //Dal Maso
