@@ -51,7 +51,7 @@ public class BillViewer extends AppCompatActivity {
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
     String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
-    String noAmountFound = "Non trovato";
+    String noFound = "Non trovato";
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class BillViewer extends AppCompatActivity {
     /** Dal Maso
      * Initialize components
      *
-     * Modify by Marco Olivieri: fixed amount error
+     * Modify by Marco Olivieri: fixed amount and shop error
      */
     public void initialize(){
         //Get data from parent view
@@ -95,12 +95,17 @@ public class BillViewer extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate()==null? "":thisTicket.getDate().toString();
-        ticketShop = thisTicket.getShop();
+        String empty = "";
+        if(!thisTicket.getShop().equals(empty)) {
+            ticketShop = thisTicket.getShop();
+        }else{
+            ticketShop = noFound;
+        }
         if(thisTicket.getAmount() !=null) {
             Double amount = thisTicket.getAmount().doubleValue();
             ticketAmount = amount.toString();
         }else{
-            ticketAmount = noAmountFound;
+            ticketAmount = noFound;
         }
 
         //Title
