@@ -69,7 +69,7 @@
     <string name="ticket">Ticket</string>
     <string name="zero_amount">0.00</string>
     <string name="redoing_ocr">Restarting scan, please wait.</string>
-
     <string name="title_activity_fullscreen">FullImageActivity</string>
+    <string name="action_deleteBill">Delete Ticket</string>
 
 </resources>

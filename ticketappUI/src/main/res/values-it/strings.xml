@@ -71,4 +71,5 @@
     <string name="redoing_ocr">Scan in corso, per favore attendi.</string>
     <string name="title_activity_fullscreen">FullImageActivity</string>
     <string name="simple_space">%1$s %2$s</string>
+    <string name="action_deleteBill">Elimina scontrino</string>
 </resources>

@@ -36,7 +36,7 @@ import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
 
 
 public class BillViewer extends AppCompatActivity {
-    public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit, fabOcr;
+    public FloatingActionButton fabEdit, fabEditor, fabCrop, fabConfirmEdit, fabOcr;
     public DataManager DB;
     long ticketId;
     Context context;
@@ -59,7 +59,7 @@ public class BillViewer extends AppCompatActivity {
         initialize();
 
         //fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
-        fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
+        fabEditor =(FloatingActionButton)findViewById(R.id.fabEdit);
         fabOcr = findViewById(R.id.fabOcr);
         /*
         fabCrop.setOnClickListener(new View.OnClickListener(){
@@ -69,10 +69,13 @@ public class BillViewer extends AppCompatActivity {
            }//onClick
         });
         */
-        fabDelete.setOnClickListener(new View.OnClickListener() {
+        fabEditor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteTicket(ticketId);
+                //Open Edit Ticket Activity
+                Intent editTicket = new Intent(context, EditTicket.class);
+                editTicket.putExtra("ticketID", thisTicket.getID());
+                startActivityForResult(editTicket, TICKET_MOD);
             }//onClick
         });
         fabOcr.setOnClickListener(view -> {
@@ -145,7 +148,7 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.editticket_menu, menu);
+        inflater.inflate(R.menu.bill_viewer_menu, menu);
         /*
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
@@ -165,11 +168,8 @@ public class BillViewer extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
 
-            case R.id.action_editTicket:
-                //Open Edit Ticket Activity
-                Intent editTicket = new Intent(context, EditTicket.class);
-                editTicket.putExtra("ticketID", thisTicket.getID());
-                startActivityForResult(editTicket, TICKET_MOD);
+            case R.id.action_deleteBill:
+                deleteTicket(ticketId);
                 break;
 
             default:
