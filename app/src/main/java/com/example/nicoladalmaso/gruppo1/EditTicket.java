@@ -15,6 +15,7 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -82,7 +83,9 @@ public class EditTicket extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                thisTicket.setShop(txtShop.getText().toString());
+
+                if(txtShop.getText().toString().replace(" ","").compareTo("") != 0)
+                    thisTicket.setShop(txtShop.getText().toString());
 
                 /**
                  * Mantovan Federico
@@ -100,16 +103,18 @@ public class EditTicket extends AppCompatActivity {
                     }
                 }
 
+
                 if(count > 0 && amount.length() - count == 0){ //Point (>1) and not number
                     Toast.makeText(context, getResources().getString(R.string.toast_multiPoint_noNumber), Toast.LENGTH_SHORT).show();
                     break;
                 }
-                else if(count > 1){ //Point and number (>1)
+                if(count > 1){ //Point and number (>1)
                     Toast.makeText(context, getResources().getString(R.string.toast_multiPoint), Toast.LENGTH_SHORT).show();
                     break;
                 }
-                else if (count <= 1){ //Zero or one point and number (>= 1)
-                    thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(txtAmount.getText().toString())));
+                if (count <= 1){ //Zero or one point and number (>= 1)
+                    if(amount.length() != 0)
+                        thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(txtAmount.getText().toString())));
                 }
 
                 DB.updateTicket(thisTicket);
@@ -133,12 +138,18 @@ public class EditTicket extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
-        if(thisTicket.getAmount() == null) {
-            ticketAmount = "0.00";
+        if(thisTicket.getAmount() == null){
+            ticketAmount = "";
         }
-        else
-            ticketAmount = new DecimalFormat("#.##").format(thisTicket.getAmount()).toString().replace(",",".");
-        ticketShop = thisTicket.getShop();
+        else {
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString();
+        }
+        if(thisTicket.getShop() == null){
+            ticketShop = "";
+        }
+        else {
+            ticketShop = thisTicket.getShop();
+        }
 
         //set those values to the edittext
         setTicketValuesOnScreen();

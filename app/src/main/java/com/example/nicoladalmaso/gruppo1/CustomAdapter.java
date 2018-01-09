@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -74,11 +75,19 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
+        TextView ticketShop = (TextView)convertView.findViewById(R.id.shop);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
 
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
         ticketTitle.setText(c.getTitle());
+
+        if(c.getShop() == null || c.getShop().trim().compareTo("") == 0){
+            ticketShop.setText(context.getString(R.string.string_NoShop));
+        }
+        else {
+            ticketShop.setText(c.getShop());
+        }
 
         //Amount text fixes
         String amount = "";
@@ -87,8 +96,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText(amount);
         }
         else {
-            amount = new DecimalFormat("#.##").format(c.getAmount()).toString();
-            tot.setText("Totale: "+amount+"€");
+            amount = c.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString();
+            tot.setText(amount+" €");
         }
 
         //Ticket image bitmap set

@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -87,12 +88,17 @@ public class BillViewer extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
-        ticketShop = thisTicket.getShop();
+        if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
+            ticketShop = getString(R.string.string_NoShop);
+        }
+        else {
+            ticketShop = thisTicket.getShop();
+        }
         if(thisTicket.getAmount() == null || thisTicket.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
-            ticketAmount = "Nessun valore trovato";
+            ticketAmount = getString(R.string.string_NoAmountFull);
         }
         else
-            ticketAmount = new DecimalFormat("#.##").format(thisTicket.getAmount()).toString();
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString()+" €";
 
         //Title
         setTitle(ticketTitle);
@@ -217,7 +223,6 @@ public class BillViewer extends AppCompatActivity {
                         thisTicket.setDate(result.date);
 
                     thisTicket.setAmount(result.amount);
-                    thisTicket.setShop(context.getString(R.string.string_NoShop));
 
                     if(result.title == null)
                         thisTicket.setTitle(context.getString(R.string.title_Ticket));

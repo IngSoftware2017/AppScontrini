@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -59,7 +60,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         MissionEntity c = getItem(position);
         title.setText(c.getName());
         location.setText(c.getLocation());
-        total.setText(new DecimalFormat("#.##").format(DB.getTotalAmountForMission(c.getID())).toString()+" €");
+        total.setText(DB.getTotalAmountForMission(c.getID()).setScale(2, RoundingMode.HALF_EVEN).toString()+" €");
         convertView.setTag(c.getID());
         Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data
