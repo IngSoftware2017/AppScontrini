@@ -481,6 +481,7 @@ public class BillActivity extends AppCompatActivity {
         ocrManager.getTicket(processor, result -> {
             Log.d("DEBUGOCR","RESULT IS READY");
             ticketEntity.setAmount(result.amount);
+            ticketEntity.setDate(result.date);
             DB.updateTicket(ticketEntity);
             runOnUiThread(new Runnable() {
                 @Override
