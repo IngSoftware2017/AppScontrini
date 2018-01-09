@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -61,6 +63,7 @@ public class EditMission extends AppCompatActivity {
 
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                hideSoftKeyboard(EditMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
@@ -68,6 +71,7 @@ public class EditMission extends AppCompatActivity {
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                hideSoftKeyboard(EditMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
             }
@@ -149,5 +153,13 @@ public class EditMission extends AppCompatActivity {
         txtMissionStart.setText(formatter.format(thisMission.getStartDate()));
         txtMissionEnd.setText(formatter.format(thisMission.getEndDate()));
         chkIsClosed.setChecked(thisMission.isRepay());
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
     }
 }

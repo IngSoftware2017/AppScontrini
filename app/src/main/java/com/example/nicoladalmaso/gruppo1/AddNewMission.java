@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -59,6 +61,14 @@ public class AddNewMission extends AppCompatActivity{
         initializeComponents();
     }
 
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
     private void initializeComponents(){
         missionStart = (TextView)findViewById(R.id.input_missionStart);
         missionFinish = (TextView)findViewById(R.id.input_missionFinish);
@@ -66,6 +76,7 @@ public class AddNewMission extends AppCompatActivity{
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionFinish);
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                hideSoftKeyboard(AddNewMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
@@ -73,6 +84,7 @@ public class AddNewMission extends AppCompatActivity{
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                hideSoftKeyboard(AddNewMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
             }
