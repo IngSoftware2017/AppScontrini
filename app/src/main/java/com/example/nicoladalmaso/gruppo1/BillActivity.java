@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Looper;
@@ -335,8 +337,7 @@ public class BillActivity extends AppCompatActivity {
                 case(REQUEST_TAKE_PHOTO):
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                     Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
-                    savePickedFile(bitmapPhoto);
-                    deleteTempFiles();
+                    savePickedFile(bitmapPhoto, tempPhotoPath);
                     printAllTickets();
                     break;
 
@@ -346,7 +347,7 @@ public class BillActivity extends AppCompatActivity {
                     photoURI = data.getData();
                     try {
                         Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                        savePickedFile(btm);
+                        savePickedFile(btm, photoURI.toString());
                         printAllTickets();
                     }catch (Exception e){
                         Log.d("Foto da galleria", "ERROR");
@@ -384,7 +385,10 @@ public class BillActivity extends AppCompatActivity {
      * Save the bitmap passed
      * @param imageToSave bitmap to save
      */
-    private void savePickedFile(Bitmap imageToSave) {
+    private void savePickedFile(Bitmap imageToSave, String imagePath) {
+
+        imageToSave = checkImageOrientation(imageToSave, imagePath);
+
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";
@@ -478,6 +482,53 @@ public class BillActivity extends AppCompatActivity {
         else{
             noBills.setVisibility(View.INVISIBLE);
         }
+    }
+
+    /** DAL MASO
+     * Check the image rotation and correct it
+     * @param img image bitmap
+     * @param path image path
+     * @return correct bitmap
+     */
+    private Bitmap checkImageOrientation(Bitmap img, String path){
+        Bitmap rotatedBitmap = img;
+        try {
+            ExifInterface ei = new ExifInterface(path);
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED);
+
+            switch (orientation) {
+
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotatedBitmap = rotateImage(img, 90);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotatedBitmap = rotateImage(img, 180);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotatedBitmap = rotateImage(img, 270);
+                    break;
+
+                default:
+                    rotatedBitmap = img;
+            }
+        } catch (IOException e){}
+        return rotatedBitmap;
+    }
+
+    /** DAL MASO
+     * Rotate the image
+     * @param source photo bitmap
+     * @param angle angle of rotation
+     * @return rotated bitmap
+     */
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
     /**PICCOLO_Edit by Dal Maso
