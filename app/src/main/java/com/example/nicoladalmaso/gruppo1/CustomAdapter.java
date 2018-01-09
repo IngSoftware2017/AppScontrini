@@ -49,6 +49,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         Log.d("MISSION", ""+missionID);
     }
 
+    // Modify by Marco Olivieri: fixed amount error
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

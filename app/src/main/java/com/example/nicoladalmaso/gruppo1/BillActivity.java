@@ -69,6 +69,8 @@ public class BillActivity extends AppCompatActivity {
     /** Modified by Federico Taschin
      *  Creates the activity that displays the tickets of the selected mission. Istantiates the OCR module.
      * @param savedInstanceState
+     *
+     * Modify by Marco Olivieri: fixed amount error
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,7 @@ public class BillActivity extends AppCompatActivity {
         missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
         PersonEntity person = DB.getPerson(thisMission.getPersonID());
-        setTitle(person.getName()+" "+person.getLastName()+": "+thisMission.getName());
+        setTitle(thisMission.getName()+": "+person.getName()+" "+person.getLastName());
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -450,7 +452,6 @@ public class BillActivity extends AppCompatActivity {
             TicketEntity ticket = new TicketEntity();
             ticket.setDate(Calendar.getInstance().getTime());
             ticket.setFileUri(uri);
-            ticket.setShop("Pam Padova");
             ticket.setTitle("Scontrino ");
             ticket.setMissionID(missionID);
             ticket.setInsertionDate(Calendar.getInstance().getTime());
