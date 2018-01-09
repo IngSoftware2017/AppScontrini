@@ -32,7 +32,8 @@ public class EditTicket extends AppCompatActivity {
     int ticketId;
     Context context;
     TicketEntity thisTicket;
-    String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
+    String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = ""; //ticketDate = "",
+    Date ticketDate;
     TextView txtTitle;
     TextView txtAmount;
     TextView txtShop;
@@ -76,13 +77,13 @@ public class EditTicket extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_confirm:
                 //Salva i file nel DB
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                //SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 thisTicket.setTitle(txtTitle.getText().toString());
-                try {
+                /*try {
                     thisTicket.setDate(format.parse(txtDate.getText().toString()));
                 } catch (ParseException e) {
                     e.printStackTrace();
-                }
+                }*/
 
                 if(txtShop.getText().toString().replace(" ","").compareTo("") != 0)
                     thisTicket.setShop(txtShop.getText().toString());
@@ -142,7 +143,7 @@ public class EditTicket extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
-        ticketDate = thisTicket.getDate().toString();
+        ticketDate = thisTicket.getDate();
         if(thisTicket.getAmount() == null){
             ticketAmount = "";
         }
@@ -164,10 +165,11 @@ public class EditTicket extends AppCompatActivity {
         txtTitle = (TextView)findViewById(R.id.input_ticketTitleMod);
         txtAmount = (TextView)findViewById(R.id.input_ticketAmountMod);
         txtShop = (TextView)findViewById(R.id.input_ticketShopMod);
-        txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
-
+        //txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
+        //SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        //txtDate.setText(formatter.format(ticketDate));
         txtTitle.setText(ticketTitle);
-        txtDate.setText(ticketDate);
+        //txtDate.setText(ticketDate);
         txtShop.setText(ticketShop);
         txtAmount.setText(ticketAmount);
     }

@@ -62,7 +62,8 @@ public class BillViewer extends AppCompatActivity {
     Context context;
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
-    String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
+    String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = ""; // ticketDate = ""
+    Date ticketDate;
     ImageView imgView;
 
     //Dal Maso
@@ -91,7 +92,7 @@ public class BillViewer extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
-        ticketDate = thisTicket.getDate().toString();
+        ticketDate = thisTicket.getDate();
         if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
             ticketShop = getString(R.string.string_NoShop);
         }
@@ -107,7 +108,8 @@ public class BillViewer extends AppCompatActivity {
         //Title
         setTitle(ticketTitle);
         TextView billLastMod = (TextView)findViewById(R.id.billDate);
-        billLastMod.setText(ticketDate);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        billLastMod.setText(formatter.format(ticketDate));
 
         //ImageName
         TextView billName = (TextView)findViewById(R.id.billName);
