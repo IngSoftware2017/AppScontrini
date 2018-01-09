@@ -124,24 +124,29 @@ public class MissionsTabbed extends AppCompatActivity {
             switch (requestCode) {
 
                 case (MISSION_MOD):
-                    missionsOpen.clearAllMissions();
+                    //missionsOpen.clearAllMissions();
                     missionsOpen.printAllMissions();
-                    missionsClosed.clearAllMissions();
+                    //missionsClosed.clearAllMissions();
                     missionsClosed.printAllMissions();
                     break;
 
                 case (PERSON_MOD):
                     thisPerson = DB.getPerson(personID);
-                    toolbar.setTitle(thisPerson.getName());
+                    toolbar.setTitle(getString(R.string.simple_space, thisPerson.getName(), thisPerson.getLastName()));
                     break;
 
                 default:
-                    missionsOpen.clearAllMissions();
+                    //missionsOpen.clearAllMissions();
                     missionsOpen.printAllMissions();
-                    missionsClosed.clearAllMissions();
+                    //missionsClosed.clearAllMissions();
                     missionsClosed.printAllMissions();
                     break;
             }
+        }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            Log.d("CANCELLED", "OK");
+            missionsOpen.printAllMissions();
+            missionsClosed.printAllMissions();
         }
     }
 
@@ -214,6 +219,14 @@ public class MissionsTabbed extends AppCompatActivity {
         AlertDialog alert = toast.show();
         Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
         nbutton.setTextColor(Color.parseColor("#2196F3"));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        finish();
     }
 
     private void reload() {

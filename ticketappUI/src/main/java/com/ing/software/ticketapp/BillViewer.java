@@ -25,13 +25,18 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import database.DataManager;
 import database.TicketEntity;
 
+import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
+
 
 public class BillViewer extends AppCompatActivity {
-    public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
+    public FloatingActionButton fabEdit, fabEditor, fabCrop, fabConfirmEdit, fabOcr;
     public DataManager DB;
     long ticketId;
     Context context;
@@ -53,19 +58,32 @@ public class BillViewer extends AppCompatActivity {
 
         initialize();
 
-        fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
-        fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
+        //fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
+        fabEditor =(FloatingActionButton)findViewById(R.id.fabEdit);
+        fabOcr = findViewById(R.id.fabOcr);
+        /*
         fabCrop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                //cropPhoto(ticketId);
+                cropPhoto(ticketId);
            }//onClick
         });
-        fabDelete.setOnClickListener(new View.OnClickListener() {
+        */
+        fabEditor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteTicket(ticketId);
+                //Open Edit Ticket Activity
+                Intent editTicket = new Intent(context, EditTicket.class);
+                editTicket.putExtra("ticketID", thisTicket.getID());
+                startActivityForResult(editTicket, TICKET_MOD);
             }//onClick
+        });
+        fabOcr.setOnClickListener(view -> {
+            Intent intent = new Intent();
+            intent.putExtra("ticketID", String.valueOf(ticketId));
+            Log.d("TICKETID_REDO_OCR", "ID is: " + ticketId);
+            setResult(REDO_OCR, intent);
+            finish();
         });
     }
 
@@ -76,7 +94,11 @@ public class BillViewer extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
-        ticketDate = thisTicket.getDate().toString();
+        if (thisTicket.getDate() != null) {
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+            ticketDate = df.format(thisTicket.getDate());
+        } else
+            ticketDate = getString(R.string.no_date);
         ticketShop = thisTicket.getShop();
         if (thisTicket.getAmount() != null)
             ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
@@ -94,7 +116,7 @@ public class BillViewer extends AppCompatActivity {
 
         //Total price
         TextView billPrice = (TextView)findViewById(R.id.billTotal);
-        billPrice.setText(ticketAmount+" €");
+        billPrice.setText(ticketAmount);
 
         //Shop
         TextView billShop = (TextView)findViewById(R.id.billShop);
@@ -126,10 +148,12 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.editticket_menu, menu);
+        inflater.inflate(R.menu.bill_viewer_menu, menu);
+        /*
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(false); //remove back button, or redo ocr doesn't work
+            */
         return true;
     }
 
@@ -144,11 +168,8 @@ public class BillViewer extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
 
-            case R.id.action_editTicket:
-                //Open Edit Ticket Activity
-                Intent editTicket = new Intent(context, EditTicket.class);
-                editTicket.putExtra("ticketID", thisTicket.getID());
-                startActivityForResult(editTicket, TICKET_MOD);
+            case R.id.action_deleteBill:
+                deleteTicket(ticketId);
                 break;
 
             default:
@@ -182,6 +203,13 @@ public class BillViewer extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent mIntent = new Intent();
+        setResult(RESULT_OK, mIntent);
+        super.onBackPressed();
+    }
+
 
     /**PICCOLO, DAL MASO
      * Method that deletes a ticket from the db
@@ -205,7 +233,7 @@ public class BillViewer extends AppCompatActivity {
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
-                }
+                } //todo log error
             }
         });
         builder.setNegativeButton(this.getString(R.string.cancel), new DialogInterface.OnClickListener() {

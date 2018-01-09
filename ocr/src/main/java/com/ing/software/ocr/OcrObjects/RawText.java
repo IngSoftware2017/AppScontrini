@@ -9,7 +9,6 @@ import android.support.annotation.Size;
 
 import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Element;
 import com.ing.software.ocr.*;
 
@@ -122,7 +121,10 @@ public class RawText implements Comparable<RawText>, Text {
             probability = ProbGrid.amountBlockProducts[position];
         else if (tags.contains(CONCLUSION_TAG))
             probability = ProbGrid.amountBlockConclusion[position];
-        log(8,"RawText.getAmountProb", "Amount Probability from grid is " + probability);
+        log(5, "RawText.getAmountProb", "rect is: " + getValue());
+        log(5, "RawText.getAmountProb", "height is: " + getBoundingBox().height());
+        log(5,"RawText.getAmountProb", "Amount Probability from grid is " + probability);
+        log(5,"RawText.getAmountProb", "Rect Height score is: " + ProbGrid.getRectHeightScore(this));
         probability += ProbGrid.getRectHeightScore(this);
         return probability;
     }
