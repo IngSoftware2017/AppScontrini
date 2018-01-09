@@ -65,9 +65,10 @@
     <string name="hint_LastName">Cognome</string>
     <string name="hint_AcademicTitle">Titolo accademico</string>
     <!--Mantovan-->
-    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
+    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe sue missioni e gli scontrini verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
-    <string name="toast_multiPoint">Devi inserire un solo punto nel valore del Totale</string>
-    <string name="toast_multiPoint_noNumber">Devi inserire un valore valido nel campo Totale</string>
+    <string name="toast_multiPoint">Totale non valido</string>
+    <string name="toast_tooHightTotal">Importo troppo grande</string>
+    <string name="toast_multiPoint_noNumber">Totale non valido</string>
 </resources>
 

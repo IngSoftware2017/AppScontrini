@@ -89,7 +89,6 @@ public class EditTicket extends AppCompatActivity {
 
                 /**
                  * Mantovan Federico
-                 *
                  * Check entry amount
                  */
 
@@ -113,8 +112,14 @@ public class EditTicket extends AppCompatActivity {
                     break;
                 }
                 if (count <= 1){ //Zero or one point and number (>= 1)
-                    if(amount.length() != 0)
-                        thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(txtAmount.getText().toString())));
+                    if(amount.length() != 0){
+                        if(Double.parseDouble(amount) > 9999){
+                            Toast.makeText(context, getResources().getString(R.string.toast_tooHightTotal), Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        else
+                            thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(txtAmount.getText().toString())));
+                    }
                 }
 
                 DB.updateTicket(thisTicket);
