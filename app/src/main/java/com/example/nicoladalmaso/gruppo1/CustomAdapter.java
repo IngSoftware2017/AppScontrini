@@ -67,8 +67,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText(amount);
         }
         else {
-            amount = ""+c.getAmount();
-            tot.setText("Totale: "+amount+"€");
+            Double a = c.getAmount().doubleValue();
+            tot.setText("Totale: "+a+"€");
         }
 
         //Bitmap image = bitmaps.get(new Integer((int)c.getID()));

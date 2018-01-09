@@ -95,7 +95,8 @@ public class BillViewer extends AppCompatActivity {
         ticketDate = thisTicket.getDate().toString();
         ticketShop = thisTicket.getShop();
         if(thisTicket.getAmount() !=null) {
-            ticketAmount = thisTicket.getAmount().toString();
+            Double amount = thisTicket.getAmount().doubleValue();
+            ticketAmount = amount.toString();
         }else{
             ticketAmount = noAmountFound;
         }
