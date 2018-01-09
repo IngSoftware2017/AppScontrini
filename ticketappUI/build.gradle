@@ -9,8 +9,8 @@ android {
         applicationId "com.ing.software.ticketapp"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 2
-        versionName "1.4.0 Kyun! Vampire Girl"
+        versionCode 3
+        versionName "1.5.0 Curry Nochi Rice"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 

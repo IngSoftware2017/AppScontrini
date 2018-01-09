@@ -14,6 +14,8 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
 import database.MissionEntity;
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
@@ -47,7 +49,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data
         Date start=c.getStartDate();
-        SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy", Locale.US);
         String startDate=tr.format(start);
         Date finish=c.getEndDate();
         String finishDate=tr.format(finish);

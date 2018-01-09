@@ -77,7 +77,6 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/MainTheme"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".EditPerson"
             android:parentActivityName=".MissionsTabbed"
@@ -94,9 +93,15 @@
             android:exported="false"/>
         <activity
             android:name=".CropActivity"
-            android:parentActivityName=".BillActivity"
-            android:theme="@style/CropTheme"
-            android:screenOrientation="portrait"/>
+            android:parentActivityName=".FullImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/CropTheme" />
+        <activity
+            android:name=".FullImageActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:parentActivityName=".BillViewer"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullscreenTheme" />
     </application>
 
 </manifest>
