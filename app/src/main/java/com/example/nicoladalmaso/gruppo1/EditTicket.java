@@ -113,7 +113,7 @@ public class EditTicket extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
-        ticketDate = thisTicket.getDate().toString()==null?"":thisTicket.getDate().toString();
+        ticketDate = thisTicket.getDate()==null?"":thisTicket.getDate().toString();
         if(thisTicket.getAmount() !=null) {
             Double amount = thisTicket.getAmount().doubleValue();
             ticketAmount = amount.toString();
