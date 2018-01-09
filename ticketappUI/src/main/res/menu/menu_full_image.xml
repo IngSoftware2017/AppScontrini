@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_action_crop"
+        android:icon="@drawable/ic_action_crop_rotate_dark"
+        android:title="crop"
+        app:showAsAction="always" />
+</menu>

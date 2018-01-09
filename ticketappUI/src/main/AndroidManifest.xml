@@ -69,7 +69,6 @@
             android:name=".AddNewPerson"
             android:parentActivityName=".MainActivity"
             android:theme="@style/MainTheme" />
-
         <activity
             android:name=".EditPerson"
             android:parentActivityName=".MissionsTabbed"
@@ -85,8 +84,13 @@
 
         <activity
             android:name=".CropActivity"
+            android:parentActivityName=".FullImageActivity"
+            android:theme="@style/CropTheme" />
+        <activity
+            android:name=".FullImageActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:parentActivityName=".BillViewer"
-            android:theme="@style/CropTheme"/>
+            android:theme="@style/FullscreenTheme" />
     </application>
 
 </manifest>

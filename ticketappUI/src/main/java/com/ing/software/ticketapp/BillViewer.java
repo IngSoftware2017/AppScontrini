@@ -29,13 +29,11 @@ import java.math.RoundingMode;
 import database.DataManager;
 import database.TicketEntity;
 
-import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
-
 
 public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
-    int ticketId;
+    long ticketId;
     Context context;
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
@@ -61,7 +59,6 @@ public class BillViewer extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 //cropPhoto(ticketId);
-                showPhoto(ticketId);
            }//onClick
         });
         fabDelete.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +72,7 @@ public class BillViewer extends AppCompatActivity {
     public void initialize(){
         //Get data from parent view
         Intent intent = getIntent();
-        ticketId = (int) intent.getExtras().getLong("ID");
+        ticketId = intent.getExtras().getLong("ID");
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
@@ -113,6 +110,12 @@ public class BillViewer extends AppCompatActivity {
                 .load(ticketPath)
                 .thumbnail(0.1f)
                 .into(imgView);
+
+        imgView.setOnClickListener(v -> {
+            Intent fullImgIntent = new Intent(this, FullImageActivity.class);
+            fullImgIntent.putExtra("ID", ticketId);
+            startActivity(fullImgIntent);
+        });
     }
 
     /** Dal Maso
@@ -238,11 +241,5 @@ public class BillViewer extends AppCompatActivity {
                 .thumbnail(0.1f)
                 .into(imgView);
     }//cropPhoto
-
-    private void showPhoto(long id) {
-        Intent intent = new Intent(this, CropActivity.class);
-        intent.putExtra("ID", id);
-        startActivity(intent);
-    }
 }
 

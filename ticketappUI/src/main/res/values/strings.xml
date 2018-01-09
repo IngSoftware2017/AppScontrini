@@ -60,4 +60,6 @@
     <string name="Open">Aperte</string>
     <string name="Closed">Chiuse</string>
 
+    <string name="title_activity_fullscreen">FullImageActivity</string>
+
 </resources>

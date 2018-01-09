@@ -5,13 +5,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
-import android.os.PersistableBundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SizeF;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -90,7 +91,7 @@ public class CropActivity extends AppCompatActivity {
         setContentView(R.layout.activity_crop);
         setTitle("");
         long id = getIntent().getLongExtra("ID", 0);
-        imgView = findViewById(R.id.imgView);
+        imgView = findViewById(R.id.img_view);
         rectView = findViewById(R.id.rectView);
         if (id != 0) {
             te = DB.getTicket(id);
@@ -111,11 +112,13 @@ public class CropActivity extends AppCompatActivity {
                 @Override
                 public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
                     imgView.setImageDrawable(resource);
-
                     imgSize = new SizeF(resource.getIntrinsicWidth(), resource.getIntrinsicHeight());
-                    cvsSize = new SizeF(rectView.getWidth(), rectView.getHeight());
-                    calcCvsPoints();
-                    rectView.setCorners(cvsPts);
+
+                    rectView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+                        cvsSize = new SizeF(rectView.getWidth(), rectView.getHeight());
+                        calcCvsPoints();
+                        rectView.setCorners(cvsPts);
+                    });
                 }
             });
 
@@ -167,9 +170,12 @@ public class CropActivity extends AppCompatActivity {
                     te.setCornerPoints(rotatedPts);
                     DB.updateTicket(te);
                 }
+                //NavUtils.navigateUpFromSameTask(this);
                 onBackPressed();
                 break;
             case android.R.id.home:
+                //NavUtils.navigateUpFromSameTask(this);
+
                 onBackPressed();
                 break;
         }
