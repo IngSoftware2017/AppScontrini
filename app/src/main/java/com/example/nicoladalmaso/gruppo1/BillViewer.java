@@ -74,21 +74,6 @@ public class BillViewer extends AppCompatActivity {
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
         initialize();
-
-        fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
-        fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
-        fabCrop.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                cropPhoto(ticketId);
-           }//onClick
-        });
-        fabDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                deleteTicket(ticketId);
-            }//onClick
-        });
     }
 
     /** Dal Maso
@@ -134,6 +119,21 @@ public class BillViewer extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(imgView);
+
+        fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
+        fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
+        fabCrop.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                cropPhoto(ticketId);
+            }//onClick
+        });
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteTicket(ticketId);
+            }//onClick
+        });
     }
 
     /** Dal Maso
@@ -191,6 +191,42 @@ public class BillViewer extends AppCompatActivity {
                     initialize();
                     break;
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
+                    thisTicket.setFileUri(thisTicket.getFileUri());
+
+                    OcrManager ocrManager = new OcrManager();
+
+                    while (ocrManager.initialize(this) != 0) { // 'this' is the context
+                        try {
+                            //On first run vision library will be downloaded
+                            Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Bitmap ocrImage= BitmapFactory.decodeFile(thisTicket.getFileUri().toString().substring(7));
+                    ImageProcessor imgProc = new ImageProcessor(ocrImage);
+                    Ticket result = ocrManager.getTicket(imgProc);
+
+                    Log.d("OCR",result.amount+", "+result.date);
+
+                    if(result.date == null)
+                        thisTicket.setDate(Calendar.getInstance().getTime());
+                    else
+                        thisTicket.setDate(result.date);
+
+                    thisTicket.setAmount(result.amount);
+                    thisTicket.setShop(context.getString(R.string.string_NoShop));
+
+                    if(result.title == null)
+                        thisTicket.setTitle(context.getString(R.string.title_Ticket));
+                    else
+                        thisTicket.setTitle(result.title);
+
+                    ocrManager.release();
+
+                    DB.updateTicket(thisTicket);
                     initialize();
                     break;
             }
@@ -233,53 +269,30 @@ public class BillViewer extends AppCompatActivity {
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }//deleteTicket
 
-    /**PICCOLO
+    /**PICCOLO, problems fixes and edit by Dal Maso
      * Method that lets the user crop and/or rotate the original photo, once the crop is confirmed,
      * the ocr is run to get data that it couldn't have red the first time
      * @param id the id of the TicketEntity in the db
      */
-    private void cropPhoto(long id) {
-        TicketEntity ticket = DB.getTicket((int) id);
-        Uri toCropUri = ticket.getFileUri();
+    private void cropPhoto(int id) {
+        Uri toCropUri = thisTicket.getFileUri();
         File originalFile = new File(toCropUri.toString().substring(7)+"orig");
         Uri originalUri=Uri.fromFile(originalFile);
         CropImage.activity(originalUri)
                 .setOutputUri(toCropUri).start(this);
-        ticket.setFileUri(toCropUri);
-        //RUNS THE OCR ONCE MORE
-        OcrManager ocrManager = new OcrManager();
-        while (ocrManager.initialize(this) != 0) { // 'this' is the context
-            try {
-                //On first run vision library will be downloaded
-                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        Bitmap ocrImage= BitmapFactory.decodeFile(toCropUri.toString().substring(7));
-        ImageProcessor imgProc = new ImageProcessor(ocrImage);
-        Ticket result = ocrManager.getTicket(imgProc);
-        Log.d("OCR",result.amount+", "+result.date);
-        if(result.date == null)
-            ticket.setDate(Calendar.getInstance().getTime());
-        else
-            ticket.setDate(result.date);
-        ticket.setAmount(result.amount);
-        ticket.setShop(context.getString(R.string.string_NoShop));
-
-        if(result.title == null)
-            ticket.setTitle(context.getString(R.string.title_Ticket));
-        else
-            ticket.setTitle(result.title);
-        DB.updateTicket(ticket);
-        ocrManager.release();
-        //
-        Glide.with(context)
-                .load(toCropUri.toString().substring(7))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(imgView);
     }//cropPhoto
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
 

@@ -145,6 +145,11 @@ public class MissionsTabbed extends AppCompatActivity {
                     break;
             }
         }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            Log.d("CANCELLED", "OK");
+            missionsOpen.printAllMissions();
+            missionsClosed.printAllMissions();
+        }
     }
 
     /** Dal Maso
@@ -222,7 +227,7 @@ public class MissionsTabbed extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
+        setResult(RESULT_CANCELED, intent);
         finish();
     }
 

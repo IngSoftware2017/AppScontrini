@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     public DataManager DB;
     public List<PersonEntity> listPeople = new LinkedList<PersonEntity>();
     static final int person_added = 1;
+    ListView listView;
+    PeopleAdapter adapter;
 
     //Dal Maso
     @Override
@@ -75,18 +77,21 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case (person_added):
-                    clearAllPeople();
                     printAllPeople();
                     break;
                 default:
-                    clearAllPeople();
                     printAllPeople();
                     break;
             }
         }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            Log.d("CANCELLED", "OK");
+            printAllPeople();
+        }
     }
 
     private void initialize(){
+        listView = (ListView)findViewById(R.id.listPeople);
         DB = new DataManager(this.getApplicationContext());
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -99,31 +104,17 @@ public class MainActivity extends AppCompatActivity {
 
     /** PICCOLO
      * Adds in the database the new mission
-     * @param person the person to be added
      */
-    public void addToList(PersonEntity person){
-        listPeople.add(person);
-        ListView listView = (ListView)findViewById(R.id.listPeople);
-        PeopleAdapter adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
+    public void addToList(){
+        adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
         listView.setAdapter(adapter);
-    }
-
-    /**Lazzarin
-     * clear the view after I've eliminated a mission(before to call printAllMissions)
-     */
-    public void clearAllPeople()
-    {
-        ListView listView = (ListView)findViewById(R.id.listPeople);
-        PeopleAdapter emptyAdapter = new PeopleAdapter(this, R.layout.mission_card, listPeople);
-        emptyAdapter.clear();
-        emptyAdapter.notifyDataSetChanged();
-        listView.setAdapter(emptyAdapter);
     }
 
     /** Dal Maso
      * get all missions from the DB and print
      */
     public void printAllPeople(){
+        listPeople.clear();
         List<PersonEntity> people = DB.getAllPerson();
         TextView noPeople = (TextView)findViewById(R.id.noPeople);
         if(people.size() == 0){
@@ -134,8 +125,9 @@ public class MainActivity extends AppCompatActivity {
         }
         for (int i = 0; i < people.size(); i++)
         {
+            listPeople.add(people.get(i));
             Log.d("Persone", ""+people.get(i).getName());
-            addToList(people.get(i));
         }
+        addToList();
     }
 }

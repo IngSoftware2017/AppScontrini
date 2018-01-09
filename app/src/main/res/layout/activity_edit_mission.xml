@@ -26,6 +26,7 @@
                 android:id="@+id/input_missionEditName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textCapWords"
                 android:hint="@string/name"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
@@ -47,6 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/location"
+                android:inputType="textCapWords"
                 android:textColor="#FFF"
                 android:textSize="22dp"
                 android:singleLine="true"/>

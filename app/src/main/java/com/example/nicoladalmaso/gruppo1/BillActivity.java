@@ -374,6 +374,10 @@ public class BillActivity extends AppCompatActivity {
                     break;
             }
         }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            Log.d("CANCELLED", "OK");
+            printAllTickets();
+        }
     }
 
     /** Dal Maso
@@ -507,7 +511,7 @@ public class BillActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
+        setResult(RESULT_CANCELED, intent);
         finish();
     }
 
