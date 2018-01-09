@@ -83,11 +83,15 @@ public class EditTicket extends AppCompatActivity {
                 thisTicket.setShop(txtShop.getText().toString());
                 //thisTicket.setAmount(BigDecimal.valueOf(Integer.parseInt(txtAmount.getText().toString())));
 
-                String newAmount = txtAmount.getText().toString();
-                newAmount = newAmount.replace(",",".");
-                Double a = Double.parseDouble(newAmount);
+                try {
+                    String newAmount = txtAmount.getText().toString();
+                    newAmount = newAmount.replace(",", ".");
+                    Double a = Double.parseDouble(newAmount);
+                    thisTicket.setAmount(BigDecimal.valueOf(a));
+                }catch (NumberFormatException e){
+                    e.printStackTrace();
+                }
 
-                thisTicket.setAmount(BigDecimal.valueOf(a));
                 DB.updateTicket(thisTicket);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -109,7 +113,12 @@ public class EditTicket extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate().toString();
-        ticketAmount = thisTicket.getAmount()==null? "":thisTicket.getAmount().toString();
+        if(thisTicket.getAmount() !=null) {
+            Double amount = thisTicket.getAmount().doubleValue();
+            ticketAmount = amount.toString();
+        }
+        else
+            ticketAmount="";
         ticketShop = thisTicket.getShop();
 
         //set those values to the edittext
