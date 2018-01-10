@@ -3,6 +3,7 @@ package com.ing.software.ocr;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
@@ -442,32 +443,28 @@ public class OcrAnalyzer {
         return priceStr != null ? new BigDecimal(priceStr) : null;
     }
 
-    /**
-     * TEMPORARY
-     */
-    //Todo: extract day, month, year using group()
-    private static List<Pair<String, TextLine>> findAllDateStrings(List<TextLine> lines) {
-        List<Pair<String, TextLine>> dateStrings = new ArrayList<>();
+    @Nullable
+    private static Date findDate(List<TextLine> lines) {
+        List<Date> dates = new ArrayList<>();
         for (TextLine line : lines) {
-            String lineMatch = null;
             for (Word w : line.words()) {
                 Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
                 if (matcher.find()) {
-                    lineMatch = matcher.group(); // get first group -> entire regex match
-                    // use matcher.group("day") or "month" or "year" to get respective strings
+                    String match = matcher.group();
+                    String[] nums = match.split("[-/.]");
+                    int day = Integer.valueOf(nums[0]);
+                    int month = Integer.valueOf(nums[1]);
+                    int year = Integer.valueOf(nums[2]);
+                    if (year < 100)
+                        year += year > YEAR_CUT ? 1900 : 2000;
+                    dates.add(new GregorianCalendar(year, month, day).getTime());
                     break;
                 }
             }
             // It's better to avoid word concatenation because it could match a wrong date.
             // Ex: 1/1/20 14:30 -> 1/1/2014:30
-            if (lineMatch != null)
-                dateStrings.add(new Pair<>(lineMatch, line));
         }
-        return dateStrings;
-    }
-
-    private static Date findDate(List<TextLine> lines) {
-        return null; // stub
+        return dates.size() == 1 ? dates.get(0) : null;
     }
 
     /**
@@ -481,13 +478,13 @@ public class OcrAnalyzer {
     public synchronized Ticket analyzeTicket(@NonNull ImageProcessor imgProc) {
         Ticket ticket = new Ticket();
         ticket.errors = new ArrayList<>();
-        ticket.rectangle = imgProc.getCorners();
 
         Bitmap bm = imgProc.undistortForOCR();
         if (bm == null) {
             ticket.errors.add(TicketError.INVALID_PROCESSOR);
             return ticket;
         }
+        ticket.rectangle = imgProc.getCorners();
         List<TextLine> lines = bitmapToLines(bm, ocrEngine);
 
         //find amount

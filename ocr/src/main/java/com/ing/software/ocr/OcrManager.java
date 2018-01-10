@@ -74,12 +74,16 @@ public class OcrManager {
      * @author Riccardo Zaglia
      */
     public synchronized Ticket getTicket(@NonNull ImageProcessor imgProc) {
+
         Ticket ticket = new Ticket();
         ticket.errors = new ArrayList<>();
         if (!operative) {
             ticket.errors.add(TicketError.INVALID_STATE);
             return ticket;
         }
+
+        if (true)
+            return analyzer.analyzeTicket(imgProc);
 
         long startTime = System.nanoTime();
         Bitmap frame = imgProc.undistortForOCR();
