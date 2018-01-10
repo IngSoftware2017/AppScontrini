@@ -10,9 +10,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.ResultReceiver;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -80,13 +82,26 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     public DataManager DB;
     MissionEntity thisMission;
 
+    private final int REFRESH = 0;
+
+    private Handler hdlr = new Handler(Looper.getMainLooper(), msg -> {
+        if (msg.what == REFRESH) {
+            clearAllImages();
+            printAllTickets();
+        }
+        return true;
+    });
+
+    private void asyncRefresh() {
+        hdlr.obtainMessage(REFRESH).sendToTarget();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        DB = new DataManager(this.getApplicationContext());
+        DB = DataManager.getInstance(this.getApplicationContext());
         context = this.getApplicationContext();
         Intent intent = getIntent();
 
@@ -425,17 +440,27 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Uri bitmapUri = ticket.getFileUri();
             String fname = getFileName(bitmapUri);
             //DB.deleteTicket(ticketID);
-            Log.d("###################", "#####################################");
-            Log.d("Image_file_name", "is: " + fname);
-            Toast.makeText(context, getResources().getString(R.string.redoing_ocr), Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(BillActivity.this, OcrService.class);
-            intent.putExtra("receiver", mReceiver);
-            intent.putExtra("image", fname);
-            intent.putExtra("root", root);
-            intent.putExtra(TICKET_ID, String.valueOf(ticketID));
-            startService(intent);
+//            Log.d("###################", "#####################################");
+//            Log.d("Image_file_name", "is: " + fname);
+//            Toast.makeText(context, getResources().getString(R.string.redoing_ocr), Toast.LENGTH_LONG).show();
+//            Intent intent = new Intent(BillActivity.this, OcrService.class);
+//            intent.putExtra("receiver", mReceiver);
+//            intent.putExtra("image", fname);
+//            intent.putExtra("root", root);
+//            intent.putExtra(TICKET_ID, String.valueOf(ticketID));
+//            startService(intent);
+            Bitmap bm = BitmapFactory.decodeFile(new File(root, fname).getAbsolutePath());
+            ImageProcessor imgProc = new ImageProcessor(bm);
+            imgProc.setCorners(ticket.getCornerPoints());
+            ocrManager.getTicket(imgProc, t -> {
+                ticket.setAmount(t.amount);
+                ticket.setDate(t.date);
+                DB.updateTicket(ticket);
+                asyncRefresh();
+            });
         }
     }
+
 
     /** Dal Maso
      * Thread sleep for 1 second for right tickets real-time vision
@@ -470,6 +495,13 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             FileOutputStream out = new FileOutputStream(file);
 
             //TODO: HardCode example, implement ocr here
+            ImageProcessor imgProc = new ImageProcessor(imageToSave);
+            ocrManager.getTicket(imgProc, t -> {
+                TicketEntity te = new TicketEntity(uri, t.amount, null, t.date, null, missionID);
+                te.setCornerPoints(t.rectangle);
+                DB.addTicket(te);
+                asyncRefresh();
+            });
 
             //DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, missionID));
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -479,11 +511,11 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
             outOriginal.flush();
             outOriginal.close();
-            Intent intent = new Intent(BillActivity.this, OcrService.class);
-            intent.putExtra("receiver", mReceiver);
-            intent.putExtra("image", fname);
-            intent.putExtra("root", root);
-            startService(intent);
+//            Intent intent = new Intent(BillActivity.this, OcrService.class);
+//            intent.putExtra("receiver", mReceiver);
+//            intent.putExtra("image", fname);
+//            intent.putExtra("root", root);
+//            startService(intent);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -578,7 +610,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                     Log.d("TICKETID_REDO_OCR", "ID received in service (start) is: " + resultData.getString(TICKET_ID));
                     if (resultData.getString(TICKET_ID) == null) {
                         //photo is not present, add an image, will be remove once clearAllImages will be called
-                        printSingleTicket(new TicketEntity(uri, null, null, null, null, missionID));
+                        //printSingleTicket(new TicketEntity(uri, null, null, null, null, missionID));
                     }
                 }
                 break;
@@ -611,11 +643,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                                 ticket.setAmount(amount);
                                 ticket.setDate(date);
                                 ticket.setFileUri(uri);
-                                List<PointF> corners = new ArrayList<>();
-                                corners.add(new PointF(resultData.getFloat(CORNER1), resultData.getFloat(CORNER2)));
-                                corners.add(new PointF(resultData.getFloat(CORNER3), resultData.getFloat(CORNER4)));
-                                corners.add(new PointF(resultData.getFloat(CORNER5), resultData.getFloat(CORNER6)));
-                                corners.add(new PointF(resultData.getFloat(CORNER7), resultData.getFloat(CORNER8)));
+                                List<PointF> corners = resultData.getParcelableArrayList(CORNER1);
                                 ticket.setCornerPoints(corners);
                             }
                             DB.updateTicket(ticket);
@@ -624,11 +652,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                         }
                     } else {
                         TicketEntity ticket = new TicketEntity(uri, amount, null, date, null, missionID);
-                        List<PointF> corners = new ArrayList<>();
-                        corners.add(new PointF(resultData.getFloat(CORNER1), resultData.getFloat(CORNER2)));
-                        corners.add(new PointF(resultData.getFloat(CORNER3), resultData.getFloat(CORNER4)));
-                        corners.add(new PointF(resultData.getFloat(CORNER5), resultData.getFloat(CORNER6)));
-                        corners.add(new PointF(resultData.getFloat(CORNER7), resultData.getFloat(CORNER8)));
+                        List<PointF> corners = resultData.getParcelableArrayList(CORNER1);
                         ticket.setCornerPoints(corners);
                         DB.addTicket(ticket);
                     }
@@ -649,6 +673,8 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
      * When ticket is ready, send message to the receiver.
      */
     public static class OcrService extends IntentService {
+
+        DataManager DB = DataManager.getInstance(this);
 
         public OcrService() {
             super("OcrService");
@@ -673,47 +699,34 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Bitmap testBmp = getBitmapFromFile(file);
             receiver.send(STATUS_RUNNING, bundleRec);
             ocrManager.initialize(this);
-            List<PointF> corners = new ArrayList<>();
-            if (ticketID == null) {//new image, not crop
-                ImageProcessor alphaPreproc = new ImageProcessor(testBmp);
-                alphaPreproc.findTicket(false);
-                corners.addAll(alphaPreproc.getCorners());
-            } else
-                corners.addAll(DataManager.getInstance(this).getTicket(Long.parseLong(ticketID)).getCornerPoints());
-            Log.d("CORNERS: ", corners.get(0) + "" + corners.get(1) + corners.get(2) + corners.get(3));
-            Log.d("BITMAP: ", "Width: "+testBmp.getWidth() + "; height: " + testBmp.getHeight());
             ImageProcessor preproc = new ImageProcessor(testBmp);
-            preproc.setCorners(corners);
-            preproc.undistort(0, err -> {
-                    ocrManager.getTicket(preproc, result -> {
-                    OcrUtils.log(1, "OcrHandler", "Detection complete");
-                    if (result.amount != null) {
-                        OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
-                        bundleRec.putString(AMOUNT_RECEIVED, result.amount.toString());
-                    } else {
-                        OcrUtils.log(1, "OcrHandler", "No amount found");
-                        bundleRec.putString(AMOUNT_RECEIVED, NOT_FOUND);
-                    }
-                    if (result.date != null) {
-                        DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-                        String formattedDate = df.format(result.date);
-                        OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
-                        OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
-                        bundleRec.putString(DATE_RECEIVED, formattedDate);
-                    } else {
-                        OcrUtils.log(1, "OcrHandler", "No date found");
-                        bundleRec.putString(DATE_RECEIVED, NOT_FOUND);
-                    }
-                        bundleRec.putFloat(CORNER1, corners.get(0).x);
-                        bundleRec.putFloat(CORNER2, corners.get(0).y);
-                        bundleRec.putFloat(CORNER3, corners.get(1).x);
-                        bundleRec.putFloat(CORNER4, corners.get(1).y);
-                        bundleRec.putFloat(CORNER5, corners.get(2).x);
-                        bundleRec.putFloat(CORNER6, corners.get(2).y);
-                        bundleRec.putFloat(CORNER7, corners.get(3).x);
-                        bundleRec.putFloat(CORNER8, corners.get(3).y);
-                        receiver.send(STATUS_FINISHED, bundleRec);
-                });
+            if (ticketID != null) {
+                List<PointF> corners = DB.getTicket(Long.parseLong(ticketID)).getCornerPoints();
+                preproc.setCorners(corners);
+                Log.d("CORNERS: ", corners.get(0) + "" + corners.get(1) + corners.get(2) + corners.get(3));
+            }
+            Log.d("BITMAP: ", "Width: "+testBmp.getWidth() + "; height: " + testBmp.getHeight());
+            ocrManager.getTicket(preproc, result -> {
+                OcrUtils.log(1, "OcrHandler", "Detection complete");
+                if (result.amount != null) {
+                    OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
+                    bundleRec.putString(AMOUNT_RECEIVED, result.amount.toString());
+                } else {
+                    OcrUtils.log(1, "OcrHandler", "No amount found");
+                    bundleRec.putString(AMOUNT_RECEIVED, NOT_FOUND);
+                }
+                if (result.date != null) {
+                    DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                    String formattedDate = df.format(result.date);
+                    OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
+                    OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
+                    bundleRec.putString(DATE_RECEIVED, formattedDate);
+                } else {
+                    OcrUtils.log(1, "OcrHandler", "No date found");
+                    bundleRec.putString(DATE_RECEIVED, NOT_FOUND);
+                }
+                bundleRec.putParcelableArrayList(CORNER1, new ArrayList<>(preproc.getCorners()));
+                receiver.send(STATUS_FINISHED, bundleRec);
             });
             this.stopSelf();
         }

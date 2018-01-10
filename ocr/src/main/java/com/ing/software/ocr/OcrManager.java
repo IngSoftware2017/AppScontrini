@@ -76,7 +76,6 @@ public class OcrManager {
     public synchronized Ticket getTicket(@NonNull ImageProcessor imgProc) {
         Ticket ticket = new Ticket();
         ticket.errors = new ArrayList<>();
-        ticket.rectangle = imgProc.getCorners();
         if (!operative) {
             ticket.errors.add(TicketError.INVALID_STATE);
             return ticket;
@@ -88,6 +87,8 @@ public class OcrManager {
             ticket.errors.add(TicketError.INVALID_PROCESSOR);
             return ticket;
         }
+        ticket.rectangle = imgProc.getCorners();
+
         OcrResult result = analyzer.analyze(frame);
         Ticket newTicket = getTicketFromResult(result);
         long endTime = System.nanoTime();

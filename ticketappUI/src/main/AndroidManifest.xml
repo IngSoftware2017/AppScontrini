@@ -94,8 +94,9 @@
         <activity
             android:name=".CropActivity"
             android:parentActivityName=".FullImageActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/CropTheme" />
+        <!--android:screenOrientation="portrait"-->
+
         <activity
             android:name=".FullImageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

@@ -534,7 +534,7 @@ public class ImageProcessor {
      * @return bitmap
      */
     synchronized Bitmap undistortForOCR() {
-        if (quickCorners || corners == null || resized == null)
+        if (quickCorners || corners == null)
             if (findTicket(false).contains(TicketError.INVALID_STATE))
                 return null;
 
@@ -587,10 +587,10 @@ public class ImageProcessor {
      */
     public synchronized void setImage(@NonNull Bitmap bm) {
         corners = null;
-        resized = null;
         undistorted = null;
         srcImg = new Mat();
         Utils.bitmapToMat(bm, srcImg);
+        resized = downScaleRgba(srcImg);
     }
 
     /**
@@ -612,7 +612,6 @@ public class ImageProcessor {
             return singletonList(TicketError.INVALID_STATE);
         undistorted = null;
 
-        resized = downScaleRgba(srcImg);
         Swap<Mat> graySwap = new Swap<>(Mat::new);
         prepareBinaryImg(graySwap, resized);
         Mat binary = graySwap.first.clone();
