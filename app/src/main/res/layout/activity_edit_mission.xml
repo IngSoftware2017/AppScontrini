@@ -197,10 +197,35 @@
                     android:textAlignment="textEnd"/>
             </LinearLayout>
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"
                 android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/format_selection"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/selection_format"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+
+                <Spinner
+                    android:id="@+id/export_spinner"
+                    android:layout_width="139dp"
+                    android:layout_height="42dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"/>
 
                 <Button
                     android:id="@+id/export_button"
@@ -211,14 +236,6 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/export_mission_button" />
-                <Spinner
-                    android:id="@+id/export_spinner"
-                    android:layout_width="139dp"
-                    android:layout_height="42dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"/>
 
             </LinearLayout>
         </LinearLayout>

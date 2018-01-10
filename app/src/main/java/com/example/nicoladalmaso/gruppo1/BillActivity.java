@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
@@ -84,7 +86,9 @@ public class BillActivity extends AppCompatActivity {
         missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
         PersonEntity person = DB.getPerson(thisMission.getPersonID());
-        setTitle(thisMission.getName()+": "+person.getName()+" "+person.getLastName());
+        android.support.v7.app.ActionBar ab = getSupportActionBar();
+        ab.setTitle(thisMission.getName()+":");
+        ab.setSubtitle(person.getName()+" "+person.getLastName());
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -473,7 +477,7 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Federico Taschin
-     * Starts the OCR analysis of the bitmap. When the resuly is ready, it updates the database and the activity is refreshed
+     * Starts the OCR analysis of the bitmap. When the result is ready, it updates the database and the activity is refreshed
      * @param bitmap not null, image to be analyzed
      * @param ticketEntity the object related to the image
      */

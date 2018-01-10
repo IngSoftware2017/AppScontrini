@@ -46,7 +46,7 @@
     <string name="toast_noDataStart">Data di inizio mancante</string>
     <string name="toast_noDataFinish">Data di fine mancante</string>
     <!--Piccolo-->
-    <string name="text_isRepaid">Missione già rimborsata?</string>
+    <string name="text_isRepaid">Missione chiusa?</string>
     <string name="title_activity_missions_tabbed">MissionsTabbed</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
@@ -59,7 +59,7 @@
     <!--Olivieri-->
     <string name="text_numPerson">Persone presenti:</string>
     <string name="text_activeMission">Missioni attive:</string>
-    <string name="text_closeMission">Missioni già rimborsate:</string>
+    <string name="text_closeMission">Missioni chiuse:</string>
     <string name="text_ticket">Scontrini totali:</string>
     <string name="ticket_count_text">Scontrini presenti :</string>
     <string name="mission_total_text">Spese totali missione:</string>
@@ -73,5 +73,6 @@
     <string name="export_activity_name">Seleziona una cartella</string>
     <string name="export_share_text">Vuoi condividere i file esportati?</string>
     <string name="export_mission_button">Esporta missione</string>
+    <string name="selection_format">Seleziona formato esportazione:</string>
 </resources>
 
