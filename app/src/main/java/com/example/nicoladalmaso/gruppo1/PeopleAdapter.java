@@ -25,6 +25,9 @@ import database.PersonEntity;
 
 /**
  * Created by nicoladalmaso on 29/12/17.
+ *
+ * Modified: remove Academic Title view
+ * @author matteo.mascotto on 12-01-2018
  */
 
 public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
@@ -45,16 +48,18 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.person_card, null);
         TextView name = (TextView)convertView.findViewById(R.id.personName);
-        TextView title=(TextView)convertView.findViewById(R.id.personAcademicTitle);
+        //TextView title=(TextView)convertView.findViewById(R.id.personAcademicTitle);
         PersonEntity person = getItem(position);
         name.setText(person.getName()+" "+person.getLastName());
         String academicTitle = person.getAcademicTitle();
+        /*
         if ((academicTitle == null) || academicTitle.replaceAll(" ","").equals("")) {
             title.setText(context.getString(R.string.noAcademicTitle));
         }
         else {
             title.setText(person.getAcademicTitle());
         }
+        */
 
         convertView.setTag(person.getID());
 
