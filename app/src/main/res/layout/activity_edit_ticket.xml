@@ -62,38 +62,6 @@
                     android:layout_marginTop="3dp"
                     android:minHeight="48dp"
                     android:minWidth="48dp"
-                    app:srcCompat="@drawable/ic_store_black_48px" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="6">
-
-                    <android.support.design.widget.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/input_ticketShopMod"
-                        android:hint="@string/shop" />
-                </android.support.design.widget.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_marginTop="30dp"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:orientation="horizontal"
-                android:layout_marginRight="10dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="11dp"
-                    android:layout_marginRight="11dp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="3dp"
-                    android:minHeight="48dp"
-                    android:minWidth="48dp"
                     app:srcCompat="@drawable/ic_euro_symbol_black_48px" />
 
                 <android.support.design.widget.TextInputLayout
@@ -139,6 +107,38 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/input_ticketDateMod"
                         android:hint="@string/date" />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginTop="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:orientation="horizontal"
+                android:layout_marginRight="10dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="3dp"
+                    android:minHeight="48dp"
+                    android:minWidth="48dp"
+                    app:srcCompat="@drawable/ic_store_black_48px" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/input_ticketShopMod"
+                        android:hint="@string/shop" />
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>

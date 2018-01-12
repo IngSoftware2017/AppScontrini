@@ -86,6 +86,9 @@ public class BillViewer extends AppCompatActivity {
      * Initialize components
      *
      * Modify by Marco Olivieri: fixed amount and shop error
+     *
+     * Modified: Remove billName view
+     * @author matteo.mascotto on 12-01-2018
      */
     public void initialize(){
         //Get data from parent view
@@ -112,11 +115,11 @@ public class BillViewer extends AppCompatActivity {
         setTitle(ticketTitle);
         TextView billLastMod = (TextView)findViewById(R.id.billDate);
         billLastMod.setText(ticketDate);
-
+        /*
         //ImageName
         TextView billName = (TextView)findViewById(R.id.billName);
         billName.setText(ticketTitle);
-
+        */
         //Total price
         TextView billPrice = (TextView)findViewById(R.id.billTotal);
         billPrice.setText(ticketAmount+" €");
