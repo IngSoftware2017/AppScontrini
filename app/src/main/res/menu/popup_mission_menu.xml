@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/modify_mission"
+        android:orderInCategory="100"
+        android:title="@string/popup_mission_modify" />
+
+    <item
+        android:id="@+id/export_mission"
+        android:orderInCategory="100"
+        android:title="@string/popup_mission_export" />
+
+    <item
+        android:id="@+id/close_mission"
+        android:orderInCategory="100"
+        android:title="@string/popup_mission_close" />
+
+    <item
+        android:id="@+id/delete_mission"
+        android:orderInCategory="100"
+        android:title="@string/popup_mission_delete" />
+
+</menu>

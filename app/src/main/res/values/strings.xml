@@ -74,5 +74,11 @@
     <string name="export_share_text">Vuoi condividere i file esportati?</string>
     <string name="export_mission_button">Esporta missione</string>
     <string name="selection_format">Seleziona formato esportazione:</string>
+
+    <!--Mascotto-->
+    <string name="popup_mission_modify">Modifica</string>
+    <string name="popup_mission_export">Export</string>
+    <string name="popup_mission_close">Chiudi missione</string>
+    <string name="popup_mission_delete">Elimina</string>
 </resources>
 

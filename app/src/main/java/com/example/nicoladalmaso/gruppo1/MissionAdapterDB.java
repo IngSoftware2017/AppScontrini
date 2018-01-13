@@ -10,11 +10,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.io.File;
@@ -25,6 +28,9 @@ import database.MissionEntity;
 
 /**
  * Created by nicoladalmaso on 30/11/17.
+ * 
+ * Modified: Add pop-up menu for the card view
+ * @author matteo.mascotto on 13-01-2018
  */
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
@@ -49,6 +55,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         CardView card = (CardView)convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
+        ImageButton menuCard = (ImageButton) convertView.findViewById(R.id.missionMenu);
 
         MissionEntity c = getItem(position);
         title.setText(c.getName());
@@ -85,12 +92,41 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 missionID = Integer.parseInt(v.getTag().toString());
-                Intent startTicketsView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
+                Intent startTicketsView = new Intent(context, BillActivity.class);
                 startTicketsView.putExtra("missionID", missionID);
                 ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);
             }
         });
 
+        /**
+         * Listener for the pupUp menu of the mission's cardView
+         * @author matteo.mascotto
+         */
+        menuCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopupMenu(menuCard, position);
+            }
+        });
+
         return convertView;
+    }
+
+    /**
+     * It show the popUp menu for the mission
+     * @author matteo.mascotto
+     *
+     * @param view Viewer of the Mission's Card
+     * @param position position inside the popUp menu list
+     */
+    private void showPopupMenu(View view, int position) {
+
+        PopupMenu popup = new PopupMenu(view.getContext(),view );
+        MenuInflater inflater = popup.getMenuInflater();
+
+        inflater.inflate(R.menu.popup_mission_menu, popup.getMenu());
+
+        popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(position));
+        popup.show();
     }
 }
