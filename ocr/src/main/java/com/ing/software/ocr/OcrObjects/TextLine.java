@@ -22,27 +22,34 @@ import static java.util.Collections.*;
 public class TextLine {
     private Line line;
     private Lazy<List<Word>> words;
-    private Lazy<List<PointF>> corners;
-    private Lazy<Double> height, width, charWidth, charHeight, charAspRatio;
-    private Lazy<String> textNoSpaces, textOnlyAlpha;
-    private Lazy<String> numNoSpaces, numConcatDot;
+    private Lazy<List<PointF>> corners; // corners of a rotated rectangle containing the line of text
+    private Lazy<Double> height, width; // width, height of entire line
+    private Lazy<Double> charWidth, charHeight; // average width, height of single character
+    private Lazy<Double> charAspRatio; // charWidth / charHeight
+    private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
+    private Lazy<String> textOnlyAlpha; // uppercase text where all non alphabetic characters are removed. No spaces between words
+    private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
+    private Lazy<String> numConcatDot; // same as numNoSpaces, but words are concatenated with a dot
 
     public TextLine(Line line) {
         this.line = line;
         words = new Lazy<>(() -> Stream.of(line.getComponents())
                 .select(Element.class).map(Word::new).toList());
         corners = new Lazy<>(() -> ptsToPtsF(asList(line.getCornerPoints())));
+        // width and height are respectively the longest and shortest side of the rotated rectangle
         width =  new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(1)),
                                              dist(corners().get(2), corners().get(3)))));
         height = new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(3)),
                                              dist(corners().get(1), corners().get(2)))));
-        charWidth = new Lazy<>(() -> width() / text().length());
-        // average of individual words char height
+        // average of individual words char width, weighted on word length.
+        charWidth = new Lazy<>(() -> Stream.of(words()).reduce(0., (sum, w) ->
+                sum + w.charWidth() * w.length()) / textNoSpaces().length());
+        // average of individual words char height, weighted on word length
         charHeight = new Lazy<>(() -> Stream.of(words()).reduce(0., (sum, w) ->
                 sum + w.charHeight() * w.length()) / textNoSpaces().length());
         charAspRatio = new Lazy<>(() -> charWidth() / height());
         textNoSpaces = new Lazy<>(() -> Stream.of(words())
-                .reduce("", (str, w) -> str + w.text()));
+                .reduce("", (str, w) -> str + w.textUppercase()));
         textOnlyAlpha = new Lazy<>(() -> Stream.of(words())
                 .reduce("", (str, w) -> str + w.textOnlyAlpha()));
         numNoSpaces = new Lazy<>(() -> Stream.of(words())
@@ -88,14 +95,15 @@ public class TextLine {
         return new SizeF((float)charWidth(), (float)height());
     }
 
-    public double centerX() {
+    public float centerX() {
         return line.getBoundingBox().exactCenterX();
     }
 
-    public double centerY() {
+    public float centerY() {
         return line.getBoundingBox().exactCenterY();
     }
 
+    // bounding box (which size is always > of (width(), height()) )
     public RectF box() {
         return new RectF(line.getBoundingBox());
     }
@@ -115,6 +123,7 @@ public class TextLine {
     public String numNoSpaces() {
         return numNoSpaces.get();
     }
+
     public String numConcatDot() {
         return numConcatDot.get();
     }

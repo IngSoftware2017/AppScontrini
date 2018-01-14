@@ -113,7 +113,7 @@ public class FullImageActivity extends AppCompatActivity {
     private void showImage() {
         if (imgView != null && ticketId != 0 && ip != null) {
             ip.setCorners(DB.getTicket(ticketId).getCornerPoints());
-            imgView.setImageBitmap(ip.undistort(0));
+            imgView.setImageBitmap(ip.undistort());
         }
     }
 
@@ -163,14 +163,5 @@ public class FullImageActivity extends AppCompatActivity {
         // Schedule a runnable to display UI elements after a delay
         mHideHandler.removeCallbacks(mHidePart2Runnable);
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    /**
-     * Schedules a call to hide() in delay milliseconds, canceling any
-     * previously scheduled calls.
-     */
-    private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(this::hide);
-        mHideHandler.postDelayed(this::hide, delayMillis);
     }
 }

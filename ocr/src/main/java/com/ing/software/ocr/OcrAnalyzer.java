@@ -7,7 +7,6 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
-import android.util.Pair;
 import android.util.SizeF;
 import android.util.SparseArray;
 import com.annimon.stream.Stream;
@@ -339,7 +338,7 @@ public class OcrAnalyzer {
 
 
 	    // Extended rectangle vertical multiplier
-    private static final double EXT_RECT_V_MUL = 3;
+    private static final float EXT_RECT_V_MUL = 3;
 
     /**
      * This function runs the ocr detection on the given bitmap.
@@ -358,6 +357,19 @@ public class OcrAnalyzer {
     }
 
     /**
+     * Find all TextLines which text is matched by any of the list of matchers.
+     * @param lines list of TextLines. Can be empty
+     * @return TextLines matched. Can be empty if no match is found.
+     * @author Riccardo Zaglia
+     */
+    // todo: find most meaningful way to combine score criteria.
+    private static List<Scored<TextLine>> findAllMatchedStrings(List<TextLine> lines, List<WordMatcher> matchers) {
+        return Stream.of(lines)
+                .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
+                .filter(s -> s.getScore() != 0).toList();
+    }
+
+    /**
      * Choose the TextLine that most probably contains the amount string.
      * Criteria: AMOUNT_MATCHER score; character size; higher in the photo
      * @param lines list of TextLines. Can be empty
@@ -366,19 +378,19 @@ public class OcrAnalyzer {
      */
     // todo: find most meaningful way to combine score criteria.
     private static TextLine findAmountString(List<TextLine> lines, SizeF bmSize) {
-        TextLine bestLine = null;
-        double bestScore = 0;
-        for (TextLine line : lines) {
-            double score = max(Stream.of(AMOUNT_MATCHERS).map(M -> M.match(line)).toList());
-            score *= line.charWidth() + line.charHeight();
-            score *= 1. - line.centerY() / bmSize.getHeight();
-            if (score > bestScore) {
-                bestLine = line;
-                bestScore = score;
-            }
+        List<Scored<TextLine>> matchedLines = findAllMatchedStrings(lines, AMOUNT_MATCHERS);
+        // modify score for each matched line
+        for (Scored<TextLine> line : matchedLines) {
+            double score = line.getScore();
+            score *= line.obj().charWidth() + line.obj().charHeight();
+            score *= 1. - line.obj().centerY() / bmSize.getHeight();
+            line.setScore(score);
         }
-        return bestLine;
+        //return best line
+        return !matchedLines.isEmpty() ? max(matchedLines).obj() : null;
     }
+
+    //todo: find
 
     /**
      * Get a strip rectangle where the amount price should be found.
@@ -389,15 +401,16 @@ public class OcrAnalyzer {
      */
     @NonNull
     private static RectF getAmountStripRect(TextLine amountStr, SizeF bmSize) {
-        double halfHeight = amountStr.charHeight() * EXT_RECT_V_MUL / 2.;
+        float halfHeight = (float)amountStr.charHeight() * EXT_RECT_V_MUL / 2f;
         // here I account that the amount number could be in the same TextLine as the amount string.
         // I use the center of the TextLine as a left boundary.
-        return new RectF((float)amountStr.centerX(), (float)(amountStr.centerY() - halfHeight),
-                bmSize.getWidth(), (float)(amountStr.centerY() + halfHeight));
+        return new RectF(amountStr.centerX(), amountStr.centerY() - halfHeight,
+                bmSize.getWidth(), amountStr.centerY() + halfHeight);
     }
 
-    private static Bitmap getAmountStrip(ImageProcessor imgProc, TextLine amountStr, RectF srcRect) {
-        return imgProc.undistortedSubregion(srcRect,
+    private static Bitmap getAmountStrip(
+            ImageProcessor imgProc, SizeF bmSize, TextLine amountStr, RectF srcRect) {
+        return imgProc.undistortedSubregion(bmSize, srcRect,
                 srcRect.width() / srcRect.height() * CHAR_ASPECT_RATIO / amountStr.charAspectRatio());
     }
 
@@ -414,24 +427,22 @@ public class OcrAnalyzer {
     // todo: reject false positives adding a lower limit to the score > 0.
     @Nullable
     private static BigDecimal findAmountPrice(
-            List<TextLine> lines,
-            TextLine amountStr,
-            SizeF srcStripSize,
-            SizeF dstStripSize) {
+            List<TextLine> lines, TextLine amountStr, SizeF srcStripSize, SizeF dstStripSize) {
         double dstAmountStrWidth = amountStr.charWidth() * dstStripSize.getWidth() / srcStripSize.getWidth();
         double dstAmountStrHeight = amountStr.charHeight() * dstStripSize.getHeight() / srcStripSize.getHeight();
 
         String priceStr = null;
         double bestScore = 0;
         for (TextLine line : lines) {
+            // remove spaces between words, apply sanitize substitutions and try matching with the price matcher
             Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
             boolean matched = matcher.find();
-            if (!matched) {
+            if (!matched) { // try again using a dot to concatenate words
                 matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numConcatDot());
                 matched = matcher.find();
             }
             if (matched) {
-                double score = 1 - abs(1 - 2 * line.centerY() / dstStripSize.getHeight());
+                double score = 1 - 0.5 * abs(1 - 2 * line.centerY() / dstStripSize.getHeight());
                 score *= 2 - abs(1 - line.charWidth() / dstAmountStrWidth)
                         - abs(1 - line.charHeight() / dstAmountStrHeight);
                 if (score > bestScore) {
@@ -450,14 +461,14 @@ public class OcrAnalyzer {
             for (Word w : line.words()) {
                 Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
                 if (matcher.find()) {
-                    String match = matcher.group();
-                    String[] nums = match.split("[-/.]");
-                    int day = Integer.valueOf(nums[0]);
-                    int month = Integer.valueOf(nums[1]);
-                    int year = Integer.valueOf(nums[2]);
+                    int day = Integer.valueOf(matcher.group(DMY_DAY));
+                    int month = Integer.valueOf(matcher.group(DMY_MONTH));
+                    int year = Integer.valueOf(matcher.group(DMY_YEAR));
+                    //todo check if day is compatible with month (29-30-31)
                     if (year < 100)
                         year += year > YEAR_CUT ? 1900 : 2000;
-                    dates.add(new GregorianCalendar(year, month, day).getTime());
+                    // correct for 0 based month
+                    dates.add(new GregorianCalendar(year, month - 1, day).getTime());
                     break;
                 }
             }
@@ -475,13 +486,13 @@ public class OcrAnalyzer {
      */
     // not tested
     // todo: integrate schemer and other heuristics
-    public synchronized Ticket analyzeTicket(@NonNull ImageProcessor imgProc) {
-        Ticket ticket = new Ticket();
+    public synchronized OcrTicket analyzeTicket(@NonNull ImageProcessor imgProc) {
+        OcrTicket ticket = new OcrTicket();
         ticket.errors = new ArrayList<>();
 
-        Bitmap bm = imgProc.undistortForOCR();
+        Bitmap bm = imgProc.undistortForOCR(0.5);
         if (bm == null) {
-            ticket.errors.add(TicketError.INVALID_PROCESSOR);
+            ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
         }
         ticket.rectangle = imgProc.getCorners();
@@ -491,16 +502,16 @@ public class OcrAnalyzer {
         TextLine amountStr = findAmountString(lines, size(bm));
         if (amountStr != null) {
             RectF srcStripRect = getAmountStripRect(amountStr, size(bm));
-            Bitmap amountStrip = getAmountStrip(imgProc, amountStr, srcStripRect);
+            Bitmap amountStrip = getAmountStrip(imgProc, size(bm), amountStr, srcStripRect);
             List<TextLine> amountLines = bitmapToLines(amountStrip, ocrEngine);
             ticket.amount = findAmountPrice(amountLines, amountStr, size(srcStripRect), size(amountStrip));
         }
         if (ticket.amount == null)
-            ticket.errors.add(TicketError.AMOUNT_NOT_FOUND);
+            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
 
         ticket.date = findDate(lines);
         if (ticket.date == null)
-            ticket.errors.add(TicketError.DATE_NOT_FOUND);
+            ticket.errors.add(OcrError.DATE_NOT_FOUND);
 
         return ticket;
     }
@@ -510,7 +521,7 @@ public class OcrAnalyzer {
      * @param imgProc ImagePreprocessor
      * @param ticketCb Callback
      */
-    public void analyzeTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<Ticket> ticketCb) {
+    public void analyzeTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<OcrTicket> ticketCb) {
         new Thread(() -> ticketCb.accept(analyzeTicket(imgProc))).start();
     }
 }

@@ -1,13 +1,18 @@
 package com.ing.software.ocr;
 
+import android.annotation.SuppressLint;
 import android.util.Pair;
 
 
 import com.ing.software.ocr.OcrObjects.WordMatcher;
 
 import static java.util.Collections.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.*;
 import static java.util.regex.Pattern.compile;
@@ -35,46 +40,58 @@ public class OcrVars {
     static final int HEIGHT_LIST_MULTIPLIER = 80; //Multiplier used while analyzing difference between average height of rects and a specific rect. Used in ProbGrid.getRectHeightScore()
     public static final int HEIGHT_SOURCE_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in height between source and target rect (total with it's price)
 
-
-
-    static final String LANG_EN = "en";
-    static final String LANG_IT = "it";
-    static final List<String> LANGS = asList(LANG_EN, LANG_IT);
-
     // day 1 to 31 with or without 0 tens.
     // month 1 to 12 with or without 0 tens.
-    // year 1960 to 2059 with or without hundreds.
+    // year 1900 to 2099 if format YYYY, year 1960 to 2059 if format YY.
     // go to https://regex101.com/ to check the behaviour of these regular expressions.
-    static final int YEAR_CUT = 60; // YY < 60 -> 20YY;  YY >= 60 -> 19YY
-    // use groups "day", "month", "year" to retrieve respective values
-    static final Pattern DATE_DMY = compile(
-            "(?<!\\d)(?<day>0?[1-9]|[12]\\d|3[01])([-\\/.])(?<month>0?[1-9]|1[012])\\2(?<year>(?:19)?[6-9]\\d|(?:20)?[0-5]\\d)(?!\\2|\\d)");
-    static final Pattern DATE_MDY = compile(
-            "(?<!\\d)(?<month>0?[1-9]|1[012])([-\\/.])(?<day>0?[1-9]|[12]\\d|3[01])\\2(?<year>(?:19)?[6-9]\\d|(?:20)?[0-5]\\d)(?!\\2|\\d)");
-    static final Pattern DATE_YMD = compile(
-            "(?<!\\d)(?<year>(?:19)?[6-9]\\d|(?:20)?[0-5]\\d)([-\\/.])(?<month>0?[1-9]|1[012])\\2(?<day>0?[1-9]|[12]\\d|3[01])(?!\\2|\\d)");
     //back reference/forward reference not supported in lookbehind but is supported in lookahead
+    static final Pattern DATE_DMY = compile(
+            "(?<!\\d)(0?[1-9]|[12]\\d|3[01])([-\\/.])(0?[1-9]|1[012])\\2((?:19)?[6-9]\\d|(?:20)?[0-5]\\d)(?!\\2|\\d)");
+    static final int YEAR_CUT = 60; // YY < 60 -> 20YY;  YY >= 60 -> 19YY
 
-    // match every number (with optional thousands mark) with 2 decimal digits or a "-" (netherlands)
-    // accept if there is something before or a single non digit after (ex: €).
-    static final Pattern PRICE_PERMISSIVE = compile(
-            "(?<!\\d|\\.)(?:0|[1-9][\\d.]*?)\\.(?:\\d{2}|-)(?=[^\\d]?$)");
-    static final Pattern PRICE_NO_THOUSAND_MARK = compile(
-            "(?<!\\d|\\.)(?:0|[1-9]\\d*?)\\.(?:\\d{2}|-)(?=[^\\d.]?$)");
+    // regex groups for DMY date format
+    // group 0 is the whole match
+    static final int DMY_DAY = 1;
+    // group 2 is the delimiter
+    static final int DMY_MONTH = 3;
+    static final int DMY_YEAR = 4;
+    // I do not use named groups because is not supported for sdk < 24.
 
-    // regex-score pairs.
-    static final List<Pair<Pattern, Double>> DATE_REGEX_EN = asList(
-            new Pair<>(DATE_DMY, 3.), // EN-GB
-            new Pair<>(DATE_MDY, 2.) // EN-US
-    );
-    static final List<Pair<Pattern, Double>> DATE_REGEX_IT = singletonList(new Pair<>(DATE_DMY, 3.));
 
+    //match any combination of digits and dots, optional minus in front, optional character before end of string
+    // first group is the sign
+    static final Pattern POTENTIAL_PRICE = compile("(?<!\\d|\\.)(-?)[\\d.]+?(?=[^\\d.]?$)");
+    //match any combination of digits and dots between them, with two mandatory decimals, optional minus in front, optional character before end of string
+    static final Pattern PRICE_PERMISSIVE = compile("(?<!\\d|\\.)(-?)(?:0|[1-9][\\d.]*?)\\.\\d{2}(?=[^\\d.]?$)");
+    //match any number with one single dot for two decimals, optional minus in front, optional character before end of string
+    static final Pattern PRICE_NO_THOUSAND_MARK = compile("(?<!\\d|\\.)(-?)(?:0|[1-9]\\d*?)\\.\\d{2}(?=[^\\d.]?$)");
+    //match any number with no points, optional minus in front, optional character before end of string
+    static final Pattern PRICE_NO_DECIMALS = compile("(?<!\\d|\\.)(-?)(?:0|[1-9]\\d*?)(?=[^\\d.]?$)");
+
+
+    //In principle, multiple words should be matched with a space between them,
+    //but since sometimes some words are split into multiple words, I remove all spaces all together
+    //and match the words without spaces, even if there were in origin effectively distinct words.
     static final List<WordMatcher> AMOUNT_MATCHERS = asList(
-            new WordMatcher("T[OUD]TALE", 6, 1),
-            new WordMatcher("TOT", 3, 0),
-            new WordMatcher("T[OUD]TALEE[UI]R[OD]", 8, 3),
-            new WordMatcher("IMP[OU]RT[OD]", 7, 1),
-            new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 8, 3)
+            new WordMatcher("T[OUD]TALE", 1),
+            new WordMatcher("TOT", 0),
+            new WordMatcher("T[OUD]TALEE[UI]R[OD]", 3),
+            new WordMatcher("IMP[OU]RT[OD]", 1),
+            new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 3)
+    );
+    static final List<WordMatcher> CASH_MATCHERS = asList(
+            new WordMatcher("CONTANT[EI]", 1),
+            new WordMatcher("CARTADICREDITO", 3),
+            new WordMatcher("PAGAMENTOCONTANTE", 4)
+            //new WordMatcher("CCRED", 0) ?
+            //new WordMatcher("ASSEGNI", 1) ?
+            //new WordMatcher("ARROTOND", 0) ?
+    );
+    static final List<WordMatcher> CHANGE_MATCHERS = asList(
+            new WordMatcher("RESTO", 1)
+    );
+    static final List<WordMatcher> INDOOR_MATCHERS = asList(
+            new WordMatcher("COPERTO", 1)
     );
 
     // ideal character width / height

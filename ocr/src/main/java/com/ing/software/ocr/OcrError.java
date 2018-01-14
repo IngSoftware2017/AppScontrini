@@ -1,9 +1,9 @@
-package com.ing.software.common;
+package com.ing.software.ocr;
 
 /**
  * General purpose error enum. Used by ImagePreprocessor, Ticket
  */
-public enum TicketError {
+public enum OcrError {
     NONE,
     RECT_NOT_FOUND,
     INVALID_POINTS,
@@ -12,4 +12,7 @@ public enum TicketError {
     INVALID_PROCESSOR,
     AMOUNT_NOT_FOUND,
     DATE_NOT_FOUND,
+    ROTATED_180,
+    UNSURE_AMOUNT, //when the amount has been corrected
+    UNSURE_DATE, //when the date has been corrected
 }

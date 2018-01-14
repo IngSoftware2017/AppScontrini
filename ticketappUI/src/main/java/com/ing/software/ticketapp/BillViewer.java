@@ -95,7 +95,7 @@ public class BillViewer extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         if (thisTicket.getDate() != null) {
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
             ticketDate = df.format(thisTicket.getDate());
         } else
             ticketDate = getString(R.string.no_date);

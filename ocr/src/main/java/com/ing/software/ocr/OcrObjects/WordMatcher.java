@@ -25,6 +25,7 @@ public class WordMatcher {
      * @param max maximum distance accepted
      * @return distance of target from regex or Integer.MAX_VALUE if the maximum value has been exceeded
      */
+    //todo: find a criteria to stop after hitting max distance
     private static int levDistance(List<List<Character>> compRegex, String target, int max)
     {
         int i, j;
@@ -78,20 +79,18 @@ public class WordMatcher {
         return compiled;
     }
 
+    //this compiled regex format represent a string where in each character position, multiple chars are accepted
     private List<List<Character>> compiledRegex;
-    private double maxScore;
     private int maxDist;
 
     /**
      * Create a WordMatcher. The regex must match only alphabetic characters.
      * @param regex regular expression (supports only square bracket operator).
-     * @param maxScore maximum score for a match
      * @param maxLevDist maximum levenshtein distance
      * @author Riccardo Zaglia
      */
-    public WordMatcher(String regex, double maxScore, int maxLevDist) {
+    public WordMatcher(String regex, int maxLevDist) {
         compiledRegex = compile(regex);
-        this.maxScore = maxScore;
         maxDist = maxLevDist;
     }
 
@@ -103,9 +102,13 @@ public class WordMatcher {
      * @author Riccardo Zaglia
      */
     public double match(TextLine line) {
+        //scanning each word, find the least levenshtein distance of regex to the current word
         int wordsLeastLoss = min(Stream.of(line.words())
                 .map(w -> levDistance(compiledRegex, w.textOnlyAlpha(), maxDist)).toList());
+        //scan also the whole line without spaces and return the least loss.
+        //sometimes, if the characters are spread horizontally, a word can be split in multiple words.
         int finalLoss = min(wordsLeastLoss, levDistance(compiledRegex, line.textOnlyAlpha(), maxDist));
-        return max(maxScore - finalLoss, 0);
+        // the final score is the length of a word that perfectly matches regex minus the least loss.
+        return max(compiledRegex.size() - finalLoss, 0);
     }
 }

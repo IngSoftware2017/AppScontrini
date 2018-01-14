@@ -62,7 +62,7 @@ import database.TicketEntity;
 
 import static com.ing.software.ticketapp.StatusVars.*;
 
-public class BillActivity extends AppCompatActivity  implements OcrResultReceiver.Receiver {
+public class BillActivity extends AppCompatActivity { //  implements OcrResultReceiver.Receiver {
 
     final OcrResultReceiver mReceiver = new OcrResultReceiver(new Handler());
     private static OcrManager ocrManager;
@@ -91,7 +91,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         }
         return true;
     });
-
     private void asyncRefresh() {
         hdlr.obtainMessage(REFRESH).sendToTarget();
     }
@@ -110,7 +109,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         setTitle(thisMission.getName());
         context = this.getApplicationContext();
         initializeComponents();
-        mReceiver.setReceiver(this);
+        //mReceiver.setReceiver(this);
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) {
             try {
@@ -452,7 +451,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Bitmap bm = BitmapFactory.decodeFile(new File(root, fname).getAbsolutePath());
             ImageProcessor imgProc = new ImageProcessor(bm);
             imgProc.setCorners(ticket.getCornerPoints());
-            ocrManager.getTicket(imgProc, t -> {
+            ocrManager.getTicket(imgProc, true, t -> {
                 ticket.setAmount(t.amount);
                 ticket.setDate(t.date);
                 DB.updateTicket(ticket);
@@ -494,9 +493,8 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         try {
             FileOutputStream out = new FileOutputStream(file);
 
-            //TODO: HardCode example, implement ocr here
             ImageProcessor imgProc = new ImageProcessor(imageToSave);
-            ocrManager.getTicket(imgProc, t -> {
+            ocrManager.getTicket(imgProc, false, t -> {
                 TicketEntity te = new TicketEntity(uri, t.amount, null, t.date, null, missionID);
                 te.setCornerPoints(t.rectangle);
                 DB.addTicket(te);
@@ -599,162 +597,162 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
 
-    @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        switch (resultCode) {
-            case STATUS_RUNNING:
-                //Toast.makeText(this, "Starting img ", Toast.LENGTH_SHORT).show();
-                //show new photo, but set amount and date to null
-                if (resultData.getString(IMAGE_RECEIVED) != null) {
-                    Uri uri = Uri.fromFile(new File(resultData.getString(ROOT_RECEIVED), resultData.getString(IMAGE_RECEIVED)));
-                    Log.d("TICKETID_REDO_OCR", "ID received in service (start) is: " + resultData.getString(TICKET_ID));
-                    if (resultData.getString(TICKET_ID) == null) {
-                        //photo is not present, add an image, will be remove once clearAllImages will be called
-                        //printSingleTicket(new TicketEntity(uri, null, null, null, null, missionID));
-                    }
-                }
-                break;
-            case STATUS_FINISHED:
-                //Toast.makeText(this, "Amount is: " + resultData.getString(AMOUNT_RECEIVED) + "\nDate is: "
-                //        + resultData.getString(DATE_RECEIVED), Toast.LENGTH_LONG).show();
-                if (resultData.getString(IMAGE_RECEIVED) != null) {
-                    Uri uri = Uri.fromFile(new File(resultData.getString(ROOT_RECEIVED), resultData.getString(IMAGE_RECEIVED)));
-                    BigDecimal amount = null;
-                    try {
-                        amount = new BigDecimal(resultData.getString(AMOUNT_RECEIVED)).setScale(2, RoundingMode.HALF_UP);
-                    } catch (NumberFormatException | NullPointerException e) {
-                        //No valid amount
-                    }
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-                    Date date = null;
-                    try {
-                        date = dateFormat.parse(resultData.getString(DATE_RECEIVED));
-                    } catch (ParseException | NullPointerException e) {
-                        //Nada
-                    }
-                    //if (date == null)
-                    //    date = Calendar.getInstance().getTime();
-                    Log.d("TICKETID_REDO_OCR", "ID received in service (finished) is: " + resultData.getString(TICKET_ID));
-                    if (resultData.getString(TICKET_ID) != null) {
-                        try {
-                            long ticketID = Long.parseLong(resultData.getString(TICKET_ID));
-                            TicketEntity ticket = DB.getTicket(ticketID);
-                            if (ticket != null) {
-                                ticket.setAmount(amount);
-                                ticket.setDate(date);
-                                ticket.setFileUri(uri);
-                                List<PointF> corners = resultData.getParcelableArrayList(CORNER1);
-                                ticket.setCornerPoints(corners);
-                            }
-                            DB.updateTicket(ticket);
-                        } catch (NumberFormatException | NullPointerException e) {
-                            //Nada
-                        }
-                    } else {
-                        TicketEntity ticket = new TicketEntity(uri, amount, null, date, null, missionID);
-                        List<PointF> corners = resultData.getParcelableArrayList(CORNER1);
-                        ticket.setCornerPoints(corners);
-                        DB.addTicket(ticket);
-                    }
-                    clearAllImages();
-                    printAllTickets();
-                }
-                break;
-            case STATUS_ERROR:
-                /* Handle the error */
-                String error = resultData.getString(ERROR_RECEIVED);
-                Toast.makeText(this, "Error: " + error, Toast.LENGTH_LONG).show();
-                break;
-        }
-    }
-
-    /**
-     * Service to manage requests to analyze tickets
-     * When ticket is ready, send message to the receiver.
-     */
-    public static class OcrService extends IntentService {
-
-        DataManager DB = DataManager.getInstance(this);
-
-        public OcrService() {
-            super("OcrService");
-        }
-
-        public OcrService(String name) {
-            super(name);
-        }
-
-        @Override
-        protected void onHandleIntent(final Intent workIntent) {
-            OcrUtils.log(1, "OcrService", "Entering service");
-            final ResultReceiver receiver = workIntent.getParcelableExtra("receiver");
-            final Bundle bundleRec = new Bundle();
-            String root = workIntent.getStringExtra("root");
-            String name = workIntent.getStringExtra("image");
-            String ticketID = workIntent.getStringExtra(TICKET_ID);
-            bundleRec.putString(ROOT_RECEIVED, root);
-            bundleRec.putString(IMAGE_RECEIVED, name);
-            bundleRec.putString(TICKET_ID, ticketID);
-            File file = new File(root, name);
-            Bitmap testBmp = getBitmapFromFile(file);
-            receiver.send(STATUS_RUNNING, bundleRec);
-            ocrManager.initialize(this);
-            ImageProcessor preproc = new ImageProcessor(testBmp);
-            if (ticketID != null) {
-                List<PointF> corners = DB.getTicket(Long.parseLong(ticketID)).getCornerPoints();
-                preproc.setCorners(corners);
-                Log.d("CORNERS: ", corners.get(0) + "" + corners.get(1) + corners.get(2) + corners.get(3));
-            }
-            Log.d("BITMAP: ", "Width: "+testBmp.getWidth() + "; height: " + testBmp.getHeight());
-            ocrManager.getTicket(preproc, result -> {
-                OcrUtils.log(1, "OcrHandler", "Detection complete");
-                if (result.amount != null) {
-                    OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
-                    bundleRec.putString(AMOUNT_RECEIVED, result.amount.toString());
-                } else {
-                    OcrUtils.log(1, "OcrHandler", "No amount found");
-                    bundleRec.putString(AMOUNT_RECEIVED, NOT_FOUND);
-                }
-                if (result.date != null) {
-                    DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-                    String formattedDate = df.format(result.date);
-                    OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
-                    OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
-                    bundleRec.putString(DATE_RECEIVED, formattedDate);
-                } else {
-                    OcrUtils.log(1, "OcrHandler", "No date found");
-                    bundleRec.putString(DATE_RECEIVED, NOT_FOUND);
-                }
-                bundleRec.putParcelableArrayList(CORNER1, new ArrayList<>(preproc.getCorners()));
-                receiver.send(STATUS_FINISHED, bundleRec);
-            });
-            this.stopSelf();
-        }
-
-        /**
-         * Decode bitmap from file
-         *
-         * @param file not null and must be an image
-         * @return bitmap from file
-         */
-        private Bitmap getBitmapFromFile(File file) {
-            FileInputStream fis = null;
-            try {
-                try {
-                    fis = new FileInputStream(file);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                return BitmapFactory.decodeStream(fis);
-            } finally {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+//    @Override
+//    public void onReceiveResult(int resultCode, Bundle resultData) {
+//        switch (resultCode) {
+//            case STATUS_RUNNING:
+//                //Toast.makeText(this, "Starting img ", Toast.LENGTH_SHORT).show();
+//                //show new photo, but set amount and date to null
+//                if (resultData.getString(IMAGE_RECEIVED) != null) {
+//                    Uri uri = Uri.fromFile(new File(resultData.getString(ROOT_RECEIVED), resultData.getString(IMAGE_RECEIVED)));
+//                    Log.d("TICKETID_REDO_OCR", "ID received in service (start) is: " + resultData.getString(TICKET_ID));
+//                    if (resultData.getString(TICKET_ID) == null) {
+//                        //photo is not present, add an image, will be remove once clearAllImages will be called
+//                        //printSingleTicket(new TicketEntity(uri, null, null, null, null, missionID));
+//                    }
+//                }
+//                break;
+//            case STATUS_FINISHED:
+//                //Toast.makeText(this, "Amount is: " + resultData.getString(AMOUNT_RECEIVED) + "\nDate is: "
+//                //        + resultData.getString(DATE_RECEIVED), Toast.LENGTH_LONG).show();
+//                if (resultData.getString(IMAGE_RECEIVED) != null) {
+//                    Uri uri = Uri.fromFile(new File(resultData.getString(ROOT_RECEIVED), resultData.getString(IMAGE_RECEIVED)));
+//                    BigDecimal amount = null;
+//                    try {
+//                        amount = new BigDecimal(resultData.getString(AMOUNT_RECEIVED)).setScale(2, RoundingMode.HALF_UP);
+//                    } catch (NumberFormatException | NullPointerException e) {
+//                        //No valid amount
+//                    }
+//                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+//                    Date date = null;
+//                    try {
+//                        date = dateFormat.parse(resultData.getString(DATE_RECEIVED));
+//                    } catch (ParseException | NullPointerException e) {
+//                        //Nada
+//                    }
+//                    //if (date == null)
+//                    //    date = Calendar.getInstance().getTime();
+//                    Log.d("TICKETID_REDO_OCR", "ID received in service (finished) is: " + resultData.getString(TICKET_ID));
+//                    if (resultData.getString(TICKET_ID) != null) {
+//                        try {
+//                            long ticketID = Long.parseLong(resultData.getString(TICKET_ID));
+//                            TicketEntity ticket = DB.getTicket(ticketID);
+//                            if (ticket != null) {
+//                                ticket.setAmount(amount);
+//                                ticket.setDate(date);
+//                                ticket.setFileUri(uri);
+//                                List<PointF> corners = resultData.getParcelableArrayList(CORNER1);
+//                                ticket.setCornerPoints(corners);
+//                            }
+//                            DB.updateTicket(ticket);
+//                        } catch (NumberFormatException | NullPointerException e) {
+//                            //Nada
+//                        }
+//                    } else {
+//                        TicketEntity ticket = new TicketEntity(uri, amount, null, date, null, missionID);
+//                        List<PointF> corners = resultData.getParcelableArrayList(CORNER1);
+//                        ticket.setCornerPoints(corners);
+//                        DB.addTicket(ticket);
+//                    }
+//                    clearAllImages();
+//                    printAllTickets();
+//                }
+//                break;
+//            case STATUS_ERROR:
+//                /* Handle the error */
+//                String error = resultData.getString(ERROR_RECEIVED);
+//                Toast.makeText(this, "Error: " + error, Toast.LENGTH_LONG).show();
+//                break;
+//        }
+//    }
+//
+//    /**
+//     * Service to manage requests to analyze tickets
+//     * When ticket is ready, send message to the receiver.
+//     */
+//    public static class OcrService extends IntentService {
+//
+//        DataManager DB = DataManager.getInstance(this);
+//
+//        public OcrService() {
+//            super("OcrService");
+//        }
+//
+//        public OcrService(String name) {
+//            super(name);
+//        }
+//
+//        @Override
+//        protected void onHandleIntent(final Intent workIntent) {
+//            OcrUtils.log(1, "OcrService", "Entering service");
+//            final ResultReceiver receiver = workIntent.getParcelableExtra("receiver");
+//            final Bundle bundleRec = new Bundle();
+//            String root = workIntent.getStringExtra("root");
+//            String name = workIntent.getStringExtra("image");
+//            String ticketID = workIntent.getStringExtra(TICKET_ID);
+//            bundleRec.putString(ROOT_RECEIVED, root);
+//            bundleRec.putString(IMAGE_RECEIVED, name);
+//            bundleRec.putString(TICKET_ID, ticketID);
+//            File file = new File(root, name);
+//            Bitmap testBmp = getBitmapFromFile(file);
+//            receiver.send(STATUS_RUNNING, bundleRec);
+//            ocrManager.initialize(this);
+//            ImageProcessor preproc = new ImageProcessor(testBmp);
+//            if (ticketID != null) {
+//                List<PointF> corners = DB.getTicket(Long.parseLong(ticketID)).getCornerPoints();
+//                preproc.setCorners(corners);
+//                Log.d("CORNERS: ", corners.get(0) + "" + corners.get(1) + corners.get(2) + corners.get(3));
+//            }
+//            Log.d("BITMAP: ", "Width: "+testBmp.getWidth() + "; height: " + testBmp.getHeight());
+//            ocrManager.getTicket(preproc, result -> {
+//                OcrUtils.log(1, "OcrHandler", "Detection complete");
+//                if (result.amount != null) {
+//                    OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
+//                    bundleRec.putString(AMOUNT_RECEIVED, result.amount.toString());
+//                } else {
+//                    OcrUtils.log(1, "OcrHandler", "No amount found");
+//                    bundleRec.putString(AMOUNT_RECEIVED, NOT_FOUND);
+//                }
+//                if (result.date != null) {
+//                    DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+//                    String formattedDate = df.format(result.date);
+//                    OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
+//                    OcrUtils.log(1, "OcrHandler", "Formatted Date: " + formattedDate);
+//                    bundleRec.putString(DATE_RECEIVED, formattedDate);
+//                } else {
+//                    OcrUtils.log(1, "OcrHandler", "No date found");
+//                    bundleRec.putString(DATE_RECEIVED, NOT_FOUND);
+//                }
+//                bundleRec.putParcelableArrayList(CORNER1, new ArrayList<>(preproc.getCorners()));
+//                receiver.send(STATUS_FINISHED, bundleRec);
+//            });
+//            this.stopSelf();
+//        }
+//
+//        /**
+//         * Decode bitmap from file
+//         *
+//         * @param file not null and must be an image
+//         * @return bitmap from file
+//         */
+//        private Bitmap getBitmapFromFile(File file) {
+//            FileInputStream fis = null;
+//            try {
+//                try {
+//                    fis = new FileInputStream(file);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//                return BitmapFactory.decodeStream(fis);
+//            } finally {
+//                try {
+//                    fis.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
     public String getFileName(Uri uri) {
         String result = null;
