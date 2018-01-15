@@ -96,14 +96,14 @@ public class WordMatcher {
 
     /**
      * Get a score of how well the input line matches with the previously passed regex.
-     * @param line TextLine to match
+     * @param line OcrText to match
      * @return value in range [0, maxScore]. maxScore is the value passed in the constructor.
      *         0 means that there was no match.
      * @author Riccardo Zaglia
      */
-    public double match(TextLine line) {
+    public double match(OcrText line) {
         //scanning each word, find the least levenshtein distance of regex to the current word
-        int wordsLeastLoss = min(Stream.of(line.words())
+        int wordsLeastLoss = min(Stream.of(line.childs())
                 .map(w -> levDistance(compiledRegex, w.textOnlyAlpha(), maxDist)).toList());
         //scan also the whole line without spaces and return the least loss.
         //sometimes, if the characters are spread horizontally, a word can be split in multiple words.

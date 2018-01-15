@@ -344,15 +344,15 @@ public class OcrAnalyzer {
      * This function runs the ocr detection on the given bitmap.
      * @param bm input bitmap
      * @param ocrEngine TextRecognizer
-     * @return list of TextLine
+     * @return list of OcrText
      * @author Riccardo Zaglia
      */
-    private static List<TextLine> bitmapToLines(Bitmap bm, TextRecognizer ocrEngine) {
+    private static List<OcrText> bitmapToLines(Bitmap bm, TextRecognizer ocrEngine) {
         SparseArray<TextBlock> blocks = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
-        List<TextLine> lines = new ArrayList<>();
+        List<OcrText> lines = new ArrayList<>();
         for (int i = 0; i < blocks.size(); i++)
             for (Text txt : blocks.valueAt(i).getComponents())
-                lines.add(new TextLine((Line)txt));
+                lines.add(new OcrText((Line)txt));
         return lines;
     }
 
@@ -363,24 +363,24 @@ public class OcrAnalyzer {
      * @author Riccardo Zaglia
      */
     // todo: find most meaningful way to combine score criteria.
-    private static List<Scored<TextLine>> findAllMatchedStrings(List<TextLine> lines, List<WordMatcher> matchers) {
+    private static List<Scored<OcrText>> findAllMatchedStrings(List<OcrText> lines, List<WordMatcher> matchers) {
         return Stream.of(lines)
                 .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
                 .filter(s -> s.getScore() != 0).toList();
     }
 
     /**
-     * Choose the TextLine that most probably contains the amount string.
+     * Choose the OcrText that most probably contains the amount string.
      * Criteria: AMOUNT_MATCHER score; character size; higher in the photo
      * @param lines list of TextLines. Can be empty
-     * @return TextLine with higher score. Can be null if no match is found.
+     * @return OcrText with higher score. Can be null if no match is found.
      * @author Riccardo Zaglia
      */
     // todo: find most meaningful way to combine score criteria.
-    private static TextLine findAmountString(List<TextLine> lines, SizeF bmSize) {
-        List<Scored<TextLine>> matchedLines = findAllMatchedStrings(lines, AMOUNT_MATCHERS);
+    private static OcrText findAmountString(List<OcrText> lines, SizeF bmSize) {
+        List<Scored<OcrText>> matchedLines = findAllMatchedStrings(lines, AMOUNT_MATCHERS);
         // modify score for each matched line
-        for (Scored<TextLine> line : matchedLines) {
+        for (Scored<OcrText> line : matchedLines) {
             double score = line.getScore();
             score *= line.obj().charWidth() + line.obj().charHeight();
             score *= 1. - line.obj().centerY() / bmSize.getHeight();
@@ -400,22 +400,22 @@ public class OcrAnalyzer {
      * @author Riccardo Zaglia
      */
     @NonNull
-    private static RectF getAmountStripRect(TextLine amountStr, SizeF bmSize) {
+    private static RectF getAmountStripRect(OcrText amountStr, SizeF bmSize) {
         float halfHeight = (float)amountStr.charHeight() * EXT_RECT_V_MUL / 2f;
-        // here I account that the amount number could be in the same TextLine as the amount string.
-        // I use the center of the TextLine as a left boundary.
+        // here I account that the amount number could be in the same OcrText as the amount string.
+        // I use the center of the OcrText as a left boundary.
         return new RectF(amountStr.centerX(), amountStr.centerY() - halfHeight,
                 bmSize.getWidth(), amountStr.centerY() + halfHeight);
     }
 
     private static Bitmap getAmountStrip(
-            ImageProcessor imgProc, SizeF bmSize, TextLine amountStr, RectF srcRect) {
+            ImageProcessor imgProc, SizeF bmSize, OcrText amountStr, RectF srcRect) {
         return imgProc.undistortedSubregion(bmSize, srcRect,
                 srcRect.width() / srcRect.height() * CHAR_ASPECT_RATIO / amountStr.charAspectRatio());
     }
 
     /**
-     * Choose the TextLine that most probably contains the amount price and return it as a BigDecimal.
+     * Choose the OcrText that most probably contains the amount price and return it as a BigDecimal.
      * Criteria: lower distance from center of strip; least character size difference from amount string
      * @param lines all lines contained inside amount strip.
      * @param amountStr amount string line.
@@ -427,13 +427,13 @@ public class OcrAnalyzer {
     // todo: reject false positives adding a lower limit to the score > 0.
     @Nullable
     private static BigDecimal findAmountPrice(
-            List<TextLine> lines, TextLine amountStr, SizeF srcStripSize, SizeF dstStripSize) {
+            List<OcrText> lines, OcrText amountStr, SizeF srcStripSize, SizeF dstStripSize) {
         double dstAmountStrWidth = amountStr.charWidth() * dstStripSize.getWidth() / srcStripSize.getWidth();
         double dstAmountStrHeight = amountStr.charHeight() * dstStripSize.getHeight() / srcStripSize.getHeight();
 
         String priceStr = null;
         double bestScore = 0;
-        for (TextLine line : lines) {
+        for (OcrText line : lines) {
             // remove spaces between words, apply sanitize substitutions and try matching with the price matcher
             Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
             boolean matched = matcher.find();
@@ -455,10 +455,10 @@ public class OcrAnalyzer {
     }
 
     @Nullable
-    private static Date findDate(List<TextLine> lines) {
+    private static Date findDate(List<OcrText> lines) {
         List<Date> dates = new ArrayList<>();
-        for (TextLine line : lines) {
-            for (Word w : line.words()) {
+        for (OcrText line : lines) {
+            for (OcrText w : line.childs()) {
                 Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
                 if (matcher.find()) {
                     int day = Integer.valueOf(matcher.group(DMY_DAY));
@@ -496,14 +496,14 @@ public class OcrAnalyzer {
             return ticket;
         }
         ticket.rectangle = imgProc.getCorners();
-        List<TextLine> lines = bitmapToLines(bm, ocrEngine);
+        List<OcrText> lines = bitmapToLines(bm, ocrEngine);
 
         //find amount
-        TextLine amountStr = findAmountString(lines, size(bm));
+        OcrText amountStr = findAmountString(lines, size(bm));
         if (amountStr != null) {
             RectF srcStripRect = getAmountStripRect(amountStr, size(bm));
             Bitmap amountStrip = getAmountStrip(imgProc, size(bm), amountStr, srcStripRect);
-            List<TextLine> amountLines = bitmapToLines(amountStrip, ocrEngine);
+            List<OcrText> amountLines = bitmapToLines(amountStrip, ocrEngine);
             ticket.amount = findAmountPrice(amountLines, amountStr, size(srcStripRect), size(amountStrip));
         }
         if (ticket.amount == null)

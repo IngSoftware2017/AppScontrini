@@ -762,6 +762,13 @@ public class ImageProcessor {
         new Thread(() -> callback.accept(undistort(marginMul, shortSide))).start();
     }
 
+    /**
+     * Rotate corners, so when undistort is called, the resulting image is rotated 180deg.
+     */
+    public void rotateUpsideDown() {
+        corners = shiftMatPoints(corners, 2); // in a rectangle, opposite corner is 2 corners away
+    }
+
 
     //UTILITY FUNCTIONS:
 

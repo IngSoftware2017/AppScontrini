@@ -1,6 +1,7 @@
 package com.ing.software.ocr;
 
 import android.graphics.PointF;
+import android.util.Pair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,6 +22,16 @@ public class OcrTicket {
      * Total amount.
      */
     public BigDecimal amount;
+
+    /**
+     * List of products (label + amount)
+     */
+    public List<Pair<String, BigDecimal>> products;
+
+    /**
+     * Indoor amount ("coperto")
+     */
+    public BigDecimal indoorAmount;
 
     /**
      * Ordered list of vertices of rectangle (first top-left, counter-clockwise)

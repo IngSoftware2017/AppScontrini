@@ -71,6 +71,11 @@ public class OcrManager {
      * @author Riccardo Zaglia
      */
     public synchronized OcrTicket getTicket(@NonNull ImageProcessor imgProc, boolean advanced) {
+        ImageProcessor procCopy = new ImageProcessor(imgProc);
+
+        //todo: for advanced mode, redo ocr with upside down bitmap.
+        // procCopy.rotateUpsideDown();
+        // frame = procCopy.undistortForOCR(1.);
 
         OcrTicket ticket = new OcrTicket();
         ticket.errors = new ArrayList<>();
@@ -80,13 +85,13 @@ public class OcrManager {
         }
 
         long startTime = System.nanoTime();
-        Bitmap frame = imgProc.undistortForOCR(advanced ? 1. : 1. / 3.); // advanced -> full resolution,
-                                                                         // else -> a third resolution
+        Bitmap frame = procCopy.undistortForOCR(advanced ? 1. : 1. / 3.); // advanced -> full resolution,
+                                                                          // else -> a third resolution
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
         }
-        ticket.rectangle = imgProc.getCorners();
+        ticket.rectangle = procCopy.getCorners();
 
         OcrResult result = analyzer.analyze(frame);
         OcrTicket newTicket = getTicketFromResult(result);

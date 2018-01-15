@@ -13,6 +13,7 @@ public enum OcrError {
     AMOUNT_NOT_FOUND,
     DATE_NOT_FOUND,
     ROTATED_180,
-    UNSURE_AMOUNT, //when the amount has been corrected
-    UNSURE_DATE, //when the date has been corrected
+    UNCERTAIN_DIRECTION,
+    UNCERTAIN_AMOUNT, //when the amount has been corrected
+    UNCERTAIN_DATE, //when the date has been corrected
 }

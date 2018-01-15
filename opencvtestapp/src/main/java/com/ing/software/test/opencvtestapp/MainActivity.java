@@ -31,7 +31,6 @@ import static com.ing.software.common.Reflect.*;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
 import static org.opencv.imgproc.Imgproc.*;
 import static java.util.Collections.*;
-import static java.lang.Math.*;
 
 
 /**
@@ -175,15 +174,15 @@ public class MainActivity extends AppCompatActivity {
         return singletonList(new MatOfPoint(cvPts.toArray(new Point[4])));
     }
 
-    static void drawTextLines(Mat img, List<TextLine> lines, Scalar backColor, double fontSize) throws Exception {
-        for (TextLine line : lines) {
+    static void drawTextLines(Mat img, List<OcrText> lines, Scalar backColor, double fontSize) throws Exception {
+        for (OcrText line : lines) {
             polylines(img, pts2matArr(line.corners()), true, RED, LINE_THICK);
-            for (Word w : line.words()) {
+            for (OcrText w : line.childs()) {
                 fillPoly(img, pts2matArr(w.corners()), backColor);
             }
         }
-        for (TextLine line : lines) {
-            for (Word w : line.words()) {
+        for (OcrText line : lines) {
+            for (OcrText w : line.childs()) {
                 PointF blPt = w.corners().get(3); // bottom-right point (clockwise from top-left)
                 putText(img, w.textUppercase(), new Point(blPt.x + 3, blPt.y - 3), // add some padding (3, -3)
                         FONT_HERSHEY_SIMPLEX, fontSize, WHITE, FONT_THICKNESS);
@@ -265,13 +264,13 @@ public class MainActivity extends AppCompatActivity {
         ((Switch)findViewById(R.id.result_only))
                 .setOnCheckedChangeListener((v, checked) -> resultOnly = checked);
 
+        // request permissions
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
                     new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
         new Thread(this::backgroundWork).start();
-
     }
 
     /**
@@ -322,14 +321,13 @@ public class MainActivity extends AppCompatActivity {
                             lines, PURPLE);
                     drawPoly(contourImg, corners, corners.rows() == 4 ? GREEN : RED, DEF_THICK);
                     showMat(contourImg);
-
                 }
 
                 Bitmap textLinesBm = invoke(imgProc, "undistortForOCR", 1. / 3.);
 
                 //find amount
-                List<TextLine> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
-                TextLine amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
+                List<OcrText> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
+                OcrText amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
                 StringBuilder titleStr = new StringBuilder();
                 titleStr.append(imgIdx);
 
@@ -365,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
                             amountStr, size(textLinesBm));
                     Bitmap amountStrip = invoke(OA_CLASS, "getAmountStrip",
                             imgProc, size(textLinesBm), amountStr, srcStripRect);
-                    List<TextLine> amountLines = invoke(OA_CLASS, "bitmapToLines",
+                    List<OcrText> amountLines = invoke(OA_CLASS, "bitmapToLines",
                             amountStrip, ocrEngine);
                     BigDecimal price = invoke(OA_CLASS, "findAmountPrice",
                             amountLines, amountStr, size(srcStripRect), size(amountStrip));
