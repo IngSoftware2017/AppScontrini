@@ -10,9 +10,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.ResultReceiver;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -60,7 +62,7 @@ import database.TicketEntity;
 
 import static com.ing.software.ticketapp.StatusVars.*;
 
-public class BillActivity extends AppCompatActivity  implements OcrResultReceiver.Receiver {
+public class BillActivity extends AppCompatActivity { //  implements OcrResultReceiver.Receiver {
 
     final OcrResultReceiver mReceiver = new OcrResultReceiver(new Handler());
     private static OcrManager ocrManager;
@@ -80,13 +82,25 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
     public DataManager DB;
     MissionEntity thisMission;
 
+    private final int REFRESH = 0;
+
+    private Handler hdlr = new Handler(Looper.getMainLooper(), msg -> {
+        if (msg.what == REFRESH) {
+            clearAllImages();
+            printAllTickets();
+        }
+        return true;
+    });
+    private void asyncRefresh() {
+        hdlr.obtainMessage(REFRESH).sendToTarget();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
-        DB = new DataManager(this.getApplicationContext());
+        DB = DataManager.getInstance(this.getApplicationContext());
         context = this.getApplicationContext();
         Intent intent = getIntent();
 
@@ -95,7 +109,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         setTitle(thisMission.getName());
         context = this.getApplicationContext();
         initializeComponents();
-        mReceiver.setReceiver(this);
+        //mReceiver.setReceiver(this);
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) {
             try {
@@ -425,6 +439,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             Uri bitmapUri = ticket.getFileUri();
             String fname = getFileName(bitmapUri);
             //DB.deleteTicket(ticketID);
+            /*
             Log.d("###################", "#####################################");
             Log.d("Image_file_name", "is: " + fname);
             Toast.makeText(context, getResources().getString(R.string.redoing_ocr), Toast.LENGTH_LONG).show();
@@ -434,8 +449,19 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             intent.putExtra("root", root);
             intent.putExtra(TICKET_ID, String.valueOf(ticketID));
             startService(intent);
+            */
+            Bitmap bm = BitmapFactory.decodeFile(new File(root, fname).getAbsolutePath());
+            ImageProcessor imgProc = new ImageProcessor(bm);
+            imgProc.setCorners(ticket.getCornerPoints());
+            ocrManager.getTicket(imgProc, true, t -> {
+                ticket.setAmount(t.amount);
+                ticket.setDate(t.date);
+                DB.updateTicket(ticket);
+                asyncRefresh();
+            });
         }
     }
+
 
     /** Dal Maso
      * Thread sleep for 1 second for right tickets real-time vision
@@ -469,7 +495,13 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         try {
             FileOutputStream out = new FileOutputStream(file);
 
-            //TODO: HardCode example, implement ocr here
+            ImageProcessor imgProc = new ImageProcessor(imageToSave);
+            ocrManager.getTicket(imgProc, false, t -> {
+                TicketEntity te = new TicketEntity(uri, t.amount, null, t.date, null, missionID);
+                te.setCornerPoints(t.rectangle);
+                DB.addTicket(te);
+                asyncRefresh();
+            });
 
             //DB.addTicket(new TicketEntity(uri, BigDecimal.valueOf(100).movePointLeft(2), null, Calendar.getInstance().getTime(), fname, missionID));
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -479,11 +511,13 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
             outOriginal.flush();
             outOriginal.close();
+            /*
             Intent intent = new Intent(BillActivity.this, OcrService.class);
             intent.putExtra("receiver", mReceiver);
             intent.putExtra("image", fname);
             intent.putExtra("root", root);
             startService(intent);
+            */
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -567,6 +601,8 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
         CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
     }//cropFile
 
+
+    /*
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
         switch (resultCode) {
@@ -637,7 +673,6 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
                 }
                 break;
             case STATUS_ERROR:
-                /* Handle the error */
                 String error = resultData.getString(ERROR_RECEIVED);
                 Toast.makeText(this, "Error: " + error, Toast.LENGTH_LONG).show();
                 break;
@@ -648,6 +683,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
      * Service to manage requests to analyze tickets
      * When ticket is ready, send message to the receiver.
      */
+    /*
     public static class OcrService extends IntentService {
 
         public OcrService() {
@@ -724,6 +760,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
          * @param file not null and must be an image
          * @return bitmap from file
          */
+    /*
         private Bitmap getBitmapFromFile(File file) {
             FileInputStream fis = null;
             try {
@@ -742,6 +779,7 @@ public class BillActivity extends AppCompatActivity  implements OcrResultReceive
             }
         }
     }
+    */
 
     public String getFileName(Uri uri) {
         String result = null;

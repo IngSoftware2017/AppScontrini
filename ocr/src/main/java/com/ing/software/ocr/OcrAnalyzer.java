@@ -3,10 +3,10 @@ package com.ing.software.ocr;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
-import android.util.Pair;
 import android.util.SizeF;
 import android.util.SparseArray;
 import com.annimon.stream.Stream;
@@ -332,5 +332,196 @@ public class OcrAnalyzer {
         int top = borders[1];
         int bottom = borders[3];
         return OcrUtils.cropImage(photo, left, top, right, bottom);
+    }
+
+
+
+
+	    // Extended rectangle vertical multiplier
+    private static final float EXT_RECT_V_MUL = 3;
+
+    /**
+     * This function runs the ocr detection on the given bitmap.
+     * @param bm input bitmap
+     * @param ocrEngine TextRecognizer
+     * @return list of OcrText
+     * @author Riccardo Zaglia
+     */
+    private static List<OcrText> bitmapToLines(Bitmap bm, TextRecognizer ocrEngine) {
+        SparseArray<TextBlock> blocks = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
+        List<OcrText> lines = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++)
+            for (Text txt : blocks.valueAt(i).getComponents())
+                lines.add(new OcrText((Line)txt));
+        return lines;
+    }
+
+    /**
+     * Find all TextLines which text is matched by any of the list of matchers.
+     * @param lines list of TextLines. Can be empty
+     * @return TextLines matched. Can be empty if no match is found.
+     * @author Riccardo Zaglia
+     */
+    // todo: find most meaningful way to combine score criteria.
+    private static List<Scored<OcrText>> findAllMatchedStrings(List<OcrText> lines, List<WordMatcher> matchers) {
+        return Stream.of(lines)
+                .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
+                .filter(s -> s.getScore() != 0).toList();
+    }
+
+    /**
+     * Choose the OcrText that most probably contains the amount string.
+     * Criteria: AMOUNT_MATCHER score; character size; higher in the photo
+     * @param lines list of TextLines. Can be empty
+     * @return OcrText with higher score. Can be null if no match is found.
+     * @author Riccardo Zaglia
+     */
+    // todo: find most meaningful way to combine score criteria.
+    private static OcrText findAmountString(List<OcrText> lines, SizeF bmSize) {
+        List<Scored<OcrText>> matchedLines = findAllMatchedStrings(lines, AMOUNT_MATCHERS);
+        // modify score for each matched line
+        for (Scored<OcrText> line : matchedLines) {
+            double score = line.getScore();
+            score *= line.obj().charWidth() + line.obj().charHeight();
+            score *= 1. - line.obj().centerY() / bmSize.getHeight();
+            line.setScore(score);
+        }
+        //return best line
+        return !matchedLines.isEmpty() ? max(matchedLines).obj() : null;
+    }
+
+    //todo: find
+
+    /**
+     * Get a strip rectangle where the amount price should be found.
+     * @param amountStr amount string line.
+     * @param bmSize bitmap size.
+     * @return RectF rectangle in bitmap space.
+     * @author Riccardo Zaglia
+     */
+    @NonNull
+    private static RectF getAmountStripRect(OcrText amountStr, SizeF bmSize) {
+        float halfHeight = (float)amountStr.charHeight() * EXT_RECT_V_MUL / 2f;
+        // here I account that the amount number could be in the same OcrText as the amount string.
+        // I use the center of the OcrText as a left boundary.
+        return new RectF(amountStr.centerX(), amountStr.centerY() - halfHeight,
+                bmSize.getWidth(), amountStr.centerY() + halfHeight);
+    }
+
+    private static Bitmap getAmountStrip(
+            ImageProcessor imgProc, SizeF bmSize, OcrText amountStr, RectF srcRect) {
+        return imgProc.undistortedSubregion(bmSize, srcRect,
+                srcRect.width() / srcRect.height() * CHAR_ASPECT_RATIO / amountStr.charAspectRatio());
+    }
+
+    /**
+     * Choose the OcrText that most probably contains the amount price and return it as a BigDecimal.
+     * Criteria: lower distance from center of strip; least character size difference from amount string
+     * @param lines all lines contained inside amount strip.
+     * @param amountStr amount string line.
+     * @param srcStripSize amount strip size in the original bitmap space.
+     * @param dstStripSize actual amount strip size.
+     * @return BigDecimal containing price, or null if no price found.
+     */
+    // todo: find most meaningful way to combine score criteria.
+    // todo: reject false positives adding a lower limit to the score > 0.
+    @Nullable
+    private static BigDecimal findAmountPrice(
+            List<OcrText> lines, OcrText amountStr, SizeF srcStripSize, SizeF dstStripSize) {
+        double dstAmountStrWidth = amountStr.charWidth() * dstStripSize.getWidth() / srcStripSize.getWidth();
+        double dstAmountStrHeight = amountStr.charHeight() * dstStripSize.getHeight() / srcStripSize.getHeight();
+
+        String priceStr = null;
+        double bestScore = 0;
+        for (OcrText line : lines) {
+            // remove spaces between words, apply sanitize substitutions and try matching with the price matcher
+            Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
+            boolean matched = matcher.find();
+            if (!matched) { // try again using a dot to concatenate words
+                matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numConcatDot());
+                matched = matcher.find();
+            }
+            if (matched) {
+                double score = 1 - 0.5 * abs(1 - 2 * line.centerY() / dstStripSize.getHeight());
+                score *= 2 - abs(1 - line.charWidth() / dstAmountStrWidth)
+                        - abs(1 - line.charHeight() / dstAmountStrHeight);
+                if (score > bestScore) {
+                    bestScore = score;
+                    priceStr = matcher.group();
+                }
+            }
+        }
+        return priceStr != null ? new BigDecimal(priceStr) : null;
+    }
+
+    @Nullable
+    private static Date findDate(List<OcrText> lines) {
+        List<Date> dates = new ArrayList<>();
+        for (OcrText line : lines) {
+            for (OcrText w : line.childs()) {
+                Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
+                if (matcher.find()) {
+                    int day = Integer.valueOf(matcher.group(DMY_DAY));
+                    int month = Integer.valueOf(matcher.group(DMY_MONTH));
+                    int year = Integer.valueOf(matcher.group(DMY_YEAR));
+                    //todo check if day is compatible with month (29-30-31)
+                    if (year < 100)
+                        year += year > YEAR_CUT ? 1900 : 2000;
+                    // correct for 0 based month
+                    dates.add(new GregorianCalendar(year, month - 1, day).getTime());
+                    break;
+                }
+            }
+            // It's better to avoid word concatenation because it could match a wrong date.
+            // Ex: 1/1/20 14:30 -> 1/1/2014:30
+        }
+        return dates.size() == 1 ? dates.get(0) : null;
+    }
+
+    /**
+     * Extract a Ticket from an ImageProcessor loaded with a bitmap.
+     * @param imgProc ImagePreprocessor with at least an image assigned (corners can be set manually).
+     * @return Ticket containing any information found, and/or a list of errors occurred.
+     * @author Riccardo Zaglia
+     */
+    // not tested
+    // todo: integrate schemer and other heuristics
+    public synchronized OcrTicket analyzeTicket(@NonNull ImageProcessor imgProc) {
+        OcrTicket ticket = new OcrTicket();
+        ticket.errors = new ArrayList<>();
+
+        Bitmap bm = imgProc.undistortForOCR(0.5);
+        if (bm == null) {
+            ticket.errors.add(OcrError.INVALID_PROCESSOR);
+            return ticket;
+        }
+        ticket.rectangle = imgProc.getCorners();
+        List<OcrText> lines = bitmapToLines(bm, ocrEngine);
+
+        //find amount
+        OcrText amountStr = findAmountString(lines, size(bm));
+        if (amountStr != null) {
+            RectF srcStripRect = getAmountStripRect(amountStr, size(bm));
+            Bitmap amountStrip = getAmountStrip(imgProc, size(bm), amountStr, srcStripRect);
+            List<OcrText> amountLines = bitmapToLines(amountStrip, ocrEngine);
+            ticket.amount = findAmountPrice(amountLines, amountStr, size(srcStripRect), size(amountStrip));
+        }
+        if (ticket.amount == null)
+            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
+
+        ticket.date = findDate(lines);
+        if (ticket.date == null)
+            ticket.errors.add(OcrError.DATE_NOT_FOUND);
+
+        return ticket;
+    }
+
+    /**
+     * Asynchronous version of analyzeTicket(imgProc). The ticket is passed by the callback parameter.
+     * @param imgProc ImagePreprocessor
+     * @param ticketCb Callback
+     */
+    public void analyzeTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<OcrTicket> ticketCb) {
+        new Thread(() -> ticketCb.accept(analyzeTicket(imgProc))).start();
     }
 }

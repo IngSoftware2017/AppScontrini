@@ -1,10 +1,9 @@
-package com.ing.software.common;
+package com.ing.software.ocr;
 
-import android.graphics.Point;
 import android.graphics.PointF;
+import android.util.Pair;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,22 +11,7 @@ import java.util.List;
 /**
  * Structure containing information about a single ticket.
  */
-public class Ticket {
-
-    /**
-     * Database identifier.
-     */
-    public int ID;
-
-    /**
-     * URI pointing to the ticket photo (local or remote).
-     */
-    public URI fileURI;
-
-    /**
-     * Ticket title
-     */
-    public String title;
+public class OcrTicket {
 
     /**
      * Purchase date.
@@ -35,9 +19,19 @@ public class Ticket {
     public Date date;
 
     /**
-     * Purchase amount.
+     * Total amount.
      */
     public BigDecimal amount;
+
+    /**
+     * List of products (label + amount)
+     */
+    public List<Pair<String, BigDecimal>> products;
+
+    /**
+     * Indoor amount ("coperto")
+     */
+    public BigDecimal indoorAmount;
 
     /**
      * Ordered list of vertices of rectangle (first top-left, counter-clockwise)
@@ -47,5 +41,5 @@ public class Ticket {
     /**
      * List of errors related to the creation or manipulation of the Ticket
      */
-    public List<TicketError> errors = new ArrayList<>();
+    public List<OcrError> errors = new ArrayList<>();
 }

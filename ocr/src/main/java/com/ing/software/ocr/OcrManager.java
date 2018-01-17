@@ -9,8 +9,6 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.vision.text.Text;
-import com.ing.software.common.Ticket;
-import com.ing.software.common.TicketError;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
@@ -35,8 +33,6 @@ import static com.ing.software.ocr.OcrVars.*;
  * <ol> Call getTicket(preproc, callback) ad libitum to extract information (Ticket object) from a photo of a ticket.</ol>
  * <ol> Call release() to release internal resources.</ol>
  */
-
-
 public class OcrManager {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
@@ -51,7 +47,7 @@ public class OcrManager {
     public synchronized int initialize(@NonNull Context context) {
         OcrUtils.log(1, "OcrManager", "Initializing OcrManager");
         int r = analyzer.initialize(context);
-        operative = r == 0;
+        operative = (r == 0);
         return r;
     }
 
@@ -68,38 +64,49 @@ public class OcrManager {
      * <ul> AMOUNT_NOT_FOUND: the amount has not been found. </ul>
      * <ul> DATE_NOT_FOUND: the date has not been found. </ul>
      * @param imgProc ImageProcessor which has been set an image. Not null.
+     * @param advanced execute ocr more accurately but slower
      * @return Ticket. Never null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
-    public synchronized Ticket getTicket(@NonNull ImageProcessor imgProc) {
-        Ticket ticket = new Ticket();
+    public synchronized OcrTicket getTicket(@NonNull ImageProcessor imgProc, boolean advanced) {
+        ImageProcessor procCopy = new ImageProcessor(imgProc);
+
+        //todo: for advanced mode, redo ocr with upside down bitmap.
+        // procCopy.rotateUpsideDown();
+        // frame = procCopy.undistortForOCR(1.);
+
+        OcrTicket ticket = new OcrTicket();
         ticket.errors = new ArrayList<>();
-        ticket.rectangle = imgProc.getCorners();
         if (!operative) {
-            ticket.errors.add(TicketError.INVALID_STATE);
+            ticket.errors.add(OcrError.INVALID_STATE);
             return ticket;
         }
 
         long startTime = System.nanoTime();
-        Bitmap frame = imgProc.undistortForOCR();
+        Bitmap frame = procCopy.undistortForOCR(advanced ? 1. : 1. / 3.); // advanced -> full resolution,
+                                                                          // else -> a third resolution
         if (frame == null) {
-            ticket.errors.add(TicketError.INVALID_PROCESSOR);
+            ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
         }
+        ticket.rectangle = procCopy.getCorners();
+
         OcrResult result = analyzer.analyze(frame);
-        Ticket newTicket = getTicketFromResult(result);
+        OcrTicket newTicket = getTicketFromResult(result);
         long endTime = System.nanoTime();
         double duration = ((double) (endTime - startTime)) / 1000000000;
         OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
 
         ticket.amount = newTicket.amount;
         ticket.date = newTicket.date;
-        if (ticket.amount == null)
-            ticket.errors.add(TicketError.AMOUNT_NOT_FOUND);
-        if (ticket.date == null)
-            ticket.errors.add(TicketError.DATE_NOT_FOUND);
+        if (ticket.amount == null) {
+            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
+        }
+        if (ticket.date == null) {
+            ticket.errors.add(OcrError.DATE_NOT_FOUND);
+        }
         return ticket;
     }
 
@@ -110,8 +117,8 @@ public class OcrManager {
      *
      * @author Riccardo Zaglia
      */
-    public void getTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<Ticket> ticketCb) {
-        new Thread(() -> ticketCb.accept(getTicket(imgProc))).start();
+    public void getTicket(@NonNull ImageProcessor imgProc, boolean advanced, @NonNull Consumer<OcrTicket> ticketCb) {
+        new Thread(() -> ticketCb.accept(getTicket(imgProc, advanced))).start();
     }
 
     /**
@@ -119,6 +126,7 @@ public class OcrManager {
      * @param b bitmap not null
      * @return scaled bitmap
      */
+    @Deprecated
     private Bitmap scaleBitmap(Bitmap b) {
         int reqWidth = b.getWidth()/2;
         int reqHeight = b.getHeight()/2;
@@ -133,9 +141,9 @@ public class OcrManager {
      * @param result OcrResult to analyze. Not null.
      * @return Ticket. Some fields can be null;
      */
-    private static Ticket getTicketFromResult(OcrResult result) {
+    private static OcrTicket getTicketFromResult(OcrResult result) {
         long startTime = System.nanoTime();
-        Ticket ticket = new Ticket();
+        OcrTicket ticket = new OcrTicket();
         OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
         List<RawText> prices = result.getRawImage().getPossiblePrices();
