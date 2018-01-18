@@ -9,7 +9,9 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.vision.text.Text;
+import com.ing.software.ocr.OcrObjects.OcrOptions;
 import com.ing.software.ocr.OcrObjects.RawGridResult;
+import com.ing.software.ocr.OcrObjects.RawImage;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
@@ -64,13 +66,15 @@ public class OcrManager {
      * <ul> AMOUNT_NOT_FOUND: the amount has not been found. </ul>
      * <ul> DATE_NOT_FOUND: the date has not been found. </ul>
      * @param imgProc ImageProcessor which has been set an image. Not null.
-     * @param advanced execute ocr more accurately but slower
+     * @param options define which operations to execute
      * @return Ticket. Never null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
-    public synchronized OcrTicket getTicket(@NonNull ImageProcessor imgProc, boolean advanced) {
+    public synchronized OcrTicket getTicket(@NonNull ImageProcessor imgProc, OcrOptions options) {
+        long startTime = 0;
+        long endTime = 1;
         ImageProcessor procCopy = new ImageProcessor(imgProc);
 
         //todo: for advanced mode, redo ocr with upside down bitmap.
@@ -84,8 +88,9 @@ public class OcrManager {
             return ticket;
         }
 
-        long startTime = System.nanoTime();
-        Bitmap frame = procCopy.undistortForOCR(advanced ? 1. : 1. / 3.); // advanced -> full resolution,
+        if (IS_DEBUG_ENABLED)
+            startTime = System.nanoTime();
+        Bitmap frame = procCopy.undistortForOCR(options.getPrecision()>1 ? 1. : 1. / 3.); // advanced -> full resolution,
                                                                           // else -> a third resolution
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
@@ -93,11 +98,14 @@ public class OcrManager {
         }
         ticket.rectangle = procCopy.getCorners();
 
-        OcrResult result = analyzer.analyze(frame);
+        RawImage mainImage = new RawImage(frame);
+        OcrResult result = analyzer.analyze(frame, mainImage);
         OcrTicket newTicket = getTicketFromResult(result);
-        long endTime = System.nanoTime();
-        double duration = ((double) (endTime - startTime)) / 1000000000;
-        OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+        if (IS_DEBUG_ENABLED) {
+            endTime = System.nanoTime();
+            double duration = ((double) (endTime - startTime)) / 1000000000;
+            OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+        }
 
         ticket.amount = newTicket.amount;
         ticket.date = newTicket.date;
@@ -117,8 +125,8 @@ public class OcrManager {
      *
      * @author Riccardo Zaglia
      */
-    public void getTicket(@NonNull ImageProcessor imgProc, boolean advanced, @NonNull Consumer<OcrTicket> ticketCb) {
-        new Thread(() -> ticketCb.accept(getTicket(imgProc, advanced))).start();
+    public void getTicket(@NonNull ImageProcessor imgProc, OcrOptions options, @NonNull Consumer<OcrTicket> ticketCb) {
+        new Thread(() -> ticketCb.accept(getTicket(imgProc, options))).start();
     }
 
     /**

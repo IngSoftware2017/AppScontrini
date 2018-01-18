@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.ing.software.common.Ref;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
+import com.ing.software.ocr.OcrObjects.OcrOptions;
 import com.ing.software.ocr.OcrTicket;
 import com.ing.software.ocr.OcrUtils;
 
@@ -233,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     //String rectString = (err.isEmpty() ? "found" : "not found");
                     //OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);
                     //bundle.putString(RECTANGLE_RECEIVED, rectString);
-                    OcrTicket result = ocrAnalyzer.getTicket(preproc, false);
+                    OcrTicket result = ocrAnalyzer.getTicket(preproc, OcrOptions.getDefaultOptions());
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     long endTime = System.nanoTime();
                     double duration = ((double) (endTime - startTime)) / 1000000000;

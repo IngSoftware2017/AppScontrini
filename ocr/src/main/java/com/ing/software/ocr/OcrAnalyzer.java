@@ -65,16 +65,20 @@ public class OcrAnalyzer {
      * @param frame Bitmap used to create an OcrResult. Not null.
      * @return OcrResult containing raw data to be further analyzed.
      */
-    OcrResult analyze(@NonNull Bitmap frame){
-        RawImage mainImage = new RawImage(frame);
-
+    OcrResult analyze(@NonNull Bitmap frame, RawImage mainImage){
         //ocrEngine analysis
-        long startTime = System.nanoTime();
+        long startTime = 0;
+        long endTime = 1;
+        if (IS_DEBUG_ENABLED)
+            startTime = System.nanoTime();
         SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(frame).build());
-        long endTime = System.nanoTime();
-        double duration = ((double) (endTime - startTime)) / 1000000000;
-        OcrUtils.log(1, "DETECTOR: ", "EXECUTION TIME: "+ duration + " seconds");
-        long startTime2 = System.nanoTime();
+        if (IS_DEBUG_ENABLED) {
+            endTime = System.nanoTime();
+            double duration = ((double) (endTime - startTime)) / 1000000000;
+            OcrUtils.log(1, "DETECTOR: ", "EXECUTION TIME: " + duration + " seconds");
+        }
+        if (IS_DEBUG_ENABLED)
+            startTime = System.nanoTime();
         List<RawText> rawOrigTexts = orderBlocks(mainImage, tempArray);
         mainImage.setRects(rawOrigTexts); //save rect configuration in rawimage
         OcrSchemer.prepareScheme(rawOrigTexts);
@@ -86,9 +90,11 @@ public class OcrAnalyzer {
         }
         valuedTexts = searchContinuousStringExtended(rawOrigTexts, valuedTexts, targetPrecision); //add possible amounts to source string
         List<RawGridResult> dateList = getDateList(rawOrigTexts);
-        long endTime2 = System.nanoTime();
-        double duration2 = ((double) (endTime2 - startTime2)) / 1000000000;
-        OcrUtils.log(1, "OCR ANALYZER: ", "EXECUTION TIME: "+ duration2 + " seconds");
+        if (IS_DEBUG_ENABLED) {
+            endTime = System.nanoTime();
+            double duration = ((double) (endTime - startTime)) / 1000000000;
+            OcrUtils.log(1, "OCR ANALYZER: ", "EXECUTION TIME: " + duration + " seconds");
+        }
         return new OcrResult(valuedTexts, dateList, mainImage);
     }
 
@@ -98,10 +104,11 @@ public class OcrAnalyzer {
      */
     private static void listEverything(@NonNull List<RawText> texts) {
         if (IS_DEBUG_ENABLED) {
+            /*
             for (RawText text : texts) {
-                //OcrUtils.log(2, "FULL LIST: ", text.getValue());
-                //OcrUtils.log(2, "FULL LIST: ","In cell: " + text.getGridBox()[1] + ";" + text.getGridBox()[0]);
+                OcrUtils.log(2, "FULL LIST: ", text.getValue());
             }
+            */
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
             for (RawText text : texts) {
                 if (text.getTags().contains(INTRODUCTION_TAG))

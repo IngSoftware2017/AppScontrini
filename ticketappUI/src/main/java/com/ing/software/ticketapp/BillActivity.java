@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
+import com.ing.software.ocr.OcrObjects.OcrOptions;
 import com.ing.software.ocr.OcrUtils;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -453,7 +454,7 @@ public class BillActivity extends AppCompatActivity { //  implements OcrResultRe
             Bitmap bm = BitmapFactory.decodeFile(new File(root, fname).getAbsolutePath());
             ImageProcessor imgProc = new ImageProcessor(bm);
             imgProc.setCorners(ticket.getCornerPoints());
-            ocrManager.getTicket(imgProc, true, t -> {
+            ocrManager.getTicket(imgProc, OcrOptions.getDefaultOptions(), t -> {
                 ticket.setAmount(t.amount);
                 ticket.setDate(t.date);
                 DB.updateTicket(ticket);
@@ -496,7 +497,7 @@ public class BillActivity extends AppCompatActivity { //  implements OcrResultRe
             FileOutputStream out = new FileOutputStream(file);
 
             ImageProcessor imgProc = new ImageProcessor(imageToSave);
-            ocrManager.getTicket(imgProc, false, t -> {
+            ocrManager.getTicket(imgProc, OcrOptions.getDefaultOptions(), t -> {
                 TicketEntity te = new TicketEntity(uri, t.amount, null, t.date, null, missionID);
                 te.setCornerPoints(t.rectangle);
                 DB.addTicket(te);

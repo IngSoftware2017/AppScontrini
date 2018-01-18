@@ -604,7 +604,7 @@ public class ImageProcessor {
      */
     public ImageProcessor(ImageProcessor otherInstance) {
         srcImg = otherInstance.srcImg.clone();
-        corners = new MatOfPoint2f(otherInstance.corners.toArray());
+        this.setCorners(otherInstance.getCorners());
         quickCorners = otherInstance.quickCorners;
     }
 

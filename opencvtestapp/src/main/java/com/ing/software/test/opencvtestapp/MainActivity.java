@@ -25,7 +25,7 @@ import org.opencv.android.Utils;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 
-import static com.ing.software.common.CommonUtils.rectToPts;
+import static com.ing.software.common.CommonUtils.rectToPointFs;
 import static com.ing.software.common.CommonUtils.size;
 import static com.ing.software.common.Reflect.*;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
                     RectF amountSripRect = invoke(OA_CLASS, "getAmountStripRect",
                             amountStr, size(textLinesBm));
                     List<Point> cvPts = invoke(IP_CLASS, "androidPtsToCV",
-                            rectToPts(amountSripRect));
+                            rectToPointFs(amountSripRect));
                     MatOfPoint2f ptsMat = invoke(IP_CLASS, "ptsToMat", cvPts);
                     drawPoly(mat, ptsMat, BLUE, DEF_THICK);
                 }

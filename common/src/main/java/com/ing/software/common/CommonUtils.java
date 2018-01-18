@@ -7,7 +7,6 @@ import android.util.SizeF;
 import com.annimon.stream.Stream;
 
 import java.util.List;
-import static java.util.Collections.*;
 import static java.util.Arrays.*;
 import static java.lang.Math.*;
 
@@ -42,7 +41,7 @@ public class CommonUtils {
      * @param pts List of Point
      * @return List of PointF
      */
-    public static List<PointF> ptsToPtsF(@NonNull List<Point> pts) {
+    public static List<PointF> pointToPointF(@NonNull List<Point> pts) {
         return Stream.of(pts).map(PointF::new).toList();
     }
 
@@ -52,7 +51,7 @@ public class CommonUtils {
      * @return List of PointF
      */
     @NonNull
-    public static List<PointF> rectToPts(@NonNull RectF rect) {
+    public static List<PointF> rectToPointFs(@NonNull RectF rect) {
         return asList(
                 new PointF(rect.left, rect.top),
                 new PointF(rect.left, rect.bottom),

@@ -54,7 +54,7 @@ public class OcrText {
     public OcrText(Text text) {
         isWord = text instanceof Element;
         childs = new Lazy<>(() -> Stream.of(text.getComponents()).map(OcrText::new).toList());
-        corners = new Lazy<>(() -> ptsToPtsF(asList(text.getCornerPoints())));
+        corners = new Lazy<>(() -> pointToPointF(asList(text.getCornerPoints())));
 
         // width and height are respectively the longest and shortest side of the rotated rectangle
         width =  new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(1)),

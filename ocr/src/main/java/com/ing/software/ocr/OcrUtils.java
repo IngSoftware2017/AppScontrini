@@ -164,7 +164,7 @@ public class OcrUtils {
      */
     public static void log(@IntRange(from = 0) int level, @Size(max = 23) String tag, String message) {
         if (OcrVars.IS_DEBUG_ENABLED && level <= LOG_LEVEL)
-            Log.d(tag, message);
+            Log.e(tag, message); //debug stream is locked in my phone
     }
 
 
