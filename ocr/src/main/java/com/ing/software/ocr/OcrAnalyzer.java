@@ -19,13 +19,14 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 import com.ing.software.common.*;
+import com.ing.software.ocr.Legacy.RawBlock;
+import com.ing.software.ocr.Legacy.RawText;
 import com.ing.software.ocr.OcrObjects.*;
 
 import static com.ing.software.common.CommonUtils.size;
 import static java.util.Collections.*;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
-import static java.lang.Math.*;
 
 /**
  * Class containing different methods to analyze a picture
@@ -80,7 +81,7 @@ public class OcrAnalyzer {
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
         List<RawText> rawOrigTexts = orderBlocks(mainImage, tempArray);
-        mainImage.setRects(rawOrigTexts); //save rect configuration in rawimage
+        mainImage.setLines(rawOrigTexts); //save rect configuration in rawimage
         OcrSchemer.prepareScheme(rawOrigTexts);
         mainImage.textFitter(); //save configuration from prepareScheme in rawimage
         listEverything(rawOrigTexts);

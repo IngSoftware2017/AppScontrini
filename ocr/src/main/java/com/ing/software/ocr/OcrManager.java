@@ -10,9 +10,8 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.ocr.OcrObjects.OcrOptions;
-import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.Legacy.RawText;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -154,7 +153,7 @@ public class OcrManager {
         OcrTicket ticket = new OcrTicket();
         OcrUtils.log(6, "OCR RESULT", result.toString());
         List<RawGridResult> dateList = result.getDateList();
-        List<RawText> prices = result.getRawImage().getPossiblePrices();
+        List<RawText> prices = result.getRawImage().getPricesTexts();
         //First level, if we have a string from "AMOUNT_STRINGS[]" we try to decode a value on the same height and if necessary fix it
         ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
         if (ticket.amount == null) //Takes all prices from schemas and use probability to find the amount (needs at least one hit to accept the value)

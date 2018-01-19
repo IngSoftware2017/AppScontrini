@@ -2,7 +2,7 @@ package com.ing.software.ocr;
 
 import android.support.annotation.NonNull;
 
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.Legacy.RawText;
 
 import static com.ing.software.ocr.OcrVars.HEIGHT_LIST_MULTIPLIER;
 
@@ -12,6 +12,7 @@ import static com.ing.software.ocr.OcrVars.HEIGHT_LIST_MULTIPLIER;
  */
 public class ProbGrid {
 
+    public static final int GRID_LENGTH = 10;
     public static final int[] amountBlockIntroduction = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     public static final int[] amountBlockProducts = new int[] {0, 0, 0, 5, 5, 10, 15, 20, 15, 10};
     public static final int[] amountBlockConclusion = new int[] {5, 5, 0, 0, 0, 0, 0, 0, 0, 0};

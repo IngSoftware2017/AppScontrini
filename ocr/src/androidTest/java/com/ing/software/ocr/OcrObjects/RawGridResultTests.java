@@ -3,6 +3,7 @@ package com.ing.software.ocr.OcrObjects;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
+import com.ing.software.ocr.Legacy.RawText;
 import com.ing.software.ocr.RawTextFactory;
 
 import org.junit.Test;

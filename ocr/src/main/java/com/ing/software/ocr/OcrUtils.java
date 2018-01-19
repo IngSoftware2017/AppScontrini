@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.google.android.gms.vision.text.TextBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.Legacy.RawText;
 
 import java.util.Collections;
 import java.util.Comparator;

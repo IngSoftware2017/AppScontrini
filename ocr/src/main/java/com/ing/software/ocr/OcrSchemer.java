@@ -4,9 +4,9 @@ import android.graphics.Rect;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
-import com.ing.software.ocr.OcrObjects.RawBlock;
+import com.ing.software.ocr.Legacy.RawBlock;
 import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.Legacy.RawText;
 
 import java.util.ArrayList;
 import java.util.Collections;

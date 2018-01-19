@@ -1,9 +1,8 @@
 package com.ing.software.ocr;
 
-import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawImage;
 import com.ing.software.ocr.OcrObjects.RawStringResult;
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.Legacy.RawText;
 import android.support.annotation.NonNull;
 
 import java.util.List;

@@ -6,7 +6,7 @@ import android.graphics.Rect;
 import org.junit.Test;
 import static junit.framework.Assert.*;
 
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.Legacy.RawText;
 
 
 /**

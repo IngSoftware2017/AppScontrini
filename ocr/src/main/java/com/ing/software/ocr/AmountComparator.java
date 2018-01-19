@@ -4,8 +4,7 @@ import android.graphics.Rect;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
-import com.ing.software.ocr.OcrObjects.RawGridResult;
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.ing.software.ocr.Legacy.RawText;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

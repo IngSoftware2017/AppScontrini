@@ -1,14 +1,14 @@
-package com.ing.software.ocr.OcrObjects;
+package com.ing.software.ocr.Legacy;
 
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
 import com.google.android.gms.vision.text.Line;
-import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
+import com.ing.software.ocr.OcrObjects.RawImage;
+import com.ing.software.ocr.OcrObjects.RawStringResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,6 +125,7 @@ public class RawBlock implements Comparable<RawBlock> {
      * Get a list of RawTexts with the probability they contain the date, non ordered
      * @return list of RawGridResult (texts + probability date is present)
      */
+    /*
     public List<RawGridResult> getDateList() {
         List<RawGridResult> list = new ArrayList<>();
         for (RawText rawText : rawTexts) {
@@ -133,6 +134,7 @@ public class RawBlock implements Comparable<RawBlock> {
         log(2,"LIST_SIZE_IS", " " + list.size());
         return list;
     }
+    */
 
     /**
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)

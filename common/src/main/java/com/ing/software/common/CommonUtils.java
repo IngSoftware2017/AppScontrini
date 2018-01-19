@@ -94,14 +94,20 @@ public class CommonUtils {
         return (p - srcStart) / (srcEnd - srcStart) * (dstEnd - dstStart) + dstStart;
     }
 
-
+    /**
+     * todo: doc
+     * @param length
+     * @param srcSize
+     * @param dstSize
+     * @return
+     */
     public static float transform(float length, float srcSize, float dstSize) {
         return length * dstSize / srcSize;
     }
 
     /**
      * Two dimensional linear transformation of a point from one space to another.
-     * The the horizontal and vertical transformation are applied independently one at a time.
+     * The horizontal and vertical transformation are applied independently one at a time.
      * @param p two-dimensional point
      * @param srcRect source space
      * @param dstRect destination space

@@ -1,4 +1,4 @@
-package com.ing.software.ocr.OcrObjects;
+package com.ing.software.ocr.Legacy;
 
 
 import android.graphics.Point;
@@ -11,6 +11,8 @@ import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.Element;
 import com.ing.software.ocr.*;
+import com.ing.software.ocr.OcrObjects.RawImage;
+import com.ing.software.ocr.OcrObjects.RawStringResult;
 
 import java.util.ArrayList;
 import java.util.List;
