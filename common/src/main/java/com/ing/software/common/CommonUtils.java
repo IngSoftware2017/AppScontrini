@@ -61,6 +61,10 @@ public class CommonUtils {
         );
     }
 
+    public static RectF rectFromSize(@NonNull SizeF size) {
+        return new RectF(0, 0, size.getWidth(), size.getHeight());
+    }
+
     /**
      * Get size of a Bitmap
      * @param bm bitmap. Not null.
@@ -133,8 +137,29 @@ public class CommonUtils {
      */
     public static RectF transform(RectF rect, RectF srcRect, RectF dstRect) {
         return new RectF(transform(rect.left, srcRect.left, srcRect.right, dstRect.left, dstRect.right),
-                transform(rect.right, srcRect.left, srcRect.right, dstRect.left, dstRect.right),
                 transform(rect.top, srcRect.top, srcRect.bottom, dstRect.top, dstRect.bottom),
+                transform(rect.right, srcRect.left, srcRect.right, dstRect.left, dstRect.right),
                 transform(rect.bottom, srcRect.top, srcRect.bottom, dstRect.top, dstRect.bottom));
+    }
+
+    /**
+     * Overwrite all bits in a pattern with "value"
+     * @param pattern bit pattern
+     * @param mask bits to be overwritten
+     * @param value value of the new bits
+     * @return updated pattern
+     */
+    public static int overwriteBits(int pattern, int mask, boolean value) {
+        return value ? (pattern | mask) : (pattern & ~mask);
+    }
+
+    /**
+     * Check if patterns has flag set.
+     * @param pattern bit pattern
+     * @param flag bit flag
+     * @return true if flag is contained in pattern, false if it is not
+     */
+    public static boolean check(int pattern, int flag) {
+        return (pattern & flag) == flag;
     }
 }

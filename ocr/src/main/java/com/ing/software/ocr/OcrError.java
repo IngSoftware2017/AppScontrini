@@ -16,4 +16,8 @@ public enum OcrError {
     UNCERTAIN_DIRECTION,
     UNCERTAIN_AMOUNT, //when the amount has been corrected
     UNCERTAIN_DATE, //when the date has been corrected
+    OVEREXPOSED,
+    UNDEREXPOSED,
+    OUT_OF_FOCUS,
+    POOR_CONTRAST, // contour bleeding or carving, could be caused by shadow
 }

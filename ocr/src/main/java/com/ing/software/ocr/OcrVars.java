@@ -40,6 +40,13 @@ public class OcrVars {
     static final int HEIGHT_LIST_MULTIPLIER = 80; //Multiplier used while analyzing difference between average height of rects and a specific rect. Used in ProbGrid.getRectHeightScore()
     public static final int HEIGHT_SOURCE_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in height between source and target rect (total with it's price)
 
+    // level of detail of image to be passed to OCR engine
+    static final double OCR_NORMAL_SCALE = 1.;
+    static final double OCR_ADVANCED_SCALE = 1. / 3.;
+
+    // Extended rectangle vertical multiplier
+    static final float EXT_RECT_V_MUL = 3;
+
     // day 1 to 31 with or without 0 tens.
     // month 1 to 12 with or without 0 tens.
     // year 1900 to 2099 if format YYYY, year 1960 to 2059 if format YY.
@@ -58,41 +65,69 @@ public class OcrVars {
     // I do not use named groups because is not supported for sdk < 24.
 
 
-    //match any combination of digits and dots, optional minus in front, optional character before end of string
     // first group is the sign
-    static final Pattern POTENTIAL_PRICE = compile("(?<!\\d|\\.)(-?)[\\d.]+?(?=[^\\d.]?$)");
-    //match any combination of digits and dots between them, with two mandatory decimals, optional minus in front, optional character before end of string
-    static final Pattern PRICE_PERMISSIVE = compile("(?<!\\d|\\.)(-?)(?:0|[1-9][\\d.]*?)\\.\\d{2}(?=[^\\d.]?$)");
-    //match any number with one single dot for two decimals, optional minus in front, optional character before end of string
-    static final Pattern PRICE_NO_THOUSAND_MARK = compile("(?<!\\d|\\.)(-?)(?:0|[1-9]\\d*?)\\.\\d{2}(?=[^\\d.]?$)");
+    //match a number between 2 and 4 digits,
+    // or match any with 0 to 6 digits before dot and 1 to 3 digits after,
+    // or match any with 1 to 6 digits before dot and 0 to 3 digits after,
+    // optional minus in front, optional character before end of string.
+    static final Pattern POTENTIAL_PRICE = compile(
+            "(?<!\\d|[.,]|-)(-?)(?:\\d{2,4}|\\d{0,6}[.,]\\d{1,3}|\\d{1,6}[.,]\\d{0,3})(?=[^\\d.]?$)");
+    //match any number with one single dot/space for two decimals, optional minus in front, optional character before end of string
+    static final Pattern PRICE_NO_THOUSAND_MARK = compile("(?<!\\d|\\.|-)(-?)(?:0|[1-9]\\d*?)[ .]\\d{2}(?=[^\\d.]?$)");
     //match any number with no points, optional minus in front, optional character before end of string
-    static final Pattern PRICE_NO_DECIMALS = compile("(?<!\\d|\\.)(-?)(?:0|[1-9]\\d*?)(?=[^\\d.]?$)");
+    static final Pattern PRICE_NO_DECIMALS = compile("(?<!\\d|\\.|-)(-?)(?:0|[1-9]\\d*?)(?=[^\\d.]?$)");
 
 
     //In principle, multiple words should be matched with a space between them,
     //but since sometimes some words are split into multiple words, I remove all spaces all together
     //and match the words without spaces, even if there were in origin effectively distinct words.
-    static final List<WordMatcher> AMOUNT_MATCHERS = asList(
+    //The accepted errors (ex: O -> U,D) are based on common errors of the ocr scanning the dataset.
+    //IT matchers:
+    static final List<WordMatcher> IT_AMOUNT_MATCHERS = asList(
             new WordMatcher("T[OUD]TALE", 1),
-            new WordMatcher("TOT", 0),
             new WordMatcher("T[OUD]TALEE[UI]R[OD]", 3),
+            new WordMatcher("TOT", 0),
+            new WordMatcher("TOTE[UI]R[OD]", 1),
             new WordMatcher("IMP[OU]RT[OD]", 1),
             new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 3)
     );
-    static final List<WordMatcher> CASH_MATCHERS = asList(
+    static final List<WordMatcher> IT_CASH_MATCHERS = asList(
             new WordMatcher("CONTANT[EI]", 1),
             new WordMatcher("CARTADICREDITO", 3),
             new WordMatcher("PAGAMENTOCONTANTE", 4)
             //new WordMatcher("CCRED", 0) ?
             //new WordMatcher("ASSEGNI", 1) ?
-            //new WordMatcher("ARROTOND", 0) ?
     );
-    static final List<WordMatcher> CHANGE_MATCHERS = asList(
+    //NB: change can be negative
+    static final List<WordMatcher> IT_CHANGE_MATCHERS = asList(
             new WordMatcher("RESTO", 1)
     );
-    static final List<WordMatcher> INDOOR_MATCHERS = asList(
+    static final List<WordMatcher> IT_INDOOR_MATCHERS = asList(
             new WordMatcher("COPERTO", 1)
     );
+    //in italy, subtotal is rarely present, skip it
+
+    //EN matchers:
+    static final List<WordMatcher> EN_AMOUNT_MATCHERS = asList(
+            new WordMatcher("T[OUD]TAL", 1),
+            new WordMatcher("AMOUNT", 1),
+            new WordMatcher("GRANDTOTAL", 2)
+    );
+    static final List<WordMatcher> EN_CASH_MATCHERS = asList(
+            new WordMatcher("CASH", 1)
+    );
+    static final List<WordMatcher> EN_CHANGE_MATCHERS = asList(
+            new WordMatcher("CHANGE", 1)
+    );
+    static final List<WordMatcher> EN_SUBTOTAL_MATCHERS = asList(
+            new WordMatcher("SUBTOTAL", 1)
+    );
+    static final List<WordMatcher> EN_TAX_MATCHERS = asList(
+            new WordMatcher("TAX", 0),
+            new WordMatcher("SALESTAX", 1)
+    );
+
+
 
     // ideal character width / height
     static final double CHAR_ASPECT_RATIO = 5./8.;

@@ -45,22 +45,20 @@ public class OcrText {
     private Lazy<RectF> box;
     private String text;
     private Lazy<String> textUppercase; // uppercase text
-    private Lazy<String> textOnlyAlpha; // uppercase text where all non alphabetic character are removed. No spaces between words
+    private Lazy<String> textAlphaNum; // uppercase text where all non alphanumeric character are removed. No spaces between words
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
     private Lazy<String> textSanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
     private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
-    private Lazy<String> numConcatDot; // same as numNoSpaces, but words are concatenated with a dot
+    //private Lazy<String> numConcatDot; // same as numNoSpaces, but words are concatenated with a dot
 
     public OcrText(Text text) {
         isWord = text instanceof Element;
         childs = new Lazy<>(() -> Stream.of(text.getComponents()).map(OcrText::new).toList());
         corners = new Lazy<>(() -> ptsToPtsF(asList(text.getCornerPoints())));
 
-        // width and height are respectively the longest and shortest side of the rotated rectangle
-        width =  new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(1)),
-                                             dist(corners().get(2), corners().get(3)))));
-        height = new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(3)),
-                                             dist(corners().get(1), corners().get(2)))));
+        // width and height are respectively the length of top and left side
+        width =  new Lazy<>(() -> dist(corners().get(0), corners().get(1)));
+        height = new Lazy<>(() -> dist(corners().get(0), corners().get(3)));
 
         charAspRatio = new Lazy<>(() -> charWidth() / height());
         box = new Lazy<>(() -> new RectF(text.getBoundingBox()));
@@ -83,7 +81,7 @@ public class OcrText {
             charHeight = new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(3)),
                     dist(corners().get(1), corners().get(2)))));
 
-            textOnlyAlpha = new Lazy<>(() -> textUppercase().replaceAll("[^A-Z]", ""));
+            textAlphaNum = new Lazy<>(() -> textUppercase().replaceAll("[^A-Z0-9]", ""));
         } else {
             // average of individual words char width, weighted on word length.
             // I do not use directly line height because sometimes it's greater than the actual font height
@@ -94,8 +92,8 @@ public class OcrText {
             charHeight = new Lazy<>(() -> Stream.of(childs()).reduce(0f, (sum, c) ->
                     sum + c.charHeight() * c.length()) / textNoSpaces().length());
 
-            textOnlyAlpha = new Lazy<>(() -> Stream.of(childs())
-                    .reduce("", (str, c) -> str + c.textOnlyAlpha()));
+            textAlphaNum = new Lazy<>(() -> Stream.of(childs())
+                    .reduce("", (str, c) -> str + c.textAlphaNumeric()));
         }
 
         // I used .reduce() to concatenate every result of the lambda expression
@@ -104,8 +102,8 @@ public class OcrText {
                 .reduce("", (str, c) -> str + c.textUppercase()));
         numNoSpaces = new Lazy<>(() -> Stream.of(childs())
                 .reduce("", (str, c) -> str + c.textSanitizedNum()));
-        numConcatDot = new Lazy<>(() -> Stream.of(childs())
-                .reduce("", (str, c) -> str + "." + c.textSanitizedNum()));
+        //numConcatDot = new Lazy<>(() -> Stream.of(childs())
+        //        .reduce("", (str, c) -> str + "." + c.textSanitizedNum()));
     }
 
     /**
@@ -122,10 +120,10 @@ public class OcrText {
 
         // to calculate the width and height I should use the transformed corners, but this would lead to
         // a distorted rectangle that would not give a proper width and height.
-        width = new Lazy<>(() -> transform(tl.width(), srcImgRect.width(), srcImgRect.width()));
-        width = new Lazy<>(() -> transform(tl.height(), srcImgRect.height(), srcImgRect.height()));
-        charWidth = new Lazy<>(() -> transform(tl.charWidth(), srcImgRect.width(), srcImgRect.width()));
-        charHeight = new Lazy<>(() -> transform(tl.charHeight(), srcImgRect.height(), srcImgRect.height()));
+        width = new Lazy<>(() -> transform(tl.width(), srcImgRect.width(), dstImgRect.width()));
+        height = new Lazy<>(() -> transform(tl.height(), srcImgRect.height(), dstImgRect.height()));
+        charWidth = new Lazy<>(() -> transform(tl.charWidth(), srcImgRect.width(), dstImgRect.width()));
+        charHeight = new Lazy<>(() -> transform(tl.charHeight(), srcImgRect.height(), dstImgRect.height()));
         charAspRatio = new Lazy<>(() -> charWidth() / height());
         box = new Lazy<>(() -> transform(tl.box(), srcImgRect, dstImgRect));
 
@@ -133,9 +131,10 @@ public class OcrText {
         text = tl.text;
         textUppercase = tl.textUppercase;
         textNoSpaces = tl.textNoSpaces;
-        textOnlyAlpha = tl.textOnlyAlpha;
+        textAlphaNum = tl.textAlphaNum;
+        textSanitizedNum = tl.textSanitizedNum;
         numNoSpaces = tl.numNoSpaces;
-        numConcatDot = tl.numConcatDot;
+        //numConcatDot = tl.numConcatDot;
     }
 
     public boolean isWord() { return isWord; }
@@ -159,12 +158,10 @@ public class OcrText {
 
     // string properties
     public String text() { return text; }
-    public String textSanitizedNum() { return textSanitizedNum.get(); }
     public String textUppercase() { return textUppercase.get(); }
-    public String textOnlyAlpha() { return textOnlyAlpha.get(); }
+    public String textAlphaNumeric() { return textAlphaNum.get(); }
     // available only if isWord() == false:
     public String textNoSpaces() { return textNoSpaces.get(); }
+    public String textSanitizedNum() { return textSanitizedNum.get(); }
     public String numNoSpaces() { return numNoSpaces.get(); }
-    public String numConcatDot() { return numConcatDot.get(); }
-
 }

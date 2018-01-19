@@ -13,9 +13,11 @@ import com.ing.software.ocr.OcrObjects.RawGridResult;
 import com.ing.software.ocr.OcrObjects.RawText;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.annimon.stream.function.Consumer;
 
@@ -85,8 +87,7 @@ public class OcrManager {
         }
 
         long startTime = System.nanoTime();
-        Bitmap frame = procCopy.undistortForOCR(advanced ? 1. : 1. / 3.); // advanced -> full resolution,
-                                                                          // else -> a third resolution
+        Bitmap frame = procCopy.undistortForOCR(advanced ? OCR_ADVANCED_SCALE : OCR_NORMAL_SCALE);
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
@@ -107,12 +108,17 @@ public class OcrManager {
         if (ticket.date == null) {
             ticket.errors.add(OcrError.DATE_NOT_FOUND);
         }
+
+        //todo: infer currency
+        ticket.currency = Currency.getInstance(Locale.ITALY);
         return ticket;
+
     }
 
     /**
      * Asynchronous version of getTicket(imgProc). The ticket is passed by the callback parameter.
      * @param imgProc ImageProcessor which has been set an image. Not null.
+     * @param advanced execute ocr more accurately but slower.
      * @param ticketCb callback to get the ticket. Not null.
      *
      * @author Riccardo Zaglia

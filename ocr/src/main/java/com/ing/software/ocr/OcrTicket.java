@@ -1,12 +1,11 @@
 package com.ing.software.ocr;
 
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.util.Pair;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Structure containing information about a single ticket.
@@ -14,14 +13,26 @@ import java.util.List;
 public class OcrTicket {
 
     /**
-     * Purchase date.
+     * Ordered list of vertices of ticket rectangle (first top-left, counter-clockwise)
      */
-    public Date date;
+    public List<PointF> rectangle;
 
     /**
      * Total amount.
      */
     public BigDecimal amount;
+
+    /**
+     * Rectangle of total amount in the normalized space [0, 1]^2 of the undistorted bitmap
+     * To get the rectangle in the undistorted bitmap, multiply by (width, height) of
+     * the undistorted bitmap
+     */
+    public RectF amountRect;
+
+    /**
+     *
+     */
+    public Currency currency;
 
     /**
      * List of products (label + amount)
@@ -34,9 +45,9 @@ public class OcrTicket {
     public BigDecimal indoorAmount;
 
     /**
-     * Ordered list of vertices of rectangle (first top-left, counter-clockwise)
+     * Purchase date.
      */
-    public List<PointF> rectangle;
+    public Date date;
 
     /**
      * List of errors related to the creation or manipulation of the Ticket
