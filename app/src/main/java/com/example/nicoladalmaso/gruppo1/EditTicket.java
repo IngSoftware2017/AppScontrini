@@ -81,13 +81,24 @@ public class EditTicket extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_confirm:
                 //Salva i file nel DB
-                int missionID=intent.getExtras().getInt("missionID");
 
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 thisTicket.setTitle(txtTitle.getText().toString());
+                /**
+                 * lazzarin
+                 */
+                int missionID=intent.getExtras().getInt("missionID");
+                SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
                 try {
-
-                    thisTicket.setDate(format.parse(txtDate.getText().toString()));
+                   MissionEntity current = DB.getMission(missionID);
+                   String  start=dateformat.format(current.getStartDate());
+                    Log.d(" date of start mission",start);
+                   String finish=dateformat.format(current.getEndDate());
+                    Log.d(" date of start mission",finish);
+                   if( AppUtilities.checkIntervalDate(start,finish,txtDate.getText().toString()))
+                       thisTicket.setDate(dateformat.parse(txtDate.getText().toString()));
+                   else
+                   {Toast.makeText(context, getResources().getString(R.string.toast_errorIntervalDate), Toast.LENGTH_SHORT).show();
+                    break;}
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
