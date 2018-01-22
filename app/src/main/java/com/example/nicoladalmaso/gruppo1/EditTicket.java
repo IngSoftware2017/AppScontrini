@@ -32,7 +32,7 @@ public class EditTicket extends AppCompatActivity {
     int ticketId;
     Context context;
     TicketEntity thisTicket;
-    String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = ""; //ticketDate = "",
+    String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = "", ticketDateString = "";
     Date ticketDate;
     TextView txtTitle;
     TextView txtAmount;
@@ -77,13 +77,13 @@ public class EditTicket extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_confirm:
                 //Salva i file nel DB
-                //SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 thisTicket.setTitle(txtTitle.getText().toString());
-                /*try {
+                try {
                     thisTicket.setDate(format.parse(txtDate.getText().toString()));
                 } catch (ParseException e) {
                     e.printStackTrace();
-                }*/
+                }
 
                 if(txtShop.getText().toString().replace(" ","").compareTo("") != 0)
                     thisTicket.setShop(txtShop.getText().toString());
@@ -165,11 +165,10 @@ public class EditTicket extends AppCompatActivity {
         txtTitle = (TextView)findViewById(R.id.input_ticketTitleMod);
         txtAmount = (TextView)findViewById(R.id.input_ticketAmountMod);
         txtShop = (TextView)findViewById(R.id.input_ticketShopMod);
-        //txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
-        //SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        //txtDate.setText(formatter.format(ticketDate));
+        txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        txtDate.setText(formatter.format(ticketDate));
         txtTitle.setText(ticketTitle);
-        //txtDate.setText(ticketDate);
         txtShop.setText(ticketShop);
         txtAmount.setText(ticketAmount);
     }
