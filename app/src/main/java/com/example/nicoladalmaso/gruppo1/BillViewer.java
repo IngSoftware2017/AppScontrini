@@ -59,6 +59,7 @@ public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
     int ticketId;
+    int missionID;
     Context context;
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
@@ -79,6 +80,11 @@ public class BillViewer extends AppCompatActivity {
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#66000000")));
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+        //lazzarin
+        Intent intent=getIntent();
+        missionID=intent.getExtras().getInt("missionID");
+
+        Log.d("id della missione",missionID+"");
         initialize();
     }
 
@@ -175,6 +181,7 @@ public class BillViewer extends AppCompatActivity {
                 //Open Edit Ticket Activity
                 Intent editTicket = new Intent(context, com.example.nicoladalmaso.gruppo1.EditTicket.class);
                 editTicket.putExtra("ticketID", thisTicket.getID());
+                editTicket.putExtra("missionID",missionID);
                 startActivityForResult(editTicket, TICKET_MOD);
                 break;
 

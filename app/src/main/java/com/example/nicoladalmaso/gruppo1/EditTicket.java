@@ -30,6 +30,7 @@ public class EditTicket extends AppCompatActivity {
 
     public DataManager DB;
     int ticketId;
+    int missionID;
     Context context;
     TicketEntity thisTicket;
     String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = "", ticketDateString = "";
@@ -38,6 +39,7 @@ public class EditTicket extends AppCompatActivity {
     TextView txtAmount;
     TextView txtShop;
     TextView txtDate;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,8 @@ public class EditTicket extends AppCompatActivity {
         setTitle(context.getString(R.string.title_EditTicket));
         setContentView(R.layout.activity_edit_ticket);
         DB = new DataManager(this.getApplicationContext());
+         intent=getIntent();
+         Log.d("missionID cercato",intent.getExtras().getInt("missionID")+"");
 
         //Get data from parent view
         setTicketValues();
@@ -77,9 +81,12 @@ public class EditTicket extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_confirm:
                 //Salva i file nel DB
+                int missionID=intent.getExtras().getInt("missionID");
+
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 thisTicket.setTitle(txtTitle.getText().toString());
                 try {
+
                     thisTicket.setDate(format.parse(txtDate.getText().toString()));
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -137,7 +144,6 @@ public class EditTicket extends AppCompatActivity {
     }
 
     private void setTicketValues(){
-        Intent intent = getIntent();
         ticketId = (int) intent.getExtras().getLong("ticketID");
         Log.d("TicketID", "Edit ticket "+ticketId);
         thisTicket = DB.getTicket(ticketId);

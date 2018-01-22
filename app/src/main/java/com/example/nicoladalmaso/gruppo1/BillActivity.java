@@ -86,6 +86,7 @@ public class BillActivity extends AppCompatActivity {
         Intent intent = getIntent();
         missionID = intent.getExtras().getInt("missionID");
         thisMission = DB.getMission(missionID);
+
         setTitle(thisMission.getName());
 
 

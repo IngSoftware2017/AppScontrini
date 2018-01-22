@@ -122,7 +122,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
                         //Put data to next activity
                         startImageView.putExtra("ID",thisTicket.getID());
-
+                        //lazzarin
+                        startImageView.putExtra("missionID",missionID);
                         //Start new activity
                         ((BillActivity)context).startActivityForResult(startImageView, 4);
                         return;
