@@ -75,6 +75,23 @@ public class AppUtilities {
         }
         return newDate;
     }
+        /**Lazzarin
+        * check if insert date is between interval of mission
+         *@param current date of start mission
+         *@param finish date of end mission
+         *@param  current date of ticket insert by user
+        */
+    public static  boolean checkIntervalDate(String start, String finish, String current)
+    {
+        if(checkDate(start,current) && checkDate(current,finish))
+            return true;
+
+     return false;
+    }
 
 
-}
+
+    }
+
+
+
