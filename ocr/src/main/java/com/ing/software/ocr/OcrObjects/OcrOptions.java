@@ -1,5 +1,7 @@
 package com.ing.software.ocr.OcrObjects;
 
+import android.support.annotation.IntRange;
+
 /**
  * Object passed to the manager to avoid performing unnecessary operations
  * and consequently reduce time (time depends primarily on precision)
@@ -7,12 +9,17 @@ package com.ing.software.ocr.OcrObjects;
 
 public class OcrOptions {
 
-    private boolean findTotal = true;
-    private boolean findDate = true;
-    private boolean findProducts = true;
-    private int precision = 2; //Precision varies from 0 to 5, where 5 = max precision
+    private static final int DEFAULT_PRECISION = 2;
+    private static final boolean DEFAULT_TOTAL = true;
+    private static final boolean DEFAULT_DATE = true;
+    private static final boolean DEFAULT_PRODUCTS = true;
 
-    public OcrOptions(boolean findTotal, boolean findDate, boolean findProducts, int precision) {
+    private boolean findTotal;
+    private boolean findDate;
+    private boolean findProducts;
+    private int precision; //Precision varies from 0 to 5, where 5 = max precision
+
+    public OcrOptions(boolean findTotal, boolean findDate, boolean findProducts, @IntRange(from = 0, to = 5) int precision) {
         this.findTotal = findTotal;
         this.findDate = findDate;
         this.findProducts = findProducts;
@@ -20,7 +27,7 @@ public class OcrOptions {
     }
 
     public static OcrOptions getDefaultOptions() {
-        return new OcrOptions(true, true, true, 2);
+        return new OcrOptions(DEFAULT_TOTAL, DEFAULT_DATE, DEFAULT_PRODUCTS, DEFAULT_PRECISION);
     }
 
     public void setPrecision(int precision) {

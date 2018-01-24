@@ -1,4 +1,4 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OcrObjects;
 
 /**
  * General purpose error enum. Used by ImagePreprocessor, Ticket

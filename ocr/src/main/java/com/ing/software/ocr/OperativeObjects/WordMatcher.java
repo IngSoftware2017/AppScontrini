@@ -1,7 +1,8 @@
-package com.ing.software.ocr.OcrObjects;
+package com.ing.software.ocr.OperativeObjects;
 
 import java.util.*;
 import com.annimon.stream.Stream;
+import com.ing.software.ocr.OcrObjects.TempText;
 
 import static java.util.Collections.*;
 import static java.lang.Math.*;
@@ -10,6 +11,39 @@ import static java.lang.Math.*;
  * The scope of this object is to apply the Levenshtein distance algorithm to a subset of regex.
  */
 public class WordMatcher {
+
+   //this compiled regex format represent a string where in each character position, multiple chars are accepted
+    private List<List<Character>> compiledRegex;
+    private int maxDist;
+
+    /**
+     * Create a WordMatcher. The regex must match only alphabetic characters.
+     * @param regex regular expression (supports only square bracket operator).
+     * @param maxLevDist maximum levenshtein distance
+     * @author Riccardo Zaglia
+     */
+    public WordMatcher(String regex, int maxLevDist) {
+        compiledRegex = compile(regex);
+        maxDist = maxLevDist;
+    }
+
+    /**
+     * Get a score of how well the input line matches with the previously passed regex.
+     * @param line OcrText to match
+     * @return value in range [0, maxScore]. maxScore is the value passed in the constructor.
+     *         0 means that there was no match.
+     * @author Riccardo Zaglia
+     */
+    public double match(TempText line) {
+        //scanning each word, find the least levenshtein distance of regex to the current word
+        int wordsLeastLoss = min(Stream.of(line.children())
+                .map(w -> levDistance(compiledRegex, w.textUppercase(), maxDist)).toList());
+        //scan also the whole line without spaces and return the least loss.
+        //sometimes, if the characters are spread horizontally, a word can be split in multiple words.
+        int finalLoss = min(wordsLeastLoss, levDistance(compiledRegex, line.textNoSpaces(), maxDist));
+        // the final score is the length of a word that perfectly matches regex minus the least loss.
+        return max(compiledRegex.size() - finalLoss, 0);
+    }
 
     /**
      * @author Salvagno
@@ -77,38 +111,5 @@ public class WordMatcher {
             }
         }
         return compiled;
-    }
-
-    //this compiled regex format represent a string where in each character position, multiple chars are accepted
-    private List<List<Character>> compiledRegex;
-    private int maxDist;
-
-    /**
-     * Create a WordMatcher. The regex must match only alphabetic characters.
-     * @param regex regular expression (supports only square bracket operator).
-     * @param maxLevDist maximum levenshtein distance
-     * @author Riccardo Zaglia
-     */
-    public WordMatcher(String regex, int maxLevDist) {
-        compiledRegex = compile(regex);
-        maxDist = maxLevDist;
-    }
-
-    /**
-     * Get a score of how well the input line matches with the previously passed regex.
-     * @param line OcrText to match
-     * @return value in range [0, maxScore]. maxScore is the value passed in the constructor.
-     *         0 means that there was no match.
-     * @author Riccardo Zaglia
-     */
-    public double match(TempText line) {
-        //scanning each word, find the least levenshtein distance of regex to the current word
-        int wordsLeastLoss = min(Stream.of(line.children())
-                .map(w -> levDistance(compiledRegex, w.textUppercase(), maxDist)).toList());
-        //scan also the whole line without spaces and return the least loss.
-        //sometimes, if the characters are spread horizontally, a word can be split in multiple words.
-        int finalLoss = min(wordsLeastLoss, levDistance(compiledRegex, line.textUppercase(), maxDist));
-        // the final score is the length of a word that perfectly matches regex minus the least loss.
-        return max(compiledRegex.size() - finalLoss, 0);
     }
 }

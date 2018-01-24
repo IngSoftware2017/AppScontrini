@@ -1,13 +1,9 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.Legacy;
 
-import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.OcrObjects.RawStringResult;
-import com.ing.software.ocr.Legacy.RawText;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 import android.support.annotation.NonNull;
 
 import java.util.List;
-
-import static com.ing.software.ocr.OcrUtils.log;
 
 /**
  * Structure containing the unprocessed text + metadata, extracted by OcrAnalyzer.
@@ -73,10 +69,6 @@ class OcrResult {
         if (dateList != null) {
             for (RawGridResult result : dateList) {
                 double probability = result.getPercentage();
-                list.append("POSSIBLE DATE: ").append(result.getText().getValue()).append(" with probability: ")
-                        .append(probability);
-                log(5,"POSSIBLE DATE: ", result.getText().getValue() + " with probability: "
-                        + probability + " and distance: " + DataAnalyzer.findDate(result.getText().getValue()));
                 list.append("\n");
             }
         }

@@ -1,4 +1,4 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.Legacy;
 
 import android.support.annotation.NonNull;
 

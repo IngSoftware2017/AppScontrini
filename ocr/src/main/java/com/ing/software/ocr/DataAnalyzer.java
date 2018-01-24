@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
-import com.ing.software.ocr.OcrObjects.RawStringResult;
+import com.ing.software.ocr.Legacy.RawStringResult;
 import com.ing.software.ocr.Legacy.RawText;
 
 import android.support.annotation.IntRange;

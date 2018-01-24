@@ -5,7 +5,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 
 import com.google.android.gms.vision.text.Text;
-import com.ing.software.ocr.OcrObjects.RawImage;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 import com.ing.software.ocr.Legacy.RawText;
 
 import java.util.List;

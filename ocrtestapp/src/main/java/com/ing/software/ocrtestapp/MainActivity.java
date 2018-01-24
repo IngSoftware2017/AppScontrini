@@ -22,7 +22,7 @@ import com.ing.software.common.Ref;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrObjects.OcrOptions;
-import com.ing.software.ocr.OcrTicket;
+import com.ing.software.ocr.OcrObjects.OcrTicket;
 import com.ing.software.ocr.OcrUtils;
 
 import java.io.File;

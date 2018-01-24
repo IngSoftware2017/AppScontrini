@@ -9,14 +9,20 @@ import android.support.annotation.Size;
 import android.util.Log;
 
 import com.google.android.gms.vision.text.TextBlock;
-import com.ing.software.ocr.OcrObjects.RawImage;
+import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 import com.ing.software.ocr.Legacy.RawText;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.ing.software.ocr.OcrVars.CONCLUSION_TAG;
+import static com.ing.software.ocr.OcrVars.INTRODUCTION_TAG;
+import static com.ing.software.ocr.OcrVars.IS_DEBUG_ENABLED;
 import static com.ing.software.ocr.OcrVars.LOG_LEVEL;
+import static com.ing.software.ocr.OcrVars.PRICES_TAG;
+import static com.ing.software.ocr.OcrVars.PRODUCTS_TAG;
 
 /**
  * Util class to manage rects, blocks, images
@@ -35,7 +41,7 @@ public class OcrUtils {
      * @param endY y coordinate of bottom right point, int >= 0
      * @return cropped image, null if invalid coordinates
      */
-    static Bitmap cropImage(@NonNull Bitmap photo, @IntRange(from = 0) int startX, @IntRange(from = 0) int startY, @IntRange(from = 0) int endX, @IntRange(from = 0) int endY) {
+    public static Bitmap cropImage(@NonNull Bitmap photo, @IntRange(from = 0) int startX, @IntRange(from = 0) int startY, @IntRange(from = 0) int endX, @IntRange(from = 0) int endY) {
         log(4,"OcrUtils.cropImage","Received crop: left " + startX + " top: " + startY + " right: " + endX + " bottom: " + endY);
         if (endX < startX || endY < startY)
             return null;
@@ -53,7 +59,7 @@ public class OcrUtils {
      * @return array of int where int[0] = left border, int[1] = top border, int[2] = right border, int[3] = bottom border
      */
     @Deprecated
-    static int[] getRectBorders(@NonNull List<TextBlock> orderedTextBlocks, @NonNull RawImage photo) {
+    public static int[] getRectBorders(@NonNull List<TextBlock> orderedTextBlocks, @NonNull RawImage photo) {
         int numberOfBorders = 4; //it's a rect
         int[] borders = new int[numberOfBorders];
         //Extreme borders for chosen photo (will be overwritten in foreach)
@@ -88,7 +94,7 @@ public class OcrUtils {
      * @param textBlocks original list. Not null.
      * @return ordered list
      */
-    static List<TextBlock> orderTextBlocks(@NonNull List<TextBlock> textBlocks) {
+    public static List<TextBlock> orderTextBlocks(@NonNull List<TextBlock> textBlocks) {
         Collections.sort(textBlocks, new Comparator<TextBlock>() {
             @Override
             public int compare(TextBlock block1, TextBlock block2) {
@@ -118,7 +124,7 @@ public class OcrUtils {
      * @param sourceRect Rect from which check the distance
      * @return ordered list
      */
-    static List<RawText> orderRawTextFromRect(@NonNull List<RawText> rawTexts, final Rect sourceRect) {
+    public static List<RawText> orderRawTextFromRect(@NonNull List<RawText> rawTexts, final Rect sourceRect) {
         Collections.sort(rawTexts, new Comparator<RawText>() {
             @Override
             public int compare(RawText text1, RawText text2) {
@@ -144,7 +150,7 @@ public class OcrUtils {
      * @param photo source rawImage (to get max width). Not null.
      * @return rect with max width
      */
-    static Rect extendWidthFromPhoto(@NonNull Rect rect, @NonNull RawImage photo) {
+    public static Rect extendWidthFromPhoto(@NonNull Rect rect, @NonNull RawImage photo) {
         int top = rect.top;
         int bottom = rect.bottom;
         int left = 0;
@@ -211,7 +217,7 @@ public class OcrUtils {
      * @param T The second string to be compared
      * @return distance between two strings
      */
-    static int levDistance(String S, String T)
+    public static int levDistance(String S, String T)
     {
         if(S == null || T == null)
             return -1;
@@ -248,7 +254,7 @@ public class OcrUtils {
      * @param max maximum distance accepted
      * @return distance between two strings or the maximum value if it has been exceeded
      */
-    static int levDistance(String S, String T, Integer max)
+    public static int levDistance(String S, String T, Integer max)
     {
         if(S == null || T == null)
             return -1;
@@ -386,13 +392,13 @@ public class OcrUtils {
      * @param percentWidth chosen percentage for width. \pixels if negative
      * @return new extended rectangle
      */
-    static Rect extendRect(@NonNull Rect rect, int percentHeight, int percentWidth) {
-        int top;
-        int bottom;
-        int right;
-        int left;
+    public static RectF extendRect(@NonNull RectF rect, int percentHeight, int percentWidth) {
+        float top;
+        float bottom;
+        float right;
+        float left;
         if (percentHeight > 0) {
-            int extendedHeight = rect.height() * percentHeight / 100;
+            float extendedHeight = rect.height() * percentHeight / 100;
             top = rect.top - extendedHeight / 2;
             bottom = rect.bottom + extendedHeight/2;
         } else {
@@ -400,7 +406,7 @@ public class OcrUtils {
             bottom = rect.bottom + Math.abs(percentHeight);
         }
         if (percentWidth > 0) {
-            int extendedWidth = rect.width() * percentWidth / 100;
+            float extendedWidth = rect.width() * percentWidth / 100;
             left = rect.left - extendedWidth / 2;
             right = rect.right + extendedWidth/2;
         } else {
@@ -412,7 +418,7 @@ public class OcrUtils {
         if (top < 0)
             top = 0;
         //Doesn't matter if bottom and right are outside the photo
-        return new Rect(left, top, right, bottom);
+        return new RectF(left, top, right, bottom);
     }
 
     /**
@@ -425,7 +431,7 @@ public class OcrUtils {
      * @param s string to analyze
      * @return Integer.MAX_VALUE if less than 2/3 of the string are not numbers; number of non-digit chars (*0.5 if special (see above))/length
 	 */
-    static double isPossiblePriceNumber(String s) {
+    public static double isPossiblePriceNumber(String s) {
         int counter = 0;
         s = s.replaceAll(" ", "");
         int initialLength = s.length();
@@ -474,4 +480,38 @@ public class OcrUtils {
         }
         return new Rect(left, top, right, bottom);
     }
+
+    /**
+     * List in debug log blocks parsed (detection + grid)
+     * @param texts List of texts. Not null.
+     */
+    public static void listEverything(@NonNull List<TempText> texts) {
+            /*
+            for (RawText text : texts) {
+                OcrUtils.log(2, "FULL LIST: ", text.getValue());
+            }
+            */
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
+            for (TempText text : texts) {
+                if (text.getTags().contains(INTRODUCTION_TAG))
+                    OcrUtils.log(2, "introduction", text.text());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRODUCTS");
+            for (TempText text : texts) {
+                if (text.getTags().contains(PRODUCTS_TAG))
+                    OcrUtils.log(2, "products", text.text());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRICES");
+            for (TempText text : texts) {
+                if (text.getTags().contains(PRICES_TAG))
+                    OcrUtils.log(2, "prices", text.text());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################\nCONCLUSION");
+            for (TempText text : texts) {
+                if (text.getTags().contains(CONCLUSION_TAG))
+                    OcrUtils.log(2, "conclusion", text.text());
+            }
+            OcrUtils.log(2, "LIST EVERYTHING", "###########################");
+        }
+
 }

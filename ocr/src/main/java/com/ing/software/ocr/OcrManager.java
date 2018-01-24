@@ -9,9 +9,11 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.vision.text.Text;
+import com.ing.software.ocr.OcrObjects.OcrError;
 import com.ing.software.ocr.OcrObjects.OcrOptions;
-import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.Legacy.RawText;
+import com.ing.software.ocr.OcrObjects.OcrTicket;
+import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,8 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.annimon.stream.function.Consumer;
+import com.ing.software.ocr.OperativeObjects.AmountComparator;
 
-import static com.ing.software.ocr.AmountComparator.*;
+import static com.ing.software.ocr.OperativeObjects.AmountComparator.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
 import static com.ing.software.ocr.OcrVars.*;
 
@@ -37,6 +40,7 @@ import static com.ing.software.ocr.OcrVars.*;
 public class OcrManager {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
+    public static RawImage mainImage;
     private boolean operative = false;
 
     /**
@@ -97,8 +101,12 @@ public class OcrManager {
         }
         ticket.rectangle = procCopy.getCorners();
 
-        RawImage mainImage = new RawImage(frame);
-        OcrResult result = analyzer.analyze(frame, mainImage);
+        mainImage = new RawImage(frame);
+        List<TempText> lines = analyzer.analyze(frame);
+        mainImage.setLines(lines); //save rect configuration in rawimage
+        OcrSchemer.prepareScheme(lines);
+        mainImage.textFitter(); //save configuration from prepareScheme in rawimage
+
         OcrTicket newTicket = getTicketFromResult(result);
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();

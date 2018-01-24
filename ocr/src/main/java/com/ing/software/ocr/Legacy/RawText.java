@@ -11,8 +11,7 @@ import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.Element;
 import com.ing.software.ocr.*;
-import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.OcrObjects.RawStringResult;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 
 import java.util.ArrayList;
 import java.util.List;

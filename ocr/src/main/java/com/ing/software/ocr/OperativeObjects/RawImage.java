@@ -1,10 +1,11 @@
-package com.ing.software.ocr.OcrObjects;
+package com.ing.software.ocr.OperativeObjects;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
+import com.ing.software.ocr.OcrObjects.TempText;
 import com.ing.software.ocr.OcrUtils;
 
 import java.util.ArrayList;
@@ -25,6 +26,10 @@ public class RawImage {
     private float averageRectHeight;
     private float averageCharHeight;
     private float averageCharWidth;
+    private RectF introRect;
+    private RectF productsRect;
+    private RectF pricesRect;
+    private RectF conclusionRect;
     private List<TempText> allTexts = new ArrayList<>();
     private List<TempText> introTexts = new ArrayList<>();
     private List<TempText> productsTexts = new ArrayList<>();
@@ -54,8 +59,10 @@ public class RawImage {
      */
     public void setLines(@NonNull List<TempText> texts) {
         allTexts = texts;
-        extendedRect = new RectF(getMaxRectBorders());
+        extendedRect = getMaxRectBorders(texts);
         averageRectHeight = checkAverageLineHeight();
+        averageCharHeight = checkAverageCharHeight();
+        averageCharWidth = checkAverageCharWidth();
     }
 
     /**
@@ -82,12 +89,20 @@ public class RawImage {
         return introTexts;
     }
 
+    public RectF getIntroRect() {
+        return introRect;
+    }
+
     /**
      * Must call textFitter() before.
      * @return list of Products RawTexts
      */
     public List<TempText> getProductsTexts() {
         return productsTexts;
+    }
+
+    public RectF getProductsRect() {
+        return productsRect;
     }
 
     /**
@@ -98,12 +113,20 @@ public class RawImage {
         return pricesTexts;
     }
 
+    public RectF getPricesRect() {
+        return pricesRect;
+    }
+
     /**
      * Must call textFitter() before.
      * @return list of Conclusion RawTexts
      */
     public List<TempText> getConclusionTexts() {
         return conclusionTexts;
+    }
+
+    public RectF getConclusionRect() {
+        return conclusionRect;
     }
 
     /**
@@ -154,13 +177,17 @@ public class RawImage {
             else if (text.getTags().contains(CONCLUSION_TAG))
                 conclusionTexts.add(text);
         }
+        introRect = getMaxRectBorders(introTexts);
+        productsRect = getMaxRectBorders(productsTexts);
+        pricesRect = getMaxRectBorders(pricesTexts);
+        conclusionRect = getMaxRectBorders(conclusionTexts);
     }
 
     /**
      * Get rect containing all lines detected
      * @return Rect containing all rects passed
      */
-    private RectF getMaxRectBorders() {
+    private RectF getMaxRectBorders(List<TempText> allTexts) {
         if (allTexts.size() == 0)
             return null;
         float left = width;

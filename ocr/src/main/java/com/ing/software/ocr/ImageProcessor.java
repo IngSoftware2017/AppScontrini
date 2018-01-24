@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.annimon.stream.function.*;
+import com.ing.software.ocr.OcrObjects.OcrError;
 
-import static java.util.Arrays.asList;
 import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.*;
 import static org.opencv.core.CvType.*;

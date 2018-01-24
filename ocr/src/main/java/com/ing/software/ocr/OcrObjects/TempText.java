@@ -2,6 +2,7 @@ package com.ing.software.ocr.OcrObjects;
 
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import com.annimon.stream.Stream;
@@ -15,18 +16,19 @@ import java.util.List;
 import static com.ing.software.common.CommonUtils.dist;
 import static com.ing.software.common.CommonUtils.pointToPointF;
 import static com.ing.software.common.CommonUtils.transform;
-import static com.ing.software.ocr.ProbGrid.GRID_LENGTH;
+import static com.ing.software.ocr.ScoreFunc.GRID_LENGTH;
 import static java.util.Arrays.asList;
 import static java.util.Collections.max;
 import static java.util.Collections.min;
 
 /**
  * todo: doc
- * todo: Lazy<Float> is useless if the goal is to reduce memory usage, better to use float directly (Lazy uses 'Float' that is way bigger than a 'float')
- * todo: if the goal is to reduce computational power, again Lazy is a better solution only if used rarely
+ * Lazy<Float> is useless if the goal is to reduce memory usage, better to use float directly (Lazy uses 'Float' that is way bigger than a 'float')
+ * if the goal is to reduce computational power, again Lazy is a better solution only if used rarely and here height and width are always accessed
+ * to get average height
  */
 
-public class TempText {
+public class TempText implements Comparable<TempText> {
 
     // List of substitutions used to correct common ocr mistakes in the reading of a price.
     private static final List<Pair<String, String>> NUM_SANITIZE_LIST = asList(
@@ -40,9 +42,8 @@ public class TempText {
     private boolean isWord;
     private Lazy<List<TempText>> children;
     private Lazy<List<PointF>> corners; // corners of a rotated rectangle containing the line of text
-    private Lazy<Float> height, width; // width, height of entire line
-    private Lazy<Float> charWidth, charHeight; // average width, height of single character
-    private Lazy<Float> charAspRatio; // charWidth / charHeight
+    private float height, width; // width, height of entire line
+    private float charWidth, charHeight; // average width, height of single character
     private Lazy<RectF> box;
     private String text;
     private Lazy<String> textUppercase; // uppercase text
@@ -59,12 +60,11 @@ public class TempText {
         corners = new Lazy<>(() -> pointToPointF(asList(text.getCornerPoints())));
 
         // width and height are respectively the longest and shortest side of the rotated rectangle
-        width =  new Lazy<>(() -> max(asList(dist(corners().get(0), corners().get(1)),
-                dist(corners().get(2), corners().get(3)))));
-        height = new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(3)),
-                dist(corners().get(1), corners().get(2)))));
+        width =  max(asList(dist(corners().get(0), corners().get(1)),
+                dist(corners().get(2), corners().get(3))));
+        height = min(asList(dist(corners().get(0), corners().get(3)),
+                dist(corners().get(1), corners().get(2))));
 
-        charAspRatio = new Lazy<>(() -> charWidth() / height());
         box = new Lazy<>(() -> new RectF(text.getBoundingBox()));
         this.text = text.getValue();
         textUppercase = new Lazy<>(() -> text().toUpperCase());
@@ -77,20 +77,20 @@ public class TempText {
 
         if (isWord) {
             // length of the longest side of the rotated rectangle, divided by the number of characters of the word
-            charWidth = new Lazy<>(() -> max(asList(dist(corners().get(0), corners().get(1)),
-                    dist(corners().get(2), corners().get(3)))) / text().length());
+            charWidth = max(asList(dist(corners().get(0), corners().get(1)),
+                    dist(corners().get(2), corners().get(3)))) / text().length();
             // length of the shortest side of the rotated rectangle
-            charHeight = new Lazy<>(() -> min(asList(dist(corners().get(0), corners().get(3)),
-                    dist(corners().get(1), corners().get(2)))));
+            charHeight = min(asList(dist(corners().get(0), corners().get(3)),
+                    dist(corners().get(1), corners().get(2))));
         } else {
             // average of individual words char width, weighted on word length.
             // I do not use directly line width because sometimes it's greater than the actual font width
-            charWidth = new Lazy<>(() -> Stream.of(children()).reduce(0f, (sum, currentChild) ->
-                    sum + currentChild.charWidth() * currentChild.length()) / textNoSpaces().length());
+            charWidth = Stream.of(children()).reduce(0f, (sum, currentChild) ->
+                    sum + currentChild.charWidth() * currentChild.length()) / textNoSpaces().length();
 
             // average of individual words char height, weighted on word length
-            charHeight = new Lazy<>(() -> Stream.of(children()).reduce(0f, (sum, currentChild) ->
-                    sum + currentChild.charHeight() * currentChild.length()) / textNoSpaces().length());
+            charHeight = Stream.of(children()).reduce(0f, (sum, currentChild) ->
+                    sum + currentChild.charHeight() * currentChild.length()) / textNoSpaces().length();
         }
 
         // I used .reduce() to concatenate every result of the lambda expression
@@ -118,11 +118,10 @@ public class TempText {
 
         // to calculate the width and height I should use the transformed corners, but this would lead to
         // a distorted rectangle that would not give a proper width and height.
-        width = new Lazy<>(() -> transform(tempText.width(), srcImgRect.width(), srcImgRect.width()));
-        width = new Lazy<>(() -> transform(tempText.height(), srcImgRect.height(), srcImgRect.height()));
-        charWidth = new Lazy<>(() -> transform(tempText.charWidth(), srcImgRect.width(), srcImgRect.width()));
-        charHeight = new Lazy<>(() -> transform(tempText.charHeight(), srcImgRect.height(), srcImgRect.height()));
-        charAspRatio = new Lazy<>(() -> charWidth() / height());
+        width = transform(tempText.width(), srcImgRect.width(), srcImgRect.width());
+        width = transform(tempText.height(), srcImgRect.height(), srcImgRect.height());
+        charWidth = transform(tempText.charWidth(), srcImgRect.width(), srcImgRect.width());
+        charHeight = transform(tempText.charHeight(), srcImgRect.height(), srcImgRect.height());
         box = new Lazy<>(() -> transform(tempText.box(), srcImgRect, dstImgRect));
 
         // the text fields remain unchanged
@@ -140,17 +139,14 @@ public class TempText {
 
     // rectangle properties
     public List<PointF> corners() { return corners.get(); }
-    public float width() { return width.get(); }
-    public float height() { return height.get(); }
+    public float width() { return width; }
+    public float height() { return height; }
     public float area() { return width() * height(); }
     public RectF box() { return box.get(); } // bounding box size is always >= of (width(), height())
-    public float centerX() { return box().centerX(); }
-    public float centerY() { return box().centerY(); }
 
     //character size
-    public float charWidth() { return charWidth.get(); }
-    public float charHeight() { return charHeight.get(); }
-    public float charAspectRatio() { return charAspRatio.get(); }
+    public float charWidth() { return charWidth; }
+    public float charHeight() { return charHeight; }
 
     // string properties
     public String text() { return text; }
@@ -182,5 +178,25 @@ public class TempText {
 
     public int getTagPosition() {
         return tagPosition;
+    }
+
+    /**
+     * Order: top to bottom, left to right
+     * @param rawText target text
+     * @return int > 0 if target comes before source (i.e. is above/on the left)
+     */
+    @Override
+    public int compareTo(@NonNull TempText rawText) {
+        RectF text2Rect = rawText.box();
+        if (text2Rect.top != box().top)
+            return box().top - text2Rect.top > 0 ? 1 : -1;
+        else if (text2Rect.left != box().left)
+            return box().left - text2Rect.left > 0 ? 1 : -1;
+        else if (text2Rect.bottom != box().bottom)
+            return box().bottom - text2Rect.bottom > 0 ? 1 : -1;
+        else if (box().right != text2Rect.right)
+            return box().right - text2Rect.right > 0 ? 1 : -1;
+        else
+            return 0;
     }
 }

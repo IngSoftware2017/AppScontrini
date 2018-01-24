@@ -7,5 +7,26 @@ Added options
 * ### Step 2   
 Adjustments to main objects   
 
+* ### Step 3   
+Main role division   
+Restored schemer   
+Link to rawImage   
+Next: focus on mainFlow   
+
+
+
+
+
+
+
+
+### TO DO:   
+[ ]- Remove hc values in schemer   
+[ ]- Rewrite DataAnalyzer   
+[ ]- Rewrite AmountComparator   
+[ ]- Divide flows between strict and loose analysis   
+[ ]- Accept both flows with different values   
+[ ]- Rewrite Manager in linear flow   
+[ ]- Add selective ocr in ocrAnalyzer   
 
 

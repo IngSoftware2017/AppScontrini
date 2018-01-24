@@ -1,4 +1,4 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OcrObjects;
 
 import android.graphics.PointF;
 import android.util.Pair;
@@ -22,6 +22,12 @@ public class OcrTicket {
      * Total amount.
      */
     public BigDecimal amount;
+
+    /**
+     * Restored amount contains a possibly different amount than 'amount' cause it's decoded
+     * trying to get a valid amount from invalid numbers.
+     */
+    public BigDecimal restoredAmount;
 
     /**
      * List of products (label + amount)

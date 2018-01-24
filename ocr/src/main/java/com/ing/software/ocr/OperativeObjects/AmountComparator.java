@@ -1,10 +1,12 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OperativeObjects;
 
 import android.graphics.Rect;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
 import com.ing.software.ocr.Legacy.RawText;
+import com.ing.software.ocr.OcrSchemer;
+import com.ing.software.ocr.OcrUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,7 +23,7 @@ import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
  * todo: handle tips and taxes
  */
 
-class AmountComparator {
+public class AmountComparator {
 
     private BigDecimal amount;
     private RawText amountText;
@@ -43,7 +45,7 @@ class AmountComparator {
      * @param amountText RawText containing amount. Not null.
      * @param amount BigDecimal containing decoded amount.
      */
-    AmountComparator(@NonNull RawText amountText, BigDecimal amount) {
+    public AmountComparator(@NonNull RawText amountText, BigDecimal amount) {
         this.amountText = amountText;
         this.amount = amount;
         if (amount != null)

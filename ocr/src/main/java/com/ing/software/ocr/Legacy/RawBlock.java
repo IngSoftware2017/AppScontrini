@@ -7,8 +7,7 @@ import android.support.annotation.Size;
 
 import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.TextBlock;
-import com.ing.software.ocr.OcrObjects.RawImage;
-import com.ing.software.ocr.OcrObjects.RawStringResult;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 
 import java.util.ArrayList;
 import java.util.List;

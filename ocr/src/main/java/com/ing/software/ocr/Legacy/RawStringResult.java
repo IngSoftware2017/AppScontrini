@@ -1,10 +1,9 @@
-package com.ing.software.ocr.OcrObjects;
+package com.ing.software.ocr.Legacy;
 
 
 import android.support.annotation.NonNull;
 
 
-import com.ing.software.ocr.Legacy.RawText;
 import com.ing.software.ocr.OcrUtils;
 
 import java.util.ArrayList;
