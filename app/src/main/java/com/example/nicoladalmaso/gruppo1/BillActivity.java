@@ -431,7 +431,7 @@ public class BillActivity extends AppCompatActivity {
      */
     private void savePickedFile(Bitmap imageToSave, String imagePath) {
 
-        imageToSave = checkImageOrientation(imageToSave, imagePath);
+        imageToSave = AppUtilities.checkImageOrientation(imageToSave, imagePath);
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -526,40 +526,6 @@ public class BillActivity extends AppCompatActivity {
         else{
             noBills.setVisibility(View.INVISIBLE);
         }
-    }
-
-    /** DAL MASO
-     * Check the image rotation and correct it
-     * @param img image bitmap
-     * @param path image path
-     * @return correct bitmap
-     */
-    private Bitmap checkImageOrientation(Bitmap img, String path){
-        Bitmap rotatedBitmap = img;
-        try {
-            ExifInterface ei = new ExifInterface(path);
-            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_UNDEFINED);
-
-            switch (orientation) {
-
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotatedBitmap = rotateImage(img, 90);
-                    break;
-
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotatedBitmap = rotateImage(img, 180);
-                    break;
-
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotatedBitmap = rotateImage(img, 270);
-                    break;
-
-                default:
-                    rotatedBitmap = img;
-            }
-        } catch (IOException e){}
-        return rotatedBitmap;
     }
 
     /** DAL MASO

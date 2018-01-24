@@ -2,8 +2,10 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
@@ -27,6 +29,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +44,7 @@ public class CameraActivity extends Activity {
     private Camera mCamera;
     private SurfaceView mPreview;
     private MediaRecorder mMediaRecorder;
+    private byte[] imageData;
     private static  final int FOCUS_AREA_SIZE= 300;
     public static final int MEDIA_TYPE_IMAGE = 1;
 
@@ -48,19 +52,20 @@ public class CameraActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
 
+        initializeComponents();
+    }
+
+    public void initializeComponents(){
         // Create an instance of Camera
         mCamera = getCameraInstance();
-
-
-
 
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+
 
         mPreview.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -75,16 +80,13 @@ public class CameraActivity extends Activity {
         preview.addView(mPreview);
 
         ImageButton captureButton = (ImageButton) findViewById(R.id.takePhoto_button);
-        captureButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // get an image from the camera
-                        mCamera.takePicture(null, null, mPicture);
-
-                    }
-                }
-        );
+        captureButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                     // get an image from the camera
+                     mCamera.takePicture(null, null, mPicture);
+             }
+        });
     }
 
     private void focusOnTouch(MotionEvent event) {
@@ -132,8 +134,19 @@ public class CameraActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        releaseMediaRecorder();       // if you are using MediaRecorder, release it first
-        releaseCamera();              // release the camera immediately on pause event
+        releaseMediaRecorder();
+        releaseCamera();
+        // two new lines for removing the old CameraPreview
+        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview.removeView(mPreview);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mCamera == null)
+        {
+            initializeComponents();
+        }
     }
 
     private Camera.AutoFocusCallback mAutoFocusTakePictureCallback = new Camera.AutoFocusCallback() {
@@ -169,70 +182,35 @@ public class CameraActivity extends Activity {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if (pictureFile == null){
-                Log.d(TAG, "Error creating media file, check storage permissions");
-                return;
-            }
-
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                Log.d(TAG, "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d(TAG, "Error accessing file: " + e.getMessage());
-            }
-
-            Intent checkPhoto = new Intent(getParent(), com.example.nicoladalmaso.gruppo1.CheckPhotoActivity.class);
-            checkPhoto.putExtra("photo", data);
-            startActivity(checkPhoto);
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap btm = AppUtilities.fromByteArrayToBitmap(data);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(btm, 0, 0, btm.getWidth(), btm.getHeight(), matrix, true);
+            //creates the temporary file and gets the path
+            String filePath = tempFileImage(getApplicationContext(), rotatedBitmap,"tempPhoto");
+            //passes the file path string with the intent
+            Intent intent = new Intent(getApplicationContext(), com.example.nicoladalmaso.gruppo1.CheckPhotoActivity.class);
+            intent.putExtra("path", filePath);
+            startActivity(intent);
         }
     };
 
+    public static String tempFileImage(Context context, Bitmap bitmap, String name) {
 
-    /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type){
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
+        File outputDir = context.getCacheDir();
+        File imageFile = new File(outputDir, name + ".jpg");
 
-    /** Create a File for saving an image or video */
-    private static File getOutputMediaFile(int type){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        } else {
-            String[] children = mediaStorageDir.list();
-            for (int i = 0; i < children.length; i++)
-            {
-                new File(mediaStorageDir, children[i]).delete();
-                Log.d("File eliminato", children[i]);
-            }
+        OutputStream os;
+        try {
+            os = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            Log.e(context.getClass().getSimpleName(), "Error writing file", e);
         }
 
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
+        return imageFile.getAbsolutePath();
     }
+
 }

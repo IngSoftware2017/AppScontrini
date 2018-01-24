@@ -2,11 +2,15 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.util.Log;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static com.example.nicoladalmaso.gruppo1.BillActivity.rotateImage;
 
 /**
  * Created by Cristian on 02/01/2018.
@@ -94,6 +98,40 @@ public class AppUtilities {
     public static Bitmap fromByteArrayToBitmap (byte[] data){
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         return bitmap;
+    }
+
+    /** DAL MASO
+     * Check the image rotation and correct it
+     * @param img image bitmap
+     * @param path image path
+     * @return correct bitmap
+     */
+    public static Bitmap checkImageOrientation(Bitmap img, String path){
+        Bitmap rotatedBitmap = img;
+        try {
+            ExifInterface ei = new ExifInterface(path);
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED);
+
+            switch (orientation) {
+
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotatedBitmap = rotateImage(img, 90);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotatedBitmap = rotateImage(img, 180);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotatedBitmap = rotateImage(img, 270);
+                    break;
+
+                default:
+                    rotatedBitmap = img;
+            }
+        } catch (IOException e){}
+        return rotatedBitmap;
     }
 
 
