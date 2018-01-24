@@ -1,19 +1,23 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -67,6 +71,7 @@ public class BillActivity extends AppCompatActivity {
     public DataManager DB;
     OcrManager ocrManager;
     CustomAdapter adapter;
+    Camera mCamera;
     ListView listView;
 
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -130,7 +135,6 @@ public class BillActivity extends AppCompatActivity {
                 deleteMission();
                 break;
             case (R.id.action_editMission):
-                //TODO: modifica la missione
                 Intent editMission = new Intent(context, com.example.nicoladalmaso.gruppo1.EditMission.class);
                 editMission.putExtra("missionID", thisMission.getID());
                 startActivityForResult(editMission, MISSION_MOD);
@@ -147,6 +151,15 @@ public class BillActivity extends AppCompatActivity {
      *  Manage all animations and catch onclick events about FloatingActionButtons
      */
     public void initializeComponents(){
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                1);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                1);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA},
+                1);
         listView = (ListView)findViewById(R.id.list1);
         printAllTickets();
         fab = (FloatingActionButton)findViewById(R.id.fab);
@@ -271,6 +284,42 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
+    /**Lazzarin
+     * It Opens the camera,takes the photo and puts as Extra Uri created by createImageFile method.
+     * @Framing Camera, directory modified by createImageFile
+     */
+    private void takePhotoIntent2() {
+        if(checkCameraHardware(context)){
+            mCamera = getCameraInstance();
+            Intent cameraActivity = new Intent(context, com.example.nicoladalmaso.gruppo1.CameraActivity.class);
+            startActivity(cameraActivity);
+        }else {
+
+        }
+    }
+
+    /** Check if this device has a camera */
+    private boolean checkCameraHardware(Context context) {
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            // this device has a camera
+            return true;
+        } else {
+            // no camera on this device
+            return false;
+        }
+    }
+
+    /** A safe way to get an instance of the Camera object. */
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        }
+        catch (Exception e){
+            // Camera is not available (in use or does not exist)
+        }
+        return c; // returns null if camera is unavailable
+    }
 
     /**Lazzarin
      * It creates a temporary file where to save the photo on.
