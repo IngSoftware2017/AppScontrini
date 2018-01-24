@@ -17,6 +17,15 @@
         <item name="colorControlActivated">#FFF</item>
     </style>
 
+    <style name="TextLabelCustom" parent="Theme.AppCompat">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">#ddd</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">#FFF</item>
+        <item name="colorControlNormal">#ddd</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
+
 
 
     <style name="AppTheme.ActionBar.Transparent" parent="AppTheme">

@@ -254,41 +254,15 @@ public class BillActivity extends AppCompatActivity {
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 
-    /**Lazzarin
-     * It Opens the camera,takes the photo and puts as Extra Uri created by createImageFile method.
-     * @Framing Camera, directory modified by createImageFile
+
+    /**Dal Maso
+     * It opens the custom camera, take the photo, analize it and save it
      */
     private void takePhotoIntent() {
-        Intent takePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePhoto.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException e)
-            {
-             Log.d("IOException","error using createImageFile method");
-            }
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePhoto, REQUEST_TAKE_PHOTO);
-            }
-        }
-    }
-
-    /**Lazzarin
-     * It Opens the camera,takes the photo and puts as Extra Uri created by createImageFile method.
-     * @Framing Camera, directory modified by createImageFile
-     */
-    private void takePhotoIntent2() {
         if(checkCameraHardware(context)){
             mCamera = getCameraInstance();
             Intent cameraActivity = new Intent(context, com.example.nicoladalmaso.gruppo1.CameraActivity.class);
-            startActivity(cameraActivity);
-        }else {
-
+            startActivityForResult(cameraActivity, REQUEST_TAKE_PHOTO);
         }
     }
 
@@ -313,41 +287,6 @@ public class BillActivity extends AppCompatActivity {
             // Camera is not available (in use or does not exist)
         }
         return c; // returns null if camera is unavailable
-    }
-
-    /**Lazzarin
-     * It creates a temporary file where to save the photo on.
-     * @Framing Directory Pictures
-     * @Return the temporary file
-     *
-     */
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        File storageDir = new File(root);
-        File image = File.createTempFile(
-                "temp",  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        // Save a file: path for use with ACTION_VIEW intents
-        tempPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-
-    /** Dal Maso
-     *  Delete all temp files used for saving camera's images
-     */
-    public void deleteTempFiles(){
-        File[] files = readAllImages();
-        String filename = "";
-        for (int i = 0; i < files.length; i++)
-        {
-            filename = files[i].getName();
-            if(filename.substring(0,4).equals("temp")){
-                files[i].delete();
-            }
-        }
     }
 
 
@@ -379,9 +318,6 @@ public class BillActivity extends AppCompatActivity {
                  * @Framing Add the photo on the directory using savePickedFile()
                  */
                 case(REQUEST_TAKE_PHOTO):
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    Bitmap bitmapPhoto = BitmapFactory.decodeFile(tempPhotoPath,bmOptions);
-                    savePickedFile(bitmapPhoto, tempPhotoPath);
                     printAllTickets();
                     break;
 
@@ -460,9 +396,7 @@ public class BillActivity extends AppCompatActivity {
             ticket.setFileUri(uri);
             ticket.setAmount(result.amount);
 
-            if(result.title == null)
-                ticket.setTitle(context.getString(R.string.title_Ticket));
-            else
+            if(result.title != null)
                 ticket.setTitle(result.title);
 
             ticket.setMissionID(missionID);
@@ -478,26 +412,6 @@ public class BillActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-
-    /** Dal Maso
-     * read all images
-     * @return all read files in the folder
-     */
-    private File[] readAllImages(){
-        String path = root;
-        Log.d("Files", "Path: " + path);
-        File directory = new File(path);
-        File[] files=null;
-        if(directory.listFiles()==null) {
-            Log.d("Files", "hai trovato l'errore");
-        }
-         else
-         files = directory.listFiles();
-        Log.d("Files", "Size: "+ files.length);
-        return files;
-    }
-
 
     /** Dal Maso
      *  Print all tickets, get it from DB
@@ -540,18 +454,6 @@ public class BillActivity extends AppCompatActivity {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
-
-    /**PICCOLO_Edit by Dal Maso
-     * Method that lets the user crop the photo
-     * @param toCrop photo's index
-     * @param path path of the photo
-     */
-    public void cropFile(int toCrop, String path){
-        Log.d("Crop","Success");
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        CropImage.activity(Uri.fromFile(files[toCrop])).start(this);
-    }//cropFile
 
     /**PICCOLO
      * Method that is run when the activity is resumed.

@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,6 +76,7 @@ public class AddNewMission extends AppCompatActivity{
         missionFinish = (TextView)findViewById(R.id.input_missionFinish);
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionFinish);
+        bntMissionFinish.setVisibility(View.INVISIBLE);
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 hideSoftKeyboard(AddNewMission.this);
@@ -81,6 +84,28 @@ public class AddNewMission extends AppCompatActivity{
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
+
+        missionStart.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(missionStart.getText() != getString(R.string.dateStart))
+                    bntMissionFinish.setVisibility(View.VISIBLE);
+            }
+        });
+
+        if(missionStart.getText() == getString(R.string.dateStart)){
+
+        }
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -120,8 +145,8 @@ public class AddNewMission extends AppCompatActivity{
                 EditText editLocation = (EditText)findViewById(R.id.input_missionLocation);
                 String name = editName.getText().toString();
                 String location = editLocation.getText().toString();
-                String startDate=(String) missionStart.getText();
-                String finishDate=(String) missionFinish.getText();
+                String startDate = missionStart.getText().toString();
+                String finishDate = missionFinish.getText().toString();
                 Log.d("marsadenadata",startDate);
 
                 if ((name == null) || name.replaceAll(" ","").equals("")) {
@@ -149,8 +174,8 @@ public class AddNewMission extends AppCompatActivity{
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
-                    String start=AppUtilities.addMonth(startDate);
-                    String finish=AppUtilities.addMonth(finishDate);
+                    String start = AppUtilities.addMonth(startDate);
+                    String finish = AppUtilities.addMonth(finishDate);
                     if(!AppUtilities.checkDate(start,finish)) {
                         Log.d("formato data inserita", "errato");
                         Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
