@@ -52,7 +52,7 @@ public class MissionsTabbed extends AppCompatActivity {
         setContentView(R.layout.activity_missions_tabbed);
 
         Intent intent = getIntent();
-        personID = intent.getExtras().getInt("personID");
+        personID = Singleton.getInstance().getPersonID();
         DB = new DataManager(this);
         thisPerson = DB.getPerson(personID);
 

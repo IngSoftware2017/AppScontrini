@@ -87,15 +87,16 @@ public class AddNewPerson extends AppCompatActivity {
 
 
                 long personID = DB.addPerson(person);
-                Log.d("New mission id", ""+personID);
+
                 //create new directory with input text
                 //Start billActivity
                 Bundle bundle = new Bundle();
 
                 Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
                 startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startMissionView.putExtra("personID", (int) personID);
-                startMissionView.putExtra("personName", name);
+
+                Singleton.getInstance().setPersonID((int) personID);
+
                 context.startActivity(startMissionView);
                 setResult(RESULT_OK, intent);
                 finish();

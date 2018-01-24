@@ -121,9 +121,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                         File photo = new File(thisTicket.getFileUri().toString().substring(7));
 
                         //Put data to next activity
-                        startImageView.putExtra("ID",thisTicket.getID());
-                        //lazzarin
-                        startImageView.putExtra("missionID",missionID);
+                        Singleton.getInstance().setTicketID(ticketID);
+
                         //Start new activity
                         ((BillActivity)context).startActivityForResult(startImageView, 4);
                         return;

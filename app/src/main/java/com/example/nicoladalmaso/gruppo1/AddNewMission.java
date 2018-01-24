@@ -149,20 +149,13 @@ public class AddNewMission extends AppCompatActivity{
 
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
-
                     String start=AppUtilities.addMonth(startDate);
-
                     String finish=AppUtilities.addMonth(finishDate);
                     if(!AppUtilities.checkDate(start,finish)) {
                         Log.d("formato data inserita", "errato");
                         Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    else
-                        Log.d("formato data inserita","corretto");
-
-
-
                     miss.setStartDate(format.parse(start));
                     miss.setEndDate(format.parse(finish));
                 } catch (ParseException e) {
@@ -171,15 +164,14 @@ public class AddNewMission extends AppCompatActivity{
 
 
                 long missionID = DB.addMission(miss);
-                Log.d("New mission id", ""+missionID);
+
                 //create new directory with input text
                 //Start billActivity
                 Bundle bundle = new Bundle();
 
                 Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startImageView.putExtra("missionID", (int) missionID);
-                startImageView.putExtra("missionName", miss.getName());
+                Singleton.getInstance().setMissionID((int)missionID);
                 context.startActivity(startImageView);
                 setResult(RESULT_OK, intent);
                 finish();

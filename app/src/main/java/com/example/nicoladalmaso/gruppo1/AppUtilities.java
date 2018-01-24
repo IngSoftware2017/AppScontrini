@@ -1,5 +1,7 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -89,9 +91,13 @@ public class AppUtilities {
      return false;
     }
 
-
-
+    public static Bitmap fromByteArrayToBitmap (byte[] data){
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        return bitmap;
     }
+
+
+}
 
 
 

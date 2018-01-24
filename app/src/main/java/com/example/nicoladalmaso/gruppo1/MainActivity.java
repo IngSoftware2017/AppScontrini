@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initialize();
         printAllPeople();
+        Singleton init = Singleton.getInstance();
     }
 
     /** Dal Maso

@@ -80,11 +80,7 @@ public class BillViewer extends AppCompatActivity {
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#66000000")));
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        //lazzarin
-        Intent intent=getIntent();
-        missionID=intent.getExtras().getInt("missionID");
 
-        Log.d("id della missione",missionID+"");
         initialize();
     }
 
@@ -94,7 +90,7 @@ public class BillViewer extends AppCompatActivity {
     public void initialize(){
         //Get data from parent view
         Intent intent = getIntent();
-        ticketId = (int) intent.getExtras().getLong("ID");
+        ticketId = Singleton.getInstance().getTicketID();
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
@@ -180,8 +176,6 @@ public class BillViewer extends AppCompatActivity {
             case R.id.action_editTicket:
                 //Open Edit Ticket Activity
                 Intent editTicket = new Intent(context, com.example.nicoladalmaso.gruppo1.EditTicket.class);
-                editTicket.putExtra("ticketID", thisTicket.getID());
-                editTicket.putExtra("missionID",missionID);
                 startActivityForResult(editTicket, TICKET_MOD);
                 break;
 

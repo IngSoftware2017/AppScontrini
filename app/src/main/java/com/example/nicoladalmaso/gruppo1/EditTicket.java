@@ -29,10 +29,11 @@ import database.TicketEntity;
 public class EditTicket extends AppCompatActivity {
 
     public DataManager DB;
-    int ticketId;
+    int ticketID;
     int missionID;
     Context context;
     TicketEntity thisTicket;
+    MissionEntity thisMission;
     String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = "", ticketDateString = "";
     Date ticketDate;
     TextView txtTitle;
@@ -48,9 +49,12 @@ public class EditTicket extends AppCompatActivity {
         context = this.getApplicationContext();
         setTitle(context.getString(R.string.title_EditTicket));
         setContentView(R.layout.activity_edit_ticket);
+
         DB = new DataManager(this.getApplicationContext());
-         intent=getIntent();
-         Log.d("missionID cercato",intent.getExtras().getInt("missionID")+"");
+        ticketID = Singleton.getInstance().getTicketID();
+        missionID = Singleton.getInstance().getMissionID();
+        thisTicket = DB.getTicket(ticketID);
+        thisMission = DB.getMission(missionID);
 
         //Get data from parent view
         setTicketValues();
@@ -84,27 +88,28 @@ public class EditTicket extends AppCompatActivity {
 
                 thisTicket.setTitle(txtTitle.getText().toString());
                 /**
-                 * lazzarin
+                 * lazzarin (Cleaned by Dal Maso)
                  */
-                int missionID=intent.getExtras().getInt("missionID");
                 SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
                 try {
-                   MissionEntity current = DB.getMission(missionID);
-                   String  start=dateformat.format(current.getStartDate());
-                    Log.d(" date of start mission",start);
-                   String finish=dateformat.format(current.getEndDate());
-                    Log.d(" date of start mission",finish);
-                   if( AppUtilities.checkIntervalDate(start,finish,txtDate.getText().toString()))
-                       thisTicket.setDate(dateformat.parse(txtDate.getText().toString()));
-                   else
-                   {Toast.makeText(context, getResources().getString(R.string.toast_errorIntervalDate), Toast.LENGTH_SHORT).show();
-                    break;}
+                    MissionEntity current = DB.getMission(missionID);
+                    String  start=dateformat.format(current.getStartDate());
+
+                    String finish=dateformat.format(current.getEndDate());
+
+                    if( AppUtilities.checkIntervalDate(start,finish,txtDate.getText().toString()))
+                        thisTicket.setDate(dateformat.parse(txtDate.getText().toString()));
+                    else {
+                        Toast.makeText(context, getResources().getString(R.string.toast_errorIntervalDate), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
 
-                if(txtShop.getText().toString().replace(" ","").compareTo("") != 0)
+                if(txtShop.getText().toString().replace(" ","").compareTo("") != 0) {
                     thisTicket.setShop(txtShop.getText().toString());
+                }
 
                 /**
                  * Mantovan Federico
@@ -155,9 +160,7 @@ public class EditTicket extends AppCompatActivity {
     }
 
     private void setTicketValues(){
-        ticketId = (int) intent.getExtras().getLong("ticketID");
-        Log.d("TicketID", "Edit ticket "+ticketId);
-        thisTicket = DB.getTicket(ticketId);
+
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate();

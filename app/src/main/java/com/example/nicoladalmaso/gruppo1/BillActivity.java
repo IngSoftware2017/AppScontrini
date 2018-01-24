@@ -88,8 +88,8 @@ public class BillActivity extends AppCompatActivity {
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
 
-        Intent intent = getIntent();
-        missionID = intent.getExtras().getInt("missionID");
+
+        missionID = Singleton.getInstance().getMissionID();
         thisMission = DB.getMission(missionID);
 
         setTitle(thisMission.getName());
@@ -152,13 +152,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void initializeComponents(){
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                1);
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                1);
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.CAMERA},
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
                 1);
         listView = (ListView)findViewById(R.id.list1);
         printAllTickets();

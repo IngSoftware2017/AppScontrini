@@ -57,6 +57,8 @@ public class EditMission extends AppCompatActivity {
         txtMissionStart=(TextView)findViewById(R.id.input_missionEditStart);
         txtMissionEnd=(TextView)findViewById(R.id.input_missionEditFinish);
         chkIsClosed=(CheckBox)findViewById(R.id.check_isRepaid);
+        missionID = Singleton.getInstance().getMissionID();
+        thisMission = DB.getMission(missionID);
 
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionEditStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionEditFinish);
@@ -143,11 +145,7 @@ public class EditMission extends AppCompatActivity {
      * set the values of the mission
      */
     private void setMissionValues(){
-        Intent intent = getIntent();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        missionID = (int) intent.getExtras().getLong("missionID");
-        thisMission = DB.getMission(missionID);
-
         txtMissionName.setText(thisMission.getName());
         txtMissionLocation.setText(thisMission.getLocation());
         txtMissionStart.setText(formatter.format(thisMission.getStartDate()));

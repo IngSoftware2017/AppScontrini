@@ -2,6 +2,7 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -41,6 +42,7 @@ public class CameraActivity extends Activity {
     private SurfaceView mPreview;
     private MediaRecorder mMediaRecorder;
     private static  final int FOCUS_AREA_SIZE= 300;
+    public static final int MEDIA_TYPE_IMAGE = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,11 +82,6 @@ public class CameraActivity extends Activity {
                         // get an image from the camera
                         mCamera.takePicture(null, null, mPicture);
 
-                        try {
-                            mCamera.reconnect();
-                        } catch (Exception e){
-
-                        }
                     }
                 }
         );
@@ -188,11 +185,13 @@ public class CameraActivity extends Activity {
             } catch (IOException e) {
                 Log.d(TAG, "Error accessing file: " + e.getMessage());
             }
+
+            Intent checkPhoto = new Intent(getParent(), com.example.nicoladalmaso.gruppo1.CheckPhotoActivity.class);
+            checkPhoto.putExtra("photo", data);
+            startActivity(checkPhoto);
         }
     };
 
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
 
     /** Create a file Uri for saving an image or video */
     private static Uri getOutputMediaFileUri(int type){
@@ -215,6 +214,13 @@ public class CameraActivity extends Activity {
                 Log.d("MyCameraApp", "failed to create directory");
                 return null;
             }
+        } else {
+            String[] children = mediaStorageDir.list();
+            for (int i = 0; i < children.length; i++)
+            {
+                new File(mediaStorageDir, children[i]).delete();
+                Log.d("File eliminato", children[i]);
+            }
         }
 
         // Create a media file name
@@ -223,9 +229,6 @@ public class CameraActivity extends Activity {
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_"+ timeStamp + ".jpg");
-        } else if(type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_"+ timeStamp + ".mp4");
         } else {
             return null;
         }

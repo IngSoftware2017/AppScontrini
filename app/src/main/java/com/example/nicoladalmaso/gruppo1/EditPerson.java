@@ -40,6 +40,8 @@ public class EditPerson extends AppCompatActivity{
         setContentView(R.layout.activity_edit_person);
 
         DB = new DataManager(context);
+        personID = Singleton.getInstance().getPersonID();
+        thisPerson = DB.getPerson(personID);
 
         //Get data from parent view
         setPersonValues();
@@ -89,16 +91,9 @@ public class EditPerson extends AppCompatActivity{
      * set the values of the person
      */
     private void setPersonValues(){
-        Intent intent = getIntent();
-        personID = intent.getExtras().getInt("personID");
-        Log.d("personID", "Edit person "+personID);
-        thisPerson = DB.getPerson(personID);
-        //TODO: fix the crash
         personName = thisPerson.getName();
         personLastName = thisPerson.getLastName();
         personAcademicTitle = thisPerson.getAcademicTitle();
-        Log.d("DBPerson",personID+" "+personName+" "+personLastName);
-        //set those values to the edittext
     }
 
     /**Dal Maso, adapted by Piccolo

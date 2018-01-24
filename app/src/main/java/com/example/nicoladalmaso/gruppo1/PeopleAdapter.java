@@ -18,6 +18,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.io.File;
 import java.util.List;
 import database.MissionEntity;
@@ -48,7 +51,9 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
 
         TextView name = (TextView)convertView.findViewById(R.id.personName);
         TextView title=(TextView)convertView.findViewById(R.id.personAcademicTitle);
+        ImageView profilePic = (ImageView)convertView.findViewById(R.id.profile_image);
         PersonEntity person = getItem(position);
+        profilePic.setImageResource(R.drawable.ic_user);
         name.setText(person.getName()+" "+person.getLastName());
         String academicTitle = person.getAcademicTitle();
         if ((academicTitle == null) || academicTitle.replaceAll(" ","").equals("")) {
@@ -60,13 +65,16 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
 
         convertView.setTag(person.getID());
 
+        //profile pic set, up to cache memory
+        Glide.with(context)
+                .load("")
+                .placeholder(R.drawable.ic_user)
+                .into(profilePic);
+
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                /*Intent startMissionsView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
-                startMissionsView.putExtra("personID", Integer.parseInt(v.getTag().toString()));
-                ((MainActivity)context).startActivityForResult(startMissionsView, 1);*/
                 Intent missionTab = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
-                missionTab.putExtra("personID", Integer.parseInt(v.getTag().toString()));
+                Singleton.getInstance().setPersonID(Integer.parseInt(v.getTag().toString()));
                 ((MainActivity)context).startActivityForResult(missionTab, 1);
             }
         });

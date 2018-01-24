@@ -30,14 +30,12 @@
                 android:layout_margin="16dp"
                 android:orientation="horizontal">
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/profile_image"
                     android:layout_width="48dp"
                     android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_user" />
+                    android:layout_centerVertical="true" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
