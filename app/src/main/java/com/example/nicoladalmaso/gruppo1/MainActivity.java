@@ -2,6 +2,7 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
@@ -28,6 +29,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -92,6 +96,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initialize(){
+
+        TapTargetView.showFor(this,                 // `this` is an Activity
+                TapTarget.forView(findViewById(R.id.fab_addPerson), "Nuovo elemento", "In qualsiasi schermata puoi aggiungere un nuovo elemento con questo pulsante")
+                        // All options below are optional
+                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                        .titleTextSize(20)                  // Specify the size (in sp) of the title text
+                        .titleTextColor(R.color.white)      // Specify the color of the title text
+                        .descriptionTextSize(10)            // Specify the size (in sp) of the description text
+                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                        .textColor(R.color.white)            // Specify a color for both the title and description text
+                        .icon(getResources().getDrawable(R.mipmap.ic_add_white_24dp))
+        );
+
         listView = (ListView)findViewById(R.id.listPeople);
         DB = new DataManager(this.getApplicationContext());
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);

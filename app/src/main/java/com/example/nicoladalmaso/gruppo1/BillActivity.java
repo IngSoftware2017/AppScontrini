@@ -36,6 +36,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.ing.software.common.Ticket;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
@@ -151,6 +153,19 @@ public class BillActivity extends AppCompatActivity {
      *  Manage all animations and catch onclick events about FloatingActionButtons
      */
     public void initializeComponents(){
+
+        TapTargetView.showFor(this,                 // `this` is an Activity
+                TapTarget.forView(findViewById(R.id.fab), "Scatta una foto", "Aggiungi un nuovo scontrino, inizia subito scattando una foto!")
+                        // All options below are optional
+                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                        .titleTextSize(20)                  // Specify the size (in sp) of the title text
+                        .titleTextColor(R.color.white)      // Specify the color of the title text
+                        .descriptionTextSize(10)            // Specify the size (in sp) of the description text
+                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                        .textColor(R.color.white)            // Specify a color for both the title and description text
+                        .icon(getResources().getDrawable(R.mipmap.ic_camera_white_24dp))
+        );
+
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
                 1);

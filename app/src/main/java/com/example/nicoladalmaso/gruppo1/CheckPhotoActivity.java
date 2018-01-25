@@ -94,8 +94,9 @@ public class CheckPhotoActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(result.amount != null)
+                    if(result.amount != null) {
                         checkPrice.setText(result.amount.toString());
+                    }
                     waitOCR.setVisibility(View.INVISIBLE);
                 }
             });
@@ -135,6 +136,7 @@ public class CheckPhotoActivity extends Activity {
             FileOutputStream outOriginal = new FileOutputStream(originalPhoto);
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
+
             TicketEntity thisTicket = new TicketEntity();
 
             if(OCR_result.date == null)
@@ -143,7 +145,12 @@ public class CheckPhotoActivity extends Activity {
                 thisTicket.setDate(OCR_result.date);
 
             thisTicket.setFileUri(uri);
-            thisTicket.setAmount(new BigDecimal(checkPrice.getText().toString()));
+            try {
+                thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(checkPrice.getText().toString())));
+            }
+            catch (Exception e){
+                thisTicket.setAmount(null);
+            }
             thisTicket.setTitle(checkName.getText().toString());
 
             thisTicket.setMissionID(Singleton.getInstance().getMissionID());
