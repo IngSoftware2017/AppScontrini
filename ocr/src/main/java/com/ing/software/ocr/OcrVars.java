@@ -105,7 +105,7 @@ public class OcrVars {
     static final List<WordMatcher> IT_CHANGE_MATCHERS = asList(
             new WordMatcher("RESTO", 1)
     );
-    static final List<WordMatcher> IT_INDOOR_MATCHERS = asList(
+    static final List<WordMatcher> IT_COVER_MATCHERS = asList(
             new WordMatcher("COPERTO", 1)
     );
     //in italy, subtotal is rarely present, skip it

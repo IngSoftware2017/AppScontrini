@@ -40,9 +40,9 @@ public class OcrTicket {
     public List<Pair<String, BigDecimal>> products;
 
     /**
-     * Indoor amount ("coperto")
+     * Cover number (number of people)
      */
-    public BigDecimal indoorAmount;
+    public int coverNumber;
 
     /**
      * Purchase date.
