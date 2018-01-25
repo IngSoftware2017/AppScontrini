@@ -67,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
         initialize();
         printAllPeople();
         Singleton init = Singleton.getInstance();
+
+        if(listPeople.size() == 0){
+            startGuide();
+        }
+
     }
 
     /** Dal Maso
@@ -95,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initialize(){
-
+    private void startGuide(){
         TapTargetView.showFor(this,                 // `this` is an Activity
                 TapTarget.forView(findViewById(R.id.fab_addPerson), "Nuovo elemento", "In qualsiasi schermata puoi aggiungere un nuovo elemento con questo pulsante")
                         // All options below are optional
@@ -108,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
                         .textColor(R.color.white)            // Specify a color for both the title and description text
                         .icon(getResources().getDrawable(R.mipmap.ic_add_white_24dp))
         );
+    }
+
+    private void initialize(){
 
         listView = (ListView)findViewById(R.id.listPeople);
         DB = new DataManager(this.getApplicationContext());

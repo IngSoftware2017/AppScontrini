@@ -109,6 +109,10 @@ public class BillActivity extends AppCompatActivity {
         }
 
         initializeComponents();
+
+        if(list.size() == 0){
+            showGuide();
+        }
     }
 
     /** Dal Maso
@@ -149,11 +153,7 @@ public class BillActivity extends AppCompatActivity {
         return true;
     }
 
-    /** Dal Maso
-     *  Manage all animations and catch onclick events about FloatingActionButtons
-     */
-    public void initializeComponents(){
-
+    public void showGuide(){
         TapTargetView.showFor(this,                 // `this` is an Activity
                 TapTarget.forView(findViewById(R.id.fab), "Scatta una foto", "Aggiungi un nuovo scontrino, inizia subito scattando una foto!")
                         // All options below are optional
@@ -165,6 +165,12 @@ public class BillActivity extends AppCompatActivity {
                         .textColor(R.color.white)            // Specify a color for both the title and description text
                         .icon(getResources().getDrawable(R.mipmap.ic_camera_white_24dp))
         );
+    }
+
+    /** Dal Maso
+     *  Manage all animations and catch onclick events about FloatingActionButtons
+     */
+    public void initializeComponents(){
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
