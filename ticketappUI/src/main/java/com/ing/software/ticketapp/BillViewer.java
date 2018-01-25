@@ -53,7 +53,7 @@ public class BillViewer extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_bill_viewer);
-        DB = new DataManager(this.getApplicationContext());
+        DB = DataManager.getInstance(this.getApplicationContext());
         context = this.getApplicationContext();
 
         initialize();
@@ -95,7 +95,7 @@ public class BillViewer extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         if (thisTicket.getDate() != null) {
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
             ticketDate = df.format(thisTicket.getDate());
         } else
             ticketDate = getString(R.string.no_date);
