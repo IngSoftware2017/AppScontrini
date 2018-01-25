@@ -157,58 +157,22 @@ public class BillActivity extends AppCompatActivity {
         listView = (ListView)findViewById(R.id.list1);
         printAllTickets();
         fab = (FloatingActionButton)findViewById(R.id.fab);
-        fab1 = (FloatingActionButton)findViewById(R.id.fab1);
-        fab2 = (FloatingActionButton)findViewById(R.id.fab2);
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_forward);
         rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
+
         fab.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                animateFAB();
-            }
-        });
-        //Camera button
-        fab1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 takePhotoIntent();
             }
         });
-        //Gallery button
-        fab2.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                pickImageFromGallery();
-            }
-        });
+
         if(thisMission.isRepay()) {
             fab.setVisibility(View.INVISIBLE);
         }
         else{
             fab.setVisibility(View.VISIBLE);
-        }
-    }
-
-    /** Dal Maso
-     *  Animations for Floating Action Button (FAB)
-     */
-    public void animateFAB(){
-
-        if(isFabOpen){
-
-            fab.startAnimation(rotate_backward);
-            fab1.startAnimation(fab_close);
-            fab2.startAnimation(fab_close);
-            fab1.setClickable(false);
-            fab2.setClickable(false);
-            isFabOpen = false;
-        } else {
-
-            fab.startAnimation(rotate_forward);
-            fab1.startAnimation(fab_open);
-            fab2.startAnimation(fab_open);
-            fab1.setClickable(true);
-            fab2.setClickable(true);
-            isFabOpen = true;
         }
     }
 
@@ -291,16 +255,6 @@ public class BillActivity extends AppCompatActivity {
 
 
     /** Dal Maso
-     *  Pick up photo from gallery
-     */
-    public void pickImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
-    }
-
-
-    /** Dal Maso
      * Catch intent results
      * @param requestCode action number
      * @param resultCode intent result code
@@ -312,31 +266,8 @@ public class BillActivity extends AppCompatActivity {
         Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-                /**lazzarin
-                 * Saves definitely the photo without losing quality, deletes the temporary file and shows
-                 * the new photo.
-                 * @Framing Add the photo on the directory using savePickedFile()
-                 */
+
                 case(REQUEST_TAKE_PHOTO):
-                    printAllTickets();
-                    break;
-
-                //Dal Maso
-                //Gallery photo
-                case (PICK_PHOTO_FOR_AVATAR):
-                    photoURI = data.getData();
-                    try {
-                        Bitmap btm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                        savePickedFile(btm, photoURI.toString());
-                        printAllTickets();
-                    }catch (Exception e){
-                        Log.d("Foto da galleria", "ERROR");
-                    }
-                    break;
-
-                //Dal Maso
-                //Resize management
-                case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
                     printAllTickets();
                     break;
 
@@ -358,58 +289,6 @@ public class BillActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_CANCELED) {
             Log.d("CANCELLED", "OK");
             printAllTickets();
-        }
-    }
-
-    /** Dal Maso
-     * Save the bitmap passed
-     * @param imageToSave bitmap to save
-     */
-    private void savePickedFile(Bitmap imageToSave, String imagePath) {
-
-        imageToSave = AppUtilities.checkImageOrientation(imageToSave, imagePath);
-
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        String fname = imageFileName+".jpg";
-        File file = new File(root, fname);
-        File originalPhoto = new File(root,fname+"orig");
-        final Uri uri=Uri.fromFile(file);
-        if (file.exists())
-            file.delete();
-        if(originalPhoto.exists())
-            originalPhoto.delete();
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-
-            ImageProcessor imgProc = new ImageProcessor(imageToSave);
-            Ticket result = ocrManager.getTicket(imgProc);
-
-            TicketEntity ticket = new TicketEntity();
-
-            if(result.date == null)
-                ticket.setDate(Calendar.getInstance().getTime());
-            else
-                ticket.setDate(result.date);
-            
-            ticket.setFileUri(uri);
-            ticket.setAmount(result.amount);
-
-            if(result.title != null)
-                ticket.setTitle(result.title);
-
-            ticket.setMissionID(missionID);
-            DB.addTicket(ticket);
-            imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            out.flush();
-            out.close();
-            FileOutputStream outOriginal = new FileOutputStream(originalPhoto);
-            imageToSave.compress(Bitmap.CompressFormat.JPEG,90,outOriginal);
-            outOriginal.flush();
-            outOriginal.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

@@ -204,40 +204,6 @@ public class BillViewer extends AppCompatActivity {
                     initialize();
                     break;
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
-                    thisTicket.setFileUri(thisTicket.getFileUri());
-
-                    OcrManager ocrManager = new OcrManager();
-
-                    while (ocrManager.initialize(this) != 0) { // 'this' is the context
-                        try {
-                            //On first run vision library will be downloaded
-                            Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    Bitmap ocrImage= BitmapFactory.decodeFile(thisTicket.getFileUri().toString().substring(7));
-                    ImageProcessor imgProc = new ImageProcessor(ocrImage);
-                    Ticket result = ocrManager.getTicket(imgProc);
-
-                    Log.d("OCR",result.amount+", "+result.date);
-
-                    if(result.date == null)
-                        thisTicket.setDate(Calendar.getInstance().getTime());
-                    else
-                        thisTicket.setDate(result.date);
-
-                    thisTicket.setAmount(result.amount);
-
-                    if(result.title == null)
-                        thisTicket.setTitle(context.getString(R.string.title_Ticket));
-                    else
-                        thisTicket.setTitle(result.title);
-
-                    ocrManager.release();
-
                     DB.updateTicket(thisTicket);
                     initialize();
                     break;

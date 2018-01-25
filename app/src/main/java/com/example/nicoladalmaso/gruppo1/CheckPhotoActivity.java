@@ -100,7 +100,7 @@ public class CheckPhotoActivity extends Activity {
                 }
             });
             OCR_result = result;
-
+            Log.d("SHAPE", result.rectangle.toString());
             btnOK.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
