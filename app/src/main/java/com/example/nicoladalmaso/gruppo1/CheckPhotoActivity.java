@@ -38,7 +38,7 @@ public class CheckPhotoActivity extends Activity {
     OcrManager ocrManager;
     String root;
     DataManager DB;
-    Ticket result;
+    Ticket OCR_result;
     EditText checkName;
     EditText checkPrice;
 
@@ -53,7 +53,13 @@ public class CheckPhotoActivity extends Activity {
         DB = new DataManager(this.getApplicationContext());
         String filePath = getIntent().getStringExtra("path");
         File file = new File(filePath);
+
         ImageView checkPhotoView = (ImageView)findViewById(R.id.checkPhoto_image);
+        checkPrice = (EditText)findViewById(R.id.input_checkTotal);
+        checkName = (EditText)findViewById(R.id.input_checkName);
+        Button btnRedo = (Button)findViewById(R.id.btnCheck_retry);
+        Button btnOK = (Button)findViewById(R.id.btnCheck_allow);
+
         //Ticket image bitmap set
         Glide.with(getApplicationContext())
                 .load(file)
@@ -76,17 +82,26 @@ public class CheckPhotoActivity extends Activity {
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
 
+
+        // OCR asynchronous implementation:
         ImageProcessor imgProc = new ImageProcessor(bitmap);
-        result = ocrManager.getTicket(imgProc);
-
-        checkPrice = (EditText)findViewById(R.id.input_checkTotal);
-        checkName = (EditText)findViewById(R.id.input_checkName);
-
-        if(result.amount != null)
-            checkPrice.setText(result.amount.toString());
-
-        Button btnRedo = (Button)findViewById(R.id.btnCheck_retry);
-        Button btnOK = (Button)findViewById(R.id.btnCheck_allow);
+        ocrManager.getTicket(imgProc, result -> {
+            //Thread UI control reservation
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    checkPrice.setText(result.amount.toString());
+                }
+            });
+            OCR_result = result;
+            btnOK.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveThisTicket(bitmap);
+                    finish();
+                }
+            });
+        });
 
         btnRedo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,13 +110,6 @@ public class CheckPhotoActivity extends Activity {
             }
         });
 
-        btnOK.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               saveThisTicket(bitmap);
-               finish();
-           }
-        });
     }
 
     public void saveThisTicket(Bitmap imageToSave){
@@ -117,26 +125,28 @@ public class CheckPhotoActivity extends Activity {
             originalPhoto.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
+            FileOutputStream outOriginal = new FileOutputStream(originalPhoto);
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
             TicketEntity thisTicket = new TicketEntity();
 
-            if(result.date == null)
+            if(OCR_result.date == null)
                 thisTicket.setDate(Calendar.getInstance().getTime());
             else
-                thisTicket.setDate(result.date);
+                thisTicket.setDate(OCR_result.date);
 
             thisTicket.setFileUri(uri);
             thisTicket.setAmount(new BigDecimal(checkPrice.getText().toString()));
             thisTicket.setTitle(checkName.getText().toString());
 
             thisTicket.setMissionID(Singleton.getInstance().getMissionID());
-            DB.addTicket(thisTicket);
+            long id = DB.addTicket(thisTicket);
+            Log.d("Aggiunto ticket", ""+id);
 
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
-            FileOutputStream outOriginal = new FileOutputStream(originalPhoto);
+
             imageToSave.compress(Bitmap.CompressFormat.JPEG,90, outOriginal);
             outOriginal.flush();
             outOriginal.close();
