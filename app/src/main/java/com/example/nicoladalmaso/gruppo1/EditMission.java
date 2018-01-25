@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -13,18 +14,26 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import database.DataManager;
 import database.MissionEntity;
+import export.ExportManager;
+import export.ExportTypeNotSupportedException;
+import export.ExportedFile;
 
 /**
  * Created by Francesco on 03/01/2018.
@@ -40,9 +49,14 @@ public class EditMission extends AppCompatActivity {
     TextView txtMissionEnd;
     TextView txtMissionLocation;
     CheckBox chkIsClosed;
+    File defaultOutputPath;
+    ExportManager manager;
 
     //TODO: poter cambiare persona?
     @Override
+    /**Piccolo
+     * Method that is run every time the activity is started
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -80,6 +94,37 @@ public class EditMission extends AppCompatActivity {
         });
 
         setMissionValues();
+        defaultOutputPath = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        manager = new ExportManager(DB, defaultOutputPath.getPath());
+        Spinner fileTypesSpinner= (Spinner) findViewById(R.id.spinner_formats);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
+        fileTypesSpinner.setAdapter(spinnerAdapter);
+
+       /* ArrayList<String> fileTypes=manager.exportTags();
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.fileTypes, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        fileTypesSpinner.setAdapter(adapter);*/
+        Button btnExport =(Button) findViewById(R.id.button_export);
+        btnExport.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+
+
+                try {
+                    Log.d("exportDebug","formato: "+fileTypesSpinner.getSelectedItem().toString());
+                    ExportedFile exported = manager.exportMission(missionID,fileTypesSpinner.getSelectedItem().toString());
+                    //TODO: EXPORT THE FILE
+                    Uri toExport = Uri.fromFile(exported.file);
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, toExport);
+                    shareIntent.setType("file/"+fileTypesSpinner.getSelectedItem().toString());
+                    startActivity(Intent.createChooser(shareIntent,getResources().getString(R.string.text_ExportMissionTo)));
+                } catch (ExportTypeNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /** Dal Maso

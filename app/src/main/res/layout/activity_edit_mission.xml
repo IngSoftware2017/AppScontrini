@@ -144,6 +144,41 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="16dp"/>
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/LayoutExport"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/msgExportMission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="30dp"
+                    android:minWidth="40dp"
+                    android:layout_marginLeft="20dp"
+                    android:text="@string/text_ExportMission"
+                    android:textSize="16dp"
+                    android:singleLine="true"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                    <!--TODO: Set a percentage?-->
+                    <Spinner
+                        android:id="@+id/spinner_formats"
+                        android:layout_width="260dp"
+                        android:layout_height="match_parent"/>
+                    <Button
+                        android:id="@+id/button_export"
+                        android:layout_marginLeft="16dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="@string/button_ExportMission"/>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 

@@ -65,11 +65,21 @@
     <string name="title_EditMission">Modifica missione</string>
     <string name="hint_LastName">Cognome</string>
     <string name="hint_AcademicTitle">Titolo accademico</string>
+    <string name="text_ExportMission">Esporta la missione:</string>
+    <string name="button_ExportMission">Esporta</string>
     <!--Mantovan-->
     <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe sue missioni e gli scontrini verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
     <string name="toast_multiPoint">Totale non valido</string>
     <string name="toast_tooHightTotal">Importo troppo grande</string>
     <string name="toast_multiPoint_noNumber">Totale non valido</string>
+    <string name="text_ExportMissionTo">Dove vuoi esportare la missione?</string>
+
+    <!-- PICCOLO -->
+    <string-array name="fileTypes">
+        <item>CSV</item>
+        <item>XML</item>
+        <item>XLS</item>
+    </string-array>
 </resources>
 
