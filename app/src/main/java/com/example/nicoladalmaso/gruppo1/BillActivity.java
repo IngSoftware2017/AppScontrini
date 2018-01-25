@@ -316,7 +316,6 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-
     /**Lazzarin
      * It creates a temporary file where to save the photo on.
      * @Framing Directory Pictures
@@ -336,7 +335,6 @@ public class BillActivity extends AppCompatActivity {
         return image;
     }
 
-
     /** Dal Maso
      *  Delete all temp files used for saving camera's images
      */
@@ -352,7 +350,6 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-
     /** Dal Maso
      *  Pick up photo from gallery
      */
@@ -361,7 +358,6 @@ public class BillActivity extends AppCompatActivity {
         intent.setType("image/*");
         startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
     }
-
 
     /** Dal Maso modified by FEDERICO TASCHIN
      * Catch intent results
@@ -433,7 +429,6 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-
     /** Dal Maso, modified by FEDERICO TASCHIN
      * Saves the given bitmap, sets its path in the TicketEntity object and inserts it in the database.
      * Starts the OCR analysis
@@ -475,7 +470,6 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
-
     /** Federico Taschin
      * Starts the OCR analysis of the bitmap. When the result is ready, it updates the database and the activity is refreshed
      * @param bitmap not null, image to be analyzed
@@ -498,8 +492,6 @@ public class BillActivity extends AppCompatActivity {
         });
     }
 
-
-
     /**PICCOLO
      * Method that clears the screen from the images
      */
@@ -510,7 +502,6 @@ public class BillActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
     }//clearAllImages
-
 
     /** Dal Maso
      * read all images
@@ -529,7 +520,6 @@ public class BillActivity extends AppCompatActivity {
         Log.d("Files", "Size: "+ files.length);
         return files;
     }
-
 
     /** Dal Maso, Modified by Federico TAschin
      *  Calls the refreshList() method. If the list is empty, it displays a message
@@ -582,7 +572,6 @@ public class BillActivity extends AppCompatActivity {
         ocrManager.release();
         super.onDestroy();
     }
-
 
     @Override
     protected void onPostResume() {

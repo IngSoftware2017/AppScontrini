@@ -80,5 +80,11 @@
     <string name="popup_mission_export">Export</string>
     <string name="popup_mission_close">Chiudi missione</string>
     <string name="popup_mission_delete">Elimina</string>
+
+    <string name="popup_export_title">Scegli Formato</string>
+    <string name="popup_export_csv">csv</string>
+    <string name="popup_export_xml">xml</string>
+    <string name="popup_export_xls">xls</string>
+
 </resources>
 

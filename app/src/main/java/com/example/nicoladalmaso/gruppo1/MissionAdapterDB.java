@@ -105,7 +105,8 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         menuCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPopupMenu(menuCard, position);
+                missionID = (int)missions.get(position).getID();
+                showPopupMenu(menuCard, missionID);
             }
         });
 
@@ -126,7 +127,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         inflater.inflate(R.menu.popup_mission_menu, popup.getMenu());
 
-        popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(position));
+        popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(view, missionID));
         popup.show();
     }
 }
