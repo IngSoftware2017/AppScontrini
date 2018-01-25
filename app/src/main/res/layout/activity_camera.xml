@@ -5,24 +5,62 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+
     <FrameLayout
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        >
-
+        android:layout_weight="1">
     </FrameLayout>
 
-    <ImageButton
-        android:id="@+id/takePhoto_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/appbar"
+        android:elevation="15dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/flashBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_flash_on" />
+
+        <Button
+            android:id="@+id/btnCheck_goBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="HO FINITO"
+            android:textColor="@color/cardview_light_background" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:background="@null"
-        android:src="@mipmap/ic_camera_white_48dp" />
+        android:elevation="15dp"
+        android:background="@drawable/appbar"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/takePhoto_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@null"
+            android:src="@drawable/camera_button" />
+    </LinearLayout>
 
 
 </RelativeLayout>

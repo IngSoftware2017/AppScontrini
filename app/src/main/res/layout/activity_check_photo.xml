@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
-        android:background="@color/common_google_signin_btn_text_light_default"
+        android:background="@drawable/appbar"
         android:elevation="15dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_weight="1"
-        android:background="@color/black_overlay"
+        android:background="@drawable/appbar"
         android:elevation="15dp"
         android:orientation="vertical">
 
@@ -79,8 +79,8 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:backgroundTint="#FFF"
-                android:text="Scontrino"
                 android:hint="@string/name"
+                android:text="Scontrino"
                 android:textColor="#fff"
                 android:textColorHint="#ddd"
                 android:textSize="22dp" />
@@ -91,10 +91,10 @@
             android:id="@+id/input_layout_checkTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="15dp"
-            android:layout_marginBottom="16dp"
             android:textColorHint="#ddd"
             android:theme="@style/TextLabelCustom">
 
@@ -114,5 +114,14 @@
         </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBarOCR"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
 
 </RelativeLayout>

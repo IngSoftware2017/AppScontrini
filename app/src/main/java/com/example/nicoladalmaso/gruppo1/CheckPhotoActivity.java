@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -59,6 +60,9 @@ public class CheckPhotoActivity extends Activity {
         checkName = (EditText)findViewById(R.id.input_checkName);
         Button btnRedo = (Button)findViewById(R.id.btnCheck_retry);
         Button btnOK = (Button)findViewById(R.id.btnCheck_allow);
+        ProgressBar waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
+
+        waitOCR.setVisibility(View.VISIBLE);
 
         //Ticket image bitmap set
         Glide.with(getApplicationContext())
@@ -90,10 +94,13 @@ public class CheckPhotoActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    checkPrice.setText(result.amount.toString());
+                    if(result.amount != null)
+                        checkPrice.setText(result.amount.toString());
+                    waitOCR.setVisibility(View.INVISIBLE);
                 }
             });
             OCR_result = result;
+
             btnOK.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -24,12 +24,14 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Parameter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,12 +61,47 @@ public class CameraActivity extends Activity {
     }
 
     public void initializeComponents(){
-        // Create an instance of Camera
         mCamera = getCameraInstance();
+        Camera.Parameters p = mCamera.getParameters();
+        p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        mCamera.setParameters(p);
+
+        final ImageButton flashButton = (ImageButton)findViewById(R.id.flashBtn);
+        flashButton.setTag(0);
+        flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_off));
+
+        flashButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick (View v) {
+                final int status =(Integer) v.getTag();
+                switch (status){
+                    case 0:
+                        v.setTag(1);
+                        flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_on));
+                        p.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+                        mCamera.setParameters(p);
+                        break;
+                    case 1:
+                        v.setTag(2);
+                        flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_auto));
+                        p.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+                        mCamera.setParameters(p);
+                        break;
+                    case 2:
+                        v.setTag(0);
+                        flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_off));
+                        p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                        mCamera.setParameters(p);
+                        break;
+                }
+            }
+        });
+
 
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+
 
 
         mPreview.setOnTouchListener(new View.OnTouchListener() {
@@ -87,6 +124,15 @@ public class CameraActivity extends Activity {
                      mCamera.takePicture(null, null, mPicture);
              }
         });
+
+        Button finishButton = (Button)findViewById(R.id.btnCheck_goBack);
+        finishButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick (View v) {
+                finish();
+            }
+        });
+
     }
 
     private void focusOnTouch(MotionEvent event) {
