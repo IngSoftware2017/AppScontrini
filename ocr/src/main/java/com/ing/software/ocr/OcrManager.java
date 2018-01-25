@@ -60,12 +60,8 @@ public class OcrManager {
 
     /**
      * Get a Ticket from an ImageProcessor. Some fields of the new ticket can be null.
-     * <p> Possible errors inside Ticket.errors can be: </p>
-     * <ul> INVALID_STATE: this OcrManager has not been properly initialized. </ul>
-     * <ul> INVALID_PROCESSOR: the ImageProcessor passed as parameter is not valid. </ul>
-     * <ul> AMOUNT_NOT_FOUND: the amount has not been found. </ul>
-     * <ul> DATE_NOT_FOUND: the date has not been found. </ul>
-     * @param imgProc ImageProcessor which has been set an image. Not null.
+     * <p> All possible errors inside Ticket.errors are listed in {@link OcrError}. </p>
+     * @param imgProc ImageProcessor which has been set an image. Not modified by this method. Not null.
      * @param advanced execute ocr more accurately but slower
      * @return Ticket. Never null.
      *
@@ -82,7 +78,7 @@ public class OcrManager {
         OcrTicket ticket = new OcrTicket();
         ticket.errors = new ArrayList<>();
         if (!operative) {
-            ticket.errors.add(OcrError.INVALID_STATE);
+            ticket.errors.add(OcrError.UNINITIALIZED);
             return ticket;
         }
 

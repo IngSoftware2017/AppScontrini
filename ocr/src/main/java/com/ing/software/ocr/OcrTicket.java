@@ -30,7 +30,7 @@ public class OcrTicket {
     public RectF amountRect;
 
     /**
-     *
+     * Currency of total amount.
      */
     public Currency currency;
 

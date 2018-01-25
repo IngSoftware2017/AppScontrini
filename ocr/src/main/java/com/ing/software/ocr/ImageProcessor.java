@@ -86,11 +86,11 @@ public class ImageProcessor {
 
     //Erode for hugh lines
     private static int[][] ERODE_KER_DATA = new int [][] {
-            new int[] {   0,   0, 255, 255, 255, 255, 255, 255, 255,   0,   0},
-            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-            new int[] {   0,   0, 255, 255, 255, 255, 255, 255, 255,   0,   0},
+            new int[] {   0,   0, 255, 255, 255, 255, 255,   0,   0},
+            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
+            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
+            new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
+            new int[] {   0,   0, 255, 255, 255, 255, 255,   0,   0},
     };
     private static Mat ERODE_KER; // assigned in the static block
 
@@ -108,7 +108,7 @@ public class ImageProcessor {
     private static final int SECTORS = 101; // accumulator resolution, should be odd
     private static final int MAX_SECTOR_DIST = SECTORS / 10; // max distance from best sector
                                                             // that separate inliers from outliers
-    private static final double MIN_CONFIDENCE = 0.5; // ratio of inlier lines score
+    private static final double MIN_CONFIDENCE = 0.7; // ratio of inlier lines score
     private static final int MIN_LINES = 5;
     // the best angle found is accepted if in the 2 / 10 of all sectors are concentrated half of all lines
 
@@ -289,7 +289,7 @@ public class ImageProcessor {
      */
     private static Mat toEdges(Swap<Mat> imgSwap) {
         Imgproc.erode(imgSwap.first, imgSwap.swap(), ERODE_KER);
-        Canny(imgSwap.first, imgSwap.swap(), 1, 1); // 1: threshold, any number over 0
+        Canny(imgSwap.first, imgSwap.swap(), 1, 1); // 1: threshold, any number above 0
         return imgSwap.first;
     }
 
@@ -394,8 +394,8 @@ public class ImageProcessor {
         double inlierScore = range(0, SECTORS).reduce(0., (score, sect) -> {
             // for the angle distance, I take into account the angle wrap-around.
             // (the angle between lines of angle +89deg and -89deg is 2deg)
-            int dist = min(abs(sect - bestSect), abs(sect - bestSect + SECTORS));
-            return dist < MAX_SECTOR_DIST ? score + accumulator[sect] : sect;
+            int dist = min(abs(sect - bestSect), SECTORS - abs(sect - bestSect));
+            return dist < MAX_SECTOR_DIST ? score + accumulator[sect] : score;
         });
         //confidence is the ratio of inliers. accepted only if the number of hough lines is > MIN_LINES.
         confidence.val = (lines.rows() > MIN_LINES ? inlierScore / totalScore : 0);
@@ -416,6 +416,12 @@ public class ImageProcessor {
         return ptsToMat(newVerts);
     }
 
+    private static int getTopLeftCornerIdx(MatOfPoint2f corners) {
+        //find index of point closer to top-left corner of image (using taxicab distance).
+        return min(Stream.of(corners.toList())
+                .mapIndexed((i, p) -> new Scored<>(p.x + p.y, i)).toList()).obj();
+    }
+
     /**
      * Order rectangle corners as the first is the top-leftmost.
      * @param srcRect MatOfPoint2f containing rect corners.
@@ -430,10 +436,7 @@ public class ImageProcessor {
                 new Point(imgSize.width / 2, imgSize.height / 2), angle, 1);
         MatOfPoint2f newRect = new MatOfPoint2f();
         Core.transform(srcRect, newRect, rotationMatrix);
-
-        //find index of point closer to top-left corner of image (using taxicab distance).
-        int topLeftIdx = min(Stream.of(newRect.toList())
-                .mapIndexed((i, p) -> new Scored<>(p.x + p.y, i)).toList()).obj();
+        int topLeftIdx = getTopLeftCornerIdx(newRect);
 
         //shift verts by topLeftIdx
         return shiftMatPoints(srcRect, topLeftIdx);
@@ -576,9 +579,10 @@ public class ImageProcessor {
     //PACKAGE PRIVATE:
 
     synchronized Bitmap undistortForOCR(double sizeMul) {
-        if (quickCorners || corners == null)
-            if (findTicket(false).contains(OcrError.INVALID_STATE))
+        if (quickCorners || corners == null) {
+            if (findTicket(false).contains(IPError.IMAGE_NOT_SET))
                 return null;
+        }
         return matToBitmap(undistort(srcImg, corners, OCR_MARGIN_MUL, sizeMul, true));
     }
 
@@ -707,17 +711,13 @@ public class ImageProcessor {
      *                                                     No orientation detection. </ul>
      *              <ul> false: slower but more accurate, good for recalculating the rectangle after the shot
      *                                                    or for analyzing an imported image. </ul>
-     * @return list of OcrError, can contain:
-     *         <ul> RECT_NOT_FOUND: the rectangle is not found; </ul>
-     *         <ul> CROOKED_TICKET: The ticket is framed sideways; </ul>
-     *         <ul> INVALID_STATE: the bitmap image has not been set for this I.P. instance </ul>
-     *         <p> if there are no errors, the rectangle is found and the corners
-     *             can be obtained with getCorners(); </p>
+     * @return list of IPError, all possible errors are listed in {@link IPError}.
+     *         <p> The rectangle corners are always found (unless the error list contains INVALID_CORNERS),
+     *             but they can be useless, depending on the presence of other errors. </p>
      */
-    public synchronized List<OcrError> findTicket(boolean quick) {
+    public synchronized List<IPError> findTicket(boolean quick) {
         if (srcImg == null)
-            return singletonList(OcrError.INVALID_STATE);
-        quickCorners = quick;
+            return singletonList(IPError.IMAGE_NOT_SET);
 
         // prepare binary and edge images
         Mat grayResized = toGrayResized(srcImg, SHORT_SIDE);
@@ -742,33 +742,41 @@ public class ImageProcessor {
                 rect = rotatedBoundingBox(contour.obj(), angle, grayResized.size());
             }
             // if angle is not reliable, correct orientation as width < height (make ticket vertical).
-            if (angleConfidence.val > MIN_CONFIDENCE) {
+            if (angleConfidence.val < MIN_CONFIDENCE) {
                 Size size = rectSizeSimple(rect);
                 if (size.width > size.height)
-                    rect = shiftMatPoints(rect, 3); //last idx (3) -> first idx (0)
-            }
+                    rect = shiftMatPoints(rect, angle > 0 ? 1 : 3); // 1 -> rotate clockwise
+            }                                                       // 3 -> rotate counter clockwise
             //todo use RANSAC to find undistort transform matrix
             candidates.add(new Scored<>(0., new ContourResult(rect, angle, angleConfidence.val)));
         }
-        //todo assign score and use Collections.max
-        ContourResult winner = candidates.get(0).obj();
+        List<IPError> errors = new ArrayList<>();
 
-        //normalize the corners in the space [0, 1]^2
-        corners = scale(winner.rect, grayResized.size(), new Size(1, 1));
+        if (candidates.size() > 0) {
+            quickCorners = quick;
 
-        // find and return errors
-        List<OcrError> errors = new ArrayList<>();
-        if (corners.rows() != 4)
-            errors.add(OcrError.RECT_NOT_FOUND);
-        if (winner.angleConfidence < MIN_CONFIDENCE)
-            errors.add(OcrError.UNCERTAIN_DIRECTION);
-        if (abs(winner.angle) > CROOCKED_THRESH)
-            errors.add(OcrError.CROOKED_TICKET);
+            //todo assign score and use Collections.max
+            ContourResult winner = candidates.get(0).obj();
+
+            //normalize the corners in the space [0, 1]^2
+            corners = scale(winner.rect, grayResized.size(), new Size(1, 1));
+
+            // find and return errors
+            if (corners.rows() != 4)
+                errors.add(IPError.RECT_NOT_FOUND);
+            Size size = rectSizeSimple(corners);
+            if (winner.angleConfidence < MIN_CONFIDENCE && size.width > size.height)
+                errors.add(IPError.UNCERTAIN_DIRECTION);
+            if (abs(winner.angle) > CROOCKED_THRESH)
+                errors.add(IPError.CROOKED_TICKET);
 //        if (!isFocused(grayResized))
-//            errors.add(OcrError.OUT_OF_FOCUS);
-//        OcrError exposureErr = checkExposure(grayResized);
-//        if (exposureErr != OcrError.NONE)
+//            errors.add(IPError.OUT_OF_FOCUS);
+//        IPError exposureErr = checkExposure(grayResized);
+//        if (exposureErr != IPError.NONE)
 //            errors.add(exposureErr);
+        } else {
+            errors.add(IPError.INVALID_CORNERS);
+        }
         return errors;
     }
 
@@ -777,7 +785,7 @@ public class ImageProcessor {
      * @param quick true: fast mode; false: slow mode.
      * @param callback Callback
      */
-    public void findTicket(boolean quick, @NonNull Consumer<List<OcrError>> callback) {
+    public void findTicket(boolean quick, @NonNull Consumer<List<IPError>> callback) {
         //in a new thread, run findTicket, then return the result calling the callback.
         new Thread(() -> callback.accept(findTicket(quick))).start();
     }
@@ -785,18 +793,17 @@ public class ImageProcessor {
     /**
      * Set pre-calculated ticket rectangle corners.
      * @param corners must be 4, ordered counter-clockwise, first is top-left of ticket. Not null.
-     * @return OcrError, can be:
-     * <ul> NONE: corners are valid. </ul>
+     * @return List of IPError, can be:
      * <ul> INVALID_CORNERS: corners are != 4 or not ordered counter-clockwise. </ul>
      */
-    public synchronized OcrError setCorners(@NonNull List<PointF> corners) {
+    public synchronized List<IPError> setCorners(@NonNull List<PointF> corners) {
         if (corners.size() != 4)
-            return OcrError.INVALID_POINTS;
+            return singletonList(IPError.INVALID_CORNERS);
 
         this.corners = ptsToMat(androidPtsToCV(corners));
         quickCorners = false;
         //todo check if corners are ordered correctly
-        return OcrError.NONE;
+        return new ArrayList<>();
     }
 
     /**
@@ -814,22 +821,23 @@ public class ImageProcessor {
      *                  A good value is 0.02.
      * @param shortSide set the shortest side of the output bitmap,
      *                  the other side is calculated to maintain right aspect ratio.
-     *                  Useful for generating thumbnails. If 0 then the original side length is used.
+     *                  Useful for generating thumbnails. If <=0, the original side length is used.
      * @return Bitmap of ticket with perspective distortion removed. Null if error.
      */
     public synchronized Bitmap undistort(double marginMul, int shortSide) {
-        if (quickCorners || corners == null)
-            if (findTicket(false).contains(OcrError.INVALID_STATE))
+        if (quickCorners || corners == null) {
+            if (findTicket(false).contains(IPError.IMAGE_NOT_SET))
                 return null;
+        }
         return matToBitmap(undistort(srcImg, corners, marginMul, shortSide, false));
     }
 
     /**
-     * Convenience overload for undistort(0, -1)
+     * Convenience overload for undistort(0, 0)
      * @return Bitmap, null if error.
      */
     public synchronized Bitmap undistort() {
-        return undistort(0, -1);
+        return undistort(0, 0);
     }
 
     /**

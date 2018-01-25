@@ -441,9 +441,17 @@ public class OcrAnalyzer {
         return Stream.of(lines).filter(line -> POTENTIAL_PRICE.matcher(line.textNoSpaces()).find()).toList();
     }
 
-    //todo move elsewhere
-    private static String spacesToDots(String str) {
-        return str.replace(' ', '.');
+    /**
+     * Get all texts that matches an upside down price
+     * @param lines
+     * @return
+     */
+    private static List<OcrText> findAllUpsideDownPrices(List<OcrText> lines) {
+        return Stream.of(lines).filter(line -> PRICE_UPSIDEDOWN.matcher(line.textNoSpaces()).find()).toList();
+    }
+
+    private static String removeSpaces(String str) {
+        return str.replace(" ", "");
     }
 
     /**
@@ -454,16 +462,18 @@ public class OcrAnalyzer {
     private static List<Pair<OcrText, String>> findAllCertainPrices(List<OcrText> lines) {
         List<Pair<OcrText, String>> prices = new ArrayList<>();
         for (OcrText line : lines) {
-            // apply sanitize substitutions and try matching with the price matcher
             Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.textSanitizedNum());
             boolean matched = matcher.find();
-            if (!matched) { // try again removing spaces between words
-                matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
+            int childsTot = line.childs().size();
+            if (!matched && childsTot >= 2) { // merge only last two words and try again
+                matcher = PRICE_NO_THOUSAND_MARK.matcher(
+                        line.childs().get(childsTot - 1).textSanitizedNum()
+                        + line.childs().get(childsTot - 2).textSanitizedNum());
                 matched = matcher.find();
             }
             if (matched) {
                 // I convert spaces to dots because the matcher is designed to accept spaces as dots
-                prices.add(new Pair<>(line, spacesToDots(matcher.group())));
+                prices.add(new Pair<>(line, removeSpaces(matcher.group())));
             }
         }
         return prices;

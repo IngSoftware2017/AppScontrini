@@ -67,15 +67,18 @@ public class OcrVars {
 
     // first group is the sign
     //match a number between 2 and 4 digits,
-    // or match any with 0 to 6 digits before dot and 1 to 3 digits after,
-    // or match any with 1 to 6 digits before dot and 0 to 3 digits after,
-    // optional minus in front, optional character before end of string.
+    // or match any with 0 to 6 digits before dot and 1 to 2 digits after,
+    // or match any with 1 to 6 digits before dot and 0 to 2 digits after,
+    // optional minus in front, optional character before end of string (could be another digit).
     static final Pattern POTENTIAL_PRICE = compile(
-            "(?<!\\d|[.,]|-)(-?)(?:\\d{2,4}|\\d{0,6}[.,]\\d{1,3}|\\d{1,6}[.,]\\d{0,3})(?=[^\\d.]?$)");
-    //match any number with one single dot/space for two decimals, optional minus in front, optional character before end of string
-    static final Pattern PRICE_NO_THOUSAND_MARK = compile("(?<!\\d|\\.|-)(-?)(?:0|[1-9]\\d*?)[ .]\\d{2}(?=[^\\d.]?$)");
+            "(?<![\\d.,-])-?(?:\\d{2,4}|\\d{0,6}[.,]\\d{1,2}|\\d{1,6}[.,]\\d{0,2})[^.,]?$");
+    //match any number with one single dot for two decimals, optional space between, optional minus in front, optional character before end of string
+    static final Pattern PRICE_NO_THOUSAND_MARK = compile("(?<![\\d.-])(-?)(?:0|[1-9]\\d*)\\. ?\\d{2}(?=[^\\d.]?$)");
     //match any number with no points, optional minus in front, optional character before end of string
-    static final Pattern PRICE_NO_DECIMALS = compile("(?<!\\d|\\.|-)(-?)(?:0|[1-9]\\d*?)(?=[^\\d.]?$)");
+    static final Pattern PRICE_NO_DECIMALS = compile("(?<![\\d.-])(-?)(?:0|[1-9]\\d*)(?=[^\\d.]?$)");
+    //match upside down prices. it's designed to reject corrupted upside down prices to avoid false positives.
+    static final Pattern PRICE_UPSIDEDOWN = compile("^[^'.,-]?[0OD1Il2ZEh5S9L8B6]{2} ?'[0OD1Il2ZEh5S9L8B6]+[^'.,]?$");
+    //java does not support regex subroutines: I have to duplicate the character matching part
 
 
     //In principle, multiple words should be matched with a space between them,
@@ -86,17 +89,17 @@ public class OcrVars {
     static final List<WordMatcher> IT_AMOUNT_MATCHERS = asList(
             new WordMatcher("T[OUD]TALE", 1),
             new WordMatcher("T[OUD]TALEE[UI]R[OD]", 3),
+            new WordMatcher("IMP[OU]RT[OD]", 1),
             new WordMatcher("TOT", 0),
             new WordMatcher("TOTE[UI]R[OD]", 1),
-            new WordMatcher("IMP[OU]RT[OD]", 1),
             new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 3)
     );
     static final List<WordMatcher> IT_CASH_MATCHERS = asList(
             new WordMatcher("CONTANT[EI]", 1),
             new WordMatcher("CARTADICREDITO", 3),
-            new WordMatcher("PAGAMENTOCONTANTE", 4)
-            //new WordMatcher("CCRED", 0) ?
-            //new WordMatcher("ASSEGNI", 1) ?
+            new WordMatcher("PAGAMENTOCONTANTE", 4),
+            new WordMatcher("CCRED", 0),
+            new WordMatcher("ASSEGNI", 1)
     );
     //NB: change can be negative
     static final List<WordMatcher> IT_CHANGE_MATCHERS = asList(
@@ -125,6 +128,19 @@ public class OcrVars {
     static final List<WordMatcher> EN_TAX_MATCHERS = asList(
             new WordMatcher("TAX", 0),
             new WordMatcher("SALESTAX", 1)
+    );
+
+    // currency
+    // todo: accept currency symbols?
+    static final List<WordMatcher> EUR_MATCHERS = asList(
+            new WordMatcher("EUR[OD]", 0),
+            new WordMatcher("EUR", 0)
+    );
+    static final List<WordMatcher> USD_MATCHERS = asList(
+            new WordMatcher("USD", 0)
+    );
+    static final List<WordMatcher> GBP_MATCHERS = asList(
+            new WordMatcher("GBP", 0)
     );
 
 
