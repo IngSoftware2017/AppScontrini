@@ -113,7 +113,6 @@ public class EditMission extends AppCompatActivity {
                 try {
                     Log.d("exportDebug","formato: "+fileTypesSpinner.getSelectedItem().toString());
                     ExportedFile exported = manager.exportMission(missionID,fileTypesSpinner.getSelectedItem().toString());
-                    //TODO: EXPORT THE FILE
                     Uri toExport = Uri.fromFile(exported.file);
                     Intent shareIntent = new Intent();
                     shareIntent.setAction(Intent.ACTION_SEND);
