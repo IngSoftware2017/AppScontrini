@@ -50,6 +50,15 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:gravity="center"
+            android:text="Premere sullo scontrino per mettere a fuoco"
+            android:textAlignment="center"
+            android:textColor="#ddd" />
+
         <ImageButton
             android:id="@+id/takePhoto_button"
             android:layout_width="60dp"
@@ -57,7 +66,7 @@
 
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:background="@null"
             android:src="@drawable/camera_button" />
     </LinearLayout>
