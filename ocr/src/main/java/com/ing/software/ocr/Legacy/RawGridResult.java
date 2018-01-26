@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
  * This object is used only for comparing purposes.
  * @author Michelon
  */
-
+@Deprecated
 public class RawGridResult implements Comparable<RawGridResult>{
 
     private double percentage;

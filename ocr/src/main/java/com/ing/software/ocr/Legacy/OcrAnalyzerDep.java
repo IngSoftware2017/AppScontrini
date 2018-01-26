@@ -2,6 +2,7 @@ package com.ing.software.ocr.Legacy;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
@@ -37,7 +38,6 @@ import java.util.regex.Matcher;
 import static com.ing.software.common.CommonUtils.size;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.AMOUNT_MATCHERS;
-import static com.ing.software.ocr.OcrVars.CHAR_ASPECT_RATIO;
 import static com.ing.software.ocr.OcrVars.DATE_DMY;
 import static com.ing.software.ocr.OcrVars.DMY_DAY;
 import static com.ing.software.ocr.OcrVars.DMY_MONTH;
@@ -49,9 +49,9 @@ import static com.ing.software.ocr.OcrVars.YEAR_CUT;
 import static java.util.Collections.max;
 
 /**
- *
+ * NOTE: TO AVOID ERRORS SOME LINES HAVE BEEN CHANGED FROM ORIGINAL CODE (e.g. all 'new RectF')
  */
-
+@Deprecated
 public class OcrAnalyzerDep {
 
     private TextRecognizer ocrEngine = null;
@@ -131,7 +131,7 @@ public class OcrAnalyzerDep {
             for (RawStringResult singleResult : results) {
                 RawText rawTextSource = singleResult.getSourceText();
                 log(6,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getValue());
-                Rect newRect = OcrUtils.extendRect(rawTextSource.getBoundingBox(), precision, -rawTextSource.getRawImage().getWidth()); //negative width to use pixels
+                RectF newRect = OcrUtils.extendRect(new RectF(rawTextSource.getBoundingBox()), precision, -rawTextSource.getRawImage().getWidth()); //negative width to use pixels
                 if (rawText.isInside(newRect)) {
                     singleResult.addDetectedTexts(rawText);
                     log(5,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getValue());
@@ -439,4 +439,21 @@ public class OcrAnalyzerDep {
         new Thread(() -> ticketCb.accept(analyzeTicket(imgProc))).start();
     }
     */
+
+    /**
+     * @author Michelon
+     * Scale a bitmap to 1/2 its height and width
+     * @param b bitmap not null
+     * @return scaled bitmap
+     */
+    @Deprecated
+    private Bitmap scaleBitmap(Bitmap b) {
+        int reqWidth = b.getWidth()/2;
+        int reqHeight = b.getHeight()/2;
+        Matrix m = new Matrix();
+        m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, reqWidth, reqHeight), Matrix.ScaleToFit.CENTER);
+        return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+    }
+
+
 }

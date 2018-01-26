@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * Structure containing the unprocessed text + metadata, extracted by OcrAnalyzer.
  */
+@Deprecated
 class OcrResult {
 
     private List<RawStringResult> amountResults;

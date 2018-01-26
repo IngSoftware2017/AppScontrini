@@ -3,6 +3,7 @@ package com.ing.software.ocr.Legacy;
 
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
@@ -25,7 +26,7 @@ import static com.ing.software.ocr.OcrVars.*;
  * todo: make it extend Text
  * @author Michelon
  */
-
+@Deprecated
 public class RawText implements Comparable<RawText>, Text {
 
     private Rect rectText;
@@ -158,8 +159,8 @@ public class RawText implements Comparable<RawText>, Text {
      * @param rect target rect that could contain this text. Not null.
      * @return true if is inside
      */
-    public boolean isInside(@NonNull Rect rect) {
-        return rect.contains(rectText);
+    public boolean isInside(@NonNull RectF rect) {
+        return rect.contains(new RectF(rectText));
     }
 
     /**

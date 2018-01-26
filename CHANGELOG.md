@@ -13,7 +13,8 @@ Restored schemer
 Link to rawImage   
 Next: focus on mainFlow   
 
-
+* ### Step 4.0
+Init manager amount flow   
 
 
 

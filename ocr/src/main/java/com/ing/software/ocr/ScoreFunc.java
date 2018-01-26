@@ -2,6 +2,7 @@ package com.ing.software.ocr;
 
 import android.graphics.RectF;
 
+import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.TempText;
 
 import static com.ing.software.ocr.OcrVars.*;
@@ -30,7 +31,7 @@ public class ScoreFunc {
     /*
     get score for rect containing amount text (='totale')
      */
-    public static double getSourceAmountScore(TempText source) {
+    public static double getSourceAmountScore(Scored<TempText> source) {
         return 0;
     }
 

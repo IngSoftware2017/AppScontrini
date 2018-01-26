@@ -2,29 +2,25 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
-import com.google.android.gms.vision.text.Text;
+import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrError;
 import com.ing.software.ocr.OcrObjects.OcrOptions;
 import com.ing.software.ocr.OcrObjects.OcrTicket;
 import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.RawImage;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.annimon.stream.function.Consumer;
-import com.ing.software.ocr.OperativeObjects.AmountComparator;
 
-import static com.ing.software.ocr.OperativeObjects.AmountComparator.*;
-import static com.ing.software.ocr.DataAnalyzer.*;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
@@ -93,21 +89,60 @@ public class OcrManager {
 
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        Bitmap frame = procCopy.undistortForOCR(options.getPrecision()>1 ? 1. : 1. / 3.); // advanced -> full resolution,
-                                                                          // else -> a third resolution
+        Bitmap frame;
+        if (options.getPrecision() == 0)
+            frame = procCopy.undistortForOCR(1. / 3.);
+        else
+            frame = procCopy.undistortForOCR(options.getPrecision()>1 ? 1. : 1. / 2.);
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
         }
         ticket.rectangle = procCopy.getCorners();
 
-        mainImage = new RawImage(frame);
-        List<TempText> lines = analyzer.analyze(frame);
+        mainImage = new RawImage(frame); //set main properties of image
+        List<TempText> lines = analyzer.analyze(frame); //Get main texts
         mainImage.setLines(lines); //save rect configuration in rawimage
-        OcrSchemer.prepareScheme(lines);
+        OcrSchemer.prepareScheme(lines); //Prepare scheme of the ticket
         mainImage.textFitter(); //save configuration from prepareScheme in rawimage
 
-        OcrTicket newTicket = getTicketFromResult(result);
+        OcrTicket newTicket = new OcrTicket();
+        if (options.isFindDate()) {
+            Date newDate = null;
+            newTicket.date = newDate;
+        }
+        if (options.isFindTotal()) {
+            BigDecimal newAmount = null;
+            /*
+            Steps:
+            1- search string in texts --> Data Analyzer --> Word Matcher
+            2- add score to chosen texts --> Score Func
+            3- if enabled redo ocr on source strip --> OcrAnalyzer
+            4- add score to target texts --> Score Func
+            5- decode amount from target texts --> Data Analyzer --> Word Matcher
+            6- decode restored amount from target texts --> Data Analyzer
+            7- check amount and restored amount against cash and products prices --> Amount Comparator
+            8- set amount in ticket from step 5
+            9- set restored amount retrieving best amount from amount comparator
+             */
+            List<Scored<TempText>> amountTexts = DataAnalyzer.getAmountTexts(lines);
+            List<ListAmountOrganizer> amountList = DataAnalyzer.organizeList(amountTexts);
+            Collections.sort(amountList);
+            if (options.getPrecision() >= OcrOptions.REDO_OCR_PRECISION) {
+                //Redo ocr on first element of list
+
+            }
+
+
+            newTicket.amount = newAmount;
+            newAmount = null; //restored Amount
+            newTicket.restoredAmount = newAmount;
+        }
+        if (options.isFindProducts()) {
+            List<Pair<String, BigDecimal>> newProducts = null;
+            newTicket.products = newProducts;
+        }
+
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
             double duration = ((double) (endTime - startTime)) / 1000000000;
@@ -115,7 +150,9 @@ public class OcrManager {
         }
 
         ticket.amount = newTicket.amount;
+        ticket.restoredAmount = newTicket.restoredAmount;
         ticket.date = newTicket.date;
+        ticket.products = newTicket.products;
         if (ticket.amount == null) {
             ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
         }
@@ -134,181 +171,5 @@ public class OcrManager {
      */
     public void getTicket(@NonNull ImageProcessor imgProc, OcrOptions options, @NonNull Consumer<OcrTicket> ticketCb) {
         new Thread(() -> ticketCb.accept(getTicket(imgProc, options))).start();
-    }
-
-    /**
-     * Scale a bitmap to 1/2 its height and width
-     * @param b bitmap not null
-     * @return scaled bitmap
-     */
-    @Deprecated
-    private Bitmap scaleBitmap(Bitmap b) {
-        int reqWidth = b.getWidth()/2;
-        int reqHeight = b.getHeight()/2;
-        Matrix m = new Matrix();
-        m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, reqWidth, reqHeight), Matrix.ScaleToFit.CENTER);
-        return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
-    }
-
-    /**
-     * @author Michelon
-     * Coverts an OcrResult into a Ticket analyzing its data
-     * @param result OcrResult to analyze. Not null.
-     * @return Ticket. Some fields can be null;
-     */
-    private static OcrTicket getTicketFromResult(OcrResult result) {
-        long startTime = System.nanoTime();
-        OcrTicket ticket = new OcrTicket();
-        OcrUtils.log(6, "OCR RESULT", result.toString());
-        List<RawGridResult> dateList = result.getDateList();
-        List<RawText> prices = result.getRawImage().getPricesTexts();
-        //First level, if we have a string from "AMOUNT_STRINGS[]" we try to decode a value on the same height and if necessary fix it
-        ticket.amount = extendedAmountAnalysis(getPossibleAmounts(result.getAmountResults()), prices);
-        if (ticket.amount == null) //Takes all prices from schemas and use probability to find the amount (needs at least one hit to accept the value)
-            ticket.amount = analyzeAlternativeAmount(prices);
-        ticket.date = getDateFromList(getPossibleDates(result.getDateList()));
-        long endTime = System.nanoTime();
-        double duration = ((double) (endTime - startTime)) / 1000000000;
-        OcrUtils.log(1, "getTicketFromResult", "EXECUTION TIME: " + duration + " sec");
-        return ticket;
-    }
-
-    /**
-     * @author Michelon
-     * @date 3-1-18
-     * Analyze possible RawTexts containing amount. When one is found check if it consistent with list of products,
-     * subtotal, cash and change.
-     * @param possibleResults List of RawGridResults containing possible amount. Not null.
-     * @param products List of RawTexts containing possible prices for products. Not null.
-     * @return BigDecimal containing detected amount. null if nothing found.
-     */
-    private static BigDecimal extendedAmountAnalysis(@NonNull List<RawGridResult> possibleResults, @NonNull List<RawText> products) {
-        BigDecimal amount = null;
-        RawText amountText = null;
-        if (possibleResults.size() == 0)
-            return null;
-        for (RawGridResult result : possibleResults) {
-            String amountString = result.getText().getValue();
-            OcrUtils.log(2, "getPossibleAmount", "Possible amount is: " + amountString);
-            amount = DataAnalyzer.analyzeAmount(amountString);
-            if (amount != null) {
-                OcrUtils.log(2, "getPossibleAmount", "Decoded value: " + amount);
-                amountText = result.getText();
-                break;
-            }
-        }
-        if (amount == null) {
-            //Create a sample rawText to emulate an amount, using first result as source
-            amountText = getDummyAmountText(possibleResults.get(0).getText());
-        }
-        AmountComparator amountComparator = new AmountComparator(amountText, amount);
-        //check against list of products and cash + change
-        List<RawGridResult> possiblePrices = getPricesList(amountText, products);
-        amountComparator.analyzeTotals(possiblePrices);
-        amountComparator.analyzePrices(possiblePrices);
-        amount = amountComparator.getBestAmount(0);
-        return amount;
-    }
-
-    /**
-     * Extracts first not null date from list of ordered dates
-     * @param dateList list of ordered RawGridResults containing possible dates. Not null
-     * @return First possible date. Null if nothing found
-     */
-    private static Date getDateFromList(@NonNull List<RawGridResult> dateList) {
-        for (RawGridResult gridResult : dateList) {
-            String possibleDate = gridResult.getText().getValue();
-            OcrUtils.log(2, "getDateFromList", "Possible date is: " + possibleDate);
-            Date evaluatedDate = DataAnalyzer.getDate(possibleDate);
-            if (evaluatedDate != null) {
-                OcrUtils.log(2, "getDateFromList", "Possible extended date is: " + evaluatedDate.toString());
-                return evaluatedDate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @author Michelon
-     * @date 3-1-18
-     * Get a dummy RawText on right side of image at the same height of source rect
-     * @param source source RawText. Not null.
-     * @return a dummy RawText
-     */
-    private static RawText getDummyAmountText(@NonNull RawText source) {
-        Rect amountRect = new Rect(source.getBoundingBox());
-        amountRect.set(source.getRawImage().getWidth()/2, source.getBoundingBox().top,
-                source.getRawImage().getWidth(), source.getBoundingBox().bottom);
-        Text text = new Text() {
-            @Override
-            public String getValue() {
-                return "";
-            }
-
-            @Override
-            public Rect getBoundingBox() {
-                return amountRect;
-            }
-
-            @Override
-            public Point[] getCornerPoints() {
-                Point a = new Point(amountRect.left, amountRect.top);
-                Point b = new Point(amountRect.right, amountRect.top);
-                Point c = new Point(amountRect.left, amountRect.bottom);
-                Point d = new Point(amountRect.right, amountRect.bottom);
-                return new Point[]{a, b, c, d};
-            }
-
-            @Override
-            public List<? extends Text> getComponents() {
-                return null;
-            }
-        };
-        return new RawText(text, source.getRawImage());
-    }
-
-    /**
-     * We have no valid amount from string search. Try to decode the amount only from products prices.
-     * @param texts List of prices
-     * @return possible amount. Null if nothing found.
-     */
-    private static BigDecimal analyzeAlternativeAmount(List<RawText> texts) {
-        if (texts.size() == 0)
-            return null;
-        OcrUtils.log(2, "AlternativeAmount", "No amount was found, use brute search");
-        RawText currentText = null;
-        int i = 0;
-        while (currentText == null && i < texts.size()) {
-            RawText text = texts.get(i);
-            if (OcrUtils.isPossiblePriceNumber(text.getValue()) < NUMBER_MIN_VALUE_ALTERNATIVE) {
-                currentText = text;
-            }
-            ++i;
-        }
-        while (i < texts.size()) {
-            RawText text = texts.get(i);
-            if (text.getAmountProbability() > currentText.getAmountProbability() && OcrUtils.isPossiblePriceNumber(text.getValue()) < NUMBER_MIN_VALUE_ALTERNATIVE)
-                currentText = text;
-            ++i;
-        }
-        if (currentText == null)
-            return null; //If no rawText pass the above if, we still have a valid text in currentText, so we must recheck it
-        OcrUtils.log(2, "AlternativeAmount", "Possible amount is: " + currentText.getValue());
-        BigDecimal amount = DataAnalyzer.analyzeAmount(currentText.getValue());
-        if (amount == null) {
-            OcrUtils.log(2, "AlternativeAmount", "No decoded value");
-            return null;
-        }
-        AmountComparator amountComparator = new AmountComparator(currentText, amount);
-        //check against list of products and cash + change
-        List<RawGridResult> possiblePrices = getPricesList(currentText, texts);
-        amountComparator.analyzeTotals(possiblePrices);
-        amountComparator.analyzePrices(possiblePrices);
-        amount = amountComparator.getBestAmount(1);
-        if (amount != null)
-            OcrUtils.log(2, "AlternativeAmount", "Maximized amount is: " + amount.toString());
-        else
-            OcrUtils.log(2, "AlternativeAmount", "No amount found.");
-        return amount;
     }
 }

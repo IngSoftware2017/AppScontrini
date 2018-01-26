@@ -10,6 +10,7 @@ import static com.ing.software.ocr.OcrVars.HEIGHT_LIST_MULTIPLIER;
  * Static class containing grids for probability regions (WIP)
  * @author Michelon
  */
+@Deprecated
 public class ProbGrid {
 
     public static final int GRID_LENGTH = 10;

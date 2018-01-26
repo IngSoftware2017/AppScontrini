@@ -12,6 +12,7 @@ import java.util.List;
  * Deprecated methods from OcrSchemer
  */
 
+@Deprecated
 public class OcrSchemerDep {
 
     /**

@@ -15,7 +15,7 @@ import static com.ing.software.ocr.OcrVars.*;
  * Class to store results from string search
  * @author Michelon
  */
-
+@Deprecated
 public class RawStringResult implements Comparable<RawStringResult>{
 
     private RawText sourceText;

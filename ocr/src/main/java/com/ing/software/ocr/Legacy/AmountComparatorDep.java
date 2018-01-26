@@ -1,10 +1,10 @@
-package com.ing.software.ocr.OperativeObjects;
+package com.ing.software.ocr.Legacy;
 
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
-import com.ing.software.ocr.Legacy.RawText;
 import com.ing.software.ocr.OcrSchemer;
 import com.ing.software.ocr.OcrUtils;
 
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.ing.software.ocr.DataAnalyzer.analyzeAmount;
+import static com.ing.software.ocr.Legacy.DataAnalyzerDep.analyzeAmount;
 import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
 /**
@@ -23,8 +23,8 @@ import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
  * todo: handle tips and taxes
  * todo: add 3 amount values: decoded, restored, internal (from cash-change and list of prices if different from those above), and add a score to all three
  */
-
-public class AmountComparator {
+@Deprecated
+public class AmountComparatorDep {
 
     private BigDecimal amount;
     private RawText amountText;
@@ -46,7 +46,7 @@ public class AmountComparator {
      * @param amountText RawText containing amount. Not null.
      * @param amount BigDecimal containing decoded amount.
      */
-    public AmountComparator(@NonNull RawText amountText, BigDecimal amount) {
+    public AmountComparatorDep(@NonNull RawText amountText, BigDecimal amount) {
         this.amountText = amountText;
         this.amount = amount;
         if (amount != null)
@@ -307,7 +307,7 @@ public class AmountComparator {
         //Search for first parsable product price
         while (cash == null && index < possiblePrices.size()) {
             if (possiblePrices.get(index).getPercentage() < 0) {//must be below total
-                if (OcrSchemer.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
+                if (OcrSchemerDep.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
                     String possibleCash = possiblePrices.get(index).getText().getValue();
                     if (OcrUtils.isPossiblePriceNumber(possibleCash) < NUMBER_MIN_VALUE) {
                         cash = analyzeAmount(possibleCash);
@@ -323,7 +323,7 @@ public class AmountComparator {
             OcrUtils.log(2, "analyzeTotals", "Cash is: " + cash.toString());
             while (index < possiblePrices.size() && change == null) {
                 //change must be below cash, here i use the same method as above, but parsing cash as rawtext
-                if (OcrSchemer.isPossibleCash(cashText, possiblePrices.get(index).getText())) {
+                if (OcrSchemerDep.isPossibleCash(cashText, possiblePrices.get(index).getText())) {
                     String possibleChange = possiblePrices.get(index).getText().getValue();
                     if (OcrUtils.isPossiblePriceNumber(possibleChange) < NUMBER_MIN_VALUE)
                         change = analyzeAmount(possibleChange);
@@ -397,7 +397,7 @@ public class AmountComparator {
      * Note: subtotal and pricelist are never compared as there are some situations where it may lead to wrong results
      * (last product equals the sum of all those before)
      */
-    public BigDecimal getBestAmount(@IntRange (from = 0, to = 2) int minHit) {
+    public BigDecimal getBestAmount(@IntRange(from = 0, to = 2) int minHit) {
         if (getPrecision() > 0) {
             //analyze all possible cases
             BigDecimal subtotal = getSubTotal();
@@ -570,7 +570,7 @@ public class AmountComparator {
      */
     private static boolean isProductPrice(@NonNull RawText amount, @NonNull RawText product) {
         int percentage = 60;
-        Rect extendedRect = OcrUtils.extendRect(amount.getBoundingBox(), 0, percentage);
+        RectF extendedRect = OcrUtils.extendRect(new RectF(amount.getBoundingBox()), 0, percentage);
         Rect productRect = product.getBoundingBox();
         return (extendedRect.left < productRect.left) && (extendedRect.right > productRect.right);
     }
@@ -587,3 +587,4 @@ public class AmountComparator {
         return Math.round(amount.getBoundingBox().top - product.getBoundingBox().top);
     }
 }
+

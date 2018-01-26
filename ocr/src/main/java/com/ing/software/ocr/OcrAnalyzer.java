@@ -2,12 +2,15 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.util.SizeF;
 import android.util.SparseArray;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.*;
 
 import java.util.*;
+import com.annimon.stream.Stream;
 
 import com.ing.software.ocr.OcrObjects.*;
 
@@ -46,7 +49,6 @@ public class OcrAnalyzer {
      * @return OcrResult containing raw data to be further analyzed.
      */
     List<TempText> analyze(@NonNull Bitmap frame){
-        //ocrEngine analysis
         long startTime = 0;
         long endTime = 1;
         if (IS_DEBUG_ENABLED)
@@ -71,24 +73,36 @@ public class OcrAnalyzer {
 
     /**
      * @author Michelon
-     * Orders TextBlock decoded by detector in a list of TempTexts
-     * Order is from top to bottom, from left to right
+     * @author Riccardo Zaglia
+     * Adds TextBlock decoded by detector in a list of TempTexts
      * @param origTextBlocks detected texts. Not null.
-     * @return list of ordered RawTexts
+     * @return list of Texts
      */
     private static List<TempText> getTexts(@NonNull SparseArray<TextBlock> origTextBlocks) {
-        List<TextBlock> newOrderedTextBlocks = new ArrayList<>();
-        for (int i = 0; i < origTextBlocks.size(); i++) {
-            newOrderedTextBlocks.add(origTextBlocks.valueAt(i));
-        }
-        newOrderedTextBlocks = OcrUtils.orderTextBlocks(newOrderedTextBlocks);
-        log(3,"OcrAnalyzer.analyzeST:" , "New Blocks ordered");
-        List<TempText> rawTexts = new ArrayList<>();
-        for (TextBlock textBlock : newOrderedTextBlocks) {
-            for (Text currentText : textBlock.getComponents()) {
-                rawTexts.add(new TempText(currentText));
+        List<TempText> texts = new ArrayList<>();
+        for (int i = 0; i < origTextBlocks.size(); ++i) {
+            for (Text currentText : origTextBlocks.valueAt(i).getComponents()) {
+                texts.add(new TempText(currentText));
             }
         }
-        return rawTexts;
+        return texts;
+    }
+
+    /**
+     * Get texts inside rect
+     * @param processor
+     * @param boundingBox
+     * @return
+     */
+    List<TempText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
+        Bitmap region = processor.undistortedSubregion(new SizeF(OcrManager.mainImage.getWidth(), OcrManager.mainImage.getHeight()),
+                boundingBox, boundingBox.width()/boundingBox.height()); //original aspect ratio
+    }
+
+    public static RectF getAmountExtendedBox(TempText amountText) {
+        float newTop = amountText.box().top - amountText.height()*RECT_HEIGHT_EXTENDER;
+        float newBottom = amountText.box().bottom + amountText.height()*RECT_HEIGHT_EXTENDER;
+        return new RectF(amountText.box().centerX(), newTop,
+                OcrManager.mainImage.getWidth(), newBottom);
     }
 }
