@@ -22,9 +22,9 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
         sourceText = new Scored<>(ScoreFunc.getSourceAmountScore(source), source.obj());
     }
 
-    public void setAmountTargetTexts(List<TempText> targets) {
-        for (TempText text : targets) {
-            targetTexts.add(new Scored<>(ScoreFunc.getAmountScore(text), text));
+    public void setAmountTargetTexts(List<Scored<TempText>> targets) {
+        for (Scored<TempText> text : targets) {
+            targetTexts.add(new Scored<>(ScoreFunc.getAmountScore(text), text.obj()));
         }
     }
 

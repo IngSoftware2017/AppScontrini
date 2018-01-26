@@ -10,9 +10,10 @@ import android.support.annotation.IntRange;
  * 0 = scan image at 1/3 of its dimension, don't reanalyze specific parts of image to get better results
  * 1 = scan image at 1/2 of its dimension, don't reanalyze specific parts of image to get better results
  * 2 = scan image at original dimension (passed by imageprocessor), don't reanalyze specific parts of image to get better results
- * 3 = scan image at original dimension (passed by imageprocessor), reanalyze total strip to get a better result
- * 4 = scan image at original dimension (passed by imageprocessor), reanalyze total and prices strips to get a better result
- * 5 = scan image at original dimension (passed by imageprocessor), reanalyze total and prices strips to get a better result, if
+ * 3 = scan image at original dimension (passed by imageprocessor), reanalyze total strip to get a better result (only first element)
+ * 4 = scan image at original dimension (passed by imageprocessor), reanalyze total (only first element) and prices strips to get a better result
+ * 5 = scan image at original dimension (passed by imageprocessor), reanalyze total (first 3 elements) and prices strips to get a better result
+ * 6 = scan image at original dimension (passed by imageprocessor), reanalyze total (first 3 elements) and prices strips to get a better result, if
  *      nothing was found scan also upside down
  */
 
@@ -27,9 +28,9 @@ public class OcrOptions {
     private boolean findTotal;
     private boolean findDate;
     private boolean findProducts;
-    private int precision; //Precision varies from 0 to 5, where 5 = max precision
+    private int precision; //Precision varies from 0 to 6, where 6 = max precision
 
-    public OcrOptions(boolean findTotal, boolean findDate, boolean findProducts, @IntRange(from = 0, to = 5) int precision) {
+    public OcrOptions(boolean findTotal, boolean findDate, boolean findProducts, @IntRange(from = 0, to = 6) int precision) {
         this.findTotal = findTotal;
         this.findDate = findDate;
         this.findProducts = findProducts;

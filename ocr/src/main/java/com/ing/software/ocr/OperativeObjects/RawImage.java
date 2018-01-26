@@ -82,6 +82,13 @@ public class RawImage {
     }
 
     /**
+     * @return list of all RawTexts
+     */
+    public List<TempText> getAllTexts() {
+        return allTexts;
+    }
+
+    /**
      * Must call textFitter() before.
      * @return list of Intro RawTexts
      */

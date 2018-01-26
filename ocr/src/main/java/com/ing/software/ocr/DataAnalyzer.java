@@ -6,7 +6,6 @@ import com.ing.software.ocr.OcrObjects.TempText;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
-import java.util.ArrayList;
 import java.util.List;
 import com.annimon.stream.Stream;
 
@@ -33,7 +32,7 @@ public class DataAnalyzer {
      * @param texts
      * @return
      */
-    public static List<ListAmountOrganizer> organizeList(List<Scored<TempText>> texts) {
+    public static List<ListAmountOrganizer> organizeAmountList(List<Scored<TempText>> texts) {
         return Stream.of(texts)
                     .map(ListAmountOrganizer::new)
                     .toList();

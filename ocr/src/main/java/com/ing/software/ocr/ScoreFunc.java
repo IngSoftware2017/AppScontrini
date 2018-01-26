@@ -24,7 +24,7 @@ public class ScoreFunc {
     /*
     Get score for text on same height as amount text
      */
-    public static double getAmountScore(TempText text) {
+    public static double getAmountScore(Scored<TempText> source) {
         return 0;
     }
 
@@ -32,6 +32,13 @@ public class ScoreFunc {
     get score for rect containing amount text (='totale')
      */
     public static double getSourceAmountScore(Scored<TempText> source) {
+        return 0;
+    }
+
+    /*
+    get score according to difference between source and target rects (distance between centers, height etc)
+     */
+    public static double getDistFromSourceScore(TempText source, TempText target) {
         return 0;
     }
 

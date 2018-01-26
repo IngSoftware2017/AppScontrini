@@ -16,6 +16,8 @@ Next: focus on mainFlow
 * ### Step 4.0
 Init manager amount flow   
 
+* ### Step 4.1   
+Extract amount rects   
 
 
 
@@ -23,11 +25,11 @@ Init manager amount flow
 
 ### TO DO:   
 [ ]- Remove hc values in schemer   
-[ ]- Rewrite DataAnalyzer   
+[ ]- Rewrite DataAnalyzer (WIP)   
 [ ]- Rewrite AmountComparator   
-[ ]- Divide flows between strict and loose analysis   
+[ ]- Divide flows between strict and loose analysis (WIP)   
 [ ]- Accept both flows with different values   
-[ ]- Rewrite Manager in linear flow   
-[ ]- Add selective ocr in ocrAnalyzer   
+[ ]- Rewrite Manager in linear flow (WIP)   
+[ ]- Add selective ocr in ocrAnalyzer (WIP)   
 
 

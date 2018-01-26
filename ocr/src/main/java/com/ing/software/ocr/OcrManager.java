@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 
+import com.annimon.stream.Stream;
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrError;
 import com.ing.software.ocr.OcrObjects.OcrOptions;
@@ -125,12 +126,20 @@ public class OcrManager {
             8- set amount in ticket from step 5
             9- set restored amount retrieving best amount from amount comparator
              */
-            List<Scored<TempText>> amountTexts = DataAnalyzer.getAmountTexts(lines);
-            List<ListAmountOrganizer> amountList = DataAnalyzer.organizeList(amountTexts);
-            Collections.sort(amountList);
-            if (options.getPrecision() >= OcrOptions.REDO_OCR_PRECISION) {
-                //Redo ocr on first element of list
-
+            List<Scored<TempText>> amountTexts = DataAnalyzer.getAmountTexts(lines); //1
+            List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountTexts); //2
+            Collections.reverse(amountList);
+            List<Scored<TempText>> amountPrice;
+            if (!amountList.isEmpty()) {
+                if (options.getPrecision() >= OcrOptions.REDO_OCR_PRECISION) {
+                    //Redo ocr on first element of list. todo: add scan for more sources if precision > 4
+                    amountPrice = analyzer.getAmountStripTexts(procCopy, amountList.get(0).getSourceText().obj());//3
+                } else {
+                    //Use current texts to search target texts (with price)
+                    amountPrice = OcrAnalyzer.getAmountOrigTexts(amountList.get(0).getSourceText().obj());
+                }
+                //set target texts to first source text
+                amountList.get(0).setAmountTargetTexts(amountPrice);
             }
 
 

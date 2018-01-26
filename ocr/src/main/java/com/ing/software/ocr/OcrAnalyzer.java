@@ -12,6 +12,7 @@ import com.google.android.gms.vision.text.*;
 import java.util.*;
 import com.annimon.stream.Stream;
 
+import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.*;
 
 import static com.ing.software.ocr.OcrUtils.log;
@@ -94,15 +95,52 @@ public class OcrAnalyzer {
      * @param boundingBox
      * @return
      */
-    List<TempText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
+    private List<TempText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
         Bitmap region = processor.undistortedSubregion(new SizeF(OcrManager.mainImage.getWidth(), OcrManager.mainImage.getHeight()),
                 boundingBox, boundingBox.width()/boundingBox.height()); //original aspect ratio
+        SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(region).build());
+        List<TempText> distortedTexts = getTexts(tempArray);
+        return Stream.of(distortedTexts)
+                .map(text -> new TempText(text, text.box(), boundingBox))
+                .toList();
     }
 
-    public static RectF getAmountExtendedBox(TempText amountText) {
+    /**
+     * Get extended rect from half of source rect (x axis) to right of pic and with height extended by RECT_HEIGHT_EXTENDER
+     * @param amountText
+     * @return
+     */
+    private static RectF getAmountExtendedBox(TempText amountText) {
         float newTop = amountText.box().top - amountText.height()*RECT_HEIGHT_EXTENDER;
         float newBottom = amountText.box().bottom + amountText.height()*RECT_HEIGHT_EXTENDER;
         return new RectF(amountText.box().centerX(), newTop,
                 OcrManager.mainImage.getWidth(), newBottom);
+    }
+
+    /**
+     * Get Texts in amount extended box
+     * @param processor
+     * @param amountText
+     * @return
+     */
+    List<Scored<TempText>> getAmountStripTexts(ImageProcessor processor, TempText amountText) {
+        return Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
+                .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
+                .toList();
+    }
+
+    /**
+     * Get original texts from extended amount rect
+     * @param amountText
+     * @return
+     */
+    static List<Scored<TempText>> getAmountOrigTexts(TempText amountText) {
+        RectF extendedRect = getAmountExtendedBox(amountText);
+        extendedRect.set(amountText.box().left, extendedRect.top, extendedRect.right, extendedRect.bottom);
+        //copy texts that are inside extended rect. todo Check if it'a a copy or if it modifies original list
+        return Stream.of(OcrManager.mainImage.getAllTexts())
+                                            .filter(text -> extendedRect.contains(text.box()))
+                                            .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
+                                            .toList();
     }
 }
