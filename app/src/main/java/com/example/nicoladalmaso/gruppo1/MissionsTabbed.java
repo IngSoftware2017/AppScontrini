@@ -81,14 +81,6 @@ public class MissionsTabbed extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.person_menu, menu);
-        return true;
-    }
-
     /** Dal Maso
      * Catch events on toolbar
      * @param item object on the toolbar
@@ -99,18 +91,6 @@ public class MissionsTabbed extends AppCompatActivity {
         Intent intent = new Intent();
         // Handle item selection
         switch (item.getItemId()) {
-
-            case (R.id.action_deletePerson):
-                deletePerson();
-                break;
-
-            case (R.id.action_editPerson):
-                //Open Edit Person Activity
-                Intent editPerson = new Intent(this, com.example.nicoladalmaso.gruppo1.EditPerson.class);
-                editPerson.putExtra("personID", personID);
-                startActivityForResult(editPerson, PERSON_MOD);
-                break;
-
             default:
                 setResult(RESULT_OK, intent);
                 finish();
@@ -131,17 +111,6 @@ public class MissionsTabbed extends AppCompatActivity {
         Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-
-                case (MISSION_MOD):
-                    missionsOpen.printAllMissions();
-                    missionsClosed.printAllMissions();
-                    break;
-
-                case (PERSON_MOD):
-                    thisPerson = DB.getPerson(personID);
-                    toolbar.setTitle(thisPerson.getName() + " " + thisPerson.getLastName());
-                    break;
-
                 default:
                     missionsOpen.printAllMissions();
                     missionsClosed.printAllMissions();
