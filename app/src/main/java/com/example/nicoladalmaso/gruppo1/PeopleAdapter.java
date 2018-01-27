@@ -121,6 +121,15 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         //Positive button
         toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                List<MissionEntity> listMissions = DB.getMissionsForPerson(personID);
+                List<TicketEntity> listTickets;
+                for(int i = 0; i < listMissions.size(); i++){
+                    listTickets = DB.getTicketsForMission(listMissions.get(i).getID());
+                    for(int j = 0; j < listTickets.size(); i++){
+                        DB.deleteTicket(listTickets.get(i).getID());
+                    }
+                    DB.deleteMission(listMissions.get(i).getID());
+                }
                 DB.deletePerson(personID);
                 persons.remove(position);
                 ((MainActivity)context).printAllPeople();

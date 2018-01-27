@@ -14,7 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -26,6 +29,7 @@ import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.TicketEntity;
 
 /**
  * Created by nicoladalmaso on 30/11/17.
@@ -35,7 +39,6 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
     Context context;
     String path = "";
-    int missionID = 0;
     List<MissionEntity> missions;
     DataManager DB;
 
@@ -56,18 +59,21 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
         TextView total = (TextView)convertView.findViewById(R.id.missionTotal);
+        ImageButton btnDelete = (ImageButton)convertView.findViewById(R.id.deleteMission);
+        ImageButton btnUpdate = (ImageButton)convertView.findViewById(R.id.editMission);
+        RelativeLayout toTickets = (RelativeLayout) convertView.findViewById(R.id.missionClick);
+        MissionEntity mission = getItem(position);
 
-        MissionEntity c = getItem(position);
-        title.setText(c.getName());
-        location.setText(c.getLocation());
-        total.setText(DB.getTotalAmountForMission(c.getID()).setScale(2, RoundingMode.HALF_EVEN).toString()+" €");
-        convertView.setTag(c.getID());
-        Log.d("MissionStartBadFormat", ""+c.getStartDate());
+        title.setText(mission.getName());
+        location.setText(mission.getLocation());
+        total.setText(DB.getTotalAmountForMission(mission.getID()).setScale(2, RoundingMode.HALF_EVEN).toString()+" €");
+        convertView.setTag(mission.getID());
+        Log.d("MissionStartBadFormat", ""+mission.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data
-        Date start=c.getStartDate();
+        Date start=mission.getStartDate();
         SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
         String startDate=tr.format(start);
-        Date finish=c.getEndDate();
+        Date finish=mission.getEndDate();
         String finishDate=tr.format(finish);
         Log.d("missionStart", startDate);
         Log.d("missionEnd",finishDate);
@@ -75,7 +81,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         //Dal Maso
         //Sets a default background color for the mission's card
-        if(c.isRepay()) {
+        if(mission.isRepay()) {
             card.setBackgroundColor(Color.parseColor("#7c7c7c"));
         }
         else{
@@ -95,15 +101,62 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
             }
         }
 
-        convertView.setOnClickListener(new View.OnClickListener(){
+        toTickets.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                missionID = Integer.parseInt(v.getTag().toString());
                 Intent startTicketsView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
-                Singleton.getInstance().setMissionID(missionID);
+                Singleton.getInstance().setMissionID((int)mission.getID());
                 ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);
             }
         });
 
+        btnDelete.setOnClickListener(new View.OnClickListener(){
+            public void onClick (View v){
+                deleteMission((int)mission.getID(), position);
+            }
+        });
+
+        btnUpdate.setOnClickListener(new View.OnClickListener(){
+            public void onClick (View v){
+                //Open Edit Person Activity
+                Intent editMission = new Intent(context, com.example.nicoladalmaso.gruppo1.EditMission.class);
+                Singleton.getInstance().setMissionID((int)mission.getID());
+                ((MissionsTabbed)context).startActivityForResult(editMission, 1);
+            }
+        });
+
         return convertView;
+    }
+
+    /**
+     * Nicola Dal Maso
+     * Delete the person and the missions\tickets associated with it
+     */
+    public void deleteMission(int missionID, int position){
+        AlertDialog.Builder toast = new AlertDialog.Builder(context);
+        //Dialog
+        toast.setMessage(context.getString(R.string.deleteMissionToast))
+                .setTitle(context.getString(R.string.deleteTitle));
+        //Positive button
+        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                List<TicketEntity> list = DB.getTicketsForMission(missionID);
+                for(int i = 0; i < list.size(); i++){
+                    DB.deleteTicket((int) list.get(i).getID());
+                }
+                DB.deleteMission(missionID);
+                missions.remove(position);
+                ((MissionsTabbed)context).refresh();
+            }
+        });
+        //Negative button
+        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Nothing to do
+            }
+        });
+        //Show toast
+        AlertDialog alert = toast.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 }

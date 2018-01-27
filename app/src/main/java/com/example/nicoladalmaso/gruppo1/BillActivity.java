@@ -112,18 +112,6 @@ public class BillActivity extends AppCompatActivity {
     }
 
     /** Dal Maso
-     * Setting toolbar delete button and style from /res/menu
-     * @param menu
-     * @return success flag
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.mission_menu, menu);
-        return true;
-    }
-
-    /** Dal Maso
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
@@ -133,14 +121,6 @@ public class BillActivity extends AppCompatActivity {
         // Handle item selection
         Intent intent = new Intent();
         switch (item.getItemId()) {
-            case (R.id.action_deleteMission):
-                deleteMission();
-                break;
-            case (R.id.action_editMission):
-                Intent editMission = new Intent(context, com.example.nicoladalmaso.gruppo1.EditMission.class);
-                editMission.putExtra("missionID", thisMission.getID());
-                startActivityForResult(editMission, MISSION_MOD);
-                break;
             default:
                 setResult(RESULT_OK, intent);
                 finish();
@@ -212,40 +192,6 @@ public class BillActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
-    /** Dal Maso (Using Lazzarin code)
-     * Delete the mission from the bill viewer (inside the mission)
-     */
-    public void deleteMission(){
-        //Lazzarin
-        AlertDialog.Builder toast = new AlertDialog.Builder(BillActivity.this);
-        //Dialog
-        toast.setMessage(context.getString(R.string.deleteMissionToast))
-                .setTitle(context.getString(R.string.deleteTitle));
-        //Positive button
-        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                List<TicketEntity> list = DB.getTicketsForMission(missionID);
-                for(int i = 0; i < list.size(); i++){
-                    DB.deleteTicket((int) list.get(i).getID());
-                }
-                DB.deleteMission(missionID);
-                Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        });
-        //Negative button
-        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //Nothing to do
-            }
-        });
-        //Show toast
-        AlertDialog alert = toast.show();
-        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
-        nbutton.setTextColor(Color.parseColor("#2196F3"));
-    }
-
 
     /**Dal Maso
      * It opens the custom camera, take the photo, analize it and save it
@@ -299,15 +245,6 @@ public class BillActivity extends AppCompatActivity {
                     printAllTickets();
                     break;
 
-                case (TICKET_MOD):
-                    printAllTickets();
-                    break;
-
-                case (MISSION_MOD):
-                    thisMission = DB.getMission(missionID);
-                    setTitle(thisMission.getName());
-                    printAllTickets();
-                    break;
 
                 default:
                     printAllTickets();

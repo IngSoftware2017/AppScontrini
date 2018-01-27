@@ -112,15 +112,13 @@ public class MissionsTabbed extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 default:
-                    missionsOpen.printAllMissions();
-                    missionsClosed.printAllMissions();
+                    refresh();
                     break;
             }
         }
         if (resultCode == Activity.RESULT_CANCELED) {
             Log.d("CANCELLED", "OK");
-            missionsOpen.printAllMissions();
-            missionsClosed.printAllMissions();
+            refresh();
         }
     }
 
@@ -155,6 +153,11 @@ public class MissionsTabbed extends AppCompatActivity {
             // Show 3 total pages.
             return 2;
         }
+    }
+
+    public void refresh(){
+        missionsOpen.printAllMissions();
+        missionsClosed.printAllMissions();
     }
 
     /**
