@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +9,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +28,8 @@ import java.util.Locale;
 import database.DataManager;
 import database.MissionEntity;
 import database.TicketEntity;
+
+import static com.example.nicoladalmaso.gruppo1.EditMission.hideSoftKeyboard;
 
 public class EditTicket extends AppCompatActivity {
 
@@ -55,6 +60,17 @@ public class EditTicket extends AppCompatActivity {
         missionID = Singleton.getInstance().getMissionID();
         thisTicket = DB.getTicket(ticketID);
         thisMission = DB.getMission(missionID);
+        //lazzarin
+        TextView editDate=(TextView)findViewById(R.id.input_ticketDateMod);
+        LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.buttonEditTicketDate);
+        bntMissionStart.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                DialogFragment newFragment = new DatePickerFragment().newInstance(editDate);
+                newFragment.show(getFragmentManager(), "startDatePicker");
+            }
+        });
+
 
         //Get data from parent view
         setTicketValues();
@@ -96,7 +112,7 @@ public class EditTicket extends AppCompatActivity {
                     String  start=dateformat.format(current.getStartDate());
 
                     String finish=dateformat.format(current.getEndDate());
-
+                    
                     if( AppUtilities.checkIntervalDate(start,finish,txtDate.getText().toString()))
                         thisTicket.setDate(dateformat.parse(txtDate.getText().toString()));
                     else {
