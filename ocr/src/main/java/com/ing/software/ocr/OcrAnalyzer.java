@@ -101,7 +101,7 @@ public class OcrAnalyzer {
         SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(region).build());
         List<TempText> distortedTexts = getTexts(tempArray);
         return Stream.of(distortedTexts)
-                .map(text -> new TempText(text, text.box(), boundingBox))
+                .map(text -> new TempText(text, new RectF(0,0,region.getWidth(), region.getHeight()), boundingBox))
                 .toList();
     }
 

@@ -46,6 +46,7 @@ public class ScoreFunc {
      * Get position of text in its block, as an int from 0 to GRID_LENGTH. -1 if an error occurred.
      * @param text source text
      * @return position of the rect in its block.
+	 * todo: directly return score from grid above
      */
     public static int getInBlockPosition(TempText text) {
         if (text.getTags().contains(INTRODUCTION_TAG))
@@ -66,12 +67,43 @@ public class ScoreFunc {
      * @param rect rect containing the whole block.
      * @return position as a int between 0 and GRID_LENGTH.
      */
-    static int getTextBlockPosition(TempText text, RectF rect) {
+    private static int getTextBlockPosition(TempText text, RectF rect) {
         float startPosition = rect.top;
         float endPosition = rect.bottom;
         float position = ((text.box().centerY() - startPosition))/(endPosition - startPosition);
         if (position > (GRID_LENGTH - 1)/GRID_LENGTH) //Fix IndexOutOfBound Exception if it's rect on bottom
             position = (GRID_LENGTH - 1)/GRID_LENGTH + 0.1f;
         return (int)(position*GRID_LENGTH);
+    }
+
+    /**
+     * @author Michelon
+     * @date 27-1-18
+     * Check if a string may be a number.
+     * Characters changed in sanitized are considered specials (see return statement).
+     * If string is longer than NUMBER_MAX_LENGTH default is Integer.MAX_VALUE (allowed numbers up to nn.nnn,nn)
+     * return is decreased if one '.' in sanitized is present, increased if more than one are present.
+     * @param originalNoSpace string with original text (textnospaces)
+     * @param sanitized string with sanitized text (numnospaces)
+     * @return Integer.MAX_VALUE if less than MIN_DIGITS_NUMBER of the string are not numbers;
+     * otherwise number of non-digit chars (*0.5 if special)/length
+     */
+    public static double isPossiblePriceNumber(String originalNoSpace, String sanitized) {
+        double specialCharsMultiplier = 0.5;
+        if (sanitized.length() >= NUMBER_MAX_LENGTH)
+            return Integer.MAX_VALUE;
+        int digits = 0;
+        int initialLength = originalNoSpace.length();
+        if (sanitized.contains(".")) {
+            --initialLength;
+            ++digits;
+        }
+        for (int i = 0; i < sanitized.length(); ++i) {
+            if (Character.isDigit(sanitized.charAt(i)))
+                ++digits;
+        }
+        if (digits < (double)sanitized.length()*MIN_DIGITS_NUMBER)
+            return Integer.MAX_VALUE;
+        return ((initialLength - sanitized.length())*specialCharsMultiplier + (sanitized.length() - digits))/sanitized.length();
     }
 }

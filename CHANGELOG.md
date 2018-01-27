@@ -19,6 +19,11 @@ Init manager amount flow
 * ### Step 4.1   
 Extract amount rects   
 
+* ### Step 4.2   
+Decode amount and restored amount   
+Init rewrite amount comparator (now with schemes)   
+
+
 
 
 
@@ -26,7 +31,7 @@ Extract amount rects
 ### TO DO:   
 [ ]- Remove hc values in schemer   
 [ ]- Rewrite DataAnalyzer (WIP)   
-[ ]- Rewrite AmountComparator   
+[ ]- Rewrite AmountComparator (WIP)   
 [ ]- Divide flows between strict and loose analysis (WIP)   
 [ ]- Accept both flows with different values   
 [ ]- Rewrite Manager in linear flow (WIP)   

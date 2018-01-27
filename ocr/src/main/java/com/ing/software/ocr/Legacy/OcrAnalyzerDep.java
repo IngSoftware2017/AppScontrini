@@ -131,7 +131,7 @@ public class OcrAnalyzerDep {
             for (RawStringResult singleResult : results) {
                 RawText rawTextSource = singleResult.getSourceText();
                 log(6,"OcrAnalyzer.SCSE", "Extending rect: " + rawTextSource.getValue());
-                RectF newRect = OcrUtils.extendRect(new RectF(rawTextSource.getBoundingBox()), precision, -rawTextSource.getRawImage().getWidth()); //negative width to use pixels
+                RectF newRect = OcrUtilsDep.extendRect(new RectF(rawTextSource.getBoundingBox()), precision, -rawTextSource.getRawImage().getWidth()); //negative width to use pixels
                 if (rawText.isInside(newRect)) {
                     singleResult.addDetectedTexts(rawText);
                     log(5,"OcrAnalyzer", "Found target string: " + singleResult.getSourceString() + "\nfrom extended: " + rawTextSource.getValue());
@@ -231,14 +231,14 @@ public class OcrAnalyzerDep {
     public static Bitmap getCroppedPhoto(@NonNull Bitmap photo, Context context) {
         List<TextBlock> orderedTextBlocks = quickAnalysis(photo, context);
         log(2,"OcrAnalyzer.analyze:" , "Blocks detected");
-        orderedTextBlocks = OcrUtils.orderTextBlocks(orderedTextBlocks);
+        orderedTextBlocks = OcrUtilsDep.orderTextBlocks(orderedTextBlocks);
         log(2,"OcrAnalyzer.analyze:" , "Blocks ordered");
-        int[] borders = OcrUtils.getRectBorders(orderedTextBlocks, new RawImage(photo));
+        int[] borders = OcrUtilsDep.getRectBorders(orderedTextBlocks, new RawImage(photo));
         int left = borders[0];
         int right = borders[2];
         int top = borders[1];
         int bottom = borders[3];
-        return OcrUtils.cropImage(photo, left, top, right, bottom);
+        return OcrUtilsDep.cropImage(photo, left, top, right, bottom);
     }
 
 

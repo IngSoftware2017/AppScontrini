@@ -7,6 +7,7 @@ import com.ing.software.ocr.OcrObjects.TempText;
 import com.ing.software.ocr.ScoreFunc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,6 +27,8 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
         for (Scored<TempText> text : targets) {
             targetTexts.add(new Scored<>(ScoreFunc.getAmountScore(text), text.obj()));
         }
+        Collections.sort(targetTexts, Collections.reverseOrder()); //higher score comes first
+        //todo: remove texts with score too low
     }
 
     public Scored<TempText> getSourceText() {

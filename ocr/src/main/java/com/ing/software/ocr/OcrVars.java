@@ -15,7 +15,6 @@ public class OcrVars {
 
     public static final boolean IS_DEBUG_ENABLED = true;
     static final int LOG_LEVEL = 2; //A Higher level, means more things are logged
-    public static final String[] AMOUNT_STRINGS = {"TOTAL", "IMPORTO"}; //Array of strings that contains the definition of total
     public static final int MAX_STRING_DISTANCE = 3; //Max allowed distance (levDistance) between a string found in a rawtext and one from AMOUNT_STRINGS
     public static final String LEFT_TAG = "left"; //tag for rawtext on left of the receipt
     public static final String CENTER_TAG = "center"; //tag for rawtext on center of the receipt
@@ -30,6 +29,8 @@ public class OcrVars {
     public static final int HEIGHT_LIST_MULTIPLIER = 80; //Multiplier used while analyzing difference between average height of rects and a specific rect. Used in ProbGrid.getRectHeightScore()
     public static final int HEIGHT_SOURCE_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in height between source and target rect (total with it's price)
     public static final float RECT_HEIGHT_EXTENDER = 1.5f; //Extend height of chosen rect
+    public static final int NUMBER_MAX_LENGTH = 8; //Max number of digits allowed for numbers
+    public static final double MIN_DIGITS_NUMBER = 2./3.;
 
 
     // day 1 to 31 with or without 0 tens.

@@ -20,6 +20,7 @@ import android.support.annotation.IntRange;
 public class OcrOptions {
 
     public static final int REDO_OCR_PRECISION = 3;
+    public static final int REDO_OCR_3 = 5; //must be changed with something better
     private static final int DEFAULT_PRECISION = 3;
     private static final boolean DEFAULT_TOTAL = true;
     private static final boolean DEFAULT_DATE = true;

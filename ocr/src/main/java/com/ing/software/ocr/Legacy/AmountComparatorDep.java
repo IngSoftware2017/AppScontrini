@@ -241,7 +241,7 @@ public class AmountComparatorDep {
         //Search for first parsable product price
         while (productsSum == null && index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
             String productPrice = possiblePrices.get(index).getText().getValue();
-            if (OcrUtils.isPossiblePriceNumber(productPrice) < NUMBER_MIN_VALUE)
+            if (OcrUtilsDep.isPossiblePriceNumber(productPrice) < NUMBER_MIN_VALUE)
                 productsSum = analyzeAmount(productPrice);
             ++index;
         }
@@ -251,7 +251,7 @@ public class AmountComparatorDep {
             OcrUtils.log(3, "analyzePrices", "List of prices, no value found");
         while (index < possiblePrices.size() && possiblePrices.get(index).getPercentage() > 0) {
             String productPrice = possiblePrices.get(index).getText().getValue();
-            if (OcrUtils.isPossiblePriceNumber(productPrice) < NUMBER_MIN_VALUE) {
+            if (OcrUtilsDep.isPossiblePriceNumber(productPrice) < NUMBER_MIN_VALUE) {
                 BigDecimal adder = analyzeAmount(productPrice);
                 if (adder != null) {
                     productsSum = productsSum.add(adder);
@@ -309,7 +309,7 @@ public class AmountComparatorDep {
             if (possiblePrices.get(index).getPercentage() < 0) {//must be below total
                 if (OcrSchemerDep.isPossibleCash(getAmountText(), possiblePrices.get(index).getText())) {
                     String possibleCash = possiblePrices.get(index).getText().getValue();
-                    if (OcrUtils.isPossiblePriceNumber(possibleCash) < NUMBER_MIN_VALUE) {
+                    if (OcrUtilsDep.isPossiblePriceNumber(possibleCash) < NUMBER_MIN_VALUE) {
                         cash = analyzeAmount(possibleCash);
                         cashText = possiblePrices.get(index).getText();
                     } else {
@@ -325,7 +325,7 @@ public class AmountComparatorDep {
                 //change must be below cash, here i use the same method as above, but parsing cash as rawtext
                 if (OcrSchemerDep.isPossibleCash(cashText, possiblePrices.get(index).getText())) {
                     String possibleChange = possiblePrices.get(index).getText().getValue();
-                    if (OcrUtils.isPossiblePriceNumber(possibleChange) < NUMBER_MIN_VALUE)
+                    if (OcrUtilsDep.isPossiblePriceNumber(possibleChange) < NUMBER_MIN_VALUE)
                         change = analyzeAmount(possibleChange);
                 }
                 ++index;
@@ -570,7 +570,7 @@ public class AmountComparatorDep {
      */
     private static boolean isProductPrice(@NonNull RawText amount, @NonNull RawText product) {
         int percentage = 60;
-        RectF extendedRect = OcrUtils.extendRect(new RectF(amount.getBoundingBox()), 0, percentage);
+        RectF extendedRect = OcrUtilsDep.extendRect(new RectF(amount.getBoundingBox()), 0, percentage);
         Rect productRect = product.getBoundingBox();
         return (extendedRect.left < productRect.left) && (extendedRect.right > productRect.right);
     }

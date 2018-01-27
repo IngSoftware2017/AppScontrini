@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static com.ing.software.ocr.OcrUtils.levDistance;
+import static com.ing.software.ocr.Legacy.OcrUtilsDep.*;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.HEIGHT_CENTER_DIFF_MULTIPLIER;
 import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
@@ -84,7 +84,7 @@ public class DataAnalyzerDep {
      */
     static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
-        if (OcrUtils.isPossiblePriceNumber(amountString) < NUMBER_MIN_VALUE) {
+        if (isPossiblePriceNumber(amountString) < NUMBER_MIN_VALUE) {
             try {
                 String decoded = deepAnalyzeAmountChars(amountString);
                 if (!decoded.equals(""))
