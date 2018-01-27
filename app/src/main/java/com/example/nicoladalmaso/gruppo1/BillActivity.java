@@ -109,10 +109,6 @@ public class BillActivity extends AppCompatActivity {
         }
 
         initializeComponents();
-
-        if(list.size() == 0){
-            showGuide();
-        }
     }
 
     /** Dal Maso
@@ -153,17 +149,25 @@ public class BillActivity extends AppCompatActivity {
         return true;
     }
 
+    /** Dal Maso
+     * Se non sono presenti ticket mostra come aggiungerli
+     */
     public void showGuide(){
-        TapTargetView.showFor(this,                 // `this` is an Activity
-                TapTarget.forView(findViewById(R.id.fab), "Scatta una foto", "Aggiungi un nuovo scontrino, inizia subito scattando una foto!")
-                        // All options below are optional
-                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                        .titleTextSize(20)                  // Specify the size (in sp) of the title text
-                        .titleTextColor(R.color.white)      // Specify the color of the title text
-                        .descriptionTextSize(10)            // Specify the size (in sp) of the description text
-                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                        .textColor(R.color.white)            // Specify a color for both the title and description text
-                        .icon(getResources().getDrawable(R.mipmap.ic_camera_white_24dp))
+        TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab), "Iniziamo!", "Aggiungi un nuovo scontrino, inizia subito scattando una foto")
+            .targetCircleColor(R.color.white)
+            .titleTextSize(20)
+            .titleTextColor(R.color.white)
+            .descriptionTextSize(10)
+            .descriptionTextColor(R.color.white)
+            .textColor(R.color.white)
+            .icon(getResources().getDrawable(R.mipmap.ic_camera_white_24dp)),
+            new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                @Override
+                public void onTargetClick(TapTargetView view) {
+                    super.onTargetClick(view);      // This call is optional
+                    takePhotoIntent();
+                }
+            }
         );
     }
 
@@ -171,7 +175,6 @@ public class BillActivity extends AppCompatActivity {
      *  Manage all animations and catch onclick events about FloatingActionButtons
      */
     public void initializeComponents(){
-
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
                 1);
@@ -194,6 +197,10 @@ public class BillActivity extends AppCompatActivity {
         }
         else{
             fab.setVisibility(View.VISIBLE);
+        }
+
+        if(DB.getAllTickets().size() == 0){
+            showGuide();
         }
     }
 

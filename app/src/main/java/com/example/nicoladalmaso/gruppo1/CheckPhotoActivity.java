@@ -34,6 +34,11 @@ import java.util.Date;
 import database.DataManager;
 import database.TicketEntity;
 
+/**
+ * This class is fully developed by Nicola Dal Maso
+ */
+
+
 public class CheckPhotoActivity extends Activity {
 
     OcrManager ocrManager;

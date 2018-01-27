@@ -1,9 +1,17 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.animation.Animator;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewAnimationUtils;
+
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -134,7 +142,25 @@ public class AppUtilities {
         return rotatedBitmap;
     }
 
+    /** Dal Maso
+     * Circular new activity reveal animation
+     * @param v view to expand
+     */
+    public static void circularReveal(View v){
+        // get the center for the clipping circle
+        int cx = v.getWidth();
+        int cy = v.getHeight();
 
+        // get the final radius for the clipping circle
+        float finalRadius = (float) Math.hypot(cx, cy);
+
+        // create the animator for this view (the start radius is zero)
+        Animator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);
+
+        // make the view visible and start the animation
+        v.setVisibility(View.VISIBLE);
+        anim.start();
+    }
 }
 
 

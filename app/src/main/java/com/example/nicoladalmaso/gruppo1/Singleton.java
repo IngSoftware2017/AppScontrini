@@ -2,6 +2,8 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.util.Log;
 
+import database.DataManager;
+
 /**
  * Created by Nicola on 24/01/2018.
  */
@@ -12,6 +14,7 @@ public class Singleton {
     private int personID;
     private int missionID;
     private int ticketID;
+    DataManager DB;
 
     private Singleton(){
         personID = 0;

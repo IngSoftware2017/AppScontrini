@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.graphics.Typeface;
@@ -22,6 +23,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ViewAnimationUtils;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     static final int person_added = 1;
     ListView listView;
     PeopleAdapter adapter;
+    View myView;
 
     //Dal Maso
     @Override
@@ -66,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initialize();
         printAllPeople();
-        Singleton init = Singleton.getInstance();
+    }
 
-        if(listPeople.size() == 0){
-            startGuide();
-        }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        myView.setVisibility(View.INVISIBLE);
     }
 
     /** Dal Maso
@@ -100,31 +103,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Dal Maso
+     * Se non sono presenti persone mostra come aggiungerne una
+     */
     private void startGuide(){
-        TapTargetView.showFor(this,                 // `this` is an Activity
-                TapTarget.forView(findViewById(R.id.fab_addPerson), "Nuovo elemento", "In qualsiasi schermata puoi aggiungere un nuovo elemento con questo pulsante")
-                        // All options below are optional
-                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                        .titleTextSize(20)                  // Specify the size (in sp) of the title text
-                        .titleTextColor(R.color.white)      // Specify the color of the title text
-                        .descriptionTextSize(10)            // Specify the size (in sp) of the description text
-                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                        .textColor(R.color.white)            // Specify a color for both the title and description text
-                        .icon(getResources().getDrawable(R.mipmap.ic_add_white_24dp))
+        TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab_addPerson), "Benvenuto in TicketManager!", "Clicca qui per aggiungere una nuova persona")
+            .targetCircleColor(R.color.white)
+            .titleTextSize(20)
+            .titleTextColor(R.color.white)
+            .descriptionTextSize(10)
+            .descriptionTextColor(R.color.white)
+            .textColor(R.color.white)
+            .icon(getResources().getDrawable(R.mipmap.ic_add_white_24dp)),
+            new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                @Override
+                public void onTargetClick(TapTargetView v) {
+                    super.onTargetClick(v);      // This call is optional
+                    AppUtilities.circularReveal(myView);
+                    Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
+                    startActivityForResult(addPerson, person_added);
+                }
+            }
         );
     }
 
     private void initialize(){
-
+        myView = findViewById(R.id.circularAnimation);
         listView = (ListView)findViewById(R.id.listPeople);
         DB = new DataManager(this.getApplicationContext());
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                AppUtilities.circularReveal(myView);
                 Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
                 startActivityForResult(addPerson, person_added);
             }
         });
+        if(DB.getAllPerson().size() == 0){
+            startGuide();
+        }
     }
 
     /** PICCOLO
@@ -155,4 +172,6 @@ public class MainActivity extends AppCompatActivity {
         }
         addToList();
     }
+
+
 }

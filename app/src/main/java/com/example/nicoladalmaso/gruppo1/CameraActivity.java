@@ -41,6 +41,10 @@ import static android.content.ContentValues.TAG;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 import static com.example.nicoladalmaso.gruppo1.BillActivity.getCameraInstance;
 
+/**
+ * This class is fully developed by Nicola Dal Maso
+ */
+
 public class CameraActivity extends Activity {
 
     private Camera mCamera;
@@ -49,6 +53,7 @@ public class CameraActivity extends Activity {
     private byte[] imageData;
     private static  final int FOCUS_AREA_SIZE= 300;
     public static final int MEDIA_TYPE_IMAGE = 1;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

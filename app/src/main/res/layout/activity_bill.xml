@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.nicoladalmaso.gruppo1.MainActivity"
-    android:background="#DFDFDF">
+    android:background="#DFDFDF"
+    tools:context="com.example.nicoladalmaso.gruppo1.MainActivity">
 
     <TextView
         android:id="@+id/noBills"
@@ -16,8 +16,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/noBills"
-        android:visibility="invisible"
         android:textAlignment="center"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/relativeLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,10 +31,10 @@
         <ListView
             android:id="@+id/list1"
             android:layout_width="match_parent"
-            android:layout_marginTop="3dp"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="3dp"
             android:divider="#00000000"
             android:listSelector="@android:color/transparent" />
 
