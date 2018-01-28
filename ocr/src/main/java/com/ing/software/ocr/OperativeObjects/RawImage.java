@@ -67,7 +67,7 @@ public class RawImage {
 
     /**
      * Must call setLines() before.
-     * @return rect containing all rawTexts
+     * @return rect containing all texts
      */
     public RectF getExtendedRect() {
         return extendedRect;
@@ -75,14 +75,30 @@ public class RawImage {
 
     /**
      * Must call setLines() before.
-     * @return average height of rawTexts
+     * @return average rect height of texts
      */
     public double getAverageRectHeight() {
         return averageRectHeight;
     }
 
     /**
-     * @return list of all RawTexts
+     * Must call setLines() before.
+     * @return average char height of texts
+     */
+    public double getAverageCharHeight() {
+        return averageCharHeight;
+    }
+
+    /**
+     * Must call setLines() before.
+     * @return average char width of texts
+     */
+    public double getAverageCharWidth() {
+        return averageCharWidth;
+    }
+
+    /**
+     * @return list of all texts
      */
     public List<TempText> getAllTexts() {
         return allTexts;

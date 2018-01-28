@@ -23,6 +23,9 @@ Extract amount rects
 Decode amount and restored amount   
 Init rewrite amount comparator (now with schemes)   
 
+* ### Step 5   
+Init score funcs   
+Init ticketSchemes   
 
 
 

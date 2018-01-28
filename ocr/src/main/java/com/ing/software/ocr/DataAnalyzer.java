@@ -2,6 +2,7 @@ package com.ing.software.ocr;
 
 
 import android.support.annotation.Size;
+import android.util.Pair;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.TempText;
@@ -60,11 +61,11 @@ public class DataAnalyzer {
      * @param texts
      * @return
      */
-    public static BigDecimal getMatchingAmount(List<Scored<TempText>> texts) {
+    public static Pair<TempText, BigDecimal>  getMatchingAmount(List<Scored<TempText>> texts) {
         for (Scored<TempText> singleText : texts) {
             BigDecimal amount = trySingleMatch(singleText.obj());
             if (amount != null)
-                return amount;
+                return new Pair<>(singleText.obj(), amount);
         }
         return null;
     }
@@ -90,12 +91,12 @@ public class DataAnalyzer {
      * @param texts
      * @return
      */
-    public static BigDecimal getRestoredAmount(List<Scored<TempText>> texts) {
+    public static Pair<TempText, BigDecimal> getRestoredAmount(List<Scored<TempText>> texts) {
         for (Scored<TempText> singleText : texts) {
             if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().numNoSpaces()) < NUMBER_MIN_VALUE) {
                 BigDecimal amount = analyzeAmount(singleText.obj().numNoSpaces());
                 if (amount != null)
-                    return amount;
+                    return new Pair<>(singleText.obj(), amount);
             }
         }
         return null;

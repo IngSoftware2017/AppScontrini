@@ -13,50 +13,72 @@ import static com.ing.software.ocr.OcrVars.*;
 
 public class ScoreFunc {
 
-    public static final int GRID_LENGTH = 10;
-    public static final int[] amountBlockIntroduction = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    public static final int[] amountBlockProducts = new int[] {0, 0, 0, 5, 5, 10, 15, 20, 15, 10};
-    public static final int[] amountBlockConclusion = new int[] {5, 5, 0, 0, 0, 0, 0, 0, 0, 0};
-    public static final int[] dateBlockIntroduction = new int[] {0, 0, 0, 0, 0, 5, 5, 10, 15, 15};
-    public static final int[] dateBlockProducts = new int[] {10, 5, 0, 0, 0, 0, 0, 5, 15, 15};
-    public static final int[] dateBlockConclusion = new int[] {15, 10, 10, 5, 5, 10, 5, 5, 10, 10};
+    private static final int HEIGHT_CENTER_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in alignment between the center of two rects (e.g. total with it's price)
+    private static final int HEIGHT_CHAR_MULTIPLIER = 50; //Multiplier used while analyzing difference between average char height and a specific rect.
+    private static final int WIDTH_CHAR_MULTIPLIER = 80; //Multiplier used while analyzing difference between average char width and a specific rect.
+    private static final int HEIGHT_SOURCE_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in height between source and target rect (e.g. total with it's price)
 
-    /*
-    Get score for text on same height as amount text
+    public static final int GRID_LENGTH = 10;
+    private static final int[] amountBlockIntroduction = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private static final int[] amountBlockProducts = new int[] {0, 0, 0, 5, 5, 10, 15, 20, 15, 10};
+    private static final int[] amountBlockConclusion = new int[] {5, 5, 0, 0, 0, 0, 0, 0, 0, 0};
+    private static final int[] dateBlockIntroduction = new int[] {0, 0, 0, 0, 0, 5, 5, 10, 15, 15};
+    private static final int[] dateBlockProducts = new int[] {10, 5, 0, 0, 0, 0, 0, 5, 15, 15};
+    private static final int[] dateBlockConclusion = new int[] {15, 10, 10, 5, 5, 10, 5, 5, 10, 10};
+
+    /**
+     * Get score for text on same height as amount text
+     * @param source
+     * @return
      */
     public static double getAmountScore(Scored<TempText> source) {
-        return 0;
-    }
-
-    /*
-    get score for rect containing amount text (='totale')
-     */
-    public static double getSourceAmountScore(Scored<TempText> source) {
-        return 0;
-    }
-
-    /*
-    get score according to difference between source and target rects (distance between centers, height etc)
-     */
-    public static double getDistFromSourceScore(TempText source, TempText target) {
-        return 0;
+        double positionScore = getAmountBlockScore(source.obj());
+        return positionScore + source.getScore();
     }
 
     /**
-     * Get position of text in its block, as an int from 0 to GRID_LENGTH. -1 if an error occurred.
-     * @param text source text
-     * @return position of the rect in its block.
-	 * todo: directly return score from grid above
+     * Get score for rect containing amount text (='totale')
+     * @param source
+     * @return
      */
-    public static int getInBlockPosition(TempText text) {
+    public static double getSourceAmountScore(Scored<TempText> source) {
+        double average = OcrManager.mainImage.getAverageCharHeight();
+        double heightDiff = source.obj().charHeight() - average;
+        heightDiff = heightDiff/average*HEIGHT_CHAR_MULTIPLIER;
+        average = OcrManager.mainImage.getAverageCharWidth();
+        double widthDiff = source.obj().charWidth() - average;
+        widthDiff = widthDiff/average*WIDTH_CHAR_MULTIPLIER;
+        return source.getScore() + heightDiff + widthDiff;
+    }
+
+    /**
+     * Get score according to difference between source and target rects (distance between centers, height etc)
+     * @param source
+     * @param target
+     * @return
+     */
+    public static double getDistFromSourceScore(TempText source, TempText target) {
+        double diffCenter = Math.abs(source.box().centerY() - target.box().centerY());
+        diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
+        double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
+        heightDiff = (1-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;
+        return diffCenter + heightDiff;
+    }
+
+    /**
+     * Get score of text according to position in its block, -1 if an error occurred.
+     * @param text source text
+     * @return score of the rect in its block.
+	 */
+    public static int getAmountBlockScore(TempText text) {
         if (text.getTags().contains(INTRODUCTION_TAG))
-            return getTextBlockPosition(text, OcrManager.mainImage.getIntroRect());
+            return amountBlockIntroduction[getTextBlockPosition(text, OcrManager.mainImage.getIntroRect())];
         else if (text.getTags().contains(PRODUCTS_TAG))
-            return getTextBlockPosition(text, OcrManager.mainImage.getProductsRect());
+            return amountBlockProducts[getTextBlockPosition(text, OcrManager.mainImage.getProductsRect())];
         else if (text.getTags().contains(PRICES_TAG))
-            return getTextBlockPosition(text, OcrManager.mainImage.getPricesRect());
+            return amountBlockProducts[getTextBlockPosition(text, OcrManager.mainImage.getPricesRect())];
         else if (text.getTags().contains(CONCLUSION_TAG))
-            return getTextBlockPosition(text, OcrManager.mainImage.getConclusionRect());
+            return amountBlockConclusion[getTextBlockPosition(text, OcrManager.mainImage.getConclusionRect())];
         else
             return -1;
     }

@@ -242,7 +242,6 @@ public class OcrAnalyzerDep {
     }
 
 
-/*
 
     // Extended rectangle vertical multiplier
     private static final float EXT_RECT_V_MUL = 3;
@@ -254,7 +253,6 @@ public class OcrAnalyzerDep {
      * @return list of OcrText
      * @author Riccardo Zaglia
      */
-    /*
     private static List<OcrText> bitmapToLines(Bitmap bm, TextRecognizer ocrEngine) {
         SparseArray<TextBlock> blocks = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
         List<OcrText> lines = new ArrayList<>();
@@ -270,7 +268,6 @@ public class OcrAnalyzerDep {
      * @return TextLines matched. Can be empty if no match is found.
      * @author Riccardo Zaglia
      */
-    /*
     // todo: find most meaningful way to combine score criteria.
     private static List<Scored<OcrText>> findAllMatchedStrings(List<OcrText> lines, List<WordMatcher> matchers) {
         return Stream.of(lines)
@@ -285,7 +282,6 @@ public class OcrAnalyzerDep {
      * @return OcrText with higher score. Can be null if no match is found.
      * @author Riccardo Zaglia
      */
-    /*
     // todo: find most meaningful way to combine score criteria.
     private static OcrText findAmountString(List<OcrText> lines, SizeF bmSize) {
         List<Scored<OcrText>> matchedLines = findAllMatchedStrings(lines, AMOUNT_MATCHERS);
@@ -309,7 +305,6 @@ public class OcrAnalyzerDep {
      * @return RectF rectangle in bitmap space.
      * @author Riccardo Zaglia
      */
-    /*
     @NonNull
     private static RectF getAmountStripRect(OcrText amountStr, SizeF bmSize) {
         float halfHeight = (float)amountStr.charHeight() * EXT_RECT_V_MUL / 2f;
@@ -334,7 +329,6 @@ public class OcrAnalyzerDep {
      * @param dstStripSize actual amount strip size.
      * @return BigDecimal containing price, or null if no price found.
      */
-    /*
     // todo: find most meaningful way to combine score criteria.
     // todo: reject false positives adding a lower limit to the score > 0.
     @Nullable
@@ -396,7 +390,6 @@ public class OcrAnalyzerDep {
      * @return Ticket containing any information found, and/or a list of errors occurred.
      * @author Riccardo Zaglia
      */
-    /*
     // not tested
     // todo: integrate schemer and other heuristics
     public synchronized OcrTicket analyzeTicket(@NonNull ImageProcessor imgProc) {
@@ -434,11 +427,9 @@ public class OcrAnalyzerDep {
      * @param imgProc ImagePreprocessor
      * @param ticketCb Callback
      */
-    /*
     public void analyzeTicket(@NonNull ImageProcessor imgProc, @NonNull Consumer<OcrTicket> ticketCb) {
         new Thread(() -> ticketCb.accept(analyzeTicket(imgProc))).start();
     }
-    */
 
     /**
      * @author Michelon
