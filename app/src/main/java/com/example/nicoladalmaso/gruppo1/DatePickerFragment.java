@@ -14,8 +14,8 @@ import android.widget.TextView;
 import java.time.Year;
 import java.util.Calendar;
 
-/**
- * Created by Nicola on 22/12/2017.
+/** This class is fully developed by Nicola Dal Maso
+ * Datepicker management
  */
 
 public class  DatePickerFragment extends DialogFragment
@@ -47,7 +47,7 @@ public class  DatePickerFragment extends DialogFragment
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
 
-        //set min date (ex. current date and time) - pass your custom date and time in milliseconds
+        //set min date
         //dialog.getDatePicker().setMinDate(c.getTimeInMillis());
 
         return dialog;

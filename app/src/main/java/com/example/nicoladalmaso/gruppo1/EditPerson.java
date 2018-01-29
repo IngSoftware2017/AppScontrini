@@ -60,6 +60,7 @@ public class EditPerson extends AppCompatActivity{
         inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
+
     /** Dal Maso, adapted by Piccolo
      * Catch events on toolbar
      * @param item object on the toolbar

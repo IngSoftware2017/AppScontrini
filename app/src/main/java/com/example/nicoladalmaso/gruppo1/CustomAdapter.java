@@ -44,8 +44,6 @@ import database.TicketEntity;
  * Created by nicoladalmaso on 28/10/17.
  */
 
-//Classe utilizzata per dupplicare la view cardview all'interno della ListView
-//Dal Maso
 public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
     Context context;
@@ -66,6 +64,13 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         Log.d("MISSION", ""+missionID);
     }
 
+    /** Dal Maso
+     * It manages the Adapter
+     * @param position item position
+     * @param convertView my custom view
+     * @param parent
+     * @return view setted
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 

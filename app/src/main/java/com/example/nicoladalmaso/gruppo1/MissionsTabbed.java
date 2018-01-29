@@ -68,6 +68,9 @@ public class MissionsTabbed extends AppCompatActivity {
         initialize();
     }
 
+    /** Dal Maso
+     * Initialize the activity
+     */
     private void initialize(){
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -156,6 +159,12 @@ public class MissionsTabbed extends AppCompatActivity {
         }
     }
 
+    /** Dal Maso
+     * Update the listViews of the missions after item delete
+     * @param choice (0: mission open, 1: mission closed)
+     * @param v view who get the animation
+     * @param position item list position
+     */
     public void updateThisAdapter(int choice, View v, final int position){
         switch (choice){
             case 0:
@@ -166,11 +175,17 @@ public class MissionsTabbed extends AppCompatActivity {
         }
     }
 
+    /** Dal Maso
+     * Refresh the listViews
+     */
     public void refresh(){
         missionsOpen.printAllMissions();
         missionsClosed.printAllMissions();
     }
 
+    /** Dal Maso
+     * It manages the physical back button
+     */
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -179,6 +194,9 @@ public class MissionsTabbed extends AppCompatActivity {
         finish();
     }
 
+    /** Dal Maso
+     * Reload the activity
+     */
     private void reload() {
         Intent intent = getIntent();
         finish();

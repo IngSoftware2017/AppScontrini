@@ -175,6 +175,9 @@ public class EditTicket extends AppCompatActivity {
         return true;
     }
 
+    /** Dal Maso
+     * set the current values on the variables
+     */
     private void setTicketValues(){
 
         ticketPath = thisTicket.getFileUri().toString().substring(7);
@@ -197,6 +200,9 @@ public class EditTicket extends AppCompatActivity {
         setTicketValuesOnScreen();
     }
 
+    /** Dal Maso
+     * set the current values on the edittexts
+     */
     private void setTicketValuesOnScreen(){
         txtTitle = (TextView)findViewById(R.id.input_ticketTitleMod);
         txtAmount = (TextView)findViewById(R.id.input_ticketAmountMod);

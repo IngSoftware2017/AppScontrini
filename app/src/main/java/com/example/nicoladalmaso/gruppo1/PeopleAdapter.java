@@ -54,6 +54,13 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         DB = new DataManager(context);
     }
 
+    /** Dal Maso
+     * It manages the Adapter
+     * @param position item position
+     * @param convertView my custom view
+     * @param parent parent view
+     * @return view setted
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext()

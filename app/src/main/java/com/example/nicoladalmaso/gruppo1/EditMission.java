@@ -54,7 +54,7 @@ public class EditMission extends AppCompatActivity {
 
     //TODO: poter cambiare persona?
     @Override
-    /**Piccolo
+    /**Piccolo (using Dal Maso's code)
      * Method that is run every time the activity is started
      */
     protected void onCreate(Bundle savedInstanceState) {

@@ -129,6 +129,9 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    /** Dal Maso
+     * Initialize the activity
+     */
     private void initialize(){
         myView = findViewById(R.id.circularAnimation);
         listView = (ListView)findViewById(R.id.listPeople);
@@ -175,6 +178,11 @@ public class MainActivity extends AppCompatActivity {
         addToList();
     }
 
+    /** Dal Maso
+     * Delete one listview cell
+     * @param v view to animate after deleting
+     * @param index item position
+     */
     public void deleteCell(final View v, final int index) {
         Animation.AnimationListener al = new Animation.AnimationListener() {
             @Override

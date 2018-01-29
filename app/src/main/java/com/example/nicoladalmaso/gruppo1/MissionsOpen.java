@@ -138,6 +138,11 @@ public class MissionsOpen extends Fragment {
         );
     }
 
+    /** Dal Maso
+     * Delete one listview cell
+     * @param v view to animate after deleting
+     * @param index item position
+     */
     public void deleteCell(final View v, final int index) {
         Animation.AnimationListener al = new Animation.AnimationListener() {
             @Override
