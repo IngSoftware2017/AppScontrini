@@ -3,34 +3,23 @@ package com.example.nicoladalmaso.gruppo1;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Looper;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +46,7 @@ import java.util.List;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.PersonEntity;
 import database.TicketEntity;
 
 public class BillActivity extends AppCompatActivity {
@@ -89,13 +79,15 @@ public class BillActivity extends AppCompatActivity {
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+        PersonEntity thisPerson = DB.getPerson(Singleton.getInstance().getPersonID());
 
 
         missionID = Singleton.getInstance().getMissionID();
         thisMission = DB.getMission(missionID);
 
-        setTitle(thisMission.getName());
-
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle(thisMission.getName());
+        ab.setSubtitle("Missione di "+thisPerson.getName()+" "+thisPerson.getLastName());
 
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context

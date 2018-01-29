@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -12,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -55,7 +58,9 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         convertView = inflater.inflate(R.layout.person_card, null);
+        final View view = convertView;
 
         TextView name = (TextView)convertView.findViewById(R.id.personName);
         TextView title=(TextView)convertView.findViewById(R.id.personAcademicTitle);
@@ -63,6 +68,8 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         ImageButton btnDelete = (ImageButton)convertView.findViewById(R.id.deletePerson);
         ImageButton btnUpdate = (ImageButton)convertView.findViewById(R.id.editPerson);
         LinearLayout toMissions = (LinearLayout) convertView.findViewById(R.id.personClick);
+        CardView personCard = (CardView) convertView.findViewById(R.id.personCard);
+
         PersonEntity person = getItem(position);
 
         profilePic.setImageResource(R.drawable.ic_user);
@@ -92,7 +99,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
 
         btnDelete.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                deletePerson((int)person.getID(), position);
+                deletePerson(view, (int)person.getID(), position);
             }
         });
 
@@ -113,26 +120,25 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
      * Mantovan Federico (adapted by Dal Maso)
      * Delete the person and the missions\tickets associated with it
      */
-    public void deletePerson(int personID, int position){
+    protected void deletePerson(View v, int personID, final int position){
         AlertDialog.Builder toast = new AlertDialog.Builder(context);
         //Dialog
         toast.setMessage(context.getString(R.string.delete_person))
                 .setTitle(context.getString(R.string.delete_title_person));
         //Positive button
         toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
+            public void onClick(DialogInterface dialog, int id){
                 List<MissionEntity> listMissions = DB.getMissionsForPerson(personID);
                 List<TicketEntity> listTickets;
                 for(int i = 0; i < listMissions.size(); i++){
                     listTickets = DB.getTicketsForMission(listMissions.get(i).getID());
                     for(int j = 0; j < listTickets.size(); i++){
-                        DB.deleteTicket(listTickets.get(i).getID());
+                        DB.deleteTicket(listTickets.get(j).getID());
                     }
                     DB.deleteMission(listMissions.get(i).getID());
                 }
                 DB.deletePerson(personID);
-                persons.remove(position);
-                ((MainActivity)context).printAllPeople();
+                ((MainActivity)context).deleteCell(v, position);
             }
         });
         //Negative button

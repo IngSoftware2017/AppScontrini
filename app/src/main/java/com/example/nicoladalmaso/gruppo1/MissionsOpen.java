@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -135,5 +136,18 @@ public class MissionsOpen extends Fragment {
                 }
             }
         );
+    }
+
+    public void deleteCell(final View v, final int index) {
+        Animation.AnimationListener al = new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                listMission.remove(index);
+                adapter.notifyDataSetChanged();
+            }
+            @Override public void onAnimationRepeat(Animation animation) {}
+            @Override public void onAnimationStart(Animation animation) {}
+        };
+        AppUtilities.collapse(v, al);
     }
 }

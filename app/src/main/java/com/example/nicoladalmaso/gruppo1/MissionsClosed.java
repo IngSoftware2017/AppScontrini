@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ public class MissionsClosed extends Fragment {
     PersonEntity thisPerson;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     View rootView;
+    MissionAdapterDB adapter;
     ListView listView;
 
     @Override
@@ -47,7 +49,7 @@ public class MissionsClosed extends Fragment {
      * Adds in the database the new mission
      */
     public void addToListDB(){
-        MissionAdapterDB adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
     }
 
@@ -73,5 +75,18 @@ public class MissionsClosed extends Fragment {
         else{
             noMissions.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public void deleteCell(final View v, final int index) {
+        Animation.AnimationListener al = new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                listMission.remove(index);
+                adapter.notifyDataSetChanged();
+            }
+            @Override public void onAnimationRepeat(Animation animation) {}
+            @Override public void onAnimationStart(Animation animation) {}
+        };
+        AppUtilities.collapse(v, al);
     }
 }

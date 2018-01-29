@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.daimajia.swipe.SwipeLayout;
+
 import java.io.File;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -54,55 +56,43 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         convertView = inflater.inflate(R.layout.mission_card, null);
-        CardView card = (CardView)convertView.findViewById(R.id.missionCard);
+        final View view = convertView;
+
+        SwipeLayout card = (SwipeLayout) convertView.findViewById(R.id.swipeMission);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
         TextView total = (TextView)convertView.findViewById(R.id.missionTotal);
         ImageButton btnDelete = (ImageButton)convertView.findViewById(R.id.deleteMission);
         ImageButton btnUpdate = (ImageButton)convertView.findViewById(R.id.editMission);
         RelativeLayout toTickets = (RelativeLayout) convertView.findViewById(R.id.missionClick);
+
         MissionEntity mission = getItem(position);
 
         title.setText(mission.getName());
         location.setText(mission.getLocation());
         total.setText(DB.getTotalAmountForMission(mission.getID()).setScale(2, RoundingMode.HALF_EVEN).toString()+" €");
         convertView.setTag(mission.getID());
-        Log.d("MissionStartBadFormat", ""+mission.getStartDate());
-        //Lazzarin :blocco per convertire in formato più leggibile la data
-        Date start=mission.getStartDate();
-        SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
-        String startDate=tr.format(start);
-        Date finish=mission.getEndDate();
-        String finishDate=tr.format(finish);
-        Log.d("missionStart", startDate);
-        Log.d("missionEnd",finishDate);
+        Date start = mission.getStartDate();
+        SimpleDateFormat tr = new SimpleDateFormat("dd/MM/yyyy");
+        String startDate = tr.format(start);
+        Date finish = mission.getEndDate();
+        String finishDate =tr.format(finish);
 
-
-        //Dal Maso
-        //Sets a default background color for the mission's card
         if(mission.isRepay()) {
+            int textColor = context.getResources().getColor(R.color.white);
             card.setBackgroundColor(Color.parseColor("#7c7c7c"));
+            total.setTextColor(textColor);
+            location.setTextColor(textColor);
+            title.setTextColor(textColor);
         }
-        else{
-            switch (position%4){
-                case 0:
-                    card.setBackgroundColor(Color.parseColor("#1F566D"));
-                    break;
-                case 1:
-                    card.setBackgroundColor(Color.parseColor("#007787"));
-                    break;
-                case 2:
-                    card.setBackgroundColor(Color.parseColor("#950068"));
-                    break;
-                case 3:
-                    card.setBackgroundColor(Color.parseColor("#BC004F"));
-                    break;
-            }
-        }
+
+        Log.d("Position", ""+position);
 
         toTickets.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
+                Log.d("Position", ""+mission.getID());
                 Intent startTicketsView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 Singleton.getInstance().setMissionID((int)mission.getID());
                 ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);
@@ -111,7 +101,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         btnDelete.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                deleteMission((int)mission.getID(), position);
+                deleteMission(view, mission, position);
             }
         });
 
@@ -131,7 +121,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
      * Nicola Dal Maso
      * Delete the person and the missions\tickets associated with it
      */
-    public void deleteMission(int missionID, int position){
+    public void deleteMission(View v, MissionEntity mission, int position){
         AlertDialog.Builder toast = new AlertDialog.Builder(context);
         //Dialog
         toast.setMessage(context.getString(R.string.deleteMissionToast))
@@ -139,13 +129,15 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         //Positive button
         toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                List<TicketEntity> list = DB.getTicketsForMission(missionID);
+                List<TicketEntity> list = DB.getTicketsForMission(mission.getID());
                 for(int i = 0; i < list.size(); i++){
                     DB.deleteTicket((int) list.get(i).getID());
                 }
-                DB.deleteMission(missionID);
-                missions.remove(position);
-                ((MissionsTabbed)context).refresh();
+                DB.deleteMission(mission.getID());
+                if(!mission.isRepay())
+                    ((MissionsTabbed)context).updateThisAdapter(0, v, position);
+                else
+                    ((MissionsTabbed)context).updateThisAdapter(1, v, position);
             }
         });
         //Negative button

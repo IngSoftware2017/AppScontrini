@@ -61,6 +61,7 @@ public class MissionsTabbed extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(thisPerson.getName()+" "+thisPerson.getLastName());
+        toolbar.setSubtitle("Missioni disponibili");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -155,47 +156,19 @@ public class MissionsTabbed extends AppCompatActivity {
         }
     }
 
+    public void updateThisAdapter(int choice, View v, final int position){
+        switch (choice){
+            case 0:
+                missionsOpen.deleteCell(v, position);
+                break;
+            case 1:
+                missionsClosed.deleteCell(v, position);
+        }
+    }
+
     public void refresh(){
         missionsOpen.printAllMissions();
         missionsClosed.printAllMissions();
-    }
-
-    /**
-     * Mantovan Federico
-     * Delete the person and the missions\tickets associated with it
-     */
-    public void deletePerson(){
-        AlertDialog.Builder toast = new AlertDialog.Builder(this);
-        //Dialog
-        toast.setMessage(getString(R.string.delete_person))
-                .setTitle(getString(R.string.delete_title_person));
-        //Positive button
-        toast.setPositiveButton(getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                List<MissionEntity> listMission = DB.getMissionsForPerson(personID);
-                for(int i = 0; i < listMission.size(); i++){
-                    List<TicketEntity> listTicket = DB.getTicketsForMission((int) listMission.get(i).getID());
-                    for(int j = 0; j < listTicket.size(); j++){
-                        DB.deleteTicket((int) listTicket.get(j).getID());
-                    }
-                }
-                DB.deleteMission(personID);
-                DB.deletePerson(personID);
-                Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        });
-        //Negative button
-        toast.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //Nothing to do
-            }
-        });
-        //Show toast
-        AlertDialog alert = toast.show();
-        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
-        nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 
     @Override

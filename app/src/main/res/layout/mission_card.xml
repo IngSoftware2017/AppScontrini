@@ -14,12 +14,12 @@
         android:layout_marginLeft="7dp"
         android:layout_marginRight="7dp"
         android:layout_marginTop="6dp"
-        app:cardUseCompatPadding="true"
+        app:cardCornerRadius="3dp"
         app:cardElevation="3dp"
-        app:cardCornerRadius="3dp">
+        app:cardUseCompatPadding="true">
 
         <com.daimajia.swipe.SwipeLayout
-            android:id="@+id/swipePerson"
+            android:id="@+id/swipeMission"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -85,8 +85,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:maxLines="1"
-                            android:text="TextView"
-                            android:textColor="#FFF"
+                            android:text="Missione"
+                            android:textColor="#333"
                             android:textSize="26sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -103,8 +103,8 @@
                                 android:layout_marginTop="10dp"
                                 android:layout_weight="1"
                                 android:maxLines="1"
-                                android:text="TextView"
-                                android:textColor="#FFF"
+                                android:text="Città"
+                                android:textColor="#666"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/missionTitle" />
 
@@ -115,9 +115,9 @@
                                 android:layout_marginTop="10dp"
                                 android:layout_weight="1"
                                 android:maxLines="1"
-                                android:text="TextView"
+                                android:text="0.00"
                                 android:textAlignment="textEnd"
-                                android:textColor="#FFF"
+                                android:textColor="#666"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/missionTitle" />
                         </LinearLayout>
