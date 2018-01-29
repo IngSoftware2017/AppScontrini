@@ -174,15 +174,15 @@ public class MainActivity extends AppCompatActivity {
         return singletonList(new MatOfPoint(cvPts.toArray(new Point[4])));
     }
 
-    static void drawTextLines(Mat img, List<OcrText> lines, Scalar backColor, double fontSize) throws Exception {
-        for (OcrText line : lines) {
+    static void drawTextLines(Mat img, List<TempText> lines, Scalar backColor, double fontSize) throws Exception {
+        for (TempText line : lines) {
             polylines(img, pts2matArr(line.corners()), true, RED, LINE_THICK);
-            for (OcrText w : line.childs()) {
+            for (TempText w : line.children()) {
                 fillPoly(img, pts2matArr(w.corners()), backColor);
             }
         }
-        for (OcrText line : lines) {
-            for (OcrText w : line.childs()) {
+        for (TempText line : lines) {
+            for (TempText w : line.children()) {
                 PointF blPt = w.corners().get(3); // bottom-right point (clockwise from top-left)
                 putText(img, w.textUppercase(), new Point(blPt.x + 3, blPt.y - 3), // add some padding (3, -3)
                         FONT_HERSHEY_SIMPLEX, fontSize, WHITE, FONT_THICKNESS);
@@ -326,8 +326,8 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap textLinesBm = invoke(imgProc, "undistortForOCR", 1. / 3.);
 
                 //find amount
-                List<OcrText> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
-                OcrText amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
+                List<TempText> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
+                TempText amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
                 StringBuilder titleStr = new StringBuilder();
                 titleStr.append(imgIdx);
 
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
                             amountStr, size(textLinesBm));
                     Bitmap amountStrip = invoke(OA_CLASS, "getAmountStrip",
                             imgProc, size(textLinesBm), amountStr, srcStripRect);
-                    List<OcrText> amountLines = invoke(OA_CLASS, "bitmapToLines",
+                    List<TempText> amountLines = invoke(OA_CLASS, "bitmapToLines",
                             amountStrip, ocrEngine);
                     BigDecimal price = invoke(OA_CLASS, "findAmountPrice",
                             amountLines, amountStr, size(srcStripRect), size(amountStrip));

@@ -157,8 +157,8 @@ public class RawImage {
      * @return average height
      */
     private float checkAverageLineHeight() {
-        float average = Stream.of(allTexts).reduce(0f, (sum, currentLine) ->
-                sum + currentLine.height()) / allTexts.size();
+        float average = Stream.of(allTexts)
+                .reduce(0f, (sum, currentLine) -> sum + currentLine.height()) / allTexts.size();
         OcrUtils.log(3, "RawImage", "AVERAGE RECT HEIGHT is: " + average);
         return average;
     }
@@ -168,8 +168,8 @@ public class RawImage {
      * @return average char height
      */
     private float checkAverageCharHeight() {
-        float average = Stream.of(allTexts).reduce(0f, (sum, currentLine) ->
-                sum + currentLine.charHeight()) / allTexts.size();
+        float average = Stream.of(allTexts)
+                .reduce(0f, (sum, currentLine) -> sum + currentLine.charHeight()) / allTexts.size();
         OcrUtils.log(3, "RawImage", "AVERAGE CHAR HEIGHT is: " + average);
         return average;
     }
@@ -179,8 +179,8 @@ public class RawImage {
      * @return average char width
      */
     private float checkAverageCharWidth() {
-        float average = Stream.of(allTexts).reduce(0f, (sum, currentLine) ->
-                sum + currentLine.charWidth()) / allTexts.size();
+        float average = Stream.of(allTexts)
+                .reduce(0f, (sum, currentLine) -> sum + currentLine.charWidth()) / allTexts.size();
         OcrUtils.log(3, "RawImage", "AVERAGE CHAR WIDTH is: " + average);
         return average;
     }

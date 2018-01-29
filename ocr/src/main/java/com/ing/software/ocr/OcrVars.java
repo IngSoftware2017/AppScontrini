@@ -25,7 +25,7 @@ public class OcrVars {
     public static final String CONCLUSION_TAG = "conclusion"; //tag for rawtext on bottom of the receipt
     public static final double NUMBER_MIN_VALUE = 0.4; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber()
     public static final double NUMBER_MIN_VALUE_ALTERNATIVE = 0.1; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber(). Used in alternative search
-    public static final float RECT_HEIGHT_EXTENDER = 1.5f; //Extend height of chosen rect
+    public static final float RECT_HEIGHT_EXTENDER = 1f; //Extend height of chosen rect
     public static final int NUMBER_MAX_LENGTH = 8; //Max number of digits allowed for numbers
     public static final double MIN_DIGITS_NUMBER = 2./3.;
 

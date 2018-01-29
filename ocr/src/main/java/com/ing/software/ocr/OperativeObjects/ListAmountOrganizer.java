@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OcrUtils;
 import com.ing.software.ocr.ScoreFunc;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
     public void setAmountTargetTexts(List<Scored<TempText>> targets) {
         for (Scored<TempText> text : targets) {
             targetTexts.add(new Scored<>(ScoreFunc.getAmountScore(text), text.obj()));
+            OcrUtils.log(4, "setAmountTargetTexts: " , "For text: " + text.obj().text() + " Score is: " + ScoreFunc.getAmountScore(text));
         }
         Collections.sort(targetTexts, Collections.reverseOrder()); //higher score comes first
         //todo: remove texts with score too low

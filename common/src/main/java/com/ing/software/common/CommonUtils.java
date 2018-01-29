@@ -7,6 +7,7 @@ import android.util.SizeF;
 import com.annimon.stream.Stream;
 
 import java.util.List;
+import static java.util.Collections.*;
 import static java.util.Arrays.*;
 import static java.lang.Math.*;
 
@@ -51,13 +52,17 @@ public class CommonUtils {
      * @return List of PointF
      */
     @NonNull
-    public static List<PointF> rectToPointFs(@NonNull RectF rect) {
+    public static List<PointF> rectToPts(@NonNull RectF rect) {
         return asList(
                 new PointF(rect.left, rect.top),
                 new PointF(rect.left, rect.bottom),
                 new PointF(rect.right, rect.bottom),
                 new PointF(rect.right, rect.top)
         );
+    }
+
+    public static RectF rectFromSize(@NonNull SizeF size) {
+        return new RectF(0, 0, size.getWidth(), size.getHeight());
     }
 
     /**
@@ -94,20 +99,14 @@ public class CommonUtils {
         return (p - srcStart) / (srcEnd - srcStart) * (dstEnd - dstStart) + dstStart;
     }
 
-    /**
-     * todo: doc
-     * @param length
-     * @param srcSize
-     * @param dstSize
-     * @return
-     */
+
     public static float transform(float length, float srcSize, float dstSize) {
         return length * dstSize / srcSize;
     }
 
     /**
      * Two dimensional linear transformation of a point from one space to another.
-     * The horizontal and vertical transformation are applied independently one at a time.
+     * The the horizontal and vertical transformation are applied independently one at a time.
      * @param p two-dimensional point
      * @param srcRect source space
      * @param dstRect destination space
@@ -138,8 +137,29 @@ public class CommonUtils {
      */
     public static RectF transform(RectF rect, RectF srcRect, RectF dstRect) {
         return new RectF(transform(rect.left, srcRect.left, srcRect.right, dstRect.left, dstRect.right),
-                transform(rect.right, srcRect.left, srcRect.right, dstRect.left, dstRect.right),
                 transform(rect.top, srcRect.top, srcRect.bottom, dstRect.top, dstRect.bottom),
+                transform(rect.right, srcRect.left, srcRect.right, dstRect.left, dstRect.right),
                 transform(rect.bottom, srcRect.top, srcRect.bottom, dstRect.top, dstRect.bottom));
+    }
+
+    /**
+     * Overwrite all bits in a pattern with "value"
+     * @param pattern bit pattern
+     * @param mask bits to be overwritten
+     * @param value value of the new bits
+     * @return updated pattern
+     */
+    public static int overwriteBits(int pattern, int mask, boolean value) {
+        return value ? (pattern | mask) : (pattern & ~mask);
+    }
+
+    /**
+     * Check if patterns has flag set.
+     * @param pattern bit pattern
+     * @param flag bit flag
+     * @return true if flag is contained in pattern, false if it is not
+     */
+    public static boolean check(int pattern, int flag) {
+        return (pattern & flag) == flag;
     }
 }

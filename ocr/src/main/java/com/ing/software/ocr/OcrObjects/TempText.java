@@ -9,6 +9,7 @@ import com.annimon.stream.Stream;
 import com.google.android.gms.vision.text.Element;
 import com.google.android.gms.vision.text.Text;
 import com.ing.software.common.Lazy;
+import com.ing.software.ocr.OcrUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,30 +51,38 @@ public class TempText implements Comparable<TempText> {
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
     private Lazy<String> textSanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
     private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
-    private Lazy<String> numConcatDot; // same as numNoSpaces, but words are concatenated with a dot
+    //private Lazy<String> numConcatDot; // same as numNoSpaces, but words are concatenated with a dot
     private List<String> tags;
-    private int tagPosition;
 
     public TempText(Text text) {
         isWord = text instanceof Element;
+        OcrUtils.log(7, "TEMPTEXT: ", "I'm a word: " + isWord);
         children = new Lazy<>(() -> Stream.of(text.getComponents()).map(TempText::new).toList());
         corners = new Lazy<>(() -> pointToPointF(asList(text.getCornerPoints())));
 
         // width and height are respectively the longest and shortest side of the rotated rectangle
-        width =  max(asList(dist(corners().get(0), corners().get(1)),
-                dist(corners().get(2), corners().get(3))));
-        height = min(asList(dist(corners().get(0), corners().get(3)),
-                dist(corners().get(1), corners().get(2))));
+        width =  dist(corners().get(0), corners().get(1));
+        height = dist(corners().get(0), corners().get(3));
 
         box = new Lazy<>(() -> new RectF(text.getBoundingBox()));
         this.text = text.getValue();
+        OcrUtils.log(7, "TEMPTEXT:", "Text is: " + text.getValue());
         textUppercase = new Lazy<>(() -> text().toUpperCase());
         textSanitizedNum = new Lazy<>(() -> {
             String res = text();
             for (Pair<String, String> p : NUM_SANITIZE_LIST)
-                res = res.replace(p.first, p.second);
+                res = res.replaceAll(p.first, p.second);
             return res;
         });
+
+        // I used .reduce() to concatenate every result of the lambda expression
+        // if these are accessed on a word, they return empty string
+        textNoSpaces = new Lazy<>(() -> Stream.of(children())
+                .reduce("", (str, c) -> str + c.textUppercase()));
+        numNoSpaces = new Lazy<>(() -> Stream.of(children())
+                .reduce("", (str, c) -> str + c.textSanitizedNum()));
+        //numConcatDot = new Lazy<>(() -> Stream.of(children())
+        //        .reduce("", (str, c) -> str + "." + c.textSanitizedNum()));
 
         if (isWord) {
             // length of the longest side of the rotated rectangle, divided by the number of characters of the word
@@ -92,15 +101,6 @@ public class TempText implements Comparable<TempText> {
             charHeight = Stream.of(children()).reduce(0f, (sum, currentChild) ->
                     sum + currentChild.charHeight() * currentChild.length()) / textNoSpaces().length();
         }
-
-        // I used .reduce() to concatenate every result of the lambda expression
-        // if these are accessed on a word, they return empty string
-        textNoSpaces = new Lazy<>(() -> Stream.of(children())
-                .reduce("", (str, c) -> str + c.textUppercase()));
-        numNoSpaces = new Lazy<>(() -> Stream.of(children())
-                .reduce("", (str, c) -> str + c.textSanitizedNum()));
-        numConcatDot = new Lazy<>(() -> Stream.of(children())
-                .reduce("", (str, c) -> str + "." + c.textSanitizedNum()));
         tags = new ArrayList<>();
     }
 
@@ -123,13 +123,23 @@ public class TempText implements Comparable<TempText> {
         charWidth = transform(tempText.charWidth(), srcImgRect.width(), srcImgRect.width());
         charHeight = transform(tempText.charHeight(), srcImgRect.height(), srcImgRect.height());
         box = new Lazy<>(() -> transform(tempText.box(), srcImgRect, dstImgRect));
+        OcrUtils.log(9, "TEMPTEXT", "Analyze: " + tempText.text());
+        OcrUtils.log(9, "TEMPTEXT", "Mapping rect (l,t,r,b): (" + tempText.box().left + "," +
+                tempText.box().top + "," + tempText.box().right + "," + tempText.box().bottom + ")");
+        OcrUtils.log(9, "TEMPTEXT", "FROM (source): (" + srcImgRect.left + "," +
+                srcImgRect.top + "," + srcImgRect.right + "," + srcImgRect.bottom + ")");
+        OcrUtils.log(9, "TEMPTEXT", "TO (dest): (" + dstImgRect.left + "," +
+                dstImgRect.top + "," + dstImgRect.right + "," + dstImgRect.bottom + ")");
+        OcrUtils.log(9, "TEMPTEXT", "RESULT: (" + box().left + "," +
+                box().top + "," + box().right + "," + box().bottom + ")");
 
         // the text fields remain unchanged
         text = tempText.text;
+        textSanitizedNum = tempText.textSanitizedNum;
         textUppercase = tempText.textUppercase;
         textNoSpaces = tempText.textNoSpaces;
         numNoSpaces = tempText.numNoSpaces;
-        numConcatDot = tempText.numConcatDot;
+        //numConcatDot = tempText.numConcatDot;
         tags = tempText.getTags();
     }
 
@@ -141,7 +151,6 @@ public class TempText implements Comparable<TempText> {
     public List<PointF> corners() { return corners.get(); }
     public float width() { return width; }
     public float height() { return height; }
-    public float area() { return width() * height(); }
     public RectF box() { return box.get(); } // bounding box size is always >= of (width(), height())
 
     //character size
@@ -155,7 +164,7 @@ public class TempText implements Comparable<TempText> {
     // available only if isWord() == false:
     public String textNoSpaces() { return textNoSpaces.get(); }
     public String numNoSpaces() { return numNoSpaces.get(); }
-    public String numConcatDot() { return numConcatDot.get(); }
+    //public String numConcatDot() { return numConcatDot.get(); }
 
     public List<String> getTags() {
         return tags;
@@ -168,16 +177,6 @@ public class TempText implements Comparable<TempText> {
 
     public void removeTag(String tag) {
         this.tags.remove(tag);
-    }
-
-    public void setTagPosition(double position) {
-        if (position > (GRID_LENGTH - 1)/GRID_LENGTH) //Fix IndexOutOfBound Exception
-            position = (GRID_LENGTH - 1)/GRID_LENGTH + 0.1;
-        this.tagPosition = (int)(position*GRID_LENGTH);
-    }
-
-    public int getTagPosition() {
-        return tagPosition;
     }
 
     /**

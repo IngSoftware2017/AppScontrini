@@ -82,8 +82,13 @@ public class OcrAnalyzer {
     private static List<TempText> getTexts(@NonNull SparseArray<TextBlock> origTextBlocks) {
         List<TempText> texts = new ArrayList<>();
         for (int i = 0; i < origTextBlocks.size(); ++i) {
-            for (Text currentText : origTextBlocks.valueAt(i).getComponents()) {
-                texts.add(new TempText(currentText));
+            //for (Text currentText : origTextBlocks.valueAt(i).getComponents()) {
+            //    texts.add(new TempText(currentText));
+            //}
+            TextBlock block = origTextBlocks.valueAt(i);
+            for (Text text : block.getComponents()) {
+                OcrUtils.log(7, "GETTEXTS: ", "Text: " + text.getValue());
+                texts.add(new TempText(text));
             }
         }
         return texts;
@@ -122,11 +127,18 @@ public class OcrAnalyzer {
      * @param processor
      * @param amountText
      * @return
+     * todo: pass these texts to schemer to add tags (using old structure), necessary or score func fails
      */
     List<Scored<TempText>> getAmountStripTexts(ImageProcessor processor, TempText amountText) {
-        return Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
+        List<Scored<TempText>> texts = Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
                 .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
+                .sorted(Collections.reverseOrder())
                 .toList();
+        //Collections.sort(texts, Collections.reverseOrder());
+        for (Scored<TempText> tt : texts) {
+            OcrUtils.log(3, "getAmountStripTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
+        }
+        return texts;
     }
 
     /**
@@ -138,9 +150,15 @@ public class OcrAnalyzer {
         RectF extendedRect = getAmountExtendedBox(amountText);
         extendedRect.set(amountText.box().left, extendedRect.top, extendedRect.right, extendedRect.bottom);
         //copy texts that are inside extended rect. todo Check if it'a a copy or if it modifies original list
-        return Stream.of(OcrManager.mainImage.getAllTexts())
+        List<Scored<TempText>> texts = Stream.of(OcrManager.mainImage.getAllTexts())
                                             .filter(text -> extendedRect.contains(text.box()))
                                             .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
+                                            .sorted(Collections.reverseOrder())
                                             .toList();
+        //Collections.sort(texts, Collections.reverseOrder());
+        for (Scored<TempText> tt : texts) {
+            OcrUtils.log(3, "getAmountOrigTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
+        }
+        return texts;
     }
 }

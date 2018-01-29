@@ -25,13 +25,16 @@ public class TicketSchemeIT_PSCC implements TicketScheme{
 
     public TicketSchemeIT_PSCC(BigDecimal total, @NonNull List<BigDecimal> aboveTotal, @NonNull List<BigDecimal> belowTotal) {
         this.total = total;
-        if (!aboveTotal.isEmpty())
-            this.subtotal = aboveTotal.get(aboveTotal.size()-1);
-        products = aboveTotal;
-        products.remove(aboveTotal.size()-1);
         if (!aboveTotal.isEmpty()) {
+            this.subtotal = aboveTotal.get(aboveTotal.size() - 1);
+        }
+        if (aboveTotal.size() > 1) {
+            products = aboveTotal;
+            products.remove(aboveTotal.size() - 1); //remove subtotal
+        }
+        if (!belowTotal.isEmpty()) {
             cash = belowTotal.get(0);
-            if (aboveTotal.size() > 0)
+            if (belowTotal.size() > 1)
                 change = belowTotal.get(1);
         }
     }

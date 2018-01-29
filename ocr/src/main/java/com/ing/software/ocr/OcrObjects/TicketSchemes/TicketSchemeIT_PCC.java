@@ -28,7 +28,7 @@ public class TicketSchemeIT_PCC implements TicketScheme{
             products = null;
         if (!belowTotal.isEmpty()) {
             cash = belowTotal.get(0);
-            if (belowTotal.size() > 0)
+            if (belowTotal.size() > 1)
                 change = belowTotal.get(1);
         }
     }

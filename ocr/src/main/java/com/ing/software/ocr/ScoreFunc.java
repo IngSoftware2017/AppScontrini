@@ -48,6 +48,8 @@ public class ScoreFunc {
         average = OcrManager.mainImage.getAverageCharWidth();
         double widthDiff = source.obj().charWidth() - average;
         widthDiff = widthDiff/average*WIDTH_CHAR_MULTIPLIER;
+        OcrUtils.log(3, "getSourceAmountScore", "Score for text: " + source.obj().text()
+                + " is: " + source.getScore() + " + (heightDiff) " + heightDiff + " + (widthDiff) " + widthDiff);
         return source.getScore() + heightDiff + widthDiff;
     }
 
@@ -58,10 +60,18 @@ public class ScoreFunc {
      * @return
      */
     public static double getDistFromSourceScore(TempText source, TempText target) {
+        OcrUtils.log(7, "getDistFromSource:", "Source rect is (l,t,r,b): (" + source.box().left + "," +
+            source.box().top + "," + source.box().right + "," + source.box().bottom + ") \n Target is: ("+
+                target.box().left + "," + target.box().top + "," + target.box().right + "," + target.box().bottom + ")");
+        OcrUtils.log(7, "getDistFromSource:", "Source center is: " + source.box().centerY()
+            + "\n Target center is: " + target.box().centerY());
         double diffCenter = Math.abs(source.box().centerY() - target.box().centerY());
+        OcrUtils.log(3, "getDistFromSource:", "Partial diff is: " + diffCenter);
         diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
         double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
         heightDiff = (1-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;
+        OcrUtils.log(3, "getDistFromSourceScore", "Score for text: " + target.text() +
+            " with source: " + source.text() + " is: (diffCenter) " + diffCenter + " + (heightDiff) " + heightDiff);
         return diffCenter + heightDiff;
     }
 

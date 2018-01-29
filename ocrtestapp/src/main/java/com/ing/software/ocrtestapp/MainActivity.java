@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 //Toast.makeText(this, "Done. \nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
                 //        "\nElapsed time is: " + resultData.getString(DURATION_RECEIVED) + " seconds", Toast.LENGTH_LONG).show();
                 s = "\nAmount is: " + resultData.getString(AMOUNT_RECEIVED) +
+                        "\nRestored amount is: " + resultData.getString(AMOUNT_RESTORED_RECEIVED) +
                         "\nDate is: " + resultData.getString(DATE_RECEIVED);
                 break;
             case STATUS_ERROR:
@@ -246,6 +247,15 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     } else {
                         OcrUtils.log(1, "OcrHandler", "No amount found");
                         bundle.putString(AMOUNT_RECEIVED, "Not found.");
+                        bundle.putString(DURATION_RECEIVED, duration + "");
+                    }
+                    if (result.restoredAmount != null) {
+                        OcrUtils.log(1, "OcrHandler", "Restored Amount: " + result.restoredAmount);
+                        bundle.putString(AMOUNT_RESTORED_RECEIVED, result.restoredAmount.toString());
+                        bundle.putString(DURATION_RECEIVED, duration + "");
+                    } else {
+                        OcrUtils.log(1, "OcrHandler", "No restored amount found");
+                        bundle.putString(AMOUNT_RESTORED_RECEIVED, "Not found.");
                         bundle.putString(DURATION_RECEIVED, duration + "");
                     }
                     if (result.date != null) {
