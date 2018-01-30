@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 public interface TicketScheme {
 
-    Scored<BigDecimal> getBestAmount();
+    Scored<BigDecimal> getBestAmount(boolean strict);
 
     String toString();
 }

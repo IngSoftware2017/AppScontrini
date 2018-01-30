@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.ing.software.common.Scored;
+import com.ing.software.ocr.OcrUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class TicketSchemeIT_PSCC implements TicketScheme{
             this.subtotal = aboveTotal.get(aboveTotal.size() - 1);
         }
         if (aboveTotal.size() > 1) {
-            products = aboveTotal;
+            products = new ArrayList<>(aboveTotal);
             products.remove(aboveTotal.size() - 1); //remove subtotal
         }
         if (!belowTotal.isEmpty()) {
@@ -40,8 +41,8 @@ public class TicketSchemeIT_PSCC implements TicketScheme{
     }
 
     @Override
-    public Scored<BigDecimal> getBestAmount() {
-        return temporaryBestAmount();
+    public Scored<BigDecimal> getBestAmount(boolean strict) {
+        return strict ? strictBestAmount() : looseBestAmount();
     }
 
     @Override
@@ -49,10 +50,25 @@ public class TicketSchemeIT_PSCC implements TicketScheme{
         return tag;
     }
 
+    private Scored<BigDecimal> strictBestAmount() {
+        if (products != null && total != null && cash != null && change != null && subtotal != null) {
+            BigDecimal normCash = cash.subtract(change);
+            BigDecimal productsSum = Stream.of(products)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            OcrUtils.log(3, "TicketScheme_" + tag, "productsSum is: " + productsSum);
+            OcrUtils.log(3, "TicketScheme_" + tag, "total is: " + total);
+            OcrUtils.log(3, "TicketScheme_" + tag, "cash is: " + normCash);
+            OcrUtils.log(3, "TicketScheme_" + tag, "subtotal is: " + subtotal);
+            if (productsSum.compareTo(total) == 0 && normCash.compareTo(total) == 0 && subtotal.compareTo(total) == 0)
+                return new Scored<>(100, total);
+        }
+        return null;
+    }
+
     /*
     Temporary, copied and modified from old amount comparator
      */
-    private Scored<BigDecimal> temporaryBestAmount() {
+    private Scored<BigDecimal> looseBestAmount() {
         int FOUR_VALUES = 100;
         int THREE_VALUES = 65;
         int THREE_VALUES_AMOUNT = 80;

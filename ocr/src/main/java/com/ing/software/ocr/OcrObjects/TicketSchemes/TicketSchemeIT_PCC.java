@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.ing.software.common.Scored;
+import com.ing.software.ocr.OcrUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class TicketSchemeIT_PCC implements TicketScheme{
 
     public TicketSchemeIT_PCC(BigDecimal total, @NonNull List<BigDecimal> aboveTotal, @NonNull List<BigDecimal> belowTotal) {
         this.total = total;
-        products = aboveTotal;
+        products = new ArrayList<>(aboveTotal);
         if (aboveTotal.isEmpty())
             products = null;
         if (!belowTotal.isEmpty()) {
@@ -34,8 +35,8 @@ public class TicketSchemeIT_PCC implements TicketScheme{
     }
 
     @Override
-    public Scored<BigDecimal> getBestAmount() {
-        return temporaryBestAmount();
+    public Scored<BigDecimal> getBestAmount(boolean strict) {
+        return strict ? strictBestAmount() : looseBestAmount();
     }
 
     @Override
@@ -43,10 +44,24 @@ public class TicketSchemeIT_PCC implements TicketScheme{
         return tag;
     }
 
+    private Scored<BigDecimal> strictBestAmount() {
+        if (products != null && total != null && cash != null && change != null) {
+            BigDecimal normCash = cash.subtract(change);
+            BigDecimal productsSum = Stream.of(products)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            OcrUtils.log(3, "TicketScheme_" + tag, "productsSum is: " + productsSum);
+            OcrUtils.log(3, "TicketScheme_" + tag, "total is: " + total);
+            OcrUtils.log(3, "TicketScheme_" + tag, "cash is: " + normCash);
+            if (productsSum.compareTo(total) == 0 && normCash.compareTo(total) == 0)
+                return new Scored<>(100, total);
+        }
+        return null;
+    }
+
     /*
     Temporary, copied and modified from old amount comparator
      */
-    private Scored<BigDecimal> temporaryBestAmount() {
+    private Scored<BigDecimal> looseBestAmount() {
         int THREE_VALUES = 80;
         int TWO_VALUES_AMOUNT = 50;
         int TWO_VALUES = 30;

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import com.annimon.stream.Stream;
+import com.ing.software.ocr.OcrUtils;
 import com.ing.software.ocr.ScoreFunc;
 
 import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
@@ -57,12 +58,13 @@ public class AmountComparator {
 
     /**
      * Retrieves amount with highest score from ticket schemes
+     * @param
      * @return amount with highest score, it's score and the ticket used. Null if no valid amount was found.
      */
-    public Scored<Pair<BigDecimal, TicketScheme>> getBestAmount() {
+    public Scored<Pair<BigDecimal, TicketScheme>> getBestAmount(boolean strict) {
         bestAmounts = Stream.of(acceptedSchemes)
-                .filter(scheme -> scheme.getBestAmount() != null)
-                .map(scheme -> new Scored<>(scheme.getBestAmount().getScore(), new Pair<>(scheme.getBestAmount().obj(), scheme)))
+                .filter(scheme -> scheme.getBestAmount(strict) != null)
+                .map(scheme -> new Scored<>(scheme.getBestAmount(strict).getScore(), new Pair<>(scheme.getBestAmount(strict).obj(), scheme)))
                 .toList();
         if (!bestAmounts.isEmpty()) {
             Collections.sort(bestAmounts, Collections.reverseOrder());

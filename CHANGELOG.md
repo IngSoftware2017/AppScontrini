@@ -27,7 +27,9 @@ Init rewrite amount comparator (now with schemes)
 Init score funcs   
 Init ticketSchemes   
 
-
+* ### Step 6   
+Simplified comparator (strict vs loose compare)   
+Replace old text with new ones from re-ocr   
 
 
 

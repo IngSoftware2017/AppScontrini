@@ -14,7 +14,7 @@ import static java.util.regex.Pattern.compile;
 public class OcrVars {
 
     public static final boolean IS_DEBUG_ENABLED = true;
-    static final int LOG_LEVEL = 2; //A Higher level, means more things are logged
+    static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
     public static final int MAX_STRING_DISTANCE = 3; //Max allowed distance (levDistance) between a string found in a rawtext and one from AMOUNT_STRINGS
     public static final String LEFT_TAG = "left"; //tag for rawtext on left of the receipt
     public static final String CENTER_TAG = "center"; //tag for rawtext on center of the receipt

@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import com.annimon.stream.Stream;
+import com.ing.software.ocr.OcrUtils;
 
 /**
  *
@@ -22,7 +23,7 @@ public class TicketSchemeIT_PC implements TicketScheme{
 
     public TicketSchemeIT_PC(BigDecimal total, @NonNull List<BigDecimal> aboveTotal, @NonNull List<BigDecimal> belowTotal) {
         this.total = total;
-        this.products = aboveTotal;
+        this.products = new ArrayList<>(aboveTotal); //Necessary or in psc last index is removed
         if (aboveTotal.isEmpty())
             products = null;
         if (!belowTotal.isEmpty()) {
@@ -31,8 +32,8 @@ public class TicketSchemeIT_PC implements TicketScheme{
     }
 
     @Override
-    public Scored<BigDecimal> getBestAmount() {
-        return temporaryBestAmount();
+    public Scored<BigDecimal> getBestAmount(boolean strict) {
+        return strict ? strictBestAmount() : looseBestAmount();
     }
 
     @Override
@@ -40,10 +41,23 @@ public class TicketSchemeIT_PC implements TicketScheme{
         return tag;
     }
 
+    private Scored<BigDecimal> strictBestAmount() {
+        if (products != null && total != null && cash != null) {
+            BigDecimal productsSum = Stream.of(products)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            OcrUtils.log(3, "TicketScheme_" + tag, "productsSum is: " + productsSum);
+            OcrUtils.log(3, "TicketScheme_" + tag, "total is: " + total);
+            OcrUtils.log(3, "TicketScheme_" + tag, "cash is: " + cash);
+            if (productsSum.compareTo(total) == 0 && cash.compareTo(total) == 0)
+                return new Scored<>(100, total);
+        }
+        return null;
+    }
+
     /*
     Temporary, copied and modified from old amount comparator
      */
-    private Scored<BigDecimal> temporaryBestAmount() {
+    private Scored<BigDecimal> looseBestAmount() {
         int THREE_VALUES = 80;
         int TWO_VALUES_AMOUNT = 50;
         int TWO_VALUES = 30;

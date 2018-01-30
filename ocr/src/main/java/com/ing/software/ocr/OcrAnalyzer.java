@@ -14,7 +14,9 @@ import com.annimon.stream.Stream;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.*;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 
+import static com.ing.software.ocr.OcrUtils.extendRect;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
 
@@ -123,6 +125,23 @@ public class OcrAnalyzer {
     }
 
     /**
+     * Replace texts in rawImage inside passed rect with new texts passed
+     * @param texts
+     * @param rect
+     */
+    private static void replaceTexts(List<Scored<TempText>> texts, RectF rect) {
+        RectF extendedRect = extendRect(rect, 5, 5);
+        List<TempText> newTexts = Stream.of(texts)
+                                    .map(text -> RawImage.mapText(text.obj()))
+                                    .toList();
+        OcrManager.mainImage.removeText(extendedRect);
+        for (TempText text : newTexts)
+            OcrManager.mainImage.addText(text);
+        OcrUtils.log(3, "replaceTexts", "NEW REPLACED TEXTS");
+        OcrUtils.listEverything(OcrManager.mainImage.getAllTexts());
+    }
+
+    /**
      * Get Texts in amount extended box
      * @param processor
      * @param amountText
@@ -138,6 +157,7 @@ public class OcrAnalyzer {
         for (Scored<TempText> tt : texts) {
             OcrUtils.log(3, "getAmountStripTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
         }
+        replaceTexts(texts, getAmountExtendedBox(amountText));
         return texts;
     }
 
@@ -156,9 +176,10 @@ public class OcrAnalyzer {
                                             .sorted(Collections.reverseOrder())
                                             .toList();
         //Collections.sort(texts, Collections.reverseOrder());
-        for (Scored<TempText> tt : texts) {
-            OcrUtils.log(3, "getAmountOrigTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
-        }
+        if (IS_DEBUG_ENABLED)
+            for (Scored<TempText> tt : texts) {
+                OcrUtils.log(4, "getAmountOrigTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
+            }
         return texts;
     }
 }

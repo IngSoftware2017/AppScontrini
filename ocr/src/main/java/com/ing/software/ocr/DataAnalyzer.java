@@ -159,9 +159,10 @@ public class DataAnalyzer {
     private static String deepAnalyzeAmountChars(@Size(min = 1) String targetAmount){
         StringBuilder manipulatedAmount;
         StringBuilder reversedAmount = new StringBuilder(targetAmount).reverse();
-        OcrUtils.log(3,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
-        OcrUtils.log(3,"deepAnalyzeAmount", "Reversed amount is: " + reversedAmount.toString());
+        OcrUtils.log(4,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
+        OcrUtils.log(5,"deepAnalyzeAmount", "Reversed amount is: " + reversedAmount.toString());
         manipulatedAmount = analyzeCharsLong(reversedAmount.toString());
+        OcrUtils.log(4,"deepAnalyzeAmount", "Analyzed amount is: " + manipulatedAmount.toString());
         return manipulatedAmount.reverse().toString();
     }
 

@@ -58,6 +58,7 @@ public class OcrSchemer {
         } else
             startingConclusion = textList.size(); // -1?
         intervalTagger(textList, PRODUCTS_TAG, PRODUCTS_TAG, PRICES_TAG, endingIntroduction + 1, startingConclusion -1);
+        OcrManager.mainImage.textFitter(); //save configuration from prepareScheme in rawimage
     }
 
     /**

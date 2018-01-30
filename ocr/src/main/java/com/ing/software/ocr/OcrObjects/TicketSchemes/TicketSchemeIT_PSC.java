@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.ing.software.common.Scored;
+import com.ing.software.ocr.OcrUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class TicketSchemeIT_PSC implements TicketScheme{
         this.total = total;
         if (!aboveTotal.isEmpty())
             this.subtotal = aboveTotal.get(aboveTotal.size()-1);
-        this.products = aboveTotal;
+        this.products = new ArrayList<>(aboveTotal);
         if (aboveTotal.isEmpty())
             products = null;
         else
@@ -36,8 +37,8 @@ public class TicketSchemeIT_PSC implements TicketScheme{
     }
 
     @Override
-    public Scored<BigDecimal> getBestAmount() {
-        return null;
+    public Scored<BigDecimal> getBestAmount(boolean strict) {
+        return strict ? strictBestAmount() : looseBestAmount();
     }
 
     @Override
@@ -45,10 +46,24 @@ public class TicketSchemeIT_PSC implements TicketScheme{
         return tag;
     }
 
+    private Scored<BigDecimal> strictBestAmount() {
+        if (products != null && total != null && cash != null && subtotal != null) {
+            BigDecimal productsSum = Stream.of(products)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            OcrUtils.log(3, "TicketScheme_" + tag, "productsSum is: " + productsSum);
+            OcrUtils.log(3, "TicketScheme_" + tag, "total is: " + total);
+            OcrUtils.log(3, "TicketScheme_" + tag, "cash is: " + cash);
+            OcrUtils.log(3, "TicketScheme_" + tag, "subtotal is: " + subtotal);
+            if (productsSum.compareTo(total) == 0 && cash.compareTo(total) == 0 && subtotal != null)
+                return new Scored<>(100, total);
+        }
+        return null;
+    }
+
     /*
     Temporary, copied and modified from old amount comparator
      */
-    private Scored<BigDecimal> temporaryBestAmount() {
+    private Scored<BigDecimal> looseBestAmount() {
         int FOUR_VALUES = 100;
         int THREE_VALUES = 65;
         int THREE_VALUES_AMOUNT = 80;

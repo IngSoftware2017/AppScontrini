@@ -109,7 +109,6 @@ public class OcrManager {
         List<TempText> lines = analyzer.analyze(frame); //Get main texts
         mainImage.setLines(lines); //save rect configuration in rawimage
         OcrSchemer.prepareScheme(lines); //Prepare scheme of the ticket
-        mainImage.textFitter(); //save configuration from prepareScheme in rawimage
         OcrUtils.listEverything(lines);
 
         OcrTicket newTicket = new OcrTicket();
@@ -137,8 +136,8 @@ public class OcrManager {
                 List<Scored<TempText>> amountPrice;
                 int i = 0;
                 int maxScan = options.getPrecision() >= REDO_OCR_3 ? 3 : 1;
-                while (i < amountList.size() && i <= maxScan) {
-                    if (options.getPrecision() >= OcrOptions.REDO_OCR_PRECISION) {
+                while (i < amountList.size()) {
+                    if (options.getPrecision() >= OcrOptions.REDO_OCR_PRECISION && i <= maxScan) {
                         //Redo ocr on first element of list. todo: add scan for more sources if precision > 4
                         amountPrice = analyzer.getAmountStripTexts(procCopy, amountList.get(i).getSourceText().obj());//3
                     } else {
@@ -149,26 +148,30 @@ public class OcrManager {
                     amountList.get(i).setAmountTargetTexts(amountPrice); //4
                     AmountComparator amountComparator;
                     Pair<TempText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts()); //5
-                    if (amountT != null) {
+                    if (amountT != null && newTicket.amount == null) {
                         newTicket.amount = amountT.second;
                         amountComparator = new AmountComparator(newTicket.amount, amountT.first); //8
-                        Scored<Pair<BigDecimal, TicketScheme>> bestAmount = amountComparator.getBestAmount();
-                        OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestAmount.obj().first.setScale(2, RoundingMode.HALF_UP) +
-                                "\nwith scheme: " + bestAmount.obj().second + "\nand score: " + bestAmount.getScore());
+                        Scored<Pair<BigDecimal, TicketScheme>> bestAmount = amountComparator.getBestAmount(true);
+                        if (bestAmount != null) {
+                            OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestAmount.obj().first.setScale(2, RoundingMode.HALF_UP) +
+                                    "\nwith scheme: " + bestAmount.obj().second + "\nand score: " + bestAmount.getScore());
+                        }
                     }
                     Pair<TempText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //6
                     //todo: Redo ocr on prices strip if enabled //7
 
                     //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
-                    if (restoredAmountT != null) {
+                    if (restoredAmountT != null && newTicket.restoredAmount == null) {
                         newTicket.restoredAmount = restoredAmountT.second;
                         amountComparator = new AmountComparator(newTicket.restoredAmount, restoredAmountT.first);
-                        Scored<Pair<BigDecimal, TicketScheme>> bestRestoredAmount = amountComparator.getBestAmount();
-                        OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredAmount.obj().first.setScale(2, RoundingMode.HALF_UP) +
-                                "\nwith scheme: " + bestRestoredAmount.obj().second + "\nand score: " + bestRestoredAmount.getScore());
-                        newTicket.restoredAmount = bestRestoredAmount.obj().first; //9
+                        Scored<Pair<BigDecimal, TicketScheme>> bestRestoredAmount = amountComparator.getBestAmount(false);
+                        if (bestRestoredAmount != null) {
+                            OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredAmount.obj().first.setScale(2, RoundingMode.HALF_UP) +
+                                    "\nwith scheme: " + bestRestoredAmount.obj().second + "\nand score: " + bestRestoredAmount.getScore());
+                            newTicket.restoredAmount = bestRestoredAmount.obj().first; //9
+                        }
                     }
-                    if (newTicket.amount != null || newTicket.restoredAmount != null) //temporary
+                    if (newTicket.amount != null && newTicket.restoredAmount != null) //temporary
                         break;
                     ++i;
                 }
