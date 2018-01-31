@@ -1,6 +1,7 @@
 package com.ing.software.ocr;
 
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 import android.util.Pair;
 
@@ -25,20 +26,20 @@ public class DataAnalyzer {
 
     /**
      * Get a list of texts where amount string is present
-     * @param texts
-     * @return
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing amount string with its score
      */
-    public static List<Scored<OcrText>> getAmountTexts(List<OcrText> texts) {
-        List<Scored<OcrText>> amounts = findAllMatchedStrings(texts, AMOUNT_MATCHERS);
-        return amounts;
+    static List<Scored<OcrText>> getAmountTexts(@NonNull List<OcrText> texts) {
+        return findAllMatchedStrings(texts, AMOUNT_MATCHERS);
     }
 
     /**
-     * Add detected amount texts in a list with source + target
-     * @param texts
-     * @return
+     * @author Michelon
+     * Insert detected amount texts in a listAmountOrganizer
+     * @param texts list of scored source texts
+     * @return list of listAmountOrganizer containing source texts
      */
-    public static List<ListAmountOrganizer> organizeAmountList(List<Scored<OcrText>> texts) {
+    static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts) {
         return Stream.of(texts)
                     .map(ListAmountOrganizer::new)
                     .toList();
@@ -58,10 +59,10 @@ public class DataAnalyzer {
 
     /**
      * Get possible amount from word matcher and regex
-     * @param texts
-     * @return
+     * @param texts list of scored target texts (prices). Not null.
+     * @return text containing amount price and it's decoded value
      */
-    public static Pair<OcrText, BigDecimal>  getMatchingAmount(List<Scored<OcrText>> texts) {
+    static Pair<OcrText, BigDecimal>  getMatchingAmount(@NonNull List<Scored<OcrText>> texts) {
         for (Scored<OcrText> singleText : texts) {
             BigDecimal amount = trySingleMatch(singleText.obj());
             if (amount != null)
@@ -72,10 +73,11 @@ public class DataAnalyzer {
 
     /**
      * Get amount for single text from word matcher and regex
-     * @param line
-     * @return
+     * @param line text containing amount price. Not null.
+     * @return Decoded value. Null if nothing found.
+     * @author Zaglia
      */
-    private static BigDecimal trySingleMatch(OcrText line) {
+    private static BigDecimal trySingleMatch(@NonNull OcrText line) {
         /*
         Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
         if (!matcher.find()) { // try again using a dot to concatenate words
@@ -102,11 +104,12 @@ public class DataAnalyzer {
     }
 
     /**
+     * @author Michelon
      * Get restored amount without regex
-     * @param texts
-     * @return
+     * @param texts list of scored target texts (prices). Not null.
+     * @return text containing amount price and it's decoded value
      */
-    public static Pair<OcrText, BigDecimal> getRestoredAmount(List<Scored<OcrText>> texts) {
+    static Pair<OcrText, BigDecimal> getRestoredAmount(@NonNull List<Scored<OcrText>> texts) {
         for (Scored<OcrText> singleText : texts) {
             if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().numNoSpaces()) < NUMBER_MIN_VALUE) {
                 BigDecimal amount = analyzeAmount(singleText.obj().numNoSpaces());
@@ -118,20 +121,11 @@ public class DataAnalyzer {
     }
 
     /*
-    « Per me si va ne la città dolente,
-    per me si va ne l'etterno dolore,
-    per me si va tra la perduta gente.
-    Giustizia mosse il mio alto fattore:
-    fecemi la divina potestate,
-    la somma sapienza e 'l primo amore;
-    dinanzi a me non fuor cose create
-    se non etterne, e io etterna duro.
-    Lasciate ogni speranza, voi ch'entrate. »
+    Old analysis. Used alongside regex.
      */
 
     /**
      * @author Michelon
-     * @date 23-12-17
      * Tries to find a BigDecimal from string
      * @param amountString string containing possible amount. Length > 0.
      * @return BigDecimal containing the amount, null if no number was found
@@ -150,7 +144,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze a string (reversed by this method) looking for a number (with two decimals).
      * Uses arbitrary decisions.
      * @param targetAmount string containing possible amount. Length > 0.
@@ -168,7 +161,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 9-12-17
      * Analyze a string looking for a number (with two decimals)
      * @param source string containing possible amount. Length > 0.
      * @return stringBuilder containing the amount, empty stringBuilder if nothing found
@@ -210,7 +202,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Keep only digits and points in a string
      * @param string source string. Length > 0.
      * @return string with only digits and '.'
@@ -225,7 +216,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Removes '.' from a string
      * @param string source string. Length > 0
      * @return string with no '.'
@@ -240,7 +230,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze a string looking for a number with two decimals
      * @param source source string @Size(min = 1, max = 3)
      * @return StringBuilder with decoded number (empty if nothing found)
@@ -256,7 +245,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze three chars, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
@@ -285,7 +273,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze two chars, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
@@ -308,7 +295,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze single char, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @return StringBuilder with decoded number (empty if nothing found)

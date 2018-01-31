@@ -22,10 +22,10 @@ import static java.util.Collections.max;
 import static java.util.Collections.min;
 
 /**
- * todo: doc
- * Lazy<Float> is useless if the goal is to reduce memory usage, better to use float directly (Lazy uses 'Float' that is way bigger than a 'float')
- * if the goal is to reduce computational power, again Lazy is a better solution only if used rarely and here height and width are always accessed
- * to get average height
+ * @author Zaglia
+ * @author (Edit) Michelon
+ * Main object used by this module. It represents a text with its absolute position in the image,
+ * the result of ocr analysis and a first raw analysis of the string extracted.
  */
 
 public class OcrText implements Comparable<OcrText> {
@@ -42,6 +42,7 @@ public class OcrText implements Comparable<OcrText> {
     private boolean isWord;
     private Lazy<List<OcrText>> children;
     private Lazy<List<PointF>> corners; // corners of a rotated rectangle containing the line of text
+    //these values are always used, so no need for lazy
     private float height, width; // width, height of entire line
     private float charWidth, charHeight; // average width, height of single character
     private Lazy<RectF> box;
@@ -50,7 +51,6 @@ public class OcrText implements Comparable<OcrText> {
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
     private Lazy<String> textSanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
     private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
-    //private Lazy<String> numConcatDot; // same as numNoSpaces, but words are concatenated with a dot
     private List<String> tags;
 
     public OcrText(Text text) {
@@ -80,8 +80,6 @@ public class OcrText implements Comparable<OcrText> {
                 .reduce("", (str, c) -> str + c.textUppercase()));
         numNoSpaces = new Lazy<>(() -> Stream.of(children())
                 .reduce("", (str, c) -> str + c.textSanitizedNum()));
-        //numConcatDot = new Lazy<>(() -> Stream.of(children())
-        //        .reduce("", (str, c) -> str + "." + c.textSanitizedNum()));
 
         if (isWord) {
             // length of the longest side of the rotated rectangle, divided by the number of characters of the word
@@ -138,7 +136,6 @@ public class OcrText implements Comparable<OcrText> {
         textUppercase = ocrText.textUppercase;
         textNoSpaces = ocrText.textNoSpaces;
         numNoSpaces = ocrText.numNoSpaces;
-        //numConcatDot = ocrText.numConcatDot;
         tags = ocrText.getTags();
     }
 
@@ -163,7 +160,6 @@ public class OcrText implements Comparable<OcrText> {
     // available only if isWord() == false:
     public String textNoSpaces() { return textNoSpaces.get(); }
     public String numNoSpaces() { return numNoSpaces.get(); }
-    //public String numConcatDot() { return numConcatDot.get(); }
 
     public List<String> getTags() {
         return tags;
@@ -179,6 +175,7 @@ public class OcrText implements Comparable<OcrText> {
     }
 
     /**
+     * Necessary for schemer.
      * Order: top to bottom, left to right
      * @param rawText target text
      * @return int > 0 if target comes before source (i.e. is above/on the left)

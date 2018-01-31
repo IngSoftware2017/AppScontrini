@@ -41,6 +41,9 @@ public class OcrAnalyzer {
         //failure causes: GSM package is not yet downloaded due to lack of time or lack of space.
     }
 
+    /**
+     * Release internal resources.
+     */
     void release() {
         ocrEngine.release();
     }
@@ -76,7 +79,7 @@ public class OcrAnalyzer {
     /**
      * @author Michelon
      * @author Riccardo Zaglia
-     * Adds TextBlock decoded by detector in a list of TempTexts
+     * Adds TextBlock decoded by detector in a list of Texts
      * @param origTextBlocks detected texts. Not null.
      * @return list of Texts
      */
@@ -97,9 +100,9 @@ public class OcrAnalyzer {
 
     /**
      * Get texts inside rect
-     * @param processor
-     * @param boundingBox
-     * @return
+     * @param processor processor containing source image
+     * @param boundingBox rect to analyze
+     * @return list of detected texts
      */
     private List<OcrText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
         Bitmap region = processor.undistortedSubregion(new SizeF(OcrManager.mainImage.getWidth(), OcrManager.mainImage.getHeight()),
@@ -113,8 +116,8 @@ public class OcrAnalyzer {
 
     /**
      * Get extended rect from half of source rect (x axis) to right of pic and with height extended by RECT_HEIGHT_EXTENDER
-     * @param amountText
-     * @return
+     * @param amountText source text containing amount string
+     * @return rect extended from source text
      */
     private static RectF getAmountExtendedBox(OcrText amountText) {
         float newTop = amountText.box().top - amountText.height()*RECT_HEIGHT_EXTENDER;
@@ -125,8 +128,8 @@ public class OcrAnalyzer {
 
     /**
      * Replace texts in rawImage inside passed rect with new texts passed
-     * @param texts
-     * @param rect
+     * @param texts new texts to add
+     * @param rect rect containing texts to remove
      */
     private static void replaceTexts(List<Scored<OcrText>> texts, RectF rect) {
         RectF extendedRect = extendRect(rect, 5, 5);
@@ -142,10 +145,9 @@ public class OcrAnalyzer {
 
     /**
      * Get Texts in amount extended box
-     * @param processor
-     * @param amountText
-     * @return
-     * todo: pass these texts to schemer to add tags (using old structure), necessary or score func fails
+     * @param processor processor containing source image
+     * @param amountText source text containing amount string
+     * @return list of scored texts containing decoded values
      */
     List<Scored<OcrText>> getAmountStripTexts(ImageProcessor processor, OcrText amountText) {
         List<Scored<OcrText>> texts = Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
@@ -162,8 +164,8 @@ public class OcrAnalyzer {
 
     /**
      * Get original texts from extended amount rect
-     * @param amountText
-     * @return
+     * @param amountText text containing amount string
+     * @return list of scored texts containing possible price
      */
     static List<Scored<OcrText>> getAmountOrigTexts(OcrText amountText) {
         RectF extendedRect = getAmountExtendedBox(amountText);

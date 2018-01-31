@@ -75,7 +75,7 @@ public class AmountComparator {
     /**
      * @author Michelon
      * Analyze the list of products from OcrSchemer and convert accepted values as bigdecimal
-     * @return list of bigdecimal of numbers above total
+     * @return list of bigDecimal of numbers above total
      */
     private List<BigDecimal> getAboveTotalPrices(OcrText amountText) {
         return Stream.of(OcrManager.mainImage.getPricesTexts())
@@ -89,7 +89,7 @@ public class AmountComparator {
     /**
      * @author Michelon
      * Analyze the list of products from OcrSchemer and convert accepted values as bigdecimal
-     * @return list of bigdecimal of numbers below total
+     * @return list of bigDecimal of numbers below total
      */
     private List<BigDecimal> getBelowTotalPrices(OcrText amountText) {
         return Stream.of(OcrManager.mainImage.getPricesTexts())
@@ -103,7 +103,7 @@ public class AmountComparator {
     /**
      * @author Michelon
      * Initialize a list of all TicketSchemes
-     * @param total bigdecimal with total value
+     * @param total bigDecimal with total value
      * @param aboveTotal list of prices above total
      * @param belowTotal list of prices below total
      * @return list of all ticketSchemes

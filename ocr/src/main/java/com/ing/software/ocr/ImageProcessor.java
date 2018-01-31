@@ -2,7 +2,6 @@ package com.ing.software.ocr;
 
 import android.graphics.*;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 import android.util.SizeF;
 
 import com.annimon.stream.Stream;
@@ -19,9 +18,9 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 import com.annimon.stream.function.*;
+import com.ing.software.ocr.OcrObjects.IPError;
 
 import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.*;

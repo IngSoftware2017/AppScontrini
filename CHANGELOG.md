@@ -33,13 +33,15 @@ Replace old text with new ones from re-ocr
 
 
 
+
 ### TO DO:   
-[ ]- Remove hc values in schemer   
-[ ]- Rewrite DataAnalyzer (WIP)   
-[ ]- Rewrite AmountComparator (WIP)   
-[ ]- Divide flows between strict and loose analysis (WIP)   
+[x]- Remove hc values in schemer   
+[ ]- Rewrite DataAnalyzer (WIP Done for amount)   
+[x]- Rewrite AmountComparator    
+[ ]- Extract products list from AmountComparator   
+[ ]- Divide flows between strict and loose analysis (WIP Done for amount)   
 [ ]- Accept both flows with different values   
 [ ]- Rewrite Manager in linear flow (WIP)   
-[ ]- Add selective ocr in ocrAnalyzer (WIP)   
+[ ]- Add selective ocr in ocrAnalyzer (WIP Done for amount)   
 
 

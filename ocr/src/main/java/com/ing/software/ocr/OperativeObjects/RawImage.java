@@ -19,7 +19,7 @@ import static com.ing.software.ocr.OcrVars.*;
  * Class to store only useful properties of source images and scheme of ticket
  * How to use:
  * - initialize with constructor
- * - call setLines() passing a list of all TempTexts
+ * - call setLines() passing a list of all Texts
  * - call OcrSchemer.prepareScheme()
  * - now you can use the others methods in this class
  * @author Michelon
@@ -105,6 +105,7 @@ public class RawImage {
     }
 
     /**
+     * Must call setLines() before.
      * @return list of all texts
      */
     public List<OcrText> getAllTexts() {
@@ -113,52 +114,68 @@ public class RawImage {
 
     /**
      * Must call textFitter() before.
-     * @return list of Intro RawTexts
+     * @return list of Intro Texts
      */
     public List<OcrText> getIntroTexts() {
         Collections.sort(introTexts);
         return introTexts;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return rect containing all Intro texts.
+     */
     public RectF getIntroRect() {
         return introRect != null? introRect : new RectF(0, 0, width, 0);
     }
 
     /**
      * Must call textFitter() before.
-     * @return list of Products RawTexts
+     * @return list of Products Texts
      */
     public List<OcrText> getProductsTexts() {
         Collections.sort(productsTexts);
         return productsTexts;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return rect containing all Products texts.
+     */
     public RectF getProductsRect() {
         return productsRect != null? productsRect : new RectF(0, getIntroRect().bottom, width/2, getConclusionRect().top);
     }
 
     /**
      * Must call textFitter() before.
-     * @return list of Prices RawTexts
+     * @return list of Prices Texts
      */
     public List<OcrText> getPricesTexts() {
         Collections.sort(pricesTexts);
         return pricesTexts;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return rect containing all Prices texts.
+     */
     public RectF getPricesRect() {
         return pricesRect != null? pricesRect : new RectF(width/2, getIntroRect().bottom, width, getConclusionRect().top);
     }
 
     /**
      * Must call textFitter() before.
-     * @return list of Conclusion RawTexts
+     * @return list of Conclusion Texts
      */
     public List<OcrText> getConclusionTexts() {
         Collections.sort(conclusionTexts);
         return conclusionTexts;
     }
 
+    /**
+     * Must call textFitter() before.
+     * @return rect containing all Conclusion texts.
+     */
     public RectF getConclusionRect() {
         return conclusionRect != null? conclusionRect : new RectF(0, height, width, height);
     }
@@ -198,7 +215,7 @@ public class RawImage {
 
     /**
      * Keeps a list of all rawTexts divided by tag.
-     * Must be used only once and after setLines() has been called and tags have been set.
+     * Must be used only once and after setLines() has been called and tags have been set (OcrSchemer.prepareScheme).
      */
     public void textFitter() {
         //Remove old lists
@@ -224,7 +241,7 @@ public class RawImage {
 
     /**
      * Get rect containing all lines detected
-     * @return Rect containing all rects passed
+     * @return Rect containing all texts passed
      */
     private RectF getMaxRectBorders(List<OcrText> texts) {
         if (texts.size() == 0)
@@ -248,8 +265,8 @@ public class RawImage {
 
     /**
      * Override a text with a new one
-     * @param oldText
-     * @param newText
+     * @param oldText old text to remove
+     * @param newText new text to insert
      */
     public void overrideText(OcrText oldText, OcrText newText) {
         allTexts.remove(oldText);
@@ -276,7 +293,7 @@ public class RawImage {
 
     /**
      * Remove a text from all lists
-     * @param oldText
+     * @param oldText text to remove
      */
     public void removeText(OcrText oldText) {
         allTexts.remove(oldText);
@@ -293,7 +310,7 @@ public class RawImage {
 
     /**
      * Remove all texts inside passed rect from all lists
-     * @param rect
+     * @param rect rect containing texts to remove
      */
     public void removeText(RectF rect) {
         List<OcrText> tempList = new ArrayList<>(allTexts);
@@ -315,7 +332,7 @@ public class RawImage {
 
     /**
      * Add text to lists
-     * @param newText
+     * @param newText text to add according to its tag
      */
     public void addText(OcrText newText) {
         allTexts.add(newText);
@@ -336,8 +353,8 @@ public class RawImage {
 
     /**
      * Add tag to text according to its position (must call textFitter before)
-     * @param text
-     * @return
+     * @param text text to tag
+     * @return text with added tag
      */
     public static OcrText mapText(OcrText text) {
         if (OcrManager.mainImage.getIntroRect().contains(text.box()))

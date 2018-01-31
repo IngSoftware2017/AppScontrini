@@ -8,7 +8,7 @@ import com.ing.software.ocr.OcrObjects.OcrText;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
- *
+ * Class used to calculate scores for texts
  */
 
 public class ScoreFunc {
@@ -17,8 +17,10 @@ public class ScoreFunc {
     private static final int HEIGHT_CHAR_MULTIPLIER = 50; //Multiplier used while analyzing difference between average char height and a specific rect.
     private static final int WIDTH_CHAR_MULTIPLIER = 80; //Multiplier used while analyzing difference between average char width and a specific rect.
     private static final int HEIGHT_SOURCE_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in height between source and target rect (e.g. total with it's price)
+    private static final int NUMBER_MAX_LENGTH = 8; //Max number of digits allowed for numbers
+    private static final double MIN_DIGITS_NUMBER = 2./3.; //Min number of digits in a string to be considered a number
 
-    public static final int GRID_LENGTH = 10;
+    private static final int GRID_LENGTH = 10;
     private static final int[] amountBlockIntroduction = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private static final int[] amountBlockProducts = new int[] {0, 0, 0, 5, 5, 10, 15, 20, 15, 10};
     private static final int[] amountBlockConclusion = new int[] {5, 5, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -26,20 +28,28 @@ public class ScoreFunc {
     private static final int[] dateBlockProducts = new int[] {10, 5, 0, 0, 0, 0, 0, 5, 15, 15};
     private static final int[] dateBlockConclusion = new int[] {15, 10, 10, 5, 5, 10, 5, 5, 10, 10};
 
-    /**
-     * Get score for text on same height as amount text
-     * @param source
-     * @return
+    /*
+    In order we call:
+    - getSourceAmountScore to score texts containing amount string
+    - getDistFromSourceScore to score texts containing possible price for amount (based on difference from source)
+    - getAmountScore to add score to texts containing possible price for amount (based on absolute height of rect and position)
      */
-    public static double getAmountScore(Scored<OcrText> source) {
-        double positionScore = getAmountBlockScore(source.obj());
-        return positionScore + source.getScore();
+
+    /**
+     * Get score for text based on position and height/width of its rect
+     * @param target text to score
+     * @return new score for text + old score
+     */
+    public static double getAmountScore(Scored<OcrText> target) {
+        double positionScore = getAmountBlockScore(target.obj());
+        //todo: add score for height etc.
+        return positionScore + target.getScore();
     }
 
     /**
-     * Get score for rect containing amount text (='totale')
-     * @param source
-     * @return
+     * Get score for text containing amount string (='totale')
+     * @param source text containing amount string
+     * @return new score + old score
      */
     public static double getSourceAmountScore(Scored<OcrText> source) {
         double average = OcrManager.mainImage.getAverageCharHeight();
@@ -54,19 +64,19 @@ public class ScoreFunc {
     }
 
     /**
-     * Get score according to difference between source and target rects (distance between centers, height etc)
-     * @param source
-     * @param target
-     * @return
+     * Get score according to difference between source and target texts (distance between centers, height etc)
+     * @param source source text
+     * @param target target text
+     * @return score for chosen texts
      */
-    public static double getDistFromSourceScore(OcrText source, OcrText target) {
+    static double getDistFromSourceScore(OcrText source, OcrText target) {
         OcrUtils.log(7, "getDistFromSource:", "Source rect is (l,t,r,b): (" + source.box().left + "," +
             source.box().top + "," + source.box().right + "," + source.box().bottom + ") \n Target is: ("+
                 target.box().left + "," + target.box().top + "," + target.box().right + "," + target.box().bottom + ")");
         OcrUtils.log(7, "getDistFromSource:", "Source center is: " + source.box().centerY()
             + "\n Target center is: " + target.box().centerY());
         double diffCenter = Math.abs(source.box().centerY() - target.box().centerY());
-        OcrUtils.log(5, "getDistFromSource:", "Partial diff is: " + diffCenter);
+        OcrUtils.log(7, "getDistFromSource:", "Partial diff is: " + diffCenter);
         diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
         double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
         heightDiff = (1-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;  //<- always 0, why?
@@ -80,7 +90,7 @@ public class ScoreFunc {
      * @param text source text
      * @return score of the rect in its block.
 	 */
-    public static int getAmountBlockScore(OcrText text) {
+    private static int getAmountBlockScore(OcrText text) {
         if (text.getTags().contains(INTRODUCTION_TAG))
             return amountBlockIntroduction[getTextBlockPosition(text, OcrManager.mainImage.getIntroRect())];
         else if (text.getTags().contains(PRODUCTS_TAG))
@@ -95,7 +105,7 @@ public class ScoreFunc {
 
     /**
      * Find position of a text inside its block with the formula: (text.centerY-start)/(end-start)
-     * @param text source rawText. Not Null. Must be inside the block.
+     * @param text source Text. Not Null. Must be inside the block.
      * @param rect rect containing the whole block.
      * @return position as a int between 0 and GRID_LENGTH.
      */
@@ -110,7 +120,6 @@ public class ScoreFunc {
 
     /**
      * @author Michelon
-     * @date 27-1-18
      * Check if a string may be a number.
      * Characters changed in sanitized are considered specials (see return statement).
      * If string is longer than NUMBER_MAX_LENGTH default is Integer.MAX_VALUE (allowed numbers up to nn.nnn,nn)

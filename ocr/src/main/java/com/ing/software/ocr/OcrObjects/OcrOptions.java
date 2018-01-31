@@ -5,6 +5,7 @@ import android.support.annotation.IntRange;
 /**
  * Object passed to the manager to avoid performing unnecessary operations
  * and consequently reduce time (time depends primarily on precision)
+ * NOTE: As of now (31-1) only precisions 0-3 are implemented
  *
  * For precision:
  * 0 = scan image at 1/3 of its dimension, don't reanalyze specific parts of image to get better results
@@ -29,8 +30,15 @@ public class OcrOptions {
     private boolean findTotal;
     private boolean findDate;
     private boolean findProducts;
-    private int precision; //Precision varies from 0 to 6, where 6 = max precision
+    private int precision;
 
+    /**
+     * Constructor
+     * @param findTotal true if you want to find total
+     * @param findDate true if you want to find date
+     * @param findProducts true if you want to find a list of products
+     * @param precision Int from 0 to 6.
+     */
     public OcrOptions(boolean findTotal, boolean findDate, boolean findProducts, @IntRange(from = 0, to = 6) int precision) {
         this.findTotal = findTotal;
         this.findDate = findDate;
@@ -38,6 +46,10 @@ public class OcrOptions {
         this.precision = precision;
     }
 
+    /**
+     * Return default Options
+     * @return default options
+     */
     public static OcrOptions getDefaultOptions() {
         return new OcrOptions(DEFAULT_TOTAL, DEFAULT_DATE, DEFAULT_PRODUCTS, DEFAULT_PRECISION);
     }

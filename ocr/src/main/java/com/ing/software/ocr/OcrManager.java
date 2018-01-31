@@ -114,6 +114,7 @@ public class OcrManager {
         OcrTicket newTicket = new OcrTicket();
         if (options.isFindDate()) {
             Date newDate = null;
+            //todo add date search
             newTicket.date = newDate;
         }
         if (options.isFindTotal()) {
@@ -179,6 +180,7 @@ public class OcrManager {
         }
         if (options.isFindProducts()) {
             List<Pair<String, BigDecimal>> newProducts = null;
+            //todo: add products search (should be used only if findTotal is enabled and with values from amountComparator)
             newTicket.products = newProducts;
         }
 

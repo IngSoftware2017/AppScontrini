@@ -13,8 +13,7 @@ import java.util.List;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
- * Util class to manage rects, blocks, images
- *
+ * Utility class
  */
 
 public class OcrUtils {
@@ -35,7 +34,7 @@ public class OcrUtils {
      * List in debug log blocks parsed (detection + grid)
      * @param texts List of texts. Not null.
      */
-    public static void listEverything(@NonNull List<OcrText> texts) {
+    static void listEverything(@NonNull List<OcrText> texts) {
             /*
             for (RawText text : texts) {
                 OcrUtils.log(2, "FULL LIST: ", text.getValue());
@@ -67,7 +66,7 @@ public class OcrUtils {
     /**
      * List in debug log blocks parsed (detection + grid)
      */
-    public static void listEverything() {
+    static void listEverything() {
         OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
         for (OcrText text : OcrManager.mainImage.getIntroTexts()) {
                 OcrUtils.log(2, "introduction", text.text());

@@ -25,7 +25,8 @@ public class OcrTicket {
 
     /**
      * Restored amount contains a possibly different amount than 'amount' cause it's decoded
-     * trying to get a valid amount from invalid numbers.
+     * trying to get a valid amount from an invalid string.
+     * May contain also the result from scheme analysis.
      */
     public BigDecimal restoredAmount;
 

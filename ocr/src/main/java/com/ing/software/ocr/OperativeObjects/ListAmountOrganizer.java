@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * keep ordered list of possible results from target string
+ * Keep ordered list of possible results from string search.
  */
 
 public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
@@ -20,14 +20,24 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
     private Scored<OcrText> sourceText;
     private List<Scored<OcrText>> targetTexts = new ArrayList<>();
 
+    /**
+     * Constructor.
+     * @param source source text containing string
+     */
     public ListAmountOrganizer(Scored<OcrText> source) {
-        sourceText = new Scored<>(ScoreFunc.getSourceAmountScore(source), source.obj());
+        source.setScore(ScoreFunc.getSourceAmountScore(source));
+        sourceText = source;
     }
 
-    public void setAmountTargetTexts(List<Scored<OcrText>> targets) {
+    /**
+     * Set target texts for current source.
+     * @param targets list of target texts. Not null.
+     */
+    public void setAmountTargetTexts(@NonNull List<Scored<OcrText>> targets) {
         for (Scored<OcrText> text : targets) {
-            targetTexts.add(new Scored<>(ScoreFunc.getAmountScore(text), text.obj()));
-            OcrUtils.log(4, "setAmountTargetTexts: " , "For text: " + text.obj().text() + " Score is: " + ScoreFunc.getAmountScore(text));
+            text.setScore(ScoreFunc.getAmountScore(text));
+            targetTexts.add(text);
+            OcrUtils.log(5, "setAmountTargetTexts: " , "For text: " + text.obj().text() + " Score is: " + ScoreFunc.getAmountScore(text));
         }
         Collections.sort(targetTexts, Collections.reverseOrder()); //higher score comes first
         //todo: remove texts with score too low

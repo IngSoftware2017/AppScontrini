@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
+ * @author Michelon
  * Manages a receipt trying to find its elements (introduction, products, prices, conclusion)
  */
 
