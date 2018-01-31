@@ -17,7 +17,6 @@ import com.ing.software.ocr.OcrObjects.*;
 import com.ing.software.ocr.OperativeObjects.RawImage;
 
 import static com.ing.software.ocr.OcrUtils.extendRect;
-import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
@@ -51,7 +50,7 @@ public class OcrAnalyzer {
      * @param frame Bitmap used to create an OcrResult. Not null.
      * @return OcrResult containing raw data to be further analyzed.
      */
-    List<TempText> analyze(@NonNull Bitmap frame){
+    List<OcrText> analyze(@NonNull Bitmap frame){
         long startTime = 0;
         long endTime = 1;
         if (IS_DEBUG_ENABLED)
@@ -64,7 +63,7 @@ public class OcrAnalyzer {
         }
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        List<TempText> rawOrigTexts = getTexts(tempArray);
+        List<OcrText> rawOrigTexts = getTexts(tempArray);
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
             double duration = ((double) (endTime - startTime)) / 1000000000;
@@ -81,16 +80,16 @@ public class OcrAnalyzer {
      * @param origTextBlocks detected texts. Not null.
      * @return list of Texts
      */
-    private static List<TempText> getTexts(@NonNull SparseArray<TextBlock> origTextBlocks) {
-        List<TempText> texts = new ArrayList<>();
+    private static List<OcrText> getTexts(@NonNull SparseArray<TextBlock> origTextBlocks) {
+        List<OcrText> texts = new ArrayList<>();
         for (int i = 0; i < origTextBlocks.size(); ++i) {
             //for (Text currentText : origTextBlocks.valueAt(i).getComponents()) {
-            //    texts.add(new TempText(currentText));
+            //    texts.add(new OcrText(currentText));
             //}
             TextBlock block = origTextBlocks.valueAt(i);
             for (Text text : block.getComponents()) {
                 OcrUtils.log(7, "GETTEXTS: ", "Text: " + text.getValue());
-                texts.add(new TempText(text));
+                texts.add(new OcrText(text));
             }
         }
         return texts;
@@ -102,13 +101,13 @@ public class OcrAnalyzer {
      * @param boundingBox
      * @return
      */
-    private List<TempText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
+    private List<OcrText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
         Bitmap region = processor.undistortedSubregion(new SizeF(OcrManager.mainImage.getWidth(), OcrManager.mainImage.getHeight()),
                 boundingBox, boundingBox.width()/boundingBox.height()); //original aspect ratio
         SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(region).build());
-        List<TempText> distortedTexts = getTexts(tempArray);
+        List<OcrText> distortedTexts = getTexts(tempArray);
         return Stream.of(distortedTexts)
-                .map(text -> new TempText(text, new RectF(0,0,region.getWidth(), region.getHeight()), boundingBox))
+                .map(text -> new OcrText(text, new RectF(0,0,region.getWidth(), region.getHeight()), boundingBox))
                 .toList();
     }
 
@@ -117,7 +116,7 @@ public class OcrAnalyzer {
      * @param amountText
      * @return
      */
-    private static RectF getAmountExtendedBox(TempText amountText) {
+    private static RectF getAmountExtendedBox(OcrText amountText) {
         float newTop = amountText.box().top - amountText.height()*RECT_HEIGHT_EXTENDER;
         float newBottom = amountText.box().bottom + amountText.height()*RECT_HEIGHT_EXTENDER;
         return new RectF(amountText.box().centerX(), newTop,
@@ -129,16 +128,16 @@ public class OcrAnalyzer {
      * @param texts
      * @param rect
      */
-    private static void replaceTexts(List<Scored<TempText>> texts, RectF rect) {
+    private static void replaceTexts(List<Scored<OcrText>> texts, RectF rect) {
         RectF extendedRect = extendRect(rect, 5, 5);
-        List<TempText> newTexts = Stream.of(texts)
+        List<OcrText> newTexts = Stream.of(texts)
                                     .map(text -> RawImage.mapText(text.obj()))
                                     .toList();
         OcrManager.mainImage.removeText(extendedRect);
-        for (TempText text : newTexts)
+        for (OcrText text : newTexts)
             OcrManager.mainImage.addText(text);
         OcrUtils.log(3, "replaceTexts", "NEW REPLACED TEXTS");
-        OcrUtils.listEverything(OcrManager.mainImage.getAllTexts());
+        OcrUtils.listEverything();
     }
 
     /**
@@ -148,13 +147,13 @@ public class OcrAnalyzer {
      * @return
      * todo: pass these texts to schemer to add tags (using old structure), necessary or score func fails
      */
-    List<Scored<TempText>> getAmountStripTexts(ImageProcessor processor, TempText amountText) {
-        List<Scored<TempText>> texts = Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
+    List<Scored<OcrText>> getAmountStripTexts(ImageProcessor processor, OcrText amountText) {
+        List<Scored<OcrText>> texts = Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
                 .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
                 .sorted(Collections.reverseOrder())
                 .toList();
         //Collections.sort(texts, Collections.reverseOrder());
-        for (Scored<TempText> tt : texts) {
+        for (Scored<OcrText> tt : texts) {
             OcrUtils.log(3, "getAmountStripTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
         }
         replaceTexts(texts, getAmountExtendedBox(amountText));
@@ -166,18 +165,18 @@ public class OcrAnalyzer {
      * @param amountText
      * @return
      */
-    static List<Scored<TempText>> getAmountOrigTexts(TempText amountText) {
+    static List<Scored<OcrText>> getAmountOrigTexts(OcrText amountText) {
         RectF extendedRect = getAmountExtendedBox(amountText);
         extendedRect.set(amountText.box().left, extendedRect.top, extendedRect.right, extendedRect.bottom);
         //copy texts that are inside extended rect. todo Check if it'a a copy or if it modifies original list
-        List<Scored<TempText>> texts = Stream.of(OcrManager.mainImage.getAllTexts())
+        List<Scored<OcrText>> texts = Stream.of(OcrManager.mainImage.getAllTexts())
                                             .filter(text -> extendedRect.contains(text.box()))
                                             .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
                                             .sorted(Collections.reverseOrder())
                                             .toList();
         //Collections.sort(texts, Collections.reverseOrder());
         if (IS_DEBUG_ENABLED)
-            for (Scored<TempText> tt : texts) {
+            for (Scored<OcrText> tt : texts) {
                 OcrUtils.log(4, "getAmountOrigTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
             }
         return texts;

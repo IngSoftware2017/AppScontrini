@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ *@author Michelon
+ * Scheme of a ticket with list of products, cash and change
  */
 
 public class TicketSchemeIT_PCC implements TicketScheme{
@@ -44,6 +45,9 @@ public class TicketSchemeIT_PCC implements TicketScheme{
         return tag;
     }
 
+    /**
+     * @return scored total if it follows this ticket scheme, null otherwise
+     */
     private Scored<BigDecimal> strictBestAmount() {
         if (products != null && total != null && cash != null && change != null) {
             BigDecimal normCash = cash.subtract(change);
@@ -58,8 +62,8 @@ public class TicketSchemeIT_PCC implements TicketScheme{
         return null;
     }
 
-    /*
-    Temporary, copied and modified from old amount comparator
+    /**
+     * @return best amount according to arbitrary decisions
      */
     private Scored<BigDecimal> looseBestAmount() {
         int THREE_VALUES = 80;

@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.ing.software.ocr.OcrManager;
-import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrUtils;
 
 import java.util.ArrayList;
@@ -37,11 +37,11 @@ public class RawImage {
     private RectF productsRect;
     private RectF pricesRect;
     private RectF conclusionRect;
-    private List<TempText> allTexts = new ArrayList<>();
-    private List<TempText> introTexts = new ArrayList<>();
-    private List<TempText> productsTexts = new ArrayList<>();
-    private List<TempText> pricesTexts = new ArrayList<>();
-    private List<TempText> conclusionTexts = new ArrayList<>();
+    private List<OcrText> allTexts = new ArrayList<>();
+    private List<OcrText> introTexts = new ArrayList<>();
+    private List<OcrText> productsTexts = new ArrayList<>();
+    private List<OcrText> pricesTexts = new ArrayList<>();
+    private List<OcrText> conclusionTexts = new ArrayList<>();
 
     /**
      * Constructor, initializes variables
@@ -64,7 +64,7 @@ public class RawImage {
      * Must be called only once.
      * @param texts list of rawTexts. Not null.
      */
-    public void setLines(@NonNull List<TempText> texts) {
+    public void setLines(@NonNull List<OcrText> texts) {
         allTexts = texts;
         extendedRect = getMaxRectBorders(texts);
         averageRectHeight = checkAverageLineHeight();
@@ -107,7 +107,7 @@ public class RawImage {
     /**
      * @return list of all texts
      */
-    public List<TempText> getAllTexts() {
+    public List<OcrText> getAllTexts() {
         return allTexts;
     }
 
@@ -115,7 +115,7 @@ public class RawImage {
      * Must call textFitter() before.
      * @return list of Intro RawTexts
      */
-    public List<TempText> getIntroTexts() {
+    public List<OcrText> getIntroTexts() {
         Collections.sort(introTexts);
         return introTexts;
     }
@@ -128,7 +128,7 @@ public class RawImage {
      * Must call textFitter() before.
      * @return list of Products RawTexts
      */
-    public List<TempText> getProductsTexts() {
+    public List<OcrText> getProductsTexts() {
         Collections.sort(productsTexts);
         return productsTexts;
     }
@@ -141,7 +141,7 @@ public class RawImage {
      * Must call textFitter() before.
      * @return list of Prices RawTexts
      */
-    public List<TempText> getPricesTexts() {
+    public List<OcrText> getPricesTexts() {
         Collections.sort(pricesTexts);
         return pricesTexts;
     }
@@ -154,7 +154,7 @@ public class RawImage {
      * Must call textFitter() before.
      * @return list of Conclusion RawTexts
      */
-    public List<TempText> getConclusionTexts() {
+    public List<OcrText> getConclusionTexts() {
         Collections.sort(conclusionTexts);
         return conclusionTexts;
     }
@@ -206,7 +206,7 @@ public class RawImage {
         pricesTexts = new ArrayList<>();
         productsTexts = new ArrayList<>();
         conclusionTexts = new ArrayList<>();
-        for (TempText text : allTexts) {
+        for (OcrText text : allTexts) {
             if (text.getTags().contains(INTRODUCTION_TAG))
                 introTexts.add(text);
             else if (text.getTags().contains(PRODUCTS_TAG))
@@ -226,14 +226,14 @@ public class RawImage {
      * Get rect containing all lines detected
      * @return Rect containing all rects passed
      */
-    private RectF getMaxRectBorders(List<TempText> texts) {
+    private RectF getMaxRectBorders(List<OcrText> texts) {
         if (texts.size() == 0)
             return null;
         float left = width;
         float right = 0;
         float top = height;
         float bottom = 0;
-        for (TempText text : texts) {
+        for (OcrText text : texts) {
             if (text.box().left < left)
                 left = text.box().left;
             if (text.box().right > right)
@@ -251,7 +251,7 @@ public class RawImage {
      * @param oldText
      * @param newText
      */
-    public void overrideText(TempText oldText, TempText newText) {
+    public void overrideText(OcrText oldText, OcrText newText) {
         allTexts.remove(oldText);
         allTexts.add(newText);
         //fail silently
@@ -278,7 +278,7 @@ public class RawImage {
      * Remove a text from all lists
      * @param oldText
      */
-    public void removeText(TempText oldText) {
+    public void removeText(OcrText oldText) {
         allTexts.remove(oldText);
         //fail silently
         introTexts.remove(oldText);
@@ -296,8 +296,8 @@ public class RawImage {
      * @param rect
      */
     public void removeText(RectF rect) {
-        List<TempText> tempList = new ArrayList<>(allTexts);
-        for (TempText text : tempList) {
+        List<OcrText> tempList = new ArrayList<>(allTexts);
+        for (OcrText text : tempList) {
             if (rect.contains(text.box())) {
                 allTexts.remove(text);
                 introTexts.remove(text);
@@ -317,7 +317,7 @@ public class RawImage {
      * Add text to lists
      * @param newText
      */
-    public void addText(TempText newText) {
+    public void addText(OcrText newText) {
         allTexts.add(newText);
         if (newText.getTags().contains(INTRODUCTION_TAG)) {
             introTexts.add(newText);
@@ -339,7 +339,7 @@ public class RawImage {
      * @param text
      * @return
      */
-    public static TempText mapText(TempText text) {
+    public static OcrText mapText(OcrText text) {
         if (OcrManager.mainImage.getIntroRect().contains(text.box()))
             text.addTag(INTRODUCTION_TAG);
         else if (OcrManager.mainImage.getProductsRect().contains(text.box()))

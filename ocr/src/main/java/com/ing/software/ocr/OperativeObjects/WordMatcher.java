@@ -2,7 +2,7 @@ package com.ing.software.ocr.OperativeObjects;
 
 import java.util.*;
 import com.annimon.stream.Stream;
-import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OcrObjects.OcrText;
 
 import static java.util.Collections.*;
 import static java.lang.Math.*;
@@ -34,7 +34,7 @@ public class WordMatcher {
      *         0 means that there was no match.
      * @author Riccardo Zaglia
      */
-    public double match(TempText line) {
+    public double match(OcrText line) {
         //scanning each word, find the least levenshtein distance of regex to the current word
         int wordsLeastLoss = min(Stream.of(line.children())
                 .map(w -> levDistance(compiledRegex, w.textUppercase(), maxDist)).toList());

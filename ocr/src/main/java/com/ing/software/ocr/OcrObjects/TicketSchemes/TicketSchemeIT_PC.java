@@ -11,7 +11,8 @@ import com.annimon.stream.Stream;
 import com.ing.software.ocr.OcrUtils;
 
 /**
- *
+ * @author Michelon
+ * Scheme of a ticket with list of products and cash
  */
 
 public class TicketSchemeIT_PC implements TicketScheme{
@@ -41,6 +42,9 @@ public class TicketSchemeIT_PC implements TicketScheme{
         return tag;
     }
 
+    /**
+     * @return scored total if it follows this ticket scheme, null otherwise
+     */
     private Scored<BigDecimal> strictBestAmount() {
         if (products != null && total != null && cash != null) {
             BigDecimal productsSum = Stream.of(products)
@@ -54,8 +58,8 @@ public class TicketSchemeIT_PC implements TicketScheme{
         return null;
     }
 
-    /*
-    Temporary, copied and modified from old amount comparator
+    /**
+     * @return best amount according to arbitrary decisions
      */
     private Scored<BigDecimal> looseBestAmount() {
         int THREE_VALUES = 80;

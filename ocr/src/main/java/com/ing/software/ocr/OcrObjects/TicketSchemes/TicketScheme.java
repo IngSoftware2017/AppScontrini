@@ -5,7 +5,7 @@ import com.ing.software.common.Scored;
 import java.math.BigDecimal;
 
 /**
- *
+ * @author Michelon
  */
 
 public interface TicketScheme {

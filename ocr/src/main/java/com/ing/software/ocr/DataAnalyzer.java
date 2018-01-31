@@ -5,7 +5,7 @@ import android.support.annotation.Size;
 import android.util.Pair;
 
 import com.ing.software.common.Scored;
-import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
@@ -28,8 +28,8 @@ public class DataAnalyzer {
      * @param texts
      * @return
      */
-    public static List<Scored<TempText>> getAmountTexts(List<TempText> texts) {
-        List<Scored<TempText>> amounts = findAllMatchedStrings(texts, AMOUNT_MATCHERS);
+    public static List<Scored<OcrText>> getAmountTexts(List<OcrText> texts) {
+        List<Scored<OcrText>> amounts = findAllMatchedStrings(texts, AMOUNT_MATCHERS);
         return amounts;
     }
 
@@ -38,7 +38,7 @@ public class DataAnalyzer {
      * @param texts
      * @return
      */
-    public static List<ListAmountOrganizer> organizeAmountList(List<Scored<TempText>> texts) {
+    public static List<ListAmountOrganizer> organizeAmountList(List<Scored<OcrText>> texts) {
         return Stream.of(texts)
                     .map(ListAmountOrganizer::new)
                     .toList();
@@ -50,7 +50,7 @@ public class DataAnalyzer {
     * @return TextLines matched. Can be empty if no match is found.
     * @author Riccardo Zaglia
     */
-    private static List<Scored<TempText>> findAllMatchedStrings(List<TempText> lines, List<WordMatcher> matchers) {
+    private static List<Scored<OcrText>> findAllMatchedStrings(List<OcrText> lines, List<WordMatcher> matchers) {
         return Stream.of(lines)
                 .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
                 .filter(s -> s.getScore() != 0).toList();
@@ -61,8 +61,8 @@ public class DataAnalyzer {
      * @param texts
      * @return
      */
-    public static Pair<TempText, BigDecimal>  getMatchingAmount(List<Scored<TempText>> texts) {
-        for (Scored<TempText> singleText : texts) {
+    public static Pair<OcrText, BigDecimal>  getMatchingAmount(List<Scored<OcrText>> texts) {
+        for (Scored<OcrText> singleText : texts) {
             BigDecimal amount = trySingleMatch(singleText.obj());
             if (amount != null)
                 return new Pair<>(singleText.obj(), amount);
@@ -75,7 +75,7 @@ public class DataAnalyzer {
      * @param line
      * @return
      */
-    private static BigDecimal trySingleMatch(TempText line) {
+    private static BigDecimal trySingleMatch(OcrText line) {
         /*
         Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
         if (!matcher.find()) { // try again using a dot to concatenate words
@@ -106,8 +106,8 @@ public class DataAnalyzer {
      * @param texts
      * @return
      */
-    public static Pair<TempText, BigDecimal> getRestoredAmount(List<Scored<TempText>> texts) {
-        for (Scored<TempText> singleText : texts) {
+    public static Pair<OcrText, BigDecimal> getRestoredAmount(List<Scored<OcrText>> texts) {
+        for (Scored<OcrText> singleText : texts) {
             if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().numNoSpaces()) < NUMBER_MIN_VALUE) {
                 BigDecimal amount = analyzeAmount(singleText.obj().numNoSpaces());
                 if (amount != null)

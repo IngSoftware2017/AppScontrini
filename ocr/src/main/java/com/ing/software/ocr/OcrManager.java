@@ -8,8 +8,8 @@ import android.util.Pair;
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrError;
 import com.ing.software.ocr.OcrObjects.OcrOptions;
+import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrObjects.OcrTicket;
-import com.ing.software.ocr.OcrObjects.TempText;
 import com.ing.software.ocr.OcrObjects.TicketSchemes.TicketScheme;
 import com.ing.software.ocr.OperativeObjects.AmountComparator;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
@@ -106,10 +106,10 @@ public class OcrManager {
 
         mainImage = new RawImage(frame); //set main properties of image
         OcrUtils.log(1, "MANAGER: ", "Starting image analysis...");
-        List<TempText> lines = analyzer.analyze(frame); //Get main texts
+        List<OcrText> lines = analyzer.analyze(frame); //Get main texts
         mainImage.setLines(lines); //save rect configuration in rawimage
         OcrSchemer.prepareScheme(lines); //Prepare scheme of the ticket
-        OcrUtils.listEverything(lines);
+        OcrUtils.listEverything();
 
         OcrTicket newTicket = new OcrTicket();
         if (options.isFindDate()) {
@@ -129,11 +129,11 @@ public class OcrManager {
             8- check amount and restored amount against cash and products prices --> Amount Comparator
             9- set restored amount retrieving best amount from amount comparator
              */
-            List<Scored<TempText>> amountTexts = DataAnalyzer.getAmountTexts(lines); //1
+            List<Scored<OcrText>> amountTexts = DataAnalyzer.getAmountTexts(lines); //1
             List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountTexts); //2
             Collections.sort(amountList, Collections.reverseOrder());
             if (!amountList.isEmpty()) {
-                List<Scored<TempText>> amountPrice;
+                List<Scored<OcrText>> amountPrice;
                 int i = 0;
                 int maxScan = options.getPrecision() >= REDO_OCR_3 ? 3 : 1;
                 while (i < amountList.size()) {
@@ -147,7 +147,7 @@ public class OcrManager {
                     //set target texts (lines) to first source text
                     amountList.get(i).setAmountTargetTexts(amountPrice); //4
                     AmountComparator amountComparator;
-                    Pair<TempText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts()); //5
+                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts()); //5
                     if (amountT != null && newTicket.amount == null) {
                         newTicket.amount = amountT.second;
                         amountComparator = new AmountComparator(newTicket.amount, amountT.first); //8
@@ -157,7 +157,7 @@ public class OcrManager {
                                     "\nwith scheme: " + bestAmount.obj().second + "\nand score: " + bestAmount.getScore());
                         }
                     }
-                    Pair<TempText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //6
+                    Pair<OcrText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //6
                     //todo: Redo ocr on prices strip if enabled //7
 
                     //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found

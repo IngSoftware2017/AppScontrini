@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 import android.util.Log;
 
-import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OcrObjects.OcrText;
 
 import java.util.List;
 
@@ -28,41 +28,64 @@ public class OcrUtils {
      */
     public static void log(@IntRange(from = 0) int level, @Size(max = 23) String tag, String message) {
         if (OcrVars.IS_DEBUG_ENABLED && level <= LOG_LEVEL)
-            Log.e(tag, message); //debug stream is locked in my phone
+            Log.d(tag, message);
     }
 
     /**
      * List in debug log blocks parsed (detection + grid)
      * @param texts List of texts. Not null.
      */
-    public static void listEverything(@NonNull List<TempText> texts) {
+    public static void listEverything(@NonNull List<OcrText> texts) {
             /*
             for (RawText text : texts) {
                 OcrUtils.log(2, "FULL LIST: ", text.getValue());
             }
             */
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
-            for (TempText text : texts) {
+            for (OcrText text : texts) {
                 if (text.getTags().contains(INTRODUCTION_TAG))
                     OcrUtils.log(2, "introduction", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRODUCTS");
-            for (TempText text : texts) {
+            for (OcrText text : texts) {
                 if (text.getTags().contains(PRODUCTS_TAG))
                     OcrUtils.log(2, "products", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRICES");
-            for (TempText text : texts) {
+            for (OcrText text : texts) {
                 if (text.getTags().contains(PRICES_TAG))
                     OcrUtils.log(2, "prices", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nCONCLUSION");
-            for (TempText text : texts) {
+            for (OcrText text : texts) {
                 if (text.getTags().contains(CONCLUSION_TAG))
                     OcrUtils.log(2, "conclusion", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################");
         }
+
+    /**
+     * List in debug log blocks parsed (detection + grid)
+     */
+    public static void listEverything() {
+        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
+        for (OcrText text : OcrManager.mainImage.getIntroTexts()) {
+                OcrUtils.log(2, "introduction", text.text());
+        }
+        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRODUCTS");
+        for (OcrText text : OcrManager.mainImage.getProductsTexts()) {
+                OcrUtils.log(2, "products", text.text());
+        }
+        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRICES");
+        for (OcrText text : OcrManager.mainImage.getPricesTexts()) {
+                OcrUtils.log(2, "prices", text.text());
+        }
+        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nCONCLUSION");
+        for (OcrText text : OcrManager.mainImage.getConclusionTexts()) {
+                OcrUtils.log(2, "conclusion", text.text());
+        }
+        OcrUtils.log(2, "LIST EVERYTHING", "###########################");
+    }
 
     /**
      * @author Michelon

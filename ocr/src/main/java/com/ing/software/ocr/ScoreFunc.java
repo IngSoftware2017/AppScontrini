@@ -3,7 +3,7 @@ package com.ing.software.ocr;
 import android.graphics.RectF;
 
 import com.ing.software.common.Scored;
-import com.ing.software.ocr.OcrObjects.TempText;
+import com.ing.software.ocr.OcrObjects.OcrText;
 
 import static com.ing.software.ocr.OcrVars.*;
 
@@ -31,7 +31,7 @@ public class ScoreFunc {
      * @param source
      * @return
      */
-    public static double getAmountScore(Scored<TempText> source) {
+    public static double getAmountScore(Scored<OcrText> source) {
         double positionScore = getAmountBlockScore(source.obj());
         return positionScore + source.getScore();
     }
@@ -41,14 +41,14 @@ public class ScoreFunc {
      * @param source
      * @return
      */
-    public static double getSourceAmountScore(Scored<TempText> source) {
+    public static double getSourceAmountScore(Scored<OcrText> source) {
         double average = OcrManager.mainImage.getAverageCharHeight();
         double heightDiff = source.obj().charHeight() - average;
         heightDiff = heightDiff/average*HEIGHT_CHAR_MULTIPLIER;
         average = OcrManager.mainImage.getAverageCharWidth();
         double widthDiff = source.obj().charWidth() - average;
         widthDiff = widthDiff/average*WIDTH_CHAR_MULTIPLIER;
-        OcrUtils.log(3, "getSourceAmountScore", "Score for text: " + source.obj().text()
+        OcrUtils.log(5, "getSourceAmountScore", "Score for text: " + source.obj().text()
                 + " is: " + source.getScore() + " + (heightDiff) " + heightDiff + " + (widthDiff) " + widthDiff);
         return source.getScore() + heightDiff + widthDiff;
     }
@@ -59,18 +59,18 @@ public class ScoreFunc {
      * @param target
      * @return
      */
-    public static double getDistFromSourceScore(TempText source, TempText target) {
+    public static double getDistFromSourceScore(OcrText source, OcrText target) {
         OcrUtils.log(7, "getDistFromSource:", "Source rect is (l,t,r,b): (" + source.box().left + "," +
             source.box().top + "," + source.box().right + "," + source.box().bottom + ") \n Target is: ("+
                 target.box().left + "," + target.box().top + "," + target.box().right + "," + target.box().bottom + ")");
         OcrUtils.log(7, "getDistFromSource:", "Source center is: " + source.box().centerY()
             + "\n Target center is: " + target.box().centerY());
         double diffCenter = Math.abs(source.box().centerY() - target.box().centerY());
-        OcrUtils.log(3, "getDistFromSource:", "Partial diff is: " + diffCenter);
+        OcrUtils.log(5, "getDistFromSource:", "Partial diff is: " + diffCenter);
         diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
         double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
-        heightDiff = (1-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;
-        OcrUtils.log(3, "getDistFromSourceScore", "Score for text: " + target.text() +
+        heightDiff = (1-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;  //<- always 0, why?
+        OcrUtils.log(5, "getDistFromSourceScore", "Score for text: " + target.text() +
             " with source: " + source.text() + " is: (diffCenter) " + diffCenter + " + (heightDiff) " + heightDiff);
         return diffCenter + heightDiff;
     }
@@ -80,7 +80,7 @@ public class ScoreFunc {
      * @param text source text
      * @return score of the rect in its block.
 	 */
-    public static int getAmountBlockScore(TempText text) {
+    public static int getAmountBlockScore(OcrText text) {
         if (text.getTags().contains(INTRODUCTION_TAG))
             return amountBlockIntroduction[getTextBlockPosition(text, OcrManager.mainImage.getIntroRect())];
         else if (text.getTags().contains(PRODUCTS_TAG))
@@ -99,7 +99,7 @@ public class ScoreFunc {
      * @param rect rect containing the whole block.
      * @return position as a int between 0 and GRID_LENGTH.
      */
-    private static int getTextBlockPosition(TempText text, RectF rect) {
+    private static int getTextBlockPosition(OcrText text, RectF rect) {
         float startPosition = rect.top;
         float endPosition = rect.bottom;
         float position = ((text.box().centerY() - startPosition))/(endPosition - startPosition);

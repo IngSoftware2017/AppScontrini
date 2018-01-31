@@ -1,4 +1,4 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OcrObjects;
 
 
 public enum IPError {

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ *@author Michelon
+ * Scheme of a ticket with list of products, subtotal and cash
  */
 
 public class TicketSchemeIT_PSC implements TicketScheme{
@@ -46,6 +47,9 @@ public class TicketSchemeIT_PSC implements TicketScheme{
         return tag;
     }
 
+    /**
+     * @return scored total if it follows this ticket scheme, null otherwise
+     */
     private Scored<BigDecimal> strictBestAmount() {
         if (products != null && total != null && cash != null && subtotal != null) {
             BigDecimal productsSum = Stream.of(products)
@@ -60,13 +64,13 @@ public class TicketSchemeIT_PSC implements TicketScheme{
         return null;
     }
 
-    /*
-    Temporary, copied and modified from old amount comparator
+    /**
+     * @return best amount according to arbitrary decisions
      */
     private Scored<BigDecimal> looseBestAmount() {
         int FOUR_VALUES = 100;
         int THREE_VALUES = 65;
-        int THREE_VALUES_AMOUNT = 80;
+        int THREE_VALUES_AMOUNT = 75;
         int TWO_VALUES_AMOUNT = 55;
         int TWO_VALUES = 30;
         int NO_MATCH = 1;
