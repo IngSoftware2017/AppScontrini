@@ -11,15 +11,16 @@ import database.DataManager;
 public class Singleton {
     private static Singleton mInstance = null;
 
-    private int personID;
-    private int missionID;
-    private int ticketID;
-    DataManager DB;
+    private int personID; //current person id
+    private int missionID; //current mission id
+    private int ticketID; //current ticket id
+    private byte[] pictureTaken; //it saves the system from another picture save (-2 sec in photo taking process)
 
     private Singleton(){
         personID = 0;
         missionID = 0;
         ticketID = 0;
+        pictureTaken = null;
     }
 
     public static synchronized Singleton getInstance(){
@@ -42,6 +43,10 @@ public class Singleton {
         return ticketID;
     }
 
+    public byte[] getTakenPicture(){
+        return pictureTaken;
+    }
+
     public void setMissionID(int value){
         missionID = value;
     }
@@ -52,5 +57,9 @@ public class Singleton {
 
     public void setTicketID(int value){
         ticketID = value;
+    }
+
+    public void setTakenPicure(byte[] value){
+        pictureTaken = value;
     }
 }

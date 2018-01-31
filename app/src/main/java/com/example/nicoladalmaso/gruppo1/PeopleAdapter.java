@@ -139,7 +139,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
                 List<TicketEntity> listTickets;
                 for(int i = 0; i < listMissions.size(); i++){
                     listTickets = DB.getTicketsForMission(listMissions.get(i).getID());
-                    for(int j = 0; j < listTickets.size(); i++){
+                    for(int j = 0; j < listTickets.size(); j++){
                         DB.deleteTicket(listTickets.get(j).getID());
                     }
                     DB.deleteMission(listMissions.get(i).getID());

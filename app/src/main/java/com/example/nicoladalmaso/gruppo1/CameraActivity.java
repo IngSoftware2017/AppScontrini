@@ -230,18 +230,10 @@ public class CameraActivity extends Activity {
     }
 
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
-
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            Bitmap btm = AppUtilities.fromByteArrayToBitmap(data);
-            Bitmap rotatedBitmap = Bitmap.createBitmap(btm, 0, 0, btm.getWidth(), btm.getHeight(), matrix, true);
-            //creates the temporary file and gets the path
-            String filePath = tempFileImage(getApplicationContext(), rotatedBitmap,"tempPhoto");
-            //passes the file path string with the intent
+            Singleton.getInstance().setTakenPicure(data);
             Intent intent = new Intent(getApplicationContext(), com.example.nicoladalmaso.gruppo1.CheckPhotoActivity.class);
-            intent.putExtra("path", filePath);
             startActivity(intent);
         }
     };

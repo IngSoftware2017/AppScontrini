@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     PeopleAdapter adapter;
     View myView;
+    TextView noPeople;
 
     //Dal Maso
     @Override
@@ -134,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initialize(){
         myView = findViewById(R.id.circularAnimation);
+        noPeople = (TextView)findViewById(R.id.noPeople);
         listView = (ListView)findViewById(R.id.listPeople);
         DB = new DataManager(this.getApplicationContext());
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
@@ -163,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     public void printAllPeople(){
         listPeople.clear();
         List<PersonEntity> people = DB.getAllPerson();
-        TextView noPeople = (TextView)findViewById(R.id.noPeople);
+
         if(people.size() == 0){
             noPeople.setVisibility(View.VISIBLE);
         }
@@ -189,6 +191,9 @@ public class MainActivity extends AppCompatActivity {
             public void onAnimationEnd(Animation arg0) {
                 listPeople.remove(index);
                 adapter.notifyDataSetChanged();
+                if(listPeople.size() == 0){
+                    noPeople.setVisibility(View.VISIBLE);
+                }
             }
             @Override public void onAnimationRepeat(Animation animation) {}
             @Override public void onAnimationStart(Animation animation) {}

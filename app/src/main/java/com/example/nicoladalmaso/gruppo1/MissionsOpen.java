@@ -43,6 +43,7 @@ public class MissionsOpen extends Fragment {
     MissionAdapterDB adapter;
     ListView listView;
     View myView;
+    TextView noMissions;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,6 +52,7 @@ public class MissionsOpen extends Fragment {
 
         DB = new DataManager(getContext());
         myView = rootView.findViewById(R.id.circularAnimation);
+        noMissions = (TextView)rootView.findViewById(R.id.noMissions);
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -95,7 +97,6 @@ public class MissionsOpen extends Fragment {
         listMission.clear();
         List<MissionEntity> missions = DB.getMissionsForPerson(personID);
         int count = 0;
-        TextView noMissions = (TextView)rootView.findViewById(R.id.noMissions);
         for (int i = 0; i < missions.size(); i++)
         {
             if(!missions.get(i).isRepay()){
@@ -149,6 +150,9 @@ public class MissionsOpen extends Fragment {
             public void onAnimationEnd(Animation arg0) {
                 listMission.remove(index);
                 adapter.notifyDataSetChanged();
+                if(listMission.size() == 0){
+                    noMissions.setVisibility(View.VISIBLE);
+                }
             }
             @Override public void onAnimationRepeat(Animation animation) {}
             @Override public void onAnimationStart(Animation animation) {}

@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,6 +26,7 @@ import com.ing.software.common.Ticket;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
@@ -38,7 +41,6 @@ import database.TicketEntity;
  * This class is fully developed by Nicola Dal Maso
  */
 
-
 public class CheckPhotoActivity extends Activity {
 
     OcrManager ocrManager;
@@ -47,6 +49,11 @@ public class CheckPhotoActivity extends Activity {
     Ticket OCR_result;
     EditText checkName;
     EditText checkPrice;
+    Bitmap finalBitmap;
+    ProgressBar waitOCR;
+    Button btnOK;
+    Button btnRedo;
+    ImageView checkPhotoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,27 +62,28 @@ public class CheckPhotoActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_check_photo);
+        //Activity operations
+        initializeComponents();
+        setFinalBitmap();
+        setPhotoTaken();
+        startOCRProcess();
+    }
+
+    /** Dal Maso
+     * Initalize all components
+     */
+    private void initializeComponents(){
         root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         DB = new DataManager(this.getApplicationContext());
-        String filePath = getIntent().getStringExtra("path");
-        File file = new File(filePath);
-
-        ImageView checkPhotoView = (ImageView)findViewById(R.id.checkPhoto_image);
+        //elements initialize
+        checkPhotoView = (ImageView)findViewById(R.id.checkPhoto_image);
         checkPrice = (EditText)findViewById(R.id.input_checkTotal);
         checkName = (EditText)findViewById(R.id.input_checkName);
-        Button btnRedo = (Button)findViewById(R.id.btnCheck_retry);
-        Button btnOK = (Button)findViewById(R.id.btnCheck_allow);
-        ProgressBar waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
-
+        btnRedo = (Button)findViewById(R.id.btnCheck_retry);
+        btnOK = (Button)findViewById(R.id.btnCheck_allow);
+        waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
         waitOCR.setVisibility(View.VISIBLE);
-
-        //Ticket image bitmap set
-        Glide.with(getApplicationContext())
-                .load(file)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(checkPhotoView);
-
+        //OCR initialize
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
@@ -86,14 +94,49 @@ public class CheckPhotoActivity extends Activity {
                 e.printStackTrace();
             }
         }
+        //Redo photo button
+        btnRedo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        //Save photo button
+        btnOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveThisTicket(finalBitmap);
+                finish();
+            }
+        });
+        //Waiting OCR
+        btnOK.setClickable(false);
+    }
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
+    /** Dal Maso
+     * set the bitmap to the imageview
+     */
+    private void setPhotoTaken(){
+        Display display = getWindowManager().getDefaultDisplay();
+        checkPhotoView.setImageBitmap(Bitmap.createScaledBitmap(finalBitmap, display.getWidth(), display.getHeight(), true));
+    }
 
+    /** Dal Maso
+     * rotate the bitmap of 90 degrees
+     */
+    private void setFinalBitmap(){
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        Bitmap btm = AppUtilities.fromByteArrayToBitmap(Singleton.getInstance().getTakenPicture());
+        finalBitmap = Bitmap.createBitmap(btm, 0, 0, btm.getWidth(), btm.getHeight(), matrix, true);
+    }
 
+    /** Dal Maso
+     * OCR photo analyzing and values set
+     */
+    private void startOCRProcess(){
         // OCR asynchronous implementation:
-        ImageProcessor imgProc = new ImageProcessor(bitmap);
+        ImageProcessor imgProc = new ImageProcessor(finalBitmap);
         ocrManager.getTicket(imgProc, result -> {
             //Thread UI control reservation
             runOnUiThread(new Runnable() {
@@ -107,25 +150,19 @@ public class CheckPhotoActivity extends Activity {
             });
             OCR_result = result;
             Log.d("SHAPE", result.rectangle.toString());
-            btnOK.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveThisTicket(bitmap);
-                    finish();
-                }
-            });
+            //enable save button
+            btnOK.setClickable(true);
         });
-
-        btnRedo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
     }
 
+    /** Dal Maso
+     * Save the image and one original copy
+     * @param imageToSave image to save
+     */
     public void saveThisTicket(Bitmap imageToSave){
+        //avoid multiple saves
+        btnOK.setClickable(false);
+
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         String fname = imageFileName+".jpg";

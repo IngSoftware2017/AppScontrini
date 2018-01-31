@@ -29,6 +29,7 @@ public class MissionsClosed extends Fragment {
     View rootView;
     MissionAdapterDB adapter;
     ListView listView;
+    TextView noMissions;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,6 +39,7 @@ public class MissionsClosed extends Fragment {
         DB = new DataManager(getContext());
 
         listView = (ListView)rootView.findViewById(R.id.listMission);
+        noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
         personID = getArguments().getInt("personID", 0);
         Log.d("TAB1", ""+personID);
 
@@ -59,7 +61,6 @@ public class MissionsClosed extends Fragment {
     public void printAllMissions(){
         listMission.clear();
         List<MissionEntity> missions = DB.getMissionsForPerson(personID);
-        TextView noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
         int count = 0;
         for (int i = 0; i < missions.size(); i++)
         {
@@ -88,6 +89,9 @@ public class MissionsClosed extends Fragment {
             public void onAnimationEnd(Animation arg0) {
                 listMission.remove(index);
                 adapter.notifyDataSetChanged();
+                if(listMission.size() == 0){
+                    noMissions.setVisibility(View.VISIBLE);
+                }
             }
             @Override public void onAnimationRepeat(Animation animation) {}
             @Override public void onAnimationStart(Animation animation) {}
