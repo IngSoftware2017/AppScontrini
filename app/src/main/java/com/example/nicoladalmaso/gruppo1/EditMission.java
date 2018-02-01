@@ -79,17 +79,27 @@ public class EditMission extends AppCompatActivity {
 
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                // edit by Lazzarin: use flag to tell Datepicker what date we're setting
                 hideSoftKeyboard(EditMission.this);
+                Log.d("stato del flag prima",Singleton.getInstance().getStartFlag()+"");
+                Singleton.getInstance().setStartFlag(false);
+                Log.d("flag appena prima",Singleton.getInstance().getStartFlag()+"");
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart);
                 newFragment.show(getFragmentManager(), "startDatePicker");
-            }
+              /*  Log.d("stato del flag durante",Singleton.getInstance().getStartFlag()+"");
+                Singleton.getInstance().setStartFlag(true);
+                Log.d("stato del flag dopo",Singleton.getInstance().getStartFlag()+"");
+            */}
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                Log.d("stato del flag prima",Singleton.getInstance().getStartFlag()+"");
                 hideSoftKeyboard(EditMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
+                Log.d("stato del flag durante",Singleton.getInstance().getStartFlag()+"");
+                Log.d("stato del flag dopo",Singleton.getInstance().getStartFlag()+"");
             }
         });
 

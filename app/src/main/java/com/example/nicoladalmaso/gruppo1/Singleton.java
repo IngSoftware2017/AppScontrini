@@ -19,6 +19,8 @@ public class Singleton {
     private byte[] pictureTaken; //it saves the system from another picture save (-2 sec in photo taking process)
     private Date startDate;
     private Date endDate;
+    private boolean flagStart;
+    private boolean flagEnd;
     private Singleton(){
         personID = 0;
         missionID = 0;
@@ -26,6 +28,8 @@ public class Singleton {
         pictureTaken = null;
         startDate=null;
         endDate=null;
+        flagEnd=false;
+        flagStart=false;
     }
 
     public static synchronized Singleton getInstance(){
@@ -76,4 +80,8 @@ public class Singleton {
     public Date getEndDate(){return endDate;}
     public void setStartDate(Date start){startDate=start;}
     public void setEndDate(Date end){endDate=end;}
+    public void setStartFlag(boolean value){flagStart=value;}
+    public void setEndFlag(boolean value){flagEnd=value;}
+    public boolean getStartFlag(){return flagStart;}
+    public boolean getEndFlag(){return flagEnd;}
 }
