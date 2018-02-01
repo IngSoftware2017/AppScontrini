@@ -2,6 +2,8 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.util.Log;
 
+import java.util.Date;
+
 import database.DataManager;
 
 /**
@@ -15,12 +17,15 @@ public class Singleton {
     private int missionID; //current mission id
     private int ticketID; //current ticket id
     private byte[] pictureTaken; //it saves the system from another picture save (-2 sec in photo taking process)
-
+    private Date startDate;
+    private Date endDate;
     private Singleton(){
         personID = 0;
         missionID = 0;
         ticketID = 0;
         pictureTaken = null;
+        startDate=null;
+        endDate=null;
     }
 
     public static synchronized Singleton getInstance(){
@@ -43,6 +48,8 @@ public class Singleton {
         return ticketID;
     }
 
+
+
     public byte[] getTakenPicture(){
         return pictureTaken;
     }
@@ -62,4 +69,11 @@ public class Singleton {
     public void setTakenPicure(byte[] value){
         pictureTaken = value;
     }
+
+
+    //lazzarin
+    public Date getStartDate(){return startDate;}
+    public Date getEndDate(){return endDate;}
+    public void setStartDate(Date start){startDate=start;}
+    public void setEndDate(Date end){endDate=end;}
 }

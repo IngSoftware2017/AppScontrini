@@ -11,6 +11,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.util.Calendar;
 
@@ -22,6 +24,7 @@ public class  DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
     int id;
+
 
     public static DatePickerFragment newInstance(TextView textView) {
         DatePickerFragment f = new DatePickerFragment();
@@ -46,10 +49,13 @@ public class  DatePickerFragment extends DialogFragment
 
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
+        //lazzarin
 
         //set min date
-        //dialog.getDatePicker().setMinDate(c.getTimeInMillis());
-
+        if(Singleton.getInstance().getStartDate()!=null) {
+            long start=Singleton.getInstance().getStartDate().getTime();
+            dialog.getDatePicker().setMinDate(start);
+        }
         return dialog;
     }
 
@@ -57,5 +63,23 @@ public class  DatePickerFragment extends DialogFragment
         Log.d("TextInputEditTextID", "ID: "+id+", R.id: "+R.id.input_missionStart);
         TextView textView = (TextView) getActivity().findViewById(id);
         textView.setText(day + "/" + (month+1) + "/" + year);
+        //lazzarin
+        SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
+        if(Singleton.getInstance().getStartDate()==null)
+            {
+            try{
+            Singleton.getInstance().setStartDate(dateformat.parse(day + "/" + (month+1) + "/" + year));
+               }
+            catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            Singleton.getInstance().setStartDate(null);
+        public Date getStartDate(){return startDate;}
+        public Date getEndDate(){return endDate;}
+        public void setStartDate(Date start){startDate=start;}
+        public void setEndDate(Date end){endDate=end;}
+        //   missionID = Singleton.getInstance().getMissionID();
     }
 }
