@@ -31,14 +31,16 @@ Init ticketSchemes
 Simplified comparator (strict vs loose compare)   
 Replace old text with new ones from re-ocr   
 
-
+* ### Step 7   
+Added products search (not tested)   
+Changed Tickets structure   
 
 
 ### TO DO:   
 [x]- Remove hc values in schemer   
 [ ]- Rewrite DataAnalyzer (WIP Done for amount)   
 [x]- Rewrite AmountComparator    
-[ ]- Extract products list from AmountComparator   
+[x]- Extract products list from AmountComparator   
 [ ]- Divide flows between strict and loose analysis (WIP Done for amount)   
 [ ]- Accept both flows with different values   
 [ ]- Rewrite Manager in linear flow (WIP)   

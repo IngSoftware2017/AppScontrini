@@ -20,7 +20,7 @@ import static com.ing.software.ocr.OcrUtils.extendRect;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
- * Class used only to perform ocr-library related operations. No more no less.
+ * Class used only to perform ocr-library related operations or Text search. No more no less.
  */
 public class OcrAnalyzer {
 
@@ -115,13 +115,13 @@ public class OcrAnalyzer {
     }
 
     /**
-     * Get extended rect from half of source rect (x axis) to right of pic and with height extended by RECT_HEIGHT_EXTENDER
+     * Get extended rect from half of source rect (x axis) to right of pic and with height extended by AMOUNT_RECT_HEIGHT_EXTENDER
      * @param amountText source text containing amount string
      * @return rect extended from source text
      */
     private static RectF getAmountExtendedBox(OcrText amountText) {
-        float newTop = amountText.box().top - amountText.height()*RECT_HEIGHT_EXTENDER;
-        float newBottom = amountText.box().bottom + amountText.height()*RECT_HEIGHT_EXTENDER;
+        float newTop = amountText.box().top - amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
+        float newBottom = amountText.box().bottom + amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
         return new RectF(amountText.box().centerX(), newTop,
                 OcrManager.mainImage.getWidth(), newBottom);
     }
@@ -182,5 +182,19 @@ public class OcrAnalyzer {
                 OcrUtils.log(4, "getAmountOrigTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
             }
         return texts;
+    }
+
+    /**
+     * Get all texts on left of source text
+     * @param source source product price rect
+     * @return list of texts on left of source rect
+     */
+    static List<OcrText> getTextsOnleft(OcrText source) {
+        float newTop = source.box().top - source.height()* PRODUCT_RECT_HEIGHT_EXTENDER;
+        float newBottom = source.box().bottom + source.height()* PRODUCT_RECT_HEIGHT_EXTENDER;
+        RectF extendedRect = new RectF(0, newTop, source.box().centerX(), newBottom);
+        return Stream.of(OcrManager.mainImage.getAllTexts())
+                        .filter(text -> extendedRect.contains(text.box()))
+                        .toList();
     }
 }

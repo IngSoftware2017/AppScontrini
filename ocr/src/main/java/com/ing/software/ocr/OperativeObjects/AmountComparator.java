@@ -24,7 +24,6 @@ import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
 public class AmountComparator {
 
-    private List<Scored<Pair<BigDecimal, TicketScheme>>> bestAmounts = new ArrayList<>();
     private List<TicketScheme> acceptedSchemes = new ArrayList<>();
 
     /**
@@ -60,28 +59,26 @@ public class AmountComparator {
      * @param strict true if you want only a confirm of the amount, false if you want the amount with highest score
      * @return amount with highest score, it's score and the ticket used. Null if no valid amount was found.
      */
-    public Scored<Pair<BigDecimal, TicketScheme>> getBestAmount(boolean strict) {
-        bestAmounts = Stream.of(acceptedSchemes)
-                .filter(scheme -> scheme.getBestAmount(strict) != null)
-                .map(scheme -> new Scored<>(scheme.getBestAmount(strict).getScore(), new Pair<>(scheme.getBestAmount(strict).obj(), scheme)))
-                .toList();
-        if (!bestAmounts.isEmpty()) {
-            Collections.sort(bestAmounts, Collections.reverseOrder());
-            return bestAmounts.get(0);
-        } else
-            return null;
+    public Scored<TicketScheme> getBestAmount(boolean strict) {
+        List<Scored<TicketScheme>> bestAmounts = Stream.of(acceptedSchemes)
+                                        .filter(scheme -> scheme.getAmountScore(strict) >= 0)
+                                        .map(scheme -> new Scored<>(scheme.getAmountScore(strict), scheme))
+                                        .sorted(Collections.reverseOrder())
+                                        .toList();
+        return bestAmounts.isEmpty()? null : bestAmounts.get(0);
     }
 
     /**
      * @author Michelon
      * Analyze the list of products from OcrSchemer and convert accepted values as bigdecimal
-     * @return list of bigDecimal of numbers above total
+     * @return list of bigDecimal and texts of numbers above total
      */
-    private List<BigDecimal> getAboveTotalPrices(OcrText amountText) {
+    private List<Pair<OcrText, BigDecimal>> getAboveTotalPrices(OcrText amountText) {
         return Stream.of(OcrManager.mainImage.getPricesTexts())
                 .filter(price -> price.box().centerY() < amountText.box().centerY())
                 .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.numNoSpaces()) < NUMBER_MIN_VALUE)
-                .map(price -> DataAnalyzer.analyzeAmount(price.numNoSpaces()))
+                .map(price -> new Pair<>(price, DataAnalyzer.analyzeAmount(price.numNoSpaces())))
+                .filter(price -> price.second != null)
                 .withoutNulls()
                 .toList();
     }
@@ -108,7 +105,7 @@ public class AmountComparator {
      * @param belowTotal list of prices below total
      * @return list of all ticketSchemes
      */
-    private static List<TicketScheme> getAllSchemes(BigDecimal total, List<BigDecimal> aboveTotal, List<BigDecimal> belowTotal) {
+    private static List<TicketScheme> getAllSchemes(BigDecimal total, List<Pair<OcrText, BigDecimal>> aboveTotal, List<BigDecimal> belowTotal) {
         TicketScheme[] schemes = {
                 new TicketSchemeIT_PC(total, aboveTotal, belowTotal),
                 new TicketSchemeIT_PCC(total, aboveTotal, belowTotal),

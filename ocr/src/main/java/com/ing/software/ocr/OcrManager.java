@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.annimon.stream.function.Consumer;
+import com.annimon.stream.Stream;
 
 import static com.ing.software.ocr.OcrObjects.OcrOptions.REDO_OCR_3;
 import static com.ing.software.ocr.OcrVars.*;
@@ -117,6 +118,7 @@ public class OcrManager {
             //todo add date search
             newTicket.date = newDate;
         }
+        Scored<TicketScheme> bestTicket = null;
         if (options.isFindTotal()) {
             /*
             Steps:
@@ -152,10 +154,10 @@ public class OcrManager {
                     if (amountT != null && newTicket.amount == null) {
                         newTicket.amount = amountT.second;
                         amountComparator = new AmountComparator(newTicket.amount, amountT.first); //8
-                        Scored<Pair<BigDecimal, TicketScheme>> bestAmount = amountComparator.getBestAmount(true);
-                        if (bestAmount != null) {
-                            OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestAmount.obj().first.setScale(2, RoundingMode.HALF_UP) +
-                                    "\nwith scheme: " + bestAmount.obj().second + "\nand score: " + bestAmount.getScore());
+                        bestTicket = amountComparator.getBestAmount(true);
+                        if (bestTicket != null) {
+                            OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
+                                    "\nwith scheme: " + bestTicket.obj().toString() + "\nand score: " + bestTicket.getScore());
                         }
                     }
                     Pair<OcrText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //6
@@ -165,11 +167,14 @@ public class OcrManager {
                     if (restoredAmountT != null && newTicket.restoredAmount == null) {
                         newTicket.restoredAmount = restoredAmountT.second;
                         amountComparator = new AmountComparator(newTicket.restoredAmount, restoredAmountT.first);
-                        Scored<Pair<BigDecimal, TicketScheme>> bestRestoredAmount = amountComparator.getBestAmount(false);
-                        if (bestRestoredAmount != null) {
-                            OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredAmount.obj().first.setScale(2, RoundingMode.HALF_UP) +
-                                    "\nwith scheme: " + bestRestoredAmount.obj().second + "\nand score: " + bestRestoredAmount.getScore());
-                            newTicket.restoredAmount = bestRestoredAmount.obj().first; //9
+                        Scored<TicketScheme> bestRestoredTicket = amountComparator.getBestAmount(false);
+                        if (bestRestoredTicket != null) {
+                            OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
+                                    "\nwith scheme: " + bestRestoredTicket.obj().toString() + "\nand score: " + bestRestoredTicket.getScore());
+                            newTicket.restoredAmount = bestRestoredTicket.obj().getBestAmount(); //9
+                            if (bestTicket == null || bestRestoredTicket.getScore() > bestTicket.getScore()) {
+                                bestTicket = bestRestoredTicket;
+                            }
                         }
                     }
                     if (newTicket.amount != null && newTicket.restoredAmount != null) //temporary
@@ -180,7 +185,13 @@ public class OcrManager {
         }
         if (options.isFindProducts()) {
             List<Pair<String, BigDecimal>> newProducts = null;
-            //todo: add products search (should be used only if findTotal is enabled and with values from amountComparator)
+            if (bestTicket != null) {
+                List<Pair<OcrText, BigDecimal>> prices = bestTicket.obj().getPricesList();
+                newProducts = Stream.of(prices)
+                        .map(price -> new Pair<>(Stream.of(OcrAnalyzer.getTextsOnleft(price.first)) //get texts for product name and concatenate these texts
+                                                    .reduce("", (string, text) -> string + text.text() + " "), price.second))
+                        .toList();
+            }
             newTicket.products = newProducts;
         }
 

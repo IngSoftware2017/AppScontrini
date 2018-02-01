@@ -1,8 +1,9 @@
 package com.ing.software.ocr.OcrObjects.TicketSchemes;
 
-import com.ing.software.common.Scored;
-
+import android.util.Pair;
+import com.ing.software.ocr.OcrObjects.OcrText;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author Michelon
@@ -10,7 +11,11 @@ import java.math.BigDecimal;
 
 public interface TicketScheme {
 
-    Scored<BigDecimal> getBestAmount(boolean strict);
+    BigDecimal getBestAmount();
+
+    double getAmountScore(boolean strict);
 
     String toString();
+
+    List<Pair<OcrText, BigDecimal>> getPricesList();
 }

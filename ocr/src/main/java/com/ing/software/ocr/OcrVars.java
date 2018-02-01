@@ -25,7 +25,8 @@ public class OcrVars {
     public static final String CONCLUSION_TAG = "conclusion"; //tag for rawtext on bottom of the receipt
     public static final double NUMBER_MIN_VALUE = 0.4; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber()
     public static final double NUMBER_MIN_VALUE_ALTERNATIVE = 0.1; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber(). Used in alternative search
-    static final float RECT_HEIGHT_EXTENDER = 1f; //Extend height of source text. Used in OcrAnalyzer.getAmountExtendedBox()
+    static final float AMOUNT_RECT_HEIGHT_EXTENDER = 1f; //Extend height of source amount text. Used in OcrAnalyzer.getAmountExtendedBox()
+    static final float PRODUCT_RECT_HEIGHT_EXTENDER = 0.5f; //Extend height of source text of product price.
 
 
     // day 1 to 31 with or without 0 tens.

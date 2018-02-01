@@ -5,8 +5,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.4.0 Kyun! Vampire Girl"
+        versionCode 2
+        versionName "2.0.0 Puff, the Magic Dragon"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
