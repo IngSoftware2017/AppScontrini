@@ -24,6 +24,7 @@ public class  DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
     int id;
+    boolean check;
 
 
     public static DatePickerFragment newInstance(TextView textView) {
@@ -37,6 +38,7 @@ public class  DatePickerFragment extends DialogFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         id = getArguments().getInt("textView");
+        check=false;
     }
 
     @Override
@@ -49,28 +51,39 @@ public class  DatePickerFragment extends DialogFragment
 
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
-        //lazzarin
-        //check if we're setting start or end date
+        /**
+         * edit by Lazzarin
+         * check if we are set Start or End date, and set min/max date
+         */
+
+        /*TO DO:
+        implementare il tutto a ritroso per max Data(data odierna)
+        */
+        //variable check is used to communicate with OnDataSet method about the DatePicker chosen.
+        check=false;
         boolean flag=Singleton.getInstance().getStartFlag();
-        Log.d("flag letto da datePiker",flag+"");
+        Log.d("flag read by datePicker",flag+"");
         if(flag)
-        //DatePicker of end Date..set min date
+            //DatePicker of end Date..set min date
             {
             if(Singleton.getInstance().getStartDate()!=null) {
-                Log.d("min data","impostata");
+
                 long start=Singleton.getInstance().getStartDate().getTime();
                 dialog.getDatePicker().setMinDate(start);
-
+                Log.d("min date","set");
                 }
-                else Log.d("errore nella data","x");
+            else
+                Log.d("error on StartDate","date is null");
             Log.d("flag by datePikerEnd",Singleton.getInstance().getStartFlag()+"");
+
             }
         else
             //DatePicker of startDate
-        {
-
-            Log.d("flag by datePikerStart", Singleton.getInstance().getStartFlag() + "");
-        }
+            {
+                Singleton.getInstance().setStartFlag(true);
+                check=true;   //per dire al OndateSet che deve aggiornare la data Minima
+                Log.d("flag by datePikerStart", Singleton.getInstance().getStartFlag() + "");
+            }
         return dialog;
     }
 
@@ -80,11 +93,11 @@ public class  DatePickerFragment extends DialogFragment
         textView.setText(day + "/" + (month+1) + "/" + year);
         //lazzarin
         SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
-        if(!Singleton.getInstance().getStartFlag())
+        if(check)
             {
             try{
             Singleton.getInstance().setStartDate(dateformat.parse(day + "/" + (month+1) + "/" + year));
-                Singleton.getInstance().setStartFlag(true); }
+                 }
             catch (ParseException e) {
                 e.printStackTrace();
             }
