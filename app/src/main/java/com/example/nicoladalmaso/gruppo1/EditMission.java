@@ -86,10 +86,7 @@ public class EditMission extends AppCompatActivity {
                 Log.d("flag appena prima",Singleton.getInstance().getStartFlag()+"");
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart);
                 newFragment.show(getFragmentManager(), "startDatePicker");
-              /*  Log.d("stato del flag durante",Singleton.getInstance().getStartFlag()+"");
-                Singleton.getInstance().setStartFlag(true);
-                Log.d("stato del flag dopo",Singleton.getInstance().getStartFlag()+"");
-            */}
+             }
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
