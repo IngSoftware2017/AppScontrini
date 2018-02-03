@@ -65,7 +65,7 @@ public class EditTicket extends AppCompatActivity {
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.buttonEditTicketDate);
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                Singleton.getInstance().setStartFlag(2);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(editDate);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }

@@ -78,11 +78,23 @@ public class  DatePickerFragment extends DialogFragment
 
             }
         else
+            if(flag==0)
             //DatePicker of startDate
             {
                 Singleton.getInstance().setStartFlag(1);
                 check=true;   //per dire al OndateSet che deve aggiornare la data Minima
                 Log.d("flag by datePikerStart", Singleton.getInstance().getStartFlag() + "");
+            }
+            else
+                //DatePicker of editTicket(2)
+            {
+
+
+                long start=Singleton.getInstance().getStartDate().getTime();
+                dialog.getDatePicker().setMinDate(start);
+                long end=Singleton.getInstance().getEndDate().getTime();
+                dialog.getDatePicker().setMaxDate(end);
+
             }
         return dialog;
     }
@@ -101,6 +113,7 @@ public class  DatePickerFragment extends DialogFragment
             catch (ParseException e) {
                 e.printStackTrace();
             }
+            check=false;
         }
 
         //   missionID = Singleton.getInstance().getMissionID();

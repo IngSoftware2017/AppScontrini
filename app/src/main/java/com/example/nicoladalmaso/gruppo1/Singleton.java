@@ -18,6 +18,7 @@ public class Singleton {
     private int ticketID; //current ticket id
     private byte[] pictureTaken; //it saves the system from another picture save (-2 sec in photo taking process)
     private Date startDate;
+    private Date endDate;
     private int flag;
     private boolean flagStart;
     private Singleton(){
@@ -78,4 +79,8 @@ public class Singleton {
 
     public void setStartFlag(int value){flag=value;}
     public int getStartFlag(){return flag;}
+
+    public Date getEndDate(){return endDate;}
+    public void setEndDate(Date end){endDate=end;}
+
 }
