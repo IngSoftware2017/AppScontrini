@@ -71,7 +71,7 @@ public class CropActivity extends AppCompatActivity {
     ImageView imgView;
     RectangleView rectView;
 
-    DataManager DB = DataManager.getInstance(this);
+    DataManager DB;
 
     TicketEntity te = null;
     int dragIdx = -1;
@@ -89,6 +89,7 @@ public class CropActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop);
+        DB = DataManager.getInstance(this.getApplicationContext());
         setTitle("");
         long id = getIntent().getLongExtra("ID", 0);
         imgView = findViewById(R.id.img_view);
@@ -108,19 +109,20 @@ public class CropActivity extends AppCompatActivity {
             back.setStrokeWidth(BACK_LINE_WIDTH);
             rectView.setPaint(front, back);
 
-            Glide.with(this).load(te.getFileUri()).into(new SimpleTarget<Drawable>() {
-                @Override
-                public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    imgView.setImageDrawable(resource);
-                    imgSize = new SizeF(resource.getIntrinsicWidth(), resource.getIntrinsicHeight());
+            rectView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+                Glide.with(this).load(te.getFileUri()).into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                        imgView.setImageDrawable(resource);
+                        imgSize = new SizeF(resource.getIntrinsicWidth(), resource.getIntrinsicHeight());
 
-                    rectView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
                         cvsSize = new SizeF(rectView.getWidth(), rectView.getHeight());
                         calcCvsPoints();
                         rectView.setCorners(cvsPts);
-                    });
-                }
+                    }
+                });
             });
+
 
             //noinspection AndroidLintClickableViewAccessibility
             rectView.setOnTouchListener((view, e) -> {
@@ -170,12 +172,9 @@ public class CropActivity extends AppCompatActivity {
                     te.setCornerPoints(rotatedPts);
                     DB.updateTicket(te);
                 }
-                //NavUtils.navigateUpFromSameTask(this);
                 onBackPressed();
                 break;
             case android.R.id.home:
-                //NavUtils.navigateUpFromSameTask(this);
-
                 onBackPressed();
                 break;
         }

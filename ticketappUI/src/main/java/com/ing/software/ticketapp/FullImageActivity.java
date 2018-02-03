@@ -65,14 +65,13 @@ public class FullImageActivity extends AppCompatActivity {
             actionBar.show();
     };
     private boolean mVisible;
-    private DataManager DB = DataManager.getInstance(this);
+    private DataManager DB;
     private long ticketId = 0;
     private ImageProcessor ip = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_fullscreen);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
@@ -81,7 +80,7 @@ public class FullImageActivity extends AppCompatActivity {
         mVisible = true;
         imgView = findViewById(R.id.img_view);
 
-
+        DB = DataManager.getInstance(this.getApplicationContext());
         // Set up the user interaction to manually show or hide the system UI.
         imgView.setOnClickListener(view -> {
             if (mVisible)
@@ -114,18 +113,8 @@ public class FullImageActivity extends AppCompatActivity {
     private void showImage() {
         if (imgView != null && ticketId != 0 && ip != null) {
             ip.setCorners(DB.getTicket(ticketId).getCornerPoints());
-            imgView.setImageBitmap(ip.undistort(0));
+            imgView.setImageBitmap(ip.undistort());
         }
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        delayedHide(700);
     }
 
     @Override
@@ -174,14 +163,5 @@ public class FullImageActivity extends AppCompatActivity {
         // Schedule a runnable to display UI elements after a delay
         mHideHandler.removeCallbacks(mHidePart2Runnable);
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    /**
-     * Schedules a call to hide() in delay milliseconds, canceling any
-     * previously scheduled calls.
-     */
-    private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(this::hide);
-        mHideHandler.postDelayed(this::hide, delayMillis);
     }
 }
