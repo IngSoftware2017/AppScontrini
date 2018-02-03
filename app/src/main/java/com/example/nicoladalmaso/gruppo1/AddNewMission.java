@@ -71,21 +71,25 @@ public class AddNewMission extends AppCompatActivity{
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
-
+    //edit by Lazzarin
     private void initializeComponents(){
         missionStart = (TextView)findViewById(R.id.input_missionStart);
         missionFinish = (TextView)findViewById(R.id.input_missionFinish);
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionFinish);
+        //clean Singleton Date
+        Singleton.getInstance().setStartDate(null);
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 hideSoftKeyboard(AddNewMission.this);
+                Singleton.getInstance().setStartFlag(0);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                Singleton.getInstance().setStartFlag(1);
                 hideSoftKeyboard(AddNewMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
                 newFragment.show(getFragmentManager(), "finishDatePicker");

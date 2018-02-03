@@ -76,7 +76,8 @@ public class EditMission extends AppCompatActivity {
 
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionEditStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionEditFinish);
-
+        //lazzarin clean startDate on Singleton
+        Singleton.getInstance().setStartDate(thisMission.getStartDate());
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // edit by Lazzarin: use flag to tell Datepicker what date we're setting
@@ -90,7 +91,9 @@ public class EditMission extends AppCompatActivity {
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
+            // edit by Lazzarin
             public void onClick(View v) {
+                Singleton.getInstance().setStartFlag(1);
                 Log.d("stato del flag prima",Singleton.getInstance().getStartFlag()+"");
                 hideSoftKeyboard(EditMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd);
