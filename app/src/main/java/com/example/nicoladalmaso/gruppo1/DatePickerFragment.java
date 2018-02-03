@@ -66,6 +66,7 @@ public class  DatePickerFragment extends DialogFragment
         if(flag==1)
             //DatePicker of end Date..set min date
             {
+                dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
             if(Singleton.getInstance().getStartDate()!=null) {
 
                 long start=Singleton.getInstance().getStartDate().getTime();
@@ -81,6 +82,7 @@ public class  DatePickerFragment extends DialogFragment
             if(flag==0)
             //DatePicker of startDate
             {
+                dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 Singleton.getInstance().setStartFlag(1);
                 check=true;   //per dire al OndateSet che deve aggiornare la data Minima
                 Log.d("flag by datePikerStart", Singleton.getInstance().getStartFlag() + "");
