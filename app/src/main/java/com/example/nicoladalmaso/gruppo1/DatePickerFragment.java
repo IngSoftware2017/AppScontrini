@@ -73,7 +73,7 @@ public class  DatePickerFragment extends DialogFragment
                 }
                 else
                     Log.d("error on StartDate", "date is null");
-
+                break;
             }
             case 0: //DatePicker of startDate
 
@@ -82,7 +82,7 @@ public class  DatePickerFragment extends DialogFragment
                 dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 Singleton.getInstance().setStartFlag(1);
                 check = true;   // tell onDateSet to write on startDate
-
+                break;
             }
             case 2:
                 //DatePicker of editTicket(2)
@@ -93,7 +93,7 @@ public class  DatePickerFragment extends DialogFragment
                 dialog.getDatePicker().setMinDate(start);
                 long end = Singleton.getInstance().getEndDate().getTime();
                 dialog.getDatePicker().setMaxDate(end);
-
+                break;
             }
             default: Log.d("error","value of flag unknown");
         }
