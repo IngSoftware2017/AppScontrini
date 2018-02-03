@@ -71,6 +71,9 @@ public class BillActivity extends AppCompatActivity {
 
         missionID = Singleton.getInstance().getMissionID();
         thisMission = DB.getMission(missionID);
+        //lazzarin
+        Singleton.getInstance().setStartDate(thisMission.getStartDate());
+        Singleton.getInstance().setEndDate(thisMission.getEndDate());
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(thisMission.getName());

@@ -56,34 +56,47 @@ public class  DatePickerFragment extends DialogFragment
          * check if we are set Start or End date, and set min/max date
          */
 
-        /*TO DO:
-        implementare il tutto a ritroso per max Data(data odierna)
-        */
         //variable check is used to communicate with OnDataSet method about the DatePicker chosen.
         check=false;
-        boolean flag=Singleton.getInstance().getStartFlag();
+        int flag=Singleton.getInstance().getStartFlag();
         Log.d("flag read by datePicker",flag+"");
-        if(flag)
-            //DatePicker of end Date..set min date
-            {
-            if(Singleton.getInstance().getStartDate()!=null) {
+        switch(flag) {
 
-                long start=Singleton.getInstance().getStartDate().getTime();
-                dialog.getDatePicker().setMinDate(start);
-                Log.d("min date","set");
+            case 1:   //DatePicker of end Date..set min date
+            {
+                dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                if (Singleton.getInstance().getStartDate() != null)
+                {
+
+                    long start = Singleton.getInstance().getStartDate().getTime();
+                    dialog.getDatePicker().setMinDate(start);
                 }
-            else
-                Log.d("error on StartDate","date is null");
-            Log.d("flag by datePikerEnd",Singleton.getInstance().getStartFlag()+"");
+                else
+                    Log.d("error on StartDate", "date is null");
+                break;
+            }
+            case 0: //DatePicker of startDate
 
-            }
-        else
-            //DatePicker of startDate
+
             {
-                Singleton.getInstance().setStartFlag(true);
-                check=true;   //per dire al OndateSet che deve aggiornare la data Minima
-                Log.d("flag by datePikerStart", Singleton.getInstance().getStartFlag() + "");
+                dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                Singleton.getInstance().setStartFlag(1);
+                check = true;   // tell onDateSet to write on startDate
+                break;
             }
+            case 2:
+                //DatePicker of editTicket(2)
+            {
+
+
+                long start = Singleton.getInstance().getStartDate().getTime();
+                dialog.getDatePicker().setMinDate(start);
+                long end = Singleton.getInstance().getEndDate().getTime();
+                dialog.getDatePicker().setMaxDate(end);
+                break;
+            }
+            default: Log.d("error","value of flag unknown");
+        }
         return dialog;
     }
 
@@ -101,8 +114,9 @@ public class  DatePickerFragment extends DialogFragment
             catch (ParseException e) {
                 e.printStackTrace();
             }
+            check=false;
         }
 
-        //   missionID = Singleton.getInstance().getMissionID();
+
     }
 }
