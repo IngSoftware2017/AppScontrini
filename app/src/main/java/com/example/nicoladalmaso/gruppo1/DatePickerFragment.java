@@ -61,9 +61,9 @@ public class  DatePickerFragment extends DialogFragment
         */
         //variable check is used to communicate with OnDataSet method about the DatePicker chosen.
         check=false;
-        boolean flag=Singleton.getInstance().getStartFlag();
+        int flag=Singleton.getInstance().getStartFlag();
         Log.d("flag read by datePicker",flag+"");
-        if(flag)
+        if(flag==1)
             //DatePicker of end Date..set min date
             {
             if(Singleton.getInstance().getStartDate()!=null) {
@@ -80,7 +80,7 @@ public class  DatePickerFragment extends DialogFragment
         else
             //DatePicker of startDate
             {
-                Singleton.getInstance().setStartFlag(true);
+                Singleton.getInstance().setStartFlag(1);
                 check=true;   //per dire al OndateSet che deve aggiornare la data Minima
                 Log.d("flag by datePikerStart", Singleton.getInstance().getStartFlag() + "");
             }

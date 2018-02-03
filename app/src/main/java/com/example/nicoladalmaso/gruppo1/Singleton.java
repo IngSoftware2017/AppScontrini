@@ -18,7 +18,7 @@ public class Singleton {
     private int ticketID; //current ticket id
     private byte[] pictureTaken; //it saves the system from another picture save (-2 sec in photo taking process)
     private Date startDate;
-
+    private int flag;
     private boolean flagStart;
     private Singleton(){
         personID = 0;
@@ -26,7 +26,7 @@ public class Singleton {
         ticketID = 0;
         pictureTaken = null;
         startDate=null;
-        flagStart=false;
+         flag=0;
     }
 
     public static synchronized Singleton getInstance(){
@@ -76,6 +76,6 @@ public class Singleton {
     public Date getStartDate(){return startDate;}
     public void setStartDate(Date start){startDate=start;}
 
-    public void setStartFlag(boolean value){flagStart=value;}
-    public boolean getStartFlag(){return flagStart;}
+    public void setStartFlag(int value){flag=value;}
+    public int getStartFlag(){return flag;}
 }

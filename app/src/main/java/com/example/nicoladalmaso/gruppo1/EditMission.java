@@ -82,7 +82,7 @@ public class EditMission extends AppCompatActivity {
                 // edit by Lazzarin: use flag to tell Datepicker what date we're setting
                 hideSoftKeyboard(EditMission.this);
                 Log.d("stato del flag prima",Singleton.getInstance().getStartFlag()+"");
-                Singleton.getInstance().setStartFlag(false);
+                Singleton.getInstance().setStartFlag(0);
                 Log.d("flag appena prima",Singleton.getInstance().getStartFlag()+"");
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart);
                 newFragment.show(getFragmentManager(), "startDatePicker");
