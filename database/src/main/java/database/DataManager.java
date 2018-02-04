@@ -151,6 +151,7 @@ public class DataManager {
         return database.ticketDao().getAllPerson();
     }
 
+
     /**
      * @author Marco Olivieri
      * Return a list of the all Persons with last name in alphabetical order
@@ -190,6 +191,17 @@ public class DataManager {
      */
     public List<MissionEntity> getMissionsForPerson(long id){
         return database.ticketDao().getMissionsForPerson(id);
+    }
+
+    /**
+     * @author Federico Taschin
+     * Return a list of the missions done by a specific Person, ordered by start date
+     *
+     * @param id identifier of the Person
+     * @return List<MissionEntity>
+     */
+    public List<MissionEntity> getMissionsForPersonOrderByStartDate(long id){
+        return database.ticketDao().getMissionsForPersonOrderByStartDate(id);
     }
 
     /**

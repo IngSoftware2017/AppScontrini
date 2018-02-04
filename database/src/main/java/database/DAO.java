@@ -150,6 +150,7 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
+
     /**
      * @author Marco Olivieri
      * Executes a SELECT of all the PersonEntity with last name in the database in alphabetical order
@@ -183,15 +184,24 @@ public interface DAO {
      * @return List<MissionEntity> not null (at least of 0 size) which contains all the missions for the given person id
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+" = :id")
-    public List<MissionEntity> getMissionsForPerson(long id);
+    List<MissionEntity> getMissionsForPerson(long id);
 
+    /**
+     * @author Federico Taschin
+     * Return a list of the missions done by a specific Person, ordered by start date
+     *
+     * @param id identifier of the Person
+     * @return List<MissionEntity>
+     */
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+" = :id ORDER BY "+Constants.MISSION_FIELD_START_DATE)
+    List<MissionEntity> getMissionsForPersonOrderByStartDate(long id);
     /**
     *Executes a SELECT query for a specified TicketEntity id
     *@param id long, the id of the TicketEntity
     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY+" =:id")
-    public TicketEntity getTicket(long id);
+    TicketEntity getTicket(long id);
 
     /**
      * @author Marco Olivieri

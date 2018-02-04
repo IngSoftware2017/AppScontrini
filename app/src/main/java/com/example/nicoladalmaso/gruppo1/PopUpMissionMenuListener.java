@@ -34,6 +34,7 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
     private long missionID;
     DataManager DB;
     MissionEntity mission;
+    MissionAdapterDB adapterDB;
     Activity activity;
 
     File defaultOutputPath;
@@ -44,11 +45,11 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
      *
      * @param missionID it contain the ID of the mission where the user tapped
      */
-    public PopUpMissionMenuListener(Activity activity, View view, long missionID) {
+    public PopUpMissionMenuListener(MissionAdapterDB adapterDB, View view, long missionID) {
         this.missionID = missionID;
-        this.activity = activity;
-
-        DB = new DataManager(activity);
+        this.adapterDB = adapterDB;
+        activity = adapterDB.activity;
+        DB = new DataManager(adapterDB.activity);
         mission = DB.getMission(missionID);
     }
 
@@ -71,7 +72,6 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
                 Intent editMission = new Intent(activity, EditMission.class);
                 editMission.putExtra(IntentCodes.INTENT_MISSION_ID, missionID);
                 activity.startActivityForResult(editMission,IntentCodes.MODIFY_MISSION);
-                // TODO Catch the error on startActivity: it make me CRAZY!
                 break;
 
             // Export
@@ -98,15 +98,13 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
             case R.id.close_mission:
                 mission.setRepay(true);
                 DB.updateMission(mission);
-                //finish();
-                // TODO find an alternative method to reload the activity. finish() it doesn't do it
+                adapterDB.notifyDataSetChanged();
                 break;
 
             // Delete the mission
             case R.id.delete_mission:
                 deleteMission();
-                //finish();
-                // TODO find an alternative method to reload the activity. finish() it doesn't do it
+                adapterDB.notifyDataSetChanged();
                 break;
         }
 
@@ -134,10 +132,7 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
                 for(int i = 0; i < list.size(); i++){
                     DB.deleteTicket((int) list.get(i).getID());
                 }
-                DB.deleteMission(missionID);
-                Intent intent = new Intent();
-                //setResult(RESULT_OK, intent);
-                //finish();
+                boolean deleted = DB.deleteMission(missionID);
             }
         });
 

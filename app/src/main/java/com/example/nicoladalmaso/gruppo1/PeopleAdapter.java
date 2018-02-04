@@ -54,7 +54,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         String academicTitle = person.getAcademicTitle();
         /*
         if ((academicTitle == null) || academicTitle.replaceAll(" ","").equals("")) {
-            title.setText(context.getString(R.string.noAcademicTitle));
+            title.setText(activity.getString(R.string.noAcademicTitle));
         }
         else {
             title.setText(person.getAcademicTitle());
@@ -65,9 +65,9 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
 
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                /*Intent startMissionsView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
+                /*Intent startMissionsView = new Intent(activity, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
                 startMissionsView.putExtra("personID", Integer.parseInt(v.getTag().toString()));
-                ((MainActivity)context).startActivityForResult(startMissionsView, 1);*/
+                ((MainActivity)activity).startActivityForResult(startMissionsView, 1);*/
                 Intent missionTab = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
                 missionTab.putExtra(IntentCodes.INTENT_PERSON_ID, Integer.parseInt(v.getTag().toString()));
                 ((MainActivity)context).startActivityForResult(missionTab, 1);

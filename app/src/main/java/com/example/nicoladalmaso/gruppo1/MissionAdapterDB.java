@@ -29,15 +29,15 @@ import database.MissionEntity;
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
-    Activity context;
+    Activity activity;
     String path = "";
     int missionID = 0;
     List<MissionEntity> missions;
 
-    public MissionAdapterDB(Fragment context, int textViewResourceId,
+    public MissionAdapterDB(Fragment activity, int textViewResourceId,
                             List<MissionEntity> objects) {
-        super(context.getActivity(), textViewResourceId, objects);
-        this.context = context.getActivity();
+        super(activity.getActivity(), textViewResourceId, objects);
+        this.activity = activity.getActivity();
         missions = objects;
     }
 
@@ -86,9 +86,9 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 missionID = Integer.parseInt(v.getTag().toString());
-                Intent startTicketsView = new Intent(context.getApplicationContext(), BillActivity.class);
+                Intent startTicketsView = new Intent(activity.getApplicationContext(), BillActivity.class);
                 startTicketsView.putExtra(IntentCodes.INTENT_MISSION_ID, missionID);
-                ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);
+                ((MissionsTabbed) activity).startActivityForResult(startTicketsView, 1);
             }
         });
 
@@ -99,7 +99,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         menuCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPopupMenu(context,menuCard, c.getID());
+                showPopupMenu(activity,menuCard, c.getID());
             }
         });
 
@@ -120,7 +120,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         inflater.inflate(R.menu.popup_mission_menu, popup.getMenu());
 
-        popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(context,view, missionID));
+        popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(MissionAdapterDB.this,view, missionID));
         popup.show();
     }
 }

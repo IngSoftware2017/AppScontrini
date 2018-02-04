@@ -39,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -156,8 +157,7 @@ public class MainActivity extends AppCompatActivity {
      * get all missions from the DB and print
      */
     public void printAllPeople(){
-        //List<PersonEntity> people = DB.getAllPerson();
-        List<PersonEntity> people = DB.getAllPersonNameOrder();
+        List<PersonEntity> people = getAllPersonOrderedByNumMission();
         TextView noPeople = (TextView)findViewById(R.id.noPeople);
         if(people.size() == 0){
             noPeople.setVisibility(View.VISIBLE);
@@ -171,4 +171,74 @@ public class MainActivity extends AppCompatActivity {
             addToList(people.get(i));
         }
     }
+
+    /**
+     * @author Federico TAschin
+     * @return List of PersonEntity not null, ordered by the number of active missions
+     */
+    public List<PersonEntity> getAllPersonOrderedByNumMission(){
+        List<PersonEntity> persons = DB.getAllPerson();
+        PersonNumMissions[] tempArray = new PersonNumMissions[persons.size()];
+        int lastIndex = 0;
+        int index;
+        for(PersonEntity personEntity : persons){
+            int numMissions = activeMissionsNumber(personEntity.getID());
+            PersonNumMissions personNumMissions = new PersonNumMissions(personEntity,numMissions);
+            index = lastIndex;
+            while (index>0 && tempArray[index-1].numMissions<numMissions){
+                index--;
+            } //now tempArray[index] is the last element with a lower value in numMissions
+            insert(tempArray, lastIndex, index, personNumMissions);
+            lastIndex++;
+        }
+        persons.clear();
+        for(PersonNumMissions personNumMissions : tempArray){
+            persons.add(personNumMissions.personEntity);
+        }
+        return persons;
+    }
+
+    /**
+     * @author Federico TAschin
+     * @param personId the id of the PersonEntity
+     * @return the number of active missions for the given PersonEntity
+     */
+    private int activeMissionsNumber(long personId){
+        List<MissionEntity> missions = DB.getMissionsForPerson(personId);
+        int cont = 0;
+        for(MissionEntity missionEntity : missions){
+            if(missionEntity.isRepay()){
+                cont++;
+            }
+        }
+        return cont;
+    }
+
+    /**
+     * @author Federico Taschin
+     * Insert a value into the array at a given position by traslating the portion of the array of 1 position right
+     * @param array the input array (not null), size >0
+     * @param lastIndex first free position of the array (between 0 and array.length-2)
+     * @param from the position from which to traslate the values (between 0 and array.length-2)
+     * @param newValue the object to be inserted
+     */
+    private void insert(PersonNumMissions[] array, int lastIndex, int from, PersonNumMissions newValue){
+        //last index is the first free position of the array
+        //from is the element from which to traslate the values
+        for(int i = lastIndex; i>from; i--){
+            array[i] = array[i-1];
+        }
+        array[from] = newValue;
+    }
+
+
+    class PersonNumMissions {
+        PersonEntity personEntity;
+        int numMissions;
+        public PersonNumMissions(PersonEntity personEntity, int numMissions) {
+            this.personEntity = personEntity;
+            this.numMissions = numMissions;
+        }
+    }
+
 }
