@@ -1,49 +1,27 @@
 package com.ing.software.ocr.OcrObjects;
 
-import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static com.ing.software.ocr.OcrObjects.OcrLevels.*;
 
 /**
  * Object passed to the manager to avoid performing unnecessary operations
- * and consequently reduce time (time depends primarily on precision)
- * NOTE: As of now (31-1) only precisions 0-3 are implemented
- *
- * For precision:
- * 0 = scan image at 1/3 of its dimension, don't reanalyze specific parts of image to get better results
- * 1 = scan image at 1/2 of its dimension, don't reanalyze specific parts of image to get better results
- * 2 = scan image at original dimension (passed by imageprocessor), don't reanalyze specific parts of image to get better results
- * 3 = scan image at original dimension (passed by imageprocessor), reanalyze total strip to get a better result (only first element)
- * 4 = scan image at original dimension (passed by imageprocessor), reanalyze total (only first element) and prices strips to get a better result
- * 5 = scan image at original dimension (passed by imageprocessor), reanalyze total (first 3 elements) and prices strips to get a better result
- * 6 = scan image at original dimension (passed by imageprocessor), reanalyze total (first 3 elements) and prices strips to get a better result, if
- *      nothing was found scan also upside down
+ * and consequently reduce time (time depends primarily on image scale)
  */
 
 public class OcrOptions {
 
-    public static final int REDO_OCR_PRECISION = 3;
-    public static final int REDO_OCR_3 = 5; //must be changed with something better
-    private static final int DEFAULT_PRECISION = 3;
-    private static final boolean DEFAULT_TOTAL = true;
-    private static final boolean DEFAULT_DATE = true;
-    private static final boolean DEFAULT_PRODUCTS = true;
-
-    private boolean findTotal;
-    private boolean findDate;
-    private boolean findProducts;
-    private int precision;
+    private List<OcrLevels> levels;
 
     /**
      * Constructor
-     * @param findTotal true if you want to find total
-     * @param findDate true if you want to find date
-     * @param findProducts true if you want to find a list of products
-     * @param precision Int from 0 to 6.
+     * @param levels list of actions to perform
      */
-    public OcrOptions(boolean findTotal, boolean findDate, boolean findProducts, @IntRange(from = 0, to = 6) int precision) {
-        this.findTotal = findTotal;
-        this.findDate = findDate;
-        this.findProducts = findProducts;
-        this.precision = precision;
+    public OcrOptions(@NonNull List<OcrLevels> levels) {
+        this.levels = levels;
     }
 
     /**
@@ -51,38 +29,24 @@ public class OcrOptions {
      * @return default options
      */
     public static OcrOptions getDefaultOptions() {
-        return new OcrOptions(DEFAULT_TOTAL, DEFAULT_DATE, DEFAULT_PRODUCTS, DEFAULT_PRECISION);
-    }
-
-    public void setPrecision(int precision) {
-        this.precision = precision;
-    }
-
-    public void setFindTotal(boolean findTotal) {
-        this.findTotal = findTotal;
-    }
-
-    public void setFindDate(boolean findDate) {
-        this.findDate = findDate;
-    }
-
-    public void setFindProducts(boolean findProducts) {
-        this.findProducts = findProducts;
+        return new OcrOptions(Arrays.asList(NORMAL, AMOUNT_DEEP, DATE_NORMAL, PRICES_DEEP));
     }
 
     public boolean isFindTotal() {
-        return findTotal;
+        return levels.contains(AMOUNT_DEEP) || levels.contains(OcrLevels.AMOUNT_NORMAL) || levels.contains(OcrLevels.EXTENDED_SEARCH);
     }
 
     public boolean isFindDate() {
-        return findDate;
+        return levels.contains(OcrLevels.DATE_NORMAL);
     }
 
     public boolean isFindProducts() {
-        return findProducts;
+        return levels.contains(OcrLevels.PRICES_DEEP) || levels.contains(OcrLevels.PRICES_NORMAL);
     }
 
-    public int getPrecision() {
-        return precision;
+    public boolean isRedoUpsideDown() {return levels.contains(UPSIDE_DOWN_SEARCH);}
+
+    public boolean contains(OcrLevels setting) {
+        return levels.contains(setting);
     }
 }

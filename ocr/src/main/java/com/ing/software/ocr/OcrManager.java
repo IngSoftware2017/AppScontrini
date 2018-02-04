@@ -7,6 +7,7 @@ import android.util.Pair;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrError;
+import com.ing.software.ocr.OcrObjects.OcrLevels;
 import com.ing.software.ocr.OcrObjects.OcrOptions;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrObjects.OcrTicket;
@@ -18,14 +19,12 @@ import com.ing.software.ocr.OperativeObjects.RawImage;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.Stream;
 
-import static com.ing.software.ocr.OcrObjects.OcrOptions.REDO_OCR_3;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
@@ -77,14 +76,24 @@ public class OcrManager {
      * @author Riccardo Zaglia
      */
     public synchronized OcrTicket getTicket(@NonNull ImageProcessor imgProc, OcrOptions options) {
+        ImageProcessor procCopy = new ImageProcessor(imgProc);
+        OcrTicket ticket = extractTicket(procCopy, options);
+        if (options.isRedoUpsideDown() && ticket.amount == null && ticket.restoredAmount == null) {
+            procCopy.rotateUpsideDown();
+            ticket = extractTicket(procCopy, options);
+        }
+        return ticket;
+    }
+
+    /**
+     * Main core of ocrManager
+     * @param imgProc copy of source image processor
+     * @param options original options
+     * @return result ticket
+     */
+    private OcrTicket extractTicket(@NonNull ImageProcessor imgProc, OcrOptions options) {
         long startTime = 0;
         long endTime = 1;
-        ImageProcessor procCopy = new ImageProcessor(imgProc);
-
-        //todo: for advanced mode, redo ocr with upside down bitmap.
-        // procCopy.rotateUpsideDown();
-        // frame = procCopy.undistortForOCR(1.);
-
         OcrTicket ticket = new OcrTicket();
         ticket.errors = new ArrayList<>();
         if (!operative) {
@@ -95,15 +104,25 @@ public class OcrManager {
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
         Bitmap frame;
-        if (options.getPrecision() == 0)
-            frame = procCopy.undistortForOCR(1. / 3.);
+        if (options.contains(OcrLevels.VERY_QUICK))
+            frame = imgProc.undistortForOCR(1. / 3.);
         else
-            frame = procCopy.undistortForOCR(options.getPrecision()>1 ? 1. : 1. / 2.);
+            frame = imgProc.undistortForOCR(options.contains(OcrLevels.QUICK) ? 1. / 2. : 1. );
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
         }
-        ticket.rectangle = procCopy.getCorners();
+        ticket.rectangle = imgProc.getCorners();
+
+        if (IS_DEBUG_ENABLED) {
+            endTime = System.nanoTime();
+            double duration = ((double) (endTime - startTime)) / 1000000000;
+            OcrUtils.log(1, "EXECUTION TIME: ", "Processor: " + duration + " seconds");
+        }
+
+        ticket.errors = new ArrayList<>();
+        if (IS_DEBUG_ENABLED)
+            startTime = System.nanoTime();
 
         mainImage = new RawImage(frame); //set main properties of image
         OcrUtils.log(1, "MANAGER: ", "Starting image analysis...");
@@ -114,9 +133,7 @@ public class OcrManager {
 
         OcrTicket newTicket = new OcrTicket();
         if (options.isFindDate()) {
-            Date newDate = null;
-            //todo add date search
-            newTicket.date = newDate;
+            newTicket.date = DataAnalyzer.findDate(lines);
         }
         Scored<TicketScheme> bestTicket = null;
         if (options.isFindTotal()) {
@@ -138,11 +155,11 @@ public class OcrManager {
             if (!amountList.isEmpty()) {
                 List<Scored<OcrText>> amountPrice;
                 int i = 0;
-                int maxScan = options.getPrecision() >= REDO_OCR_3 ? 3 : 1;
+                int maxScan = options.contains(OcrLevels.EXTENDED_SEARCH) ? 3 : 1;
                 while (i < amountList.size()) {
-                    if (options.getPrecision() >= OcrOptions.REDO_OCR_PRECISION && i <= maxScan) {
-                        //Redo ocr on first element of list. todo: add scan for more sources if precision > 4
-                        amountPrice = analyzer.getAmountStripTexts(procCopy, amountList.get(i).getSourceText().obj());//3
+                    if (options.contains(OcrLevels.AMOUNT_DEEP) && i <= maxScan) {
+                        //Redo ocr on first element of list.
+                        amountPrice = analyzer.getAmountStripTexts(imgProc, amountList.get(i).getSourceText().obj());//3
                     } else {
                         //Use current texts to search target texts (with price)
                         amountPrice = OcrAnalyzer.getAmountOrigTexts(amountList.get(i).getSourceText().obj());
@@ -171,12 +188,13 @@ public class OcrManager {
                         if (bestRestoredTicket != null) {
                             OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
                                     "\nwith scheme: " + bestRestoredTicket.obj().toString() + "\nand score: " + bestRestoredTicket.getScore());
-                            newTicket.restoredAmount = bestRestoredTicket.obj().getBestAmount(); //9
                             if (bestTicket == null || bestRestoredTicket.getScore() > bestTicket.getScore()) {
                                 bestTicket = bestRestoredTicket;
                             }
                         }
                     }
+                    if (bestTicket != null)
+                        newTicket.restoredAmount = bestTicket.obj().getBestAmount(); //9
                     if (newTicket.amount != null && newTicket.restoredAmount != null) //temporary
                         break;
                     ++i;
@@ -189,7 +207,7 @@ public class OcrManager {
                 List<Pair<OcrText, BigDecimal>> prices = bestTicket.obj().getPricesList();
                 newProducts = Stream.of(prices)
                         .map(price -> new Pair<>(Stream.of(OcrAnalyzer.getTextsOnleft(price.first)) //get texts for product name and concatenate these texts
-                                                    .reduce("", (string, text) -> string + text.text() + " "), price.second))
+                                .reduce("", (string, text) -> string + text.text() + " "), price.second))
                         .toList();
             }
             newTicket.products = newProducts;
@@ -198,7 +216,7 @@ public class OcrManager {
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
             double duration = ((double) (endTime - startTime)) / 1000000000;
-            OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+            OcrUtils.log(1, "EXECUTION TIME: ", "Core: " + duration + " seconds");
         }
 
         ticket.amount = newTicket.amount;

@@ -56,9 +56,9 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         if (null == convertView) {
             convertView = inflater.inflate(R.layout.cardview, parent, false);
         }
-        ImageView img = (ImageView)convertView.findViewById(R.id.image);
-        TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
-        TextView tot = (TextView)convertView.findViewById(R.id.description);
+        ImageView img = (ImageView) convertView.findViewById(R.id.image);
+        TextView ticketTitle = (TextView) convertView.findViewById(R.id.title);
+        TextView tot = (TextView) convertView.findViewById(R.id.description);
 
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
@@ -66,11 +66,10 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
         //Amount text fixes
         String amount = "";
-        if(c.getAmount() == null){
+        if (c.getAmount() == null) {
             amount = context.getString(R.string.no_amount);
             tot.setText(amount);
-        }
-        else {
+        } else {
             amount = c.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
             tot.setText(context.getString(R.string.total_with_numb, amount));
         }
@@ -113,25 +112,25 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                         }
                     } catch (Exception e) {
                         //BABABA
-                    ticketID = Integer.parseInt(v.getTag().toString());
-                    for (int i = 0; i < t.size(); i++) {
-                        if (t.get(i).getID() == ticketID) {
-                            TicketEntity thisTicket = t.get(i);
-                            Intent startImageView = new Intent(context, BillViewer.class);
-                            File photo = new File(thisTicket.getFileUri().toString().substring(7));
+                        ticketID = Integer.parseInt(v.getTag().toString());
+                        for (int i = 0; i < t.size(); i++) {
+                            if (t.get(i).getID() == ticketID) {
+                                TicketEntity thisTicket = t.get(i);
+                                Intent startImageView = new Intent(context, BillViewer.class);
+                                File photo = new File(thisTicket.getFileUri().toString().substring(7));
 
-                            //Put data to next activity
-                            startImageView.putExtra("ID", thisTicket.getID());
+                                //Put data to next activity
+                                startImageView.putExtra("ID", thisTicket.getID());
 
-                            //Start new activity
-                            ((BillActivity) context).startActivityForResult(startImageView, TICKET_MOD);
-                            return;
+                                //Start new activity
+                                ((BillActivity) context).startActivityForResult(startImageView, TICKET_MOD);
+                                return;
+                            }
                         }
                     }
                 }//onClick
             });
         }
-
         return convertView;
     }
 

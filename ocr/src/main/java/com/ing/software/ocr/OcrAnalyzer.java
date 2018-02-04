@@ -170,7 +170,7 @@ public class OcrAnalyzer {
     static List<Scored<OcrText>> getAmountOrigTexts(OcrText amountText) {
         RectF extendedRect = getAmountExtendedBox(amountText);
         extendedRect.set(amountText.box().left, extendedRect.top, extendedRect.right, extendedRect.bottom);
-        //copy texts that are inside extended rect. todo Check if it'a a copy or if it modifies original list
+        //copy texts that are inside extended rect.
         List<Scored<OcrText>> texts = Stream.of(OcrManager.mainImage.getAllTexts())
                                             .filter(text -> extendedRect.contains(text.box()))
                                             .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))

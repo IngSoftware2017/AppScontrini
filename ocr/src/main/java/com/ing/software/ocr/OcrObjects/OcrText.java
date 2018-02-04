@@ -38,6 +38,14 @@ public class OcrText implements Comparable<OcrText> {
             new Pair<>("s", "5"),
             new Pair<>(",", ".")
     );
+    // These substitutions are less frequent and may produce false positives. Should be used only if you are sure your string is a number.
+    private static final List<Pair<String, String>> NUM_SANITIZE_FORCED = asList(
+            new Pair<>("D", "0"),
+            new Pair<>("I", "1"),
+            new Pair<>("l", "1"), // lowercase L
+            new Pair<>("U", "0"),
+            new Pair<>("B", "8")
+    );
 
     private boolean isWord;
     private Lazy<List<OcrText>> children;
@@ -50,6 +58,7 @@ public class OcrText implements Comparable<OcrText> {
     private Lazy<String> textUppercase; // uppercase text
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
     private Lazy<String> textSanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
+    private Lazy<String> textSanitizedForced; // text where it was applied the NUM_SANITIZE_FORCED substitutions
     private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
     private List<String> tags;
 
@@ -70,6 +79,12 @@ public class OcrText implements Comparable<OcrText> {
         textSanitizedNum = new Lazy<>(() -> {
             String res = text();
             for (Pair<String, String> p : NUM_SANITIZE_LIST)
+                res = res.replaceAll(p.first, p.second);
+            return res;
+        });
+        textSanitizedForced = new Lazy<>(() -> {
+            String res = numNoSpaces();
+            for (Pair<String, String> p : NUM_SANITIZE_FORCED)
                 res = res.replaceAll(p.first, p.second);
             return res;
         });
@@ -133,6 +148,7 @@ public class OcrText implements Comparable<OcrText> {
         // the text fields remain unchanged
         text = ocrText.text;
         textSanitizedNum = ocrText.textSanitizedNum;
+        textSanitizedForced = ocrText.textSanitizedForced;
         textUppercase = ocrText.textUppercase;
         textNoSpaces = ocrText.textNoSpaces;
         numNoSpaces = ocrText.numNoSpaces;
@@ -156,6 +172,7 @@ public class OcrText implements Comparable<OcrText> {
     // string properties
     public String text() { return text; }
     public String textSanitizedNum() { return textSanitizedNum.get(); }
+    public String textSanitizedForced() { return textSanitizedForced.get(); }
     public String textUppercase() { return textUppercase.get(); }
     // available only if isWord() == false:
     public String textNoSpaces() { return textNoSpaces.get(); }

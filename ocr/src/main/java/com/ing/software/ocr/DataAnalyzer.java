@@ -11,6 +11,9 @@ import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -23,6 +26,35 @@ import static java.util.Collections.max;
  * Class used to extract information from raw data
  */
 public class DataAnalyzer {
+
+    /**
+     * @author Zaglia
+     *
+     * @param lines
+     * @return
+     */
+    static Date findDate(@NonNull List<OcrText> lines) {
+        List<Date> dates = new ArrayList<>();
+        for (OcrText line : lines) {
+            for (OcrText w : line.children()) {
+                Matcher matcher = DATE_DMY.matcher(w.textSanitizedNum());
+                if (matcher.find()) {
+                    int day = Integer.valueOf(matcher.group(DMY_DAY));
+                    int month = Integer.valueOf(matcher.group(DMY_MONTH));
+                    int year = Integer.valueOf(matcher.group(DMY_YEAR));
+                    //todo check if day is compatible with month (29-30-31)
+                    if (year < 100)
+                        year += year > YEAR_CUT ? 1900 : 2000;
+                    // correct for 0 based month
+                    dates.add(new GregorianCalendar(year, month - 1, day).getTime());
+                    break;
+                }
+            }
+            // It's better to avoid word concatenation because it could match a wrong date.
+            // Ex: 1/1/20 14:30 -> 1/1/2014:30
+        }
+        return dates.size() == 1 ? dates.get(0) : null;
+    }
 
     /**
      * Get a list of texts where amount string is present
@@ -112,7 +144,7 @@ public class DataAnalyzer {
     static Pair<OcrText, BigDecimal> getRestoredAmount(@NonNull List<Scored<OcrText>> texts) {
         for (Scored<OcrText> singleText : texts) {
             if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().numNoSpaces()) < NUMBER_MIN_VALUE) {
-                BigDecimal amount = analyzeAmount(singleText.obj().numNoSpaces());
+                BigDecimal amount = analyzeAmount(singleText.obj().textSanitizedForced());
                 if (amount != null)
                     return new Pair<>(singleText.obj(), amount);
             }
