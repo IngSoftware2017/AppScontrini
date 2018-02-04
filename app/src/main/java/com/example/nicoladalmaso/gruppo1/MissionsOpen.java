@@ -68,7 +68,7 @@ public class MissionsOpen extends Fragment {
     public void addToListDB(MissionEntity mission){
         listMission.add(mission);
         ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        MissionAdapterDB adapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
     }
 
@@ -78,7 +78,7 @@ public class MissionsOpen extends Fragment {
     public void clearAllMissions()
     {
         ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB emptyAdapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        MissionAdapterDB emptyAdapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
         emptyAdapter.clear();
         emptyAdapter.notifyDataSetChanged();
         listView.setAdapter(emptyAdapter);

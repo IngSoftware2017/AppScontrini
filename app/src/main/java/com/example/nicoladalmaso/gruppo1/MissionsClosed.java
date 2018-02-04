@@ -1,9 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
-import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +30,6 @@ public class MissionsClosed extends Fragment {
         rootView = inflater.inflate(R.layout.activity_missions_closed, container, false);
 
         DB = new DataManager(getContext());
-
         personID = getArguments().getInt("personID", 0);
         Log.d("TAB1", ""+personID);
 
@@ -48,7 +44,7 @@ public class MissionsClosed extends Fragment {
     public void addToListDB(MissionEntity mission){
         listMission.add(mission);
         ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        MissionAdapterDB adapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
     }
 
@@ -58,7 +54,7 @@ public class MissionsClosed extends Fragment {
     public void clearAllMissions()
     {
         ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB emptyAdapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        MissionAdapterDB emptyAdapter = new MissionAdapterDB(this, R.layout.mission_card, listMission);
         emptyAdapter.clear();
         emptyAdapter.notifyDataSetChanged();
         listView.setAdapter(emptyAdapter);

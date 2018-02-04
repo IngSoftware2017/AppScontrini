@@ -1,13 +1,12 @@
 package com.example.nicoladalmaso.gruppo1;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -30,12 +29,12 @@ import export.ExportedFile;
  * Created by matteo.mascotto on 13/01/2018.
  */
 
-public class PopUpMissionMenuListener extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListener {
 
-    private int missionID;
+    private long missionID;
     DataManager DB;
     MissionEntity mission;
-    final Context context;
+    Activity activity;
 
     File defaultOutputPath;
     ExportManager manager;
@@ -45,11 +44,11 @@ public class PopUpMissionMenuListener extends AppCompatActivity implements Popup
      *
      * @param missionID it contain the ID of the mission where the user tapped
      */
-    public PopUpMissionMenuListener(View view, int missionID) {
+    public PopUpMissionMenuListener(Activity activity, View view, long missionID) {
         this.missionID = missionID;
-        this.context = view.getContext();
+        this.activity = activity;
 
-        DB = new DataManager(context);
+        DB = new DataManager(activity);
         mission = DB.getMission(missionID);
     }
 
@@ -66,9 +65,12 @@ public class PopUpMissionMenuListener extends AppCompatActivity implements Popup
 
             // Open modify activity
             case R.id.modify_mission:
-                Intent editMission = new Intent(this.context, EditMission.class);
+                if(activity ==null){
+                    Log.d("DEBUG","CONTEXT NULL");
+                }
+                Intent editMission = new Intent(activity, EditMission.class);
                 editMission.putExtra(IntentCodes.INTENT_MISSION_ID, missionID);
-                //startActivity(editMission);
+                activity.startActivityForResult(editMission,IntentCodes.MODIFY_MISSION);
                 // TODO Catch the error on startActivity: it make me CRAZY!
                 break;
 
@@ -81,12 +83,12 @@ public class PopUpMissionMenuListener extends AppCompatActivity implements Popup
             case R.id.export_xls:
             case R.id.export_xml:
 
-                defaultOutputPath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                defaultOutputPath = activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
                 manager = new ExportManager(DB, defaultOutputPath.getPath());
 
                 try {
-                    ExportedFile exported = manager.exportMission(missionID, context.getResources().getString(R.string.popup_export_csv));
-                    EmailBuilder.createEmail().attachFile(exported.file).sendEmail(context);
+                    ExportedFile exported = manager.exportMission(missionID, activity.getResources().getString(R.string.popup_export_csv));
+                    EmailBuilder.createEmail().attachFile(exported.file).sendEmail(activity);
                 } catch (ExportTypeNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -96,14 +98,14 @@ public class PopUpMissionMenuListener extends AppCompatActivity implements Popup
             case R.id.close_mission:
                 mission.setRepay(true);
                 DB.updateMission(mission);
-                finish();
+                //finish();
                 // TODO find an alternative method to reload the activity. finish() it doesn't do it
                 break;
 
             // Delete the mission
             case R.id.delete_mission:
                 deleteMission();
-                finish();
+                //finish();
                 // TODO find an alternative method to reload the activity. finish() it doesn't do it
                 break;
         }
@@ -119,14 +121,14 @@ public class PopUpMissionMenuListener extends AppCompatActivity implements Popup
     public void deleteMission(){
 
         //Lazzarin
-        AlertDialog.Builder toast = new AlertDialog.Builder(context);
+        AlertDialog.Builder toast = new AlertDialog.Builder(activity);
 
         //Dialog
-        toast.setMessage(context.getString(R.string.deleteMissionToast))
-                .setTitle(context.getString(R.string.deleteTitle));
+        toast.setMessage(activity.getString(R.string.deleteMissionToast))
+                .setTitle(activity.getString(R.string.deleteTitle));
 
         //Positive button
-        toast.setPositiveButton(context.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
+        toast.setPositiveButton(activity.getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 List<TicketEntity> list = DB.getTicketsForMission(missionID);
                 for(int i = 0; i < list.size(); i++){
@@ -134,13 +136,13 @@ public class PopUpMissionMenuListener extends AppCompatActivity implements Popup
                 }
                 DB.deleteMission(missionID);
                 Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
+                //setResult(RESULT_OK, intent);
+                //finish();
             }
         });
 
         //Negative button
-        toast.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+        toast.setNegativeButton(activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //Nothing to do
             }

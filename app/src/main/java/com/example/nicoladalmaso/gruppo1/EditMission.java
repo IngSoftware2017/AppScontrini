@@ -183,8 +183,12 @@ public class EditMission extends AppCompatActivity {
     private void setMissionValues(){
         Intent intent = getIntent();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        missionID = (int) intent.getExtras().getLong("missionID");
+        missionID = (int) intent.getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
+        Log.d("EDITMISSION","MISSION_ID= "+missionID);
+        for(MissionEntity missionEntity : DB.getAllMission()){
+            Log.d("EDITMISSION",""+missionEntity.getID());
+        }
         person = DB.getPerson(thisMission.getPersonID());
 
         txtMissionName.setText(thisMission.getName());

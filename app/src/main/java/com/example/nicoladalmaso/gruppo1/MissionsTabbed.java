@@ -128,14 +128,6 @@ public class MissionsTabbed extends AppCompatActivity {
         Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-
-                case (MISSION_MOD):
-                    missionsOpen.clearAllMissions();
-                    missionsOpen.printAllMissions();
-                    missionsClosed.clearAllMissions();
-                    missionsClosed.printAllMissions();
-                    break;
-
                 case (PERSON_MOD):
                     thisPerson = DB.getPerson(personID);
                     toolbar.setTitle(thisPerson.getName());

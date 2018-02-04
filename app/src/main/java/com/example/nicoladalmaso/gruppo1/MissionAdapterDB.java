@@ -1,12 +1,10 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,13 +12,9 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -35,15 +29,15 @@ import database.MissionEntity;
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
-    Context context;
+    Activity context;
     String path = "";
     int missionID = 0;
     List<MissionEntity> missions;
 
-    public MissionAdapterDB(Context context, int textViewResourceId,
-                          List<MissionEntity> objects) {
-        super(context, textViewResourceId, objects);
-        this.context = context;
+    public MissionAdapterDB(Fragment context, int textViewResourceId,
+                            List<MissionEntity> objects) {
+        super(context.getActivity(), textViewResourceId, objects);
+        this.context = context.getActivity();
         missions = objects;
     }
 
@@ -92,8 +86,8 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         convertView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 missionID = Integer.parseInt(v.getTag().toString());
-                Intent startTicketsView = new Intent(context, BillActivity.class);
-                startTicketsView.putExtra("missionID", missionID);
+                Intent startTicketsView = new Intent(context.getApplicationContext(), BillActivity.class);
+                startTicketsView.putExtra(IntentCodes.INTENT_MISSION_ID, missionID);
                 ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);
             }
         });
@@ -105,8 +99,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         menuCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                missionID = (int)missions.get(position).getID();
-                showPopupMenu(menuCard, missionID);
+                showPopupMenu(context,menuCard, c.getID());
             }
         });
 
@@ -118,16 +111,16 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
      * @author matteo.mascotto
      *
      * @param view Viewer of the Mission's Card
-     * @param position position inside the popUp menu list
+     * @param missionID position inside the popUp menu list
      */
-    private void showPopupMenu(View view, int position) {
+    private void showPopupMenu(Activity context, View view, long missionID) {
 
-        PopupMenu popup = new PopupMenu(view.getContext(),view );
+        PopupMenu popup = new PopupMenu(view.getContext(),view);
         MenuInflater inflater = popup.getMenuInflater();
 
         inflater.inflate(R.menu.popup_mission_menu, popup.getMenu());
 
-        popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(view, missionID));
+        popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(context,view, missionID));
         popup.show();
     }
 }
