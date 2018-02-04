@@ -3,6 +3,7 @@ package com.ing.software.common;
 import android.support.annotation.NonNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,11 +65,28 @@ public class Reflect {
                 }
                 if (paramsMatch) {
                     m.setAccessible(true);
-                    return (T)m.invoke(isType ? null : clazz, params);
+                    try {
+                        return (T)m.invoke(isType ? null : clazz, params);
+                    } catch (InvocationTargetException e) {
+                        // log where the real exception occurred
+                        e.getCause().printStackTrace();
+                        throw e;
+                    }
                 }
             }
         }
         throw new NoSuchMethodException();
+    }
+
+    /**
+     * Common code for getField and setField
+     */
+    private static Field getFieldInstance(Object clazz, String fieldName) throws Exception {
+        boolean isType = clazz instanceof Class<?>;
+        Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
+        Field field = classType.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field;
     }
 
     /**
@@ -84,11 +102,7 @@ public class Reflect {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getField(@NonNull Object clazz, @NonNull String fieldName) throws Exception {
-        boolean isType = clazz instanceof Class<?>;
-        Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
-        Field field = classType.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return (T)field.get(isType ? null : clazz);
+        return (T)getFieldInstance(clazz, fieldName).get(clazz instanceof Class<?> ? null : clazz);
     }
 
     /**
@@ -101,12 +115,6 @@ public class Reflect {
      *  NullPointerException: Trying to set an instance field passing a class type.
      */
     public static void setField(@NonNull Object clazz, @NonNull String fieldName, Object newVal) throws Exception {
-        boolean isType = clazz instanceof Class<?>;
-        Class<?> classType = isType ? (Class<?>)clazz : clazz.getClass();
-        Field field = classType.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(isType ? null : clazz, newVal);
+        getFieldInstance(clazz, fieldName).set(clazz instanceof Class<?> ? null : clazz, newVal);
     }
-
-    // I know these two functions have duplicate code but I don't bother putting it in another function.
 }

@@ -2,6 +2,7 @@ package com.ing.software.test.opencvtestapp;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
@@ -12,27 +13,24 @@ import android.os.*;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Pair;
-import android.util.SizeF;
 import android.widget.*;
 
-import com.annimon.stream.Stream;
 import com.google.android.gms.vision.text.*;
 
 import com.ing.software.common.*;
 import com.ing.software.ocr.*;
 import com.ing.software.ocr.OcrObjects.*;
 
+import org.opencv.android.Utils;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 
+import static com.ing.software.common.CommonUtils.rectToPts;
 import static com.ing.software.common.CommonUtils.size;
 import static com.ing.software.common.Reflect.*;
-import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
 import static org.opencv.imgproc.Imgproc.*;
 import static java.util.Collections.*;
-import static java.lang.String.*;
 
 
 /**
@@ -43,9 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String folder = "TestOCR";
     private static final Class<?> IP_CLASS = ImageProcessor.class; // alias
     private static final Class<?> OA_CLASS = OcrAnalyzer.class; // alias
-    private static final int DEF_THICK = 20;
+    private static final int DEF_THICK = 6;
     private static final int LINE_THICK = 6;
-    private static final double FONT_SIZE = 0.6;
+    private static final double FONT_SIZE_DEF = 0.6;
+    private static final double FONT_SIZE_AMOUNT = 2.;
+    private static final int FONT_THICKNESS = 2;
 
     private static final Scalar BLUE = new Scalar(0,0,255, 255);
     private static final Scalar PURPLE = new Scalar(255,0,255, 255);
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MSG_EXCEPTION = 2;
 
     private Semaphore sem = new Semaphore(0);
-    private int imageIdx = 0;
+    private int imgIdx = 0;
     private boolean resultOnly = false;
 
     /**
@@ -100,6 +100,12 @@ public class MainActivity extends AppCompatActivity {
         hdl.obtainMessage(MSG_TITLE, str).sendToTarget();
     }
 
+    private Mat bitmapToMat(Bitmap bm) {
+        Mat mat = new Mat();
+        Utils.bitmapToMat(bm, mat);
+        return mat;
+    }
+
     /**
      * Show on screen an Android bitmap
      * This method is blocked until user taps screen.
@@ -127,10 +133,10 @@ public class MainActivity extends AppCompatActivity {
      * @param color Scalar with 4 channels
      * @return output RGBA Mat
      */
-    static Mat drawContour(Mat rgba, MatOfPoint contour, Scalar color) {
+    static Mat drawContour(Mat rgba, MatOfPoint contour, Scalar color, int thickness) {
         Mat img = rgba.clone();
         List<MatOfPoint> ctrList = Collections.singletonList(contour);
-        drawContours(img, ctrList, 0, color, 3);
+        drawContours(img, ctrList, 0, color, thickness);
         return img;
     }
 
@@ -158,29 +164,32 @@ public class MainActivity extends AppCompatActivity {
         return copy;
     }
 
+    static void drawPoly(Mat img, MatOfPoint2f pts, Scalar color, int thick) {
+        polylines(img, singletonList(new MatOfPoint(pts.toArray())), true, color, thick);
+    }
+
     @NonNull
-    static List<MatOfPoint> pts2mat(List<PointF> pts) throws Exception {
+    static List<MatOfPoint> pts2matArr(List<PointF> pts) throws Exception {
         List<Point> cvPts = invoke(IP_CLASS, "androidPtsToCV", pts);
-        MatOfPoint ptsMat = new MatOfPoint(cvPts.toArray(new Point[4]));
-        return Collections.singletonList(ptsMat);
+        return singletonList(new MatOfPoint(cvPts.toArray(new Point[4])));
     }
-/*
-    static void drawTextLines(Mat img, List<TextLine> lines, Scalar wordBgColor) throws Exception {
-        for (TextLine line : lines) {
-            polylines(img, pts2mat(line.corners()), true, RED, LINE_THICK);
-            for (Word w : line.words()) {
-                fillPoly(img, pts2mat(w.corners()), wordBgColor);
+
+    static void drawTextLines(Mat img, List<OcrText> lines, Scalar backColor, double fontSize) throws Exception {
+        for (OcrText line : lines) {
+            polylines(img, pts2matArr(line.corners()), true, RED, LINE_THICK);
+            for (OcrText w : line.children()) {
+                fillPoly(img, pts2matArr(w.corners()), backColor);
             }
         }
-        for (TextLine line : lines) {
-            for (Word w : line.words()) {
+        for (OcrText line : lines) {
+            for (OcrText w : line.children()) {
                 PointF blPt = w.corners().get(3); // bottom-right point (clockwise from top-left)
-                putText(img, w.text().toUpperCase(), new Point(blPt.x + 2, blPt.y - 2),
-                        FONT_HERSHEY_SIMPLEX, FONT_SIZE, WHITE);
+                putText(img, w.textUppercase(), new Point(blPt.x + 3, blPt.y - 3), // add some padding (3, -3)
+                        FONT_HERSHEY_SIMPLEX, fontSize, WHITE, FONT_THICKNESS);
             }
         }
     }
-*/
+
     /**
      * Draw text on a Bitmap.
      * @param bm input bitmap
@@ -236,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
     static Bitmap getBitmap(int idx) throws FileNotFoundException {
         return BitmapFactory.decodeStream(new FileInputStream(
                 new File(Environment.getExternalStorageDirectory().toString()
-                + "/" + folder  + "/" + String.valueOf(idx) + ".jpg")));
+                        + "/" + folder  + "/" + String.valueOf(idx) + ".jpg")));
     }
 
     @Override
@@ -245,22 +254,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         findViewById(R.id.imageView).setOnClickListener(v -> sem.release());
         findViewById(R.id.prev_btn).setOnClickListener(v -> {
-            imageIdx--;
-            this.setTitle(String.valueOf(imageIdx));
+            imgIdx--;
+            this.setTitle(String.valueOf(imgIdx));
         });
         findViewById(R.id.succ_btn).setOnClickListener(v -> {
-            imageIdx++;
-            this.setTitle(String.valueOf(imageIdx));
+            imgIdx++;
+            this.setTitle(String.valueOf(imgIdx));
         });
         ((Switch)findViewById(R.id.result_only))
                 .setOnCheckedChangeListener((v, checked) -> resultOnly = checked);
 
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        // request permissions
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
                     new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
         new Thread(this::backgroundWork).start();
-
     }
 
     /**
@@ -275,13 +285,13 @@ public class MainActivity extends AppCompatActivity {
             int imgsTot = getImgsTot();
             while(true) {
 
-                if (imageIdx < 0)
-                    imageIdx = 0;
-                else if(imageIdx >= imgsTot)
-                    imageIdx = imgsTot - 1;
-                asyncSetTitle(String.valueOf(imageIdx));
+                if (imgIdx < 0)
+                    imgIdx = 0;
+                else if(imgIdx >= imgsTot)
+                    imgIdx = imgsTot - 1;
+                asyncSetTitle(String.valueOf(imgIdx));
 
-                Bitmap bm = getBitmap(imageIdx);
+                Bitmap bm = getBitmap(imgIdx);
                 ImageProcessor imgProc = new ImageProcessor(bm);
 
                 if (!resultOnly) {
@@ -305,56 +315,70 @@ public class MainActivity extends AppCompatActivity {
                     showMat(graySwap.first);
 
                     MatOfInt4 lines = invoke(IP_CLASS, "houghLines", graySwap);
+                    MatOfPoint2f corners = invoke(IP_CLASS, "findPolySimple", contour);
                     // show both contours and hough lines
-                    showMat(drawLines(drawContour(rgbaResized, contour, BLUE), lines, PURPLE));
-
-                    MatOfPoint2f cornersMat = invoke(IP_CLASS, "findPolySimple", contour);
-                    cornersMat = invoke(IP_CLASS, "scale", cornersMat, rgbaResized.size(), srcImg.size());
-                    List<PointF> corners = invoke(IP_CLASS, "cvPtsToAndroid", cornersMat.toList());
-                    showBitmap(drawPoly(bm, corners, corners.size() == 4 ? Color.GREEN : Color.RED, DEF_THICK));
+                    Mat contourImg = drawLines(drawContour(rgbaResized, contour, BLUE, DEF_THICK),
+                            lines, PURPLE);
+                    drawPoly(contourImg, corners, corners.rows() == 4 ? GREEN : RED, DEF_THICK);
+                    showMat(contourImg);
                 }
 
-                imgProc.findTicket(false);
-                Bitmap textLinesBm = invoke(imgProc, "undistortForOCR");
-/*
-                //find amount
-                List<TextLine> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
-                TextLine amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
-                String titleStr;
+                Bitmap textLinesBm = invoke(imgProc, "undistortForOCR", 1. / 3.);
 
-//                List<Pair<String, TextLine>> dateResults = invoke(OcrAnalyzer.class,
-//                        "findAllDateStrings", lines);
-//                drawTextLines(mat, Stream.of(dateResults).map(p -> p.second).toList(), PURPLE);
-//                if (dateResults.size() == 1)
-//                    titleStr += " - " + dateResults.get(0).first;
-//                else if (dateResults.size() > 1) {
-//                    titleStr += " - multiple date matches";
-//                }
-                Mat mat = new Mat();
-                bitmapToMat(textLinesBm, mat);
-                drawTextLines(mat, lines, BLUE);
-                if (amountStr != null)
-                    drawTextLines(mat, singletonList(amountStr), DARK_GREEN);
-                //asyncSetTitle(titleStr);
+                //find amount
+                List<OcrText> lines = invoke(OA_CLASS, "bitmapToLines", textLinesBm, ocrEngine);
+                OcrText amountStr = invoke(OA_CLASS, "findAmountString", lines, size(textLinesBm));
+                StringBuilder titleStr = new StringBuilder();
+                titleStr.append(imgIdx);
+
+                // find date
+                Date date = invoke(OcrAnalyzer.class, "findDate", lines);
+                if (date != null) {
+                    titleStr.append(" - ").append(
+                            new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(date));
+                } else {
+                    titleStr.append(" - date not found or multiple");
+                }
+                Mat mat = bitmapToMat(textLinesBm);
+
+                //show all TextLines, amount string and amount strip rect
+                if (amountStr != null) {
+                    RectF amountSripRect = invoke(OA_CLASS, "getAmountStripRect",
+                            amountStr, size(textLinesBm));
+                    List<Point> cvPts = invoke(IP_CLASS, "androidPtsToCV",
+                            rectToPts(amountSripRect));
+                    MatOfPoint2f ptsMat = invoke(IP_CLASS, "ptsToMat", cvPts);
+                    drawPoly(mat, ptsMat, BLUE, DEF_THICK);
+                }
+                drawTextLines(mat, lines, BLUE, FONT_SIZE_DEF);
+                if (amountStr != null) {
+                    drawTextLines(mat, singletonList(amountStr), DARK_GREEN, FONT_SIZE_DEF);
+                }
+                asyncSetTitle(titleStr.toString());
                 showMat(mat);
 
+                // find amount price
                 if (amountStr != null) {
-                    RectF srcStripRect = invoke(OA_CLASS, "getAmountStripRect", amountStr, size(textLinesBm));
-                    Bitmap amountStrip = invoke(OA_CLASS, "getAmountStrip", imgProc, amountStr, srcStripRect);
-                    List<TextLine> amountLines =invoke(OA_CLASS, "bitmapToLines", amountStrip, ocrEngine);
+                    RectF srcStripRect = invoke(OA_CLASS, "getAmountStripRect",
+                            amountStr, size(textLinesBm));
+                    Bitmap amountStrip = invoke(OA_CLASS, "getAmountStrip",
+                            imgProc, size(textLinesBm), amountStr, srcStripRect);
+                    List<OcrText> amountLines = invoke(OA_CLASS, "bitmapToLines",
+                            amountStrip, ocrEngine);
                     BigDecimal price = invoke(OA_CLASS, "findAmountPrice",
                             amountLines, amountStr, size(srcStripRect), size(amountStrip));
 
-                    titleStr = valueOf(imageIdx);
+                    titleStr = new StringBuilder();
+                    titleStr.append(imgIdx);
                     if (price != null)
-                        titleStr += " -  " + price.toString();
-                    asyncSetTitle(titleStr);
-                    bitmapToMat(amountStrip, mat);
-                    drawTextLines(mat, amountLines, BLUE);
+                        titleStr.append(" -  ").append(price);
+                    asyncSetTitle(titleStr.toString());
+                    mat = bitmapToMat(amountStrip);
+                    drawTextLines(mat, amountLines, BLUE, FONT_SIZE_AMOUNT);
                     showMat(mat);
                 }
-*/
-                imageIdx++;
+
+                imgIdx++;
             }
         });
     }

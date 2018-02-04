@@ -113,6 +113,20 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                         }
                     } catch (Exception e) {
                         //BABABA
+                    ticketID = Integer.parseInt(v.getTag().toString());
+                    for (int i = 0; i < t.size(); i++) {
+                        if (t.get(i).getID() == ticketID) {
+                            TicketEntity thisTicket = t.get(i);
+                            Intent startImageView = new Intent(context, BillViewer.class);
+                            File photo = new File(thisTicket.getFileUri().toString().substring(7));
+
+                            //Put data to next activity
+                            startImageView.putExtra("ID", thisTicket.getID());
+
+                            //Start new activity
+                            ((BillActivity) context).startActivityForResult(startImageView, TICKET_MOD);
+                            return;
+                        }
                     }
                 }//onClick
             });

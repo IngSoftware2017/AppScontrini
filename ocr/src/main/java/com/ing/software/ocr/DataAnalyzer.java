@@ -1,154 +1,149 @@
 package com.ing.software.ocr;
 
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 import android.support.annotation.NonNull;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Locale;
-
-import com.ing.software.ocr.OcrObjects.RawGridResult;
-import com.ing.software.ocr.OcrObjects.RawStringResult;
-import com.ing.software.ocr.OcrObjects.RawText;
-
-import android.support.annotation.IntRange;
 import android.support.annotation.Size;
+import android.util.Pair;
 
-import static com.ing.software.ocr.OcrUtils.levDistance;
-import static com.ing.software.ocr.OcrUtils.log;
-import static com.ing.software.ocr.OcrVars.HEIGHT_CENTER_DIFF_MULTIPLIER;
-import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
+import com.ing.software.common.Scored;
+import com.ing.software.ocr.OcrObjects.OcrText;
+import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
+import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
-import java.text.ParseException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.regex.Matcher;
 
+import com.annimon.stream.Stream;
 
+import static com.ing.software.ocr.OcrVars.*;
+import static java.util.Collections.max;
 
 /**
- * Class used to extract informations from raw data
- * todo: fallback, if no amount is present try to decode a possible pricelist
+ * Class used to extract information from raw data
  */
-class DataAnalyzer {
+public class DataAnalyzer {
 
     /**
-     * @author Michelon
-     * Search through results from the research of amount string and retrieves the text with highest
-     * probability to contain the amount calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
-     * If no amount was found in first result iterate through all results following previous order.
-     * @param amountResults list of RawStringResult from amount search. Not null.
-     * @return List of ordered possible amounts as RawGridResults.
+     * Get a list of texts where amount string is present
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing amount string with its score
      */
-    static List<RawGridResult> getPossibleAmounts(@NonNull List<RawStringResult> amountResults) {
-        int distanceMultiplier = 15;
-        List<RawGridResult> possibleResults = new ArrayList<>();
-        Collections.sort(amountResults);
-        for (RawStringResult stringResult : amountResults) {
-            //Ignore text with invalid distance (-1) according to findSubstring() documentation
-            if (stringResult.getDistanceFromTarget() > -1) {
-                RawText sourceText = stringResult.getSourceText();
-                double baseSingleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
-                if (stringResult.getDetectedTexts() != null) {
-                    //Here we order texts according to their distance (position) from source rect
-                    //List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getTargetTexts(), stringResult.getSourceText().getBoundingBox());
-                    for (RawGridResult gridResult : stringResult.getDetectedTexts()) {
-                        RawText rawText = gridResult.getText();
-                        double diffCenter = Math.abs(rawText.getBoundingBox().centerY() - sourceText.getBoundingBox().centerY());
-                        diffCenter = (sourceText.getBoundingBox().height() - diffCenter)/sourceText.getBoundingBox().height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
-                        log(4,"AmountProb(DataAn)", "Base is: " + baseSingleCatch + " | grid is: "+ gridResult.getPercentage() + " | diff in center is: " + diffCenter);
-                        double singleCatch = baseSingleCatch + gridResult.getPercentage() + diffCenter;
-                        if (!rawText.equals(sourceText)) {
-                            possibleResults.add(new RawGridResult(rawText, singleCatch));
-                            OcrUtils.log(3, "getPossibleAmount", "Analyzing source text: " + sourceText.getValue() +
-                                    " where target is: " + rawText.getValue() + " with decoded probability: " + singleCatch +
-                                    " and distance: " + stringResult.getDistanceFromTarget());
-                        }
-                    }
-                }
-            } else {
-                OcrUtils.log(3, "getPossibleAmount", "Ignoring text: " + stringResult.getSourceText().getValue());
-            }
-        }
-        if (possibleResults.size() > 0) {
-            /* Here we order considering their final probability to contain the amount:
-            If the probability is the same, the fallback is their previous order, so based on when
-            they are inserted.
-            */
-            Collections.sort(possibleResults);
-        }
-        return possibleResults;
+    static List<Scored<OcrText>> getAmountTexts(@NonNull List<OcrText> texts) {
+        return findAllMatchedStrings(texts, AMOUNT_MATCHERS);
     }
 
     /**
      * @author Michelon
-     * @date 23-12-17
+     * Insert detected amount texts in a listAmountOrganizer
+     * @param texts list of scored source texts
+     * @return list of listAmountOrganizer containing source texts
+     */
+    static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts) {
+        return Stream.of(texts)
+                    .map(ListAmountOrganizer::new)
+                    .toList();
+    }
+
+    /**
+    * Find all TextLines which text is matched by any of the list of matchers.
+    * @param lines list of TextLines. Can be empty
+    * @return TextLines matched. Can be empty if no match is found.
+    * @author Riccardo Zaglia
+    */
+    private static List<Scored<OcrText>> findAllMatchedStrings(List<OcrText> lines, List<WordMatcher> matchers) {
+        return Stream.of(lines)
+                .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
+                .filter(s -> s.getScore() != 0).toList();
+    }
+
+    /**
+     * Get possible amount from word matcher and regex
+     * @param texts list of scored target texts (prices). Not null.
+     * @return text containing amount price and it's decoded value
+     */
+    static Pair<OcrText, BigDecimal>  getMatchingAmount(@NonNull List<Scored<OcrText>> texts) {
+        for (Scored<OcrText> singleText : texts) {
+            BigDecimal amount = trySingleMatch(singleText.obj());
+            if (amount != null)
+                return new Pair<>(singleText.obj(), amount);
+        }
+        return null;
+    }
+
+    /**
+     * Get amount for single text from word matcher and regex
+     * @param line text containing amount price. Not null.
+     * @return Decoded value. Null if nothing found.
+     * @author Zaglia
+     */
+    private static BigDecimal trySingleMatch(@NonNull OcrText line) {
+        /*
+        Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
+        if (!matcher.find()) { // try again using a dot to concatenate words
+            matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numConcatDot());
+           if (matcher.find())
+               return new BigDecimal(matcher.group());
+        } else
+            return new BigDecimal(matcher.group());
+        return null;
+        */
+        Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.textSanitizedNum());
+        boolean matched = matcher.find();
+        int childsTot = line.children().size();
+        if (!matched && childsTot >= 2) { // merge only last two words and try again
+            matcher = PRICE_NO_THOUSAND_MARK.matcher(
+                    line.children().get(childsTot - 1).textSanitizedNum()
+                            + line.children().get(childsTot - 2).textSanitizedNum());
+            matched = matcher.find();
+        }
+        if (matched) {
+            return new BigDecimal(matcher.group().replaceAll(" ", ""));
+        }
+        return null;
+    }
+
+    /**
+     * @author Michelon
+     * Get restored amount without regex
+     * @param texts list of scored target texts (prices). Not null.
+     * @return text containing amount price and it's decoded value
+     */
+    static Pair<OcrText, BigDecimal> getRestoredAmount(@NonNull List<Scored<OcrText>> texts) {
+        for (Scored<OcrText> singleText : texts) {
+            if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().numNoSpaces()) < NUMBER_MIN_VALUE) {
+                BigDecimal amount = analyzeAmount(singleText.obj().numNoSpaces());
+                if (amount != null)
+                    return new Pair<>(singleText.obj(), amount);
+            }
+        }
+        return null;
+    }
+
+    /*
+    Old analysis. Used alongside regex.
+     */
+
+    /**
+     * @author Michelon
      * Tries to find a BigDecimal from string
      * @param amountString string containing possible amount. Length > 0.
      * @return BigDecimal containing the amount, null if no number was found
      */
-    static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
+    public static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
-        if (OcrUtils.isPossiblePriceNumber(amountString) < NUMBER_MIN_VALUE) {
-            try {
-                String decoded = deepAnalyzeAmountChars(amountString);
-                if (!decoded.equals(""))
-                    amount = new BigDecimal(decoded);
-            } catch (Exception e1) {
-                amount = null;
-            }
-            if (amount != null)
-                amount = amount.setScale(2, RoundingMode.HALF_UP);
+        try {
+            String decoded = deepAnalyzeAmountChars(amountString);
+            if (!decoded.equals(""))
+                amount = new BigDecimal(decoded);
+        } catch (Exception e1) {
+            amount = null;
         }
         return amount;
     }
 
     /**
      * @author Michelon
-     * Tries to find a number in string that may contain also letters (ex. '€' recognized as 'e')
-     * @param targetAmount string containing possible amount. Length > 0.
-     * @return string containing the amount, null if no number was found
-     */
-    @Deprecated
-    private static String deepAnalyzeAmount(@Size(min = 1) String targetAmount){
-        targetAmount = targetAmount.replaceAll(",", ".").replaceAll("S", "5");
-        StringBuilder manipulatedAmount = new StringBuilder();
-        OcrUtils.log(2,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
-        boolean numberPresent = false; //used because length can be > 0 if '.' was found but no number
-        for (int i = 0; i < targetAmount.length(); ++i) {
-            char singleChar = targetAmount.charAt(i);
-            if (Character.isDigit(singleChar)) {
-                manipulatedAmount.append(singleChar);
-                numberPresent = true;
-            } else if (singleChar=='.') {
-                //Should be replaced with a better analysis
-                if (targetAmount.length()-1 != i) { //bad way to check if it's last '.'
-                    String temp = manipulatedAmount.toString().replaceAll("\\.", ""); //Replace previous '.' so only last '.' is saved
-                    manipulatedAmount = new StringBuilder(temp);
-                }
-                manipulatedAmount.append(singleChar);
-            //} else if (isExp(targetAmount, i)) { //Removes previous exponents
-            //    String temp = manipulatedAmount.toString().replaceAll("E", "");
-            //    temp = temp.replaceAll("\\+", "");
-            //    temp = temp.replaceAll("-", "");
-            //    manipulatedAmount = new StringBuilder(temp);
-            //    manipulatedAmount.append(getExp(targetAmount, i));
-            } else if (singleChar == '-' && manipulatedAmount.length() == 0) { //If negative number
-                manipulatedAmount.append(singleChar);
-            }
-        }
-        if (manipulatedAmount.toString().length() == 0 || !numberPresent)
-            return null;
-        //If last char is '.' remove it
-        if (manipulatedAmount.toString().charAt(manipulatedAmount.length()-1) == '.')
-            manipulatedAmount.setLength(manipulatedAmount.length()-1);
-        return manipulatedAmount.toString();
-    }
-
-    /**
-     * @author Michelon
-     * @date 8-12-17
      * Analyze a string (reversed by this method) looking for a number (with two decimals).
      * Uses arbitrary decisions.
      * @param targetAmount string containing possible amount. Length > 0.
@@ -156,17 +151,16 @@ class DataAnalyzer {
      */
     private static String deepAnalyzeAmountChars(@Size(min = 1) String targetAmount){
         StringBuilder manipulatedAmount;
-        StringBuilder reversedAmount = new StringBuilder(targetAmount.replaceAll(",", ".")
-                .replaceAll(" ", "").replaceAll("S", "5")).reverse();
-        OcrUtils.log(3,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
-        OcrUtils.log(3,"deepAnalyzeAmount", "Reversed amount is: " + reversedAmount.toString());
+        StringBuilder reversedAmount = new StringBuilder(targetAmount).reverse();
+        OcrUtils.log(4,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
+        OcrUtils.log(5,"deepAnalyzeAmount", "Reversed amount is: " + reversedAmount.toString());
         manipulatedAmount = analyzeCharsLong(reversedAmount.toString());
+        OcrUtils.log(4,"deepAnalyzeAmount", "Analyzed amount is: " + manipulatedAmount.toString());
         return manipulatedAmount.reverse().toString();
     }
 
     /**
      * @author Michelon
-     * @date 9-12-17
      * Analyze a string looking for a number (with two decimals)
      * @param source string containing possible amount. Length > 0.
      * @return stringBuilder containing the amount, empty stringBuilder if nothing found
@@ -208,7 +202,6 @@ class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Keep only digits and points in a string
      * @param string source string. Length > 0.
      * @return string with only digits and '.'
@@ -223,7 +216,6 @@ class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Removes '.' from a string
      * @param string source string. Length > 0
      * @return string with no '.'
@@ -238,7 +230,6 @@ class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze a string looking for a number with two decimals
      * @param source source string @Size(min = 1, max = 3)
      * @return StringBuilder with decoded number (empty if nothing found)
@@ -254,7 +245,6 @@ class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze three chars, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
@@ -283,7 +273,6 @@ class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze two chars, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
@@ -306,7 +295,6 @@ class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze single char, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @return StringBuilder with decoded number (empty if nothing found)
@@ -317,283 +305,5 @@ class DataAnalyzer {
             return result.append("00.").append(char0);
         else
             return result;
-    }
-
-    /**
-     * @author Michelon
-     * Check if at chosen index the string contains an exponential form.
-     * Exp are recognized if they are in the form:
-     * E'num'
-     * E+'num'
-     * E-'num'
-     * where 'num' is a number
-     * @param text source string. Length > 0.
-     * @param startingPoint position of 'E' (from 0 to text.length-1). Int >= 0.
-     * @return true if it's a valid exponential form
-     */
-    static boolean isExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
-        if (text.length() <= startingPoint + 2) //There must be at least E'num'
-            return false;
-        if (text.charAt(startingPoint)!='E')
-            return false;
-        else
-            if (Character.isDigit(text.charAt(startingPoint + 1)))
-                return true;
-            else if (text.charAt(startingPoint + 1) == '+' || text.charAt(startingPoint + 1) == '-')
-                return Character.isDigit(text.charAt(startingPoint + 2));
-        return false;
-    }
-
-    /**
-     * @author Michelon
-     * Get exponential form from chosen string.
-     * Note: isExp() must return true for these same text and startingPoint
-     * @param text source text. Length > 0.
-     * @param startingPoint position of 'E'. Int >= 0.
-     * @return String containing the exponential form (only 'E' and, if present, '+' or '-')
-     */
-    static String getExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
-        if (Character.isDigit(text.charAt(startingPoint + 1)))
-            return String.valueOf(text.charAt(startingPoint));
-        else if (text.charAt(startingPoint + 1) == '+' || text.charAt(startingPoint + 1) == '-')
-            if (Character.isDigit(text.charAt(startingPoint + 2)))
-                return text.substring(startingPoint, startingPoint + 2);
-        return "";
-    }
-
-    /**
-     * @author Salvagno
-     * Accept a text and check if there is a combination of date format.
-     * Controllo per tutte le combinazioni simili a
-     * xx/xx/xxxx o xx/xx/xxxx o xxxx/xx/xx
-     * xx-xx-xxxx o xx-xx-xxxx o xxxx-xx-xx
-     * xx.xx.xxxx o xx.xx.xxxx xxxx.xx.xx
-     *
-     * @param text The text to find the date format
-     * @return the absolute value of the minimum distance found between all combinations,
-     * if the distance is >= 10 or the inserted text is empty returns -1
-     */
-    static int findDate(String text) {
-        if (text.length() == 0)
-            return -1;
-
-        //Splits the string into tokens
-        String[] pack = text.split("\\s");
-
-        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
-
-        //Maximum number of characters in the date format
-        int minDistance = 10;
-        //Th eminimum of number combinations of date format without symbols like '/' or '.' or '-'
-        int minCharaterDate = 8;
-
-        for (String p : pack) {
-            for (String d : formatDate) {
-                //Convert string to uppercase
-                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
-                if (distanceNow < minDistance)
-                    minDistance = distanceNow;
-            }
-        }
-
-        if(minDistance==10)
-            return -1;
-        else
-            //Returns the absolute value of the distance by subtracting the minimum character
-            return Math.abs(minCharaterDate-minDistance);
-
-    }
-
-
-    /**
-     * @author Salvagno
-     * It takes a text and returns the date if a similarity is found with a date format
-     *
-     * @param text The text to find the date
-     * @return date or null if the date is not there
-     */
-    static Date getDate(String text) {
-        if (text.length() == 0)
-            return null;
-
-        Date date = null;
-
-        //Possible date formats
-        String[] formatDate = {"xx/xxxx/xx", "xxxx/xx/xx","xx/xx/xxxx", "xx-xxxx-xx", "xxxx-xx-xx","xx-xx-xxxx","xx.xxxx.xx","xxxx.xx.xx" ,"xx.xx.xxxx"};
-
-
-        //Analyze the text by removing the spaces
-        String text_w_o_space =  text.replace(" ", "");
-
-        //Set the maximum length of the string as the minimum distance
-        int minDistance = text_w_o_space.length();
-        String dataSearch = null;
-
-        //Search a piece of string as long as the length of the searched string in the text
-        int start;
-        for (String d : formatDate) {
-            int subLength = d.length();
-            start = 0;
-            int tokenLength = 6; //Set at 6 the minimum number of characters that a date can have (x-x-xx)
-            for (int finish = subLength; finish <= (text_w_o_space.length()); finish++) {
-                String token = text_w_o_space.substring(start, finish);
-                token = token.toUpperCase();
-                String tokenNUmber = "";
-                //Check if there are letters or 'S', in this case the change in 5
-                char[] string = token.toCharArray();
-                for (char c : string){
-                    boolean isLetter = Character.isDigit(c);
-                    if(isLetter)
-                        tokenNUmber = tokenNUmber+c;
-                    else
-                    {
-                        if(c == 'S')
-                            tokenNUmber = tokenNUmber+'5';
-                        else if (c == '-' || c == '.' || c == '/')
-                            tokenNUmber = tokenNUmber+c;
-                    }
-
-                }
-                //Check if the length of characters is greater than the last one found
-                if(tokenNUmber.length()>=tokenLength) {
-                    int distanceNow = levDistance(tokenNUmber, d.toUpperCase());
-                    if (distanceNow <= minDistance) {
-                        minDistance = distanceNow;
-                        dataSearch = tokenNUmber;
-                        tokenLength = tokenNUmber.length();
-                    }
-                }
-                start++;
-            }
-        }
-
-        //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
-        if(dataSearch != null && minDistance<10)
-        {
-            date = parseDate(dataSearch);
-        }
-        return date;
-
-
-    }
-
-    /**
-     * @author Salvagno
-     *
-     * @param dateString An input date string.
-     * @return A Date (java.util.Date) reference. The reference will be null if
-     *         we could not match any of the known formats.
-     */
-    public static Date parseDate(String dateString)
-    {
-        Date date = null;
-        Locale locale = new Locale("US");
-
-        //prendo i tre pezzi della stringa data
-        char[] string = dateString.toCharArray();
-        String token1 = "";
-        String token2 = "";
-        String token3 = "";
-        Integer numberOfSymbols = 0;
-        String finalDate = "";
-        String[] formats = null;
-
-
-
-        for (char c : string) {
-            if (c == '-' || c == '.' || c == '/')
-            {
-                numberOfSymbols ++;
-                finalDate=finalDate+'-';
-            }
-            else
-            {
-                finalDate=finalDate+c;
-
-                if(numberOfSymbols == 0)
-                    token1 = token1+c;
-                else if(numberOfSymbols == 1)
-                    token2 = token2+c;
-                else if(numberOfSymbols == 2)
-                    token3 = token3+c;
-                else
-                    return null;
-            }
-
-        }
-
-        //convert string to integer and get last two digit
-        int token1Number = -1;
-        int token2Number = -1;
-        int token3Number = -1;
-        try {
-            token1Number = ((Integer.parseInt(token1))%100);    //probably is day
-            token2Number = ((Integer.parseInt(token2))%100);    //probably is month
-            if(token3.length()==4) //if this token have 4 character
-            {
-                token3Number = Integer.parseInt(token3);
-                formats = new String[] {"dd-MM-yyyy","MM-dd-yyyy"};
-            }
-            else {
-                token3Number = ((Integer.parseInt(token3)) % 100);
-                formats = new String[] {"dd-MM-yy", "MM-dd-yy"};
-            }
-        } catch (NumberFormatException e) {
-            return null;
-        }
-
-        if((token1Number >= 1 && token1Number <= 12) && (token2Number >= 1 && token2Number <= 12))
-            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
-        else if(token2Number > 12)
-            dateString = String.valueOf(token2Number)+'-'+String.valueOf(token1Number)+'-'+String.valueOf(token3Number);
-        else
-            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
-
-        for (int i = 0; i < formats.length; i++)
-        {
-            String format = formats[i];
-            SimpleDateFormat dateFormat = new SimpleDateFormat(format,locale);
-            try
-            {
-                // parse() will throw an exception if the given dateString doesn't match
-                // the current format
-                date = dateFormat.parse(dateString);
-                break;
-            }
-            catch(ParseException e)
-            {
-                // don't do anything. just let the loop continue.
-            }
-        }
-
-        return date;
-    }
-
-    /**
-     * @author Michelon
-     * Search through results from the research of date string and retrieves the text with highest
-     * probability to contain the date calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
-     * If no date was found in first result iterate through all results following previous order.
-     * @param dateResults list of RawGridResult from date search. Not null.
-     * @return List of possible dates ordered
-     */
-    static List<RawGridResult> getPossibleDates(@NonNull List<RawGridResult> dateResults) {
-        int distanceMultiplier = 20;
-        List<RawGridResult> possibleResults = new ArrayList<>();
-        Collections.sort(dateResults);
-        for (RawGridResult gridResult : dateResults) {
-            //Ignore text with invalid distance (-1) according to findDate() documentation
-            int distanceFromDate = findDate(gridResult.getText().getValue());
-            if (distanceFromDate > -1) {
-                double singleCatch = gridResult.getPercentage() - distanceFromDate * distanceMultiplier;
-                possibleResults.add(new RawGridResult(gridResult.getText(), singleCatch));
-            } else {
-                OcrUtils.log(5, "getPossibleDate", "Ignoring text: " + gridResult.getText().getValue());
-            }
-        }
-        if (possibleResults.size() > 0) {
-            Collections.sort(possibleResults);
-        }
-        return possibleResults;
     }
 }
