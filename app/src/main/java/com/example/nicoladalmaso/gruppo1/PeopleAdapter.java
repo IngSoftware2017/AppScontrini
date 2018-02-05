@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
+
+import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 
@@ -52,6 +54,16 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         PersonEntity person = getItem(position);
         name.setText(person.getName()+" "+person.getLastName());
         String academicTitle = person.getAcademicTitle();
+        TextView countText = (TextView)convertView.findViewById(R.id.activeCountText);
+        DataManager db = new DataManager(context);
+        int count=db.getActiveMissionsNumberForPerson(person.getID());
+        if(count==0)
+            countText.setVisibility(View.INVISIBLE);
+        else{
+            countText.setVisibility(View.VISIBLE);
+            countText.setText(count+"");
+        }
+
         /*
         if ((academicTitle == null) || academicTitle.replaceAll(" ","").equals("")) {
             title.setText(activity.getString(R.string.noAcademicTitle));

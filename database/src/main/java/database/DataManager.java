@@ -352,6 +352,16 @@ public class DataManager {
     public List<TicketEntity> getTicketForMissionOrderedByInsertionDate(int missionId){
         return database.ticketDao().getTicketsForMissionOrderedByDate(missionId);
     }
+
+
+    /**Created by Stefano Elardo
+     * Gets the number of active missions for the given person
+     * @param personID long, identifier of the person
+     * @return the amount of active missions
+     */
+     public int getActiveMissionsNumberForPerson(long personID){
+         return database.ticketDao().getActiveMissionsNumberForPerson(personID);
+     }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null
