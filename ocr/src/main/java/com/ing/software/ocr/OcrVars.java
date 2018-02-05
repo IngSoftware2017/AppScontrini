@@ -13,6 +13,10 @@ import static java.util.regex.Pattern.compile;
  */
 public class OcrVars {
 
+    /*
+    @author Michelon
+     */
+
     public static final boolean IS_DEBUG_ENABLED = true;
     static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
     public static final int MAX_STRING_DISTANCE = 3; //Max allowed distance (levDistance) between a string found in a rawtext and one from AMOUNT_STRINGS
@@ -28,6 +32,10 @@ public class OcrVars {
     static final float AMOUNT_RECT_HEIGHT_EXTENDER = 1f; //Extend height of source amount text. Used in OcrAnalyzer.getAmountExtendedBox()
     static final float PRODUCT_RECT_HEIGHT_EXTENDER = 0.5f; //Extend height of source text of product price.
 
+
+    /*
+     @author Zaglia
+     */
 
     // day 1 to 31 with or without 0 tens.
     // month 1 to 12 with or without 0 tens.
@@ -46,37 +54,90 @@ public class OcrVars {
     static final int DMY_YEAR = 4;
     // I do not use named groups because is not supported for sdk < 24.
 
-
-    //match any combination of digits and dots, optional minus in front, optional character before end of string
     // first group is the sign
-    static final Pattern POTENTIAL_PRICE = compile("(?<!\\d|\\.)(-?)[\\d.]+?(?=[^\\d.]?$)");
-    //match any combination of digits and dots between them, with two mandatory decimals, optional minus in front, optional character before end of string
-    static final Pattern PRICE_PERMISSIVE = compile("(?<!\\d|\\.)(-?)(?:0|[1-9][\\d.]*?)\\.\\d{2}(?=[^\\d.]?$)");
-    //match any number with one single dot for two decimals, optional minus in front, optional character before end of string
-    static final Pattern PRICE_NO_THOUSAND_MARK = compile("(?<!\\d|\\.)(-?)(?:0|[1-9]\\d*?)\\.\\d{2}(?=[^\\d.]?$)");
+    //match a number between 2 and 4 digits,
+    // or match any with 0 to 6 digits before dot and 1 to 2 digits after,
+    // or match any with 1 to 6 digits before dot and 0 to 2 digits after,
+    // optional minus in front, optional character before end of string (could be another digit).
+    static final Pattern POTENTIAL_PRICE = compile(
+            "(?<![\\d.,-])-?(?:\\d{2,4}|\\d{0,6}[.,]\\d{1,2}|\\d{1,6}[.,]\\d{0,2})[^.,]?$");
+    //match any number with one single dot for two decimals (or a space or a dot + space),
+    // optional space between, optional minus in front, optional character before end of string
+    static final Pattern PRICE_NO_THOUSAND_MARK = compile(
+            "(?<![\\d.-])(-?)(?:0|[1-9]\\d*)(?:\\. |[. ])\\d{2}(?=[^\\d.]?$)");
     //match any number with no points, optional minus in front, optional character before end of string
-    static final Pattern PRICE_NO_DECIMALS = compile("(?<!\\d|\\.)(-?)(?:0|[1-9]\\d*?)(?=[^\\d.]?$)");
+    static final Pattern PRICE_NO_DECIMALS = compile(
+            "(?<![\\d.-])(-?)(?:0|[1-9]\\d*)(?=[^\\d.]?$)");
+    //match upside down prices. it's designed to reject corrupted upside down prices to avoid false positives.
+    static final Pattern PRICE_UPSIDEDOWN = compile(
+            "^[^'.,-]?[0OD1Il2ZEh5S9L8B6]{2} ?'[0OD1Il2ZEh5S9L8B6]+[^'.,]?$");
+    //java does not support regex subroutines: I have to duplicate the character matching part
 
 
     //In principle, multiple words should be matched with a space between them,
     //but since sometimes some words are split into multiple words, I remove all spaces all together
     //and match the words without spaces, even if there were in origin effectively distinct words.
-    public static final List<WordMatcher> AMOUNT_MATCHERS = asList(
+    //The accepted errors (ex: O -> U,D) are based on common errors of the ocr scanning the dataset.
+    //IT matchers:
+    static final List<WordMatcher> IT_AMOUNT_MATCHERS = asList(
             new WordMatcher("T[OUD]TALE", 1),
-            new WordMatcher("TOT", 0),
             new WordMatcher("T[OUD]TALEE[UI]R[OD]", 3),
             new WordMatcher("IMP[OU]RT[OD]", 1),
+            new WordMatcher("TOT", 0),
+            new WordMatcher("TOTE[UI]R[OD]", 1),
             new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 3)
     );
-    static final List<WordMatcher> CASH_MATCHERS = asList(
+    static final List<WordMatcher> IT_CASH_MATCHERS = asList(
             new WordMatcher("CONTANT[EI]", 1),
             new WordMatcher("CARTADICREDITO", 3),
-            new WordMatcher("PAGAMENTOCONTANTE", 4)
+            new WordMatcher("PAGAMENTOCONTANTE", 4),
+            new WordMatcher("CCRED", 0),
+            new WordMatcher("ASSEGNI", 1)
     );
-    static final List<WordMatcher> CHANGE_MATCHERS = asList(
+    //NB: change can be negative
+    static final List<WordMatcher> IT_CHANGE_MATCHERS = asList(
             new WordMatcher("RESTO", 1)
     );
-    static final List<WordMatcher> INDOOR_MATCHERS = asList(
+    static final List<WordMatcher> IT_SUBTOTAL_MATCHERS = asList(
+            new WordMatcher("SUBT[OD]TALE", 1)
+    );
+    static final List<WordMatcher> IT_COVER_MATCHERS = asList(
             new WordMatcher("COPERTO", 1)
     );
+
+    //EN matchers:
+    static final List<WordMatcher> EN_AMOUNT_MATCHERS = asList(
+            new WordMatcher("T[OUD]TAL", 1),
+            new WordMatcher("AMOUNT", 1),
+            new WordMatcher("GRANDTOTAL", 2)
+    );
+    static final List<WordMatcher> EN_CASH_MATCHERS = asList(
+            new WordMatcher("CASH", 1)
+    );
+    static final List<WordMatcher> EN_CHANGE_MATCHERS = asList(
+            new WordMatcher("CHANGE", 1)
+    );
+    static final List<WordMatcher> EN_SUBTOTAL_MATCHERS = asList(
+            new WordMatcher("SUBTOTAL", 1)
+    );
+    static final List<WordMatcher> EN_TAX_MATCHERS = asList(
+            new WordMatcher("TAX", 0),
+            new WordMatcher("SALESTAX", 1)
+    );
+
+    // currency
+    // todo: accept currency symbols?
+    static final List<WordMatcher> EUR_MATCHERS = asList(
+            new WordMatcher("EUR[OD]", 0),
+            new WordMatcher("EUR", 0)
+    );
+    static final List<WordMatcher> USD_MATCHERS = asList(
+            new WordMatcher("USD", 0)
+    );
+    static final List<WordMatcher> GBP_MATCHERS = asList(
+            new WordMatcher("GBP", 0)
+    );
+
+    // ideal character width / height
+    static final double CHAR_ASPECT_RATIO = 5./8.;
 }

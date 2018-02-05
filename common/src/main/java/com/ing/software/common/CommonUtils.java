@@ -42,7 +42,7 @@ public class CommonUtils {
      * @param pts List of Point
      * @return List of PointF
      */
-    public static List<PointF> pointToPointF(@NonNull List<Point> pts) {
+    public static List<PointF> pointsToPointFs(@NonNull List<Point> pts) {
         return Stream.of(pts).map(PointF::new).toList();
     }
 
@@ -51,7 +51,6 @@ public class CommonUtils {
      * @param rect RectF
      * @return List of PointF
      */
-    @NonNull
     public static List<PointF> rectToPts(@NonNull RectF rect) {
         return asList(
                 new PointF(rect.left, rect.top),
@@ -61,6 +60,11 @@ public class CommonUtils {
         );
     }
 
+    /**
+     * Get an origin aligned rectangle from it's dimensions.
+     * @param size rectangle dimensions
+     * @return rectangle
+     */
     public static RectF rectFromSize(@NonNull SizeF size) {
         return new RectF(0, 0, size.getWidth(), size.getHeight());
     }
@@ -70,7 +74,6 @@ public class CommonUtils {
      * @param bm bitmap. Not null.
      * @return Size
      */
-    @NonNull
     public static SizeF size(@NonNull Bitmap bm) {
         return new SizeF(bm.getWidth(), bm.getHeight());
     }
@@ -80,10 +83,7 @@ public class CommonUtils {
      * @param rect RectF. Not null.
      * @return Size
      */
-    @NonNull
-    public static SizeF size(@NonNull RectF rect) {
-        return new SizeF(rect.width(), rect.height());
-    }
+    public static SizeF size(@NonNull RectF rect) { return new SizeF(rect.width(), rect.height()); }
 
 
     /**
@@ -159,7 +159,5 @@ public class CommonUtils {
      * @param flag bit flag
      * @return true if flag is contained in pattern, false if it is not
      */
-    public static boolean check(int pattern, int flag) {
-        return (pattern & flag) == flag;
-    }
+    public static boolean check(int pattern, int flag) { return (pattern & flag) == flag; }
 }

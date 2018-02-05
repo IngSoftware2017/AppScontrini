@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This class contains some function to write fluently reflection invocations.
  * @author Riccardo Zaglia
  */
 public class Reflect {

@@ -7,11 +7,7 @@ package com.ing.software.common;
 public class Ref<T> {
     public T val;
 
-    public Ref() {
-        val = null;
-    }
+    public Ref() { val = null; }
 
-    public Ref(T obj) {
-        val = obj;
-    }
+    public Ref(T obj) { val = obj; }
 }

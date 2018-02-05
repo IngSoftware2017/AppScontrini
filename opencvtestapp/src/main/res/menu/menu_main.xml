@@ -4,9 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.ing.software.opencvtestapp.MainActivity">
     <item
-        android:id="@+id/action_fetch"
+        android:id="@+id/show_original"
+        android:checkable="true"
+        android:checked="true"
         android:orderInCategory="100"
-        android:title="Fetch"
-        app:showAsAction="always" />
+        android:title="Original" />
+    <item
+        android:id="@+id/show_opencv"
+        android:checkable="true"
+        android:orderInCategory="101"
+        android:title="OpenCV" />
+    <item
+        android:id="@+id/show_OCR"
+        android:checkable="true"
+        android:checked="true"
+        android:orderInCategory="102"
+        android:title="OCR" />
 
 </menu>
