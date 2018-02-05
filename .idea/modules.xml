@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<< HEAD
-=======
-      <module fileurl="file://S:\Users\Francesco\AndroidStudioProjects\AppScontrini\App.iml" filepath="S:\Users\Francesco\AndroidStudioProjects\AppScontrini\App.iml" />
->>>>>>> 769626062bb8e54be4d956b7ca4f4c844cc1acc7
-      <module fileurl="file://C:\Users\Nicola\Desktop\AppScontrini\App.iml" filepath="C:\Users\Nicola\Desktop\AppScontrini\App.iml" />
       <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
-      <module fileurl="file://C:\Users\Cristian\Desktop\App\AppScontrini.iml" filepath="C:\Users\Cristian\Desktop\App\AppScontrini.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />

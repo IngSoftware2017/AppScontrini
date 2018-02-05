@@ -77,22 +77,20 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         LinearLayout toMissions = (LinearLayout) convertView.findViewById(R.id.personClick);
         TextView openMissions=(TextView) convertView.findViewById(R.id.personOpenMissions);
         CardView personCard = (CardView) convertView.findViewById(R.id.personCard);
-
         PersonEntity person = getItem(position);
-        Log.d("Mission Counter Debug","personID:"+person.getID());
-        List<MissionEntity> missions=DB.getMissionsForPerson(person.getID());
-        int openMissionCounter=0;
+
+        List<MissionEntity> missions = DB.getMissionsForPerson(person.getID());
+        int openMissionCounter = 0;
         for(MissionEntity i:missions){
-            Log.d("Mission Counter Debug","counter value:"+openMissionCounter);
             if(!(i.isRepay())){
                 openMissionCounter++;
             }
         }
-        Log.d("Mission Counter Debug","counter value final:"+openMissionCounter);
         openMissions.setText(openMissionCounter+"");
         if(openMissionCounter==0){
             openMissions.setVisibility(View.INVISIBLE);
         }
+
         profilePic.setImageResource(R.drawable.ic_user);
         name.setText(person.getName()+" "+person.getLastName());
         String academicTitle = person.getAcademicTitle();

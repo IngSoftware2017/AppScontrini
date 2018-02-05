@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     /** Dal Maso
      * Se non sono presenti persone mostra come aggiungerne una
      */
-    private void startGuide(){
+    private void startFabGuide(){
         TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab_addPerson), "Benvenuto in TicketManager!", "Clicca qui per aggiungere una nuova persona")
             .targetCircleColor(R.color.white)
             .titleTextSize(20)
@@ -147,8 +147,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         if(DB.getAllPerson().size() == 0){
-            startGuide();
+            startFabGuide();
         }
+
     }
 
     /** PICCOLO
