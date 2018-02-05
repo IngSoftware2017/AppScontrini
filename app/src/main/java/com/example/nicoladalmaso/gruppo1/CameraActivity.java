@@ -69,6 +69,7 @@ public class CameraActivity extends Activity {
         mCamera = getCameraInstance();
         Camera.Parameters p = mCamera.getParameters();
         p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        p.setJpegQuality(100);
         mCamera.setParameters(p);
 
         final ImageButton flashButton = (ImageButton)findViewById(R.id.flashBtn);

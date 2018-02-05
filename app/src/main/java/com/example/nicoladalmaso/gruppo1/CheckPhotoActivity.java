@@ -199,11 +199,11 @@ public class CheckPhotoActivity extends Activity {
             long id = DB.addTicket(thisTicket);
             Log.d("Aggiunto ticket", ""+id);
 
-            imageToSave.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
 
-            imageToSave.compress(Bitmap.CompressFormat.JPEG,90, outOriginal);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG,100, outOriginal);
             outOriginal.flush();
             outOriginal.close();
         } catch (Exception e) {

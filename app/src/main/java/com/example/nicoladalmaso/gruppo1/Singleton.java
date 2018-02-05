@@ -26,8 +26,8 @@ public class Singleton {
         missionID = 0;
         ticketID = 0;
         pictureTaken = null;
-        startDate=null;
-         flag=0;
+        startDate = null;
+        flag = 0;
     }
 
     public static synchronized Singleton getInstance(){
@@ -75,12 +75,15 @@ public class Singleton {
 
     //lazzarin
     public Date getStartDate(){return startDate;}
-    public void setStartDate(Date start){startDate=start;}
 
-    public void setStartFlag(int value){flag=value;}
+    public void setStartDate(Date start){startDate = start;}
+
+    public void setStartFlag(int value){flag = value;}
+
     public int getStartFlag(){return flag;}
 
     public Date getEndDate(){return endDate;}
-    public void setEndDate(Date end){endDate=end;}
+
+    public void setEndDate(Date end){endDate = end;}
 
 }
