@@ -62,6 +62,9 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         else{
             countText.setVisibility(View.VISIBLE);
             countText.setText(count+"");
+            if(count>9) {
+                countText.setTextSize(countText.getTextSize() / 4);
+            }
         }
 
         /*
