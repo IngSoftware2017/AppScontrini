@@ -102,7 +102,6 @@
                                 android:text="Text"
                                 android:textColor="#333"
                                 android:textSize="20dp" />
-
                             <TextView
                                 android:id="@+id/personAcademicTitle"
                                 android:layout_width="match_parent"
@@ -111,7 +110,20 @@
                                 android:text="AcademicTitle"
                                 android:textColor="#666"
                                 android:textSize="12dp" />
+                        </LinearLayout>
 
+                        <LinearLayout
+                            android:layout_width="25dp"
+                            android:layout_height="25dp">
+
+                            <TextView
+                                android:id="@+id/personOpenMissions"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text=""
+                                android:textColor="#666"
+                                android:textSize="12dp" />
                         </LinearLayout>
                     </LinearLayout>
                 </RelativeLayout>
