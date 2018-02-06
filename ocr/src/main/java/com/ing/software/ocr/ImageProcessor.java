@@ -2,7 +2,6 @@ package com.ing.software.ocr;
 
 import android.graphics.*;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 import android.util.SizeF;
 
 import com.annimon.stream.Stream;
@@ -19,7 +18,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 import com.annimon.stream.function.*;
 
@@ -72,6 +70,7 @@ import static com.ing.software.common.CommonUtils.*;
 public class ImageProcessor {
 
     private static final int WHITE = 255;
+    private static final int BLACK = 0;
 
     // length of smallest side of downscaled image
     // must be chosen to limit side effects of resampling, on both 16:9 and 4:3 aspect ratio images
@@ -81,8 +80,11 @@ public class ImageProcessor {
     private static final int BF_KER_SZ = 9; // kernel size, must be odd
     private static final int BF_SIGMA = 30; // space/color variance
 
-    //Erode/Dilate iterations
-    private static final int E_D_ITERS = 5;
+    //Opening iterations
+    private static final int OPEN_ITERS = 5;
+
+    //Closing iterations
+    private static final int CLOSE_ITERS = 30;
 
     //Erode for hugh lines
     private static int[][] ERODE_KER_DATA = new int [][] {
@@ -224,7 +226,7 @@ public class ImageProcessor {
     /**
      * Erode a mask with a 3x3 kernel.
      * @param imgSwap in-out swap of B&W Mat. Not null.
-     * @param iters number of iterations
+     * @param iters number of iterations.
      */
     private static void erode(Swap<Mat> imgSwap, int iters) {
         Imgproc.erode(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters);
@@ -233,10 +235,20 @@ public class ImageProcessor {
     /**
      * Dilate a mask with a 3x3 kernel.
      * @param imgSwap in-out swap of B&W Mat. Not null.
-     * @param iters number of iterations
+     * @param iters number of iterations.
      */
     private static void dilate(Swap<Mat> imgSwap, int iters) {
         Imgproc.dilate(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters);
+    }
+
+    /**
+     * Erode then dilate a mask with a 3x3 kernel.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
+     * @param iters number of iterations.
+     */
+    private static void opening(Swap<Mat> imgSwap, int iters) {
+        erode(imgSwap, iters);
+        dilate(imgSwap, iters);
     }
 
     /**
@@ -260,12 +272,9 @@ public class ImageProcessor {
      * @return Contour-area pairs with biggest area. Never null.
      */
     private static List<Scored<MatOfPoint>> findBiggestContours(Swap<Mat> imgSwap, int k) {
-        erode(imgSwap, E_D_ITERS);
-        dilate(imgSwap, E_D_ITERS);
-        //median(imgRef);
-
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
+        //NB: findContours mangles the image!
         findContours(imgSwap.first, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
         Podium<Scored<MatOfPoint>> podium = new Podium<>(k);
@@ -294,14 +303,23 @@ public class ImageProcessor {
     }
 
     /**
+     * Get a mask from a contour
+     * @param imgSwap out swap of B&W Mat. Not null.
+     * @param contour MatOfPoint containing a contour. Not null.
+     */
+    private static void maskFromContour(Swap<Mat> imgSwap, MatOfPoint contour) {
+        imgSwap.first.setTo(new Scalar(BLACK));
+        fillPoly(imgSwap.first, singletonList(contour), new Scalar(WHITE));
+    }
+
+    /**
      * Set to white everything outside contour.
      * @param imgSwap in-out swap of B&W Mat. Not null.
      * @param contour MatOfPoint containing a contour. Not null.
      */
     private static void removeBackground(Swap<Mat> imgSwap, MatOfPoint contour) {
         Mat binary = imgSwap.first.clone();
-        imgSwap.first.setTo(new Scalar(0));
-        fillPoly(imgSwap.first, singletonList(contour), new Scalar(255));
+        maskFromContour(imgSwap, contour);
         erode(imgSwap, ERODE_KER_DATA[0].length + 1);
         bitwise_and(binary, imgSwap.first, imgSwap.swap());
     }
@@ -518,6 +536,27 @@ public class ImageProcessor {
     }
 
     /**
+     * Apply dilation followed by erosion on a contour to remove creeks.
+     * Not to be confused with closing a curve into a contour.
+     * @param contour input contour. Not null.
+     * @param imgSwap in swap of B&W Mat. Modified by this function. Not null.
+     * @return new contour or null if no contour found.
+     */
+    private static Scored<MatOfPoint> contourClosing(MatOfPoint contour, Swap<Mat> imgSwap, int iters) {
+        maskFromContour(imgSwap, contour);
+        //closing
+        dilate(imgSwap, iters);
+        // I have to force erode to consider the outside of the image all black.
+        medianBlur(imgSwap.first, imgSwap.swap(), MED_SZ);
+        Imgproc.erode(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters,
+                BORDER_CONSTANT, new Scalar(BLACK));
+//        erode(imgSwap, iters);
+        List<Scored<MatOfPoint>> contours = findBiggestContours(imgSwap, 1);
+        // no contours found if image side is < than 2 * iters
+        return contours.size() > 0 ? contours.get(0) : null;
+    }
+
+    /**
      * Create a rectangle (4 corners inside a MatOfPoint2f) from size and margin
      * @param size rectangle size
      * @param margin rectangle margin
@@ -663,12 +702,13 @@ public class ImageProcessor {
     //PUBLIC:
 
     /**
-     * You need to call setBitmap().
+     * To make this {@link ImageProcessor} instance valid, you still need to call {@link #setImage(Bitmap)}.
      */
     public ImageProcessor() {}
 
     /**
      * Copy constructor
+     * @param otherInstance instance to be copied.
      */
     public ImageProcessor(ImageProcessor otherInstance) {
         srcImg = otherInstance.srcImg.clone();
@@ -678,17 +718,15 @@ public class ImageProcessor {
     }
 
     /**
-     * No need to call setBitmap().
+     * Constructor that calls {@link #setImage(Bitmap)}.
      * @param bm ticket bitmap. Not null.
      */
-    public ImageProcessor(@NonNull Bitmap bm) {
-        setImage(bm);
-    }
+    public ImageProcessor(@NonNull Bitmap bm) { setImage(bm); }
 
     /**
-     * Constructor that calls setImage() and setCorners().
+     * Constructor that calls {@link #setImage(Bitmap)}, {@link #setCorners(List)}.
      * @param bm ticket bitmap. Not null.
-     * @param corners pre-calculated ticket corners with findTicket().
+     * @param corners pre-calculated ticket corners with {@link #findTicket(boolean)}.
      */
     public ImageProcessor(@NonNull Bitmap bm, @NonNull List<PointF> corners) {
         setImage(bm);
@@ -712,7 +750,7 @@ public class ImageProcessor {
      * @param quick <ul> true: faster but more inaccurate, good for real time visual feedback. </ul>
      *              <ul> false: slower but more accurate, good for recalculating the rectangle after the shot
      *                                                    or for analyzing an imported image. </ul>
-     * @return list of IPError, all possible errors are listed in {@link IPError}.
+     * @return list of {@link IPError}.
      *         <p> The rectangle corners are always found (unless the error list contains INVALID_CORNERS),
      *             but they can be useless, depending on the presence of other errors. </p>
      */
@@ -725,12 +763,15 @@ public class ImageProcessor {
         Swap<Mat> graySwap = new Swap<>(grayResized.clone(), new Mat());
         Mat binary = prepareBinaryImg(graySwap).clone(); // I use clone because otherwise
         Mat edges = toEdges(graySwap).clone();           // they will be recycled by the swap.
-        graySwap.first = binary; // not cloning the image, it will be overwritten with findBiggestContours.
+        graySwap.first = binary; // not cloning the image, it will be overwritten
+        opening(graySwap, OPEN_ITERS);
+        List<Scored<MatOfPoint>> contours = findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS);
 
         // select the contour that most likely contains a Ticket
         List<Scored<ContourResult>> candidates = new ArrayList<>();
-        for (Scored<MatOfPoint> contour : findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS)) {
-            MatOfPoint2f rect = findPolySimple(contour.obj());
+        for (Scored<MatOfPoint> contour : contours) {
+            Scored<MatOfPoint> sanitizedCtr = contourClosing(contour.obj(), graySwap, CLOSE_ITERS);
+            MatOfPoint2f rect = findPolySimple((sanitizedCtr != null ? sanitizedCtr : contour).obj());
             // find Hough lines of ticket text
             graySwap.first = edges.clone();
             removeBackground(graySwap, contour.obj());
@@ -748,7 +789,6 @@ public class ImageProcessor {
                 if (size.width > size.height)
                     rect = shiftMatPoints(rect, angle > 0 ? 1 : 3); // 1 -> rotate clockwise
             }                                                       // 3 -> rotate counter clockwise
-            //todo use RANSAC to find undistort transform matrix
             candidates.add(new Scored<>(0., new ContourResult(rect, angle, angleConfidence.val)));
         }
         List<IPError> errors = new ArrayList<>();
@@ -782,12 +822,12 @@ public class ImageProcessor {
     }
 
     /**
-     * Asynchronous version of findTicket(quick). The errors are passed by the callback parameter.
+     * Asynchronous version of {@link #findTicket(boolean)}. The errors are passed by the callback parameter.
      * @param quick true: fast mode; false: slow mode.
      * @param callback Callback
      */
     public void findTicket(boolean quick, @NonNull Consumer<List<IPError>> callback) {
-        //in a new thread, run findTicket, then return the result calling the callback.
+        //in a new thread, run findTicket, then return the result executing the callback.
         new Thread(() -> callback.accept(findTicket(quick))).start();
     }
 
@@ -817,7 +857,7 @@ public class ImageProcessor {
     }
 
     /**
-     * Get a Bitmap of a ticket with a perspective correction applied, with a margin.
+     * Get a {@link Bitmap} of a ticket with a perspective correction applied, with a margin.
      * @param marginMul Fraction of length of shortest side of the rectangle of the ticket.
      *                  A good value is 0.02.
      * @param shortSide set the shortest side of the output bitmap,
@@ -834,15 +874,13 @@ public class ImageProcessor {
     }
 
     /**
-     * Convenience overload for undistort(0, 0)
+     * Convenience overload for undistort(0, 0).
      * @return Bitmap, null if error.
      */
-    public synchronized Bitmap undistort() {
-        return undistort(0, 0);
-    }
+    public synchronized Bitmap undistort() { return undistort(0, 0); }
 
     /**
-     * Asynchronous version of undistort(marginMul). The bitmap is passed by the callback parameter.
+     * Asynchronous version of {@link #undistort(double, int)}. The bitmap is passed by the callback parameter.
      * @param marginMul Margin multiplier
      * @param callback Callback
      */

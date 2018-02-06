@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private static final Scalar RED = new Scalar(255,0,0, 255);
     private static final Scalar DARK_RED = new Scalar(127,0, 0, 255);
     private static final Scalar ORANGE = new Scalar(255,127, 0, 255);
+    private static final Scalar YELLOW = new Scalar(255,255, 0, 255);
     private static final Scalar GREEN = new Scalar(0,255,0, 255);
     private static final Scalar DARK_GREEN = new Scalar(0,127,0, 255);
     private static final Scalar BLUE = new Scalar(0,0,255, 255);
@@ -353,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
      * This method was build as a monolith to edit the pipeline more easily, but once this method is
      * called, it cannot be canceled halfway in.
      */
+    @SuppressWarnings("unchecked")
     private void processImage(Bitmap bm, ThrowableConsumer<Bitmap, Exception> show) throws Exception {
         ThrowableConsumer<Mat, Exception> showMat = img ->
                 show.accept(invoke(IP_CLASS, "matToBitmap", img));
@@ -370,9 +372,13 @@ public class MainActivity extends AppCompatActivity {
             Mat binary = ((Mat)invoke(IP_CLASS, "prepareBinaryImg", graySwap)).clone();
             showMat.accept(binary);
 
+            int openingIters = getField(IP_CLASS, "OPEN_ITERS");
+            invoke(IP_CLASS, "opening", graySwap, openingIters);
             List<Scored<MatOfPoint>> contours =
                     invoke(IP_CLASS, "findBiggestContours", graySwap, 2);
-            MatOfPoint contour = contours.get(0).obj();
+            int closingIters = getField(IP_CLASS, "CLOSE_ITERS");
+            MatOfPoint contour = ((Scored<MatOfPoint>)invoke(IP_CLASS, "contourClosing",
+                    contours.get(0).obj(), graySwap, closingIters)).obj();
 
             graySwap.first = binary;
             invoke(IP_CLASS, "toEdges", graySwap);
@@ -384,8 +390,9 @@ public class MainActivity extends AppCompatActivity {
             // show both contours and hough lines
             Mat rgbaResized = new Mat();
             cvtColor(grayResized, rgbaResized, COLOR_GRAY2RGBA);
-            Mat contourImg = drawLines(drawContour(drawContour(rgbaResized, contours.get(1).obj(),
-                    ORANGE, DEF_THICKNESS), contour, BLUE, DEF_THICKNESS), lines, PURPLE);
+            Mat contourImg = drawContour(rgbaResized, contours.get(1).obj(), ORANGE, DEF_THICKNESS);
+            contourImg = drawContour(contourImg, contours.get(0).obj(), YELLOW, DEF_THICKNESS);
+            contourImg = drawLines(drawContour(contourImg, contour, BLUE, DEF_THICKNESS), lines, PURPLE);
             drawPoly(contourImg, corners, corners.rows() == 4 ? GREEN : RED, DEF_THICKNESS);
             showMat.accept(contourImg);
         }
