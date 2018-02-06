@@ -62,7 +62,7 @@ public class DataAnalyzer {
      * @return list of texts containing amount string with its score
      */
     static List<Scored<OcrText>> getAmountTexts(@NonNull List<OcrText> texts) {
-        return findAllMatchedStrings(texts, AMOUNT_MATCHERS);
+        return findAllMatchedStrings(texts, IT_AMOUNT_MATCHERS);
     }
 
     /**
@@ -141,9 +141,13 @@ public class DataAnalyzer {
      * @param texts list of scored target texts (prices). Not null.
      * @return text containing amount price and it's decoded value
      */
+    /* ZAGLIA: I have set numNoSpaces() deprecated, instead you should concatenate only last two sanitizednum words for best result.
+     Consider also to try to add a dot between the two sanitized words, like in trySingleMatch.
+     Prices wold never get split to more than 2 words.
+    */
     static Pair<OcrText, BigDecimal> getRestoredAmount(@NonNull List<Scored<OcrText>> texts) {
         for (Scored<OcrText> singleText : texts) {
-            if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().numNoSpaces()) < NUMBER_MIN_VALUE) {
+            if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().textSanitizedNum()) < NUMBER_MIN_VALUE) {
                 BigDecimal amount = analyzeAmount(singleText.obj().textSanitizedForced());
                 if (amount != null)
                     return new Pair<>(singleText.obj(), amount);

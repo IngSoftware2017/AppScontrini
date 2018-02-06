@@ -125,11 +125,12 @@ public class ScoreFunc {
      * If string is longer than NUMBER_MAX_LENGTH default is Integer.MAX_VALUE (allowed numbers up to nn.nnn,nn)
      * return is decreased if one '.' in sanitized is present, increased if more than one are present.
      * @param originalNoSpace string with original text (textnospaces)
-     * @param sanitized string with sanitized text (numnospaces)
+     * @param sanitized string with sanitized text (sanitized text)
      * @return Integer.MAX_VALUE if less than MIN_DIGITS_NUMBER of the string are not numbers;
      * otherwise number of non-digit chars (*0.5 if special)/length
      */
     public static double isPossiblePriceNumber(String originalNoSpace, String sanitized) {
+        sanitized = sanitized.replace(" ", "");
         double specialCharsMultiplier = 0.5;
         if (sanitized.length() >= NUMBER_MAX_LENGTH)
             return Integer.MAX_VALUE;

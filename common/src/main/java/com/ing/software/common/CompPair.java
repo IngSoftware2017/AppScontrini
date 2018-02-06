@@ -16,7 +16,5 @@ public class CompPair<C extends Comparable<C>, T> implements Comparable<CompPair
     }
 
     @Override
-    public int compareTo(@NonNull CompPair<C, T> o) {
-        return comp.compareTo(o.comp);
-    }
+    public int compareTo(@NonNull CompPair<C, T> o) { return comp.compareTo(o.comp); }
 }

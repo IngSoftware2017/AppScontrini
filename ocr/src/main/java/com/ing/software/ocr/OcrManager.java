@@ -6,11 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import com.ing.software.common.Scored;
-import com.ing.software.ocr.OcrObjects.OcrError;
-import com.ing.software.ocr.OcrObjects.OcrLevels;
-import com.ing.software.ocr.OcrObjects.OcrOptions;
 import com.ing.software.ocr.OcrObjects.OcrText;
-import com.ing.software.ocr.OcrObjects.OcrTicket;
 import com.ing.software.ocr.OcrObjects.TicketSchemes.TicketScheme;
 import com.ing.software.ocr.OperativeObjects.AmountComparator;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
@@ -63,14 +59,10 @@ public class OcrManager {
 
     /**
      * Get a Ticket from an ImageProcessor. Some fields of the new ticket can be null.
-     * <p> Possible errors inside Ticket.errors can be: </p>
-     * <ul> INVALID_STATE: this OcrManager has not been properly initialized. </ul>
-     * <ul> INVALID_PROCESSOR: the ImageProcessor passed as parameter is not valid. </ul>
-     * <ul> AMOUNT_NOT_FOUND: the amount has not been found. </ul>
-     * <ul> DATE_NOT_FOUND: the date has not been found. </ul>
-     * @param imgProc ImageProcessor which has been set an image. Not null.
-     * @param options define which operations to execute
-     * @return Ticket. Never null.
+     * <p> All possible errors inside {@link OcrTicket#errors} are listed in {@link OcrError}. </p>
+     * @param imgProc {{@link ImageProcessor} which has been set an image. Not modified by this method. Not null.
+     * @param options define which operations to execute and detection accuracy. Not Null
+     * @return {@link OcrTicket} Never null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
@@ -78,7 +70,7 @@ public class OcrManager {
     public synchronized OcrTicket getTicket(@NonNull ImageProcessor imgProc, OcrOptions options) {
         ImageProcessor procCopy = new ImageProcessor(imgProc);
         OcrTicket ticket = extractTicket(procCopy, options);
-        if (options.isRedoUpsideDown() && ticket.amount == null && ticket.restoredAmount == null) {
+        if (options.redoUpsideDown() && ticket.amount == null && ticket.restoredAmount == null) {
             procCopy.rotateUpsideDown();
             ticket = extractTicket(procCopy, options);
         }
@@ -103,11 +95,7 @@ public class OcrManager {
 
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        Bitmap frame;
-        if (options.contains(OcrLevels.VERY_QUICK))
-            frame = imgProc.undistortForOCR(1. / 3.);
-        else
-            frame = imgProc.undistortForOCR(options.contains(OcrLevels.QUICK) ? 1. / 2. : 1. );
+        Bitmap frame = imgProc.undistortForOCR(options.getResolutionMultiplier());
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
@@ -132,11 +120,11 @@ public class OcrManager {
         OcrUtils.listEverything();
 
         OcrTicket newTicket = new OcrTicket();
-        if (options.isFindDate()) {
+        if (options.findDate()) {
             newTicket.date = DataAnalyzer.findDate(lines);
         }
         Scored<TicketScheme> bestTicket = null;
-        if (options.isFindTotal()) {
+        if (options.findTotal()) {
             /*
             Steps:
             1- search string in texts --> Data Analyzer --> Word Matcher
@@ -201,7 +189,7 @@ public class OcrManager {
                 }
             }
         }
-        if (options.isFindProducts()) {
+        if (options.findProducts()) {
             List<Pair<String, BigDecimal>> newProducts = null;
             if (bestTicket != null) {
                 List<Pair<OcrText, BigDecimal>> prices = bestTicket.obj().getPricesList();
@@ -233,8 +221,10 @@ public class OcrManager {
     }
 
     /**
-     * Asynchronous version of getTicket(imgProc). The ticket is passed by the callback parameter.
-     * @param imgProc ImageProcessor which has been set an image. Not null.
+     * Asynchronous version of {@link #getTicket(ImageProcessor, OcrOptions)}.
+     * The ticket is passed by the callback parameter.
+     * @param imgProc {{@link ImageProcessor} which has been set an image. Not modified by this method. Not null.
+     * @param options define which operations to execute and detection accuracy. Not Null
      * @param ticketCb callback to get the ticket. Not null.
      *
      * @author Riccardo Zaglia

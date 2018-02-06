@@ -2,6 +2,7 @@ package com.ing.software.ocr;
 
 import android.graphics.*;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 import android.util.SizeF;
 
 import com.annimon.stream.Stream;
@@ -18,9 +19,9 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.DoubleAccumulator;
 
 import com.annimon.stream.function.*;
-import com.ing.software.ocr.OcrObjects.IPError;
 
 import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.*;
@@ -106,7 +107,7 @@ public class ImageProcessor {
     //Accumulator for Hough lines
     private static final int SECTORS = 101; // accumulator resolution, should be odd
     private static final int MAX_SECTOR_DIST = SECTORS / 10; // max distance from best sector
-                                                            // that separate inliers from outliers
+    // that separate inliers from outliers
     private static final double MIN_CONFIDENCE = 0.7; // ratio of inlier lines score
     private static final int MIN_LINES = 5;
     // the best angle found is accepted if in the 2 / 10 of all sectors are concentrated half of all lines
@@ -478,11 +479,11 @@ public class ImageProcessor {
      * Get a score proportional to exposure
      * @param img gray Mat. Not null
      * @param contour contour containing the ticket
-     * @return value between -1 and 1
+     * @return
      */
     //Check if average of area inside contour is above e.g. 200, if not: UNDEREXPOSED
     // then check if the the darker shades (text) are well spread
-    // (can use ratio between convex hull of contour and convex hull of text), if not: OVEREXPOSED
+    // (can use ratio between area of convex hull of contour and area of convex hull of text), if not: OVEREXPOSED
     private static double getExposure(Mat img, MatOfPoint contour) {
         return 0; // stub
     }
@@ -491,11 +492,13 @@ public class ImageProcessor {
      * Get a score proportional to focus
      * @param img gray Mat. Not null
      * @param contour contour containing the ticket
-     * @return value between 0 and 1
+     * @return
      */
     // Use a simple edge detector (try Canny) tuned to detect sharp edges.
     // if there are too few edges, the image is out of focus.
-    private static double getFocus(Mat img, MatOfPoint contour) {
+    // return (number of edge pixels)^2 / contour area
+    // use ^2 because edges are one dimensional, but we want to compare to an area (2 dimensional)
+    private static double getFocus(Mat img, MatOfPoint contour, double area) {
         return 1; // stub
     }
 
@@ -503,7 +506,7 @@ public class ImageProcessor {
      * Get a score proportional to contrast from background
      * @param rect perspective rectangle containing the ticket
      * @param contour contour containing the ticket
-     * @return value between 0 and 1
+     * @return
      */
     //Problem: Sometimes, if the contrast of the ticket with background is poor, the contour bleeds
     // into the background. Sometimes if the text is too close to the edge of the ticked, a carving
@@ -598,7 +601,7 @@ public class ImageProcessor {
     synchronized Bitmap undistortedSubregion(SizeF undistorted, RectF region, double newAspectRatio) {
         if (quickCorners || corners == null)
             return null; // region and aspect ratio make sense only if calculated from
-                         // the bitmap obtained with undistort(), which calculates the corners.
+        // the bitmap obtained with undistort(), which calculates the corners.
         // convert android structures to OpenCV. "resized" means these are resized compared to the original bitmap.
         Size resizedUndistorted = new Size(undistorted.getWidth(), undistorted.getHeight());
         MatOfPoint2f resizedRegVerts = new MatOfPoint2f(
@@ -706,8 +709,7 @@ public class ImageProcessor {
     /**
      * Find the 4 corners of a ticket, ordered counter-clockwise from the top-left corner of the ticket.
      * The corners are ordered to get a straight ticket (but could be upside down).
-     * @param quick <ul> true: faster but more inaccurate, good for real time visual feedback.
-     *                                                     No orientation detection. </ul>
+     * @param quick <ul> true: faster but more inaccurate, good for real time visual feedback. </ul>
      *              <ul> false: slower but more accurate, good for recalculating the rectangle after the shot
      *                                                    or for analyzing an imported image. </ul>
      * @return list of IPError, all possible errors are listed in {@link IPError}.

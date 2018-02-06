@@ -37,10 +37,10 @@ public class WordMatcher {
     public double match(OcrText line) {
         //scanning each word, find the least levenshtein distance of regex to the current word
         int wordsLeastLoss = min(Stream.of(line.children())
-                .map(w -> levDistance(compiledRegex, w.textUppercase(), maxDist)).toList());
+                .map(w -> levDistance(compiledRegex, w.uppercaseAlphaNum(), maxDist)).toList());
         //scan also the whole line without spaces and return the least loss.
         //sometimes, if the characters are spread horizontally, a word can be split in multiple words.
-        int finalLoss = min(wordsLeastLoss, levDistance(compiledRegex, line.textNoSpaces(), maxDist));
+        int finalLoss = min(wordsLeastLoss, levDistance(compiledRegex, line.uppercaseAlphaNum(), maxDist));
         // the final score is the length of a word that perfectly matches regex minus the least loss.
         return max(compiledRegex.size() - finalLoss, 0);
     }

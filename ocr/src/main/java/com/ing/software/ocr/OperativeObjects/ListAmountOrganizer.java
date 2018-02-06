@@ -41,6 +41,7 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
         }
         Collections.sort(targetTexts, Collections.reverseOrder()); //higher score comes first
         //todo: remove texts with score too low
+        // ZAGLIA: Use Podium?
     }
 
     public Scored<OcrText> getSourceText() {
