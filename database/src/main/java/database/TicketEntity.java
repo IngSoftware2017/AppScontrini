@@ -36,7 +36,7 @@ public class TicketEntity {
     private List<String> category;
     private float[] corners;
     private Date insertionDate;
-    private short tagPlaces = 1;    //the number of place setting in the ticket
+    private short tagPlaces;    //the number of place setting in the ticket
     private BigDecimal pricePerson; //the single total for person (amountTicket/tagPlaces)
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
@@ -47,6 +47,7 @@ public class TicketEntity {
      * Non parametric constructor to use when you don't want set all fields
      */
     public TicketEntity() {
+        tagPlaces = 1;
     }
 
     /**

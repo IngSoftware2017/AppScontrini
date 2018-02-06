@@ -224,7 +224,7 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Gets the total amount of all tickets associate to a specific Mission
+     * Gets the total amount (for repayment) of all tickets associate to a specific Mission
      * @param id
      * @return
      */
@@ -232,8 +232,8 @@ public class DataManager {
         List<TicketEntity> tickets = getTicketsForMission(id);
         BigDecimal totAmount = BigDecimal.ZERO;
         for(int i=0; i<tickets.size(); i++)
-            if(tickets.get(i).getAmountTicket() != null)
-                totAmount = totAmount.add(tickets.get(i).getAmountTicket());
+            if(tickets.get(i).getPricePerson() != null && tickets.get(i).getTagPlaces() != 0)
+                totAmount = totAmount.add(tickets.get(i).getPricePerson());
         return totAmount;
     }
 
