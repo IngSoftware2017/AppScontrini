@@ -110,11 +110,6 @@ public class TicketEntity {
      */
     public void setAmountTicket(BigDecimal amountTicket) {
         this.amountTicket = amountTicket;
-        if(tagPlaces == 0)
-            pricePerson = BigDecimal.ZERO;
-        //divide amountTicket for the number of place setting
-        if(tagPlaces > 0)
-            pricePerson = amountTicket.divide(new BigDecimal(tagPlaces));
     }
 
     /** Created by Marco Olivieri
@@ -237,11 +232,7 @@ public class TicketEntity {
      */
     public void setTagPlaces(short tagPlaces) {
         this.tagPlaces = tagPlaces;
-        if(tagPlaces == 0)
-            pricePerson = BigDecimal.ZERO;
-        //divide amountTicket for the number of place setting
-        if(tagPlaces > 0)
-            pricePerson = amountTicket.divide(new BigDecimal(tagPlaces));
+
     }
 
     /** Created by Marco Olivieri
@@ -249,6 +240,12 @@ public class TicketEntity {
      * @return price Person
      */
     public BigDecimal getPricePerson() {
+        if(tagPlaces == 1)
+            pricePerson = amountTicket;
+        else if(tagPlaces == 0)
+            pricePerson = BigDecimal.ZERO;
+        else if(tagPlaces > 1 && amountTicket != null) //divide amountTicket for the number of place setting
+            pricePerson = amountTicket.divide(new BigDecimal(tagPlaces));
         return pricePerson;
     }
 
