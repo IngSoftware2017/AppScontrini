@@ -43,13 +43,13 @@ public class TicketEntityTest {
 
     @Test
     public void getAmountReturnTheAmount(){
-        assertTrue(ticketEntity1.getAmountTicket().equals(amount));
+        assertTrue(ticketEntity1.getAmount().equals(amount));
     }
 
     @Test
     public void setAmountSetTheAmount(){
-        ticketEntity2.setAmountTicket(amount);
-        assertTrue(ticketEntity2.getAmountTicket().equals(ticketEntity1.getAmountTicket()));
+        ticketEntity2.setAmount(amount);
+        assertTrue(ticketEntity2.getAmount().equals(ticketEntity1.getAmount()));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class TicketEntityTest {
 
     @Test
     public void toStringReturnTheExactStringForm(){
-        assertTrue(ticketEntity1.toString().equals( ticketEntity1.getShop()+"\nTotale: "+ ticketEntity1.getAmountTicket()));
+        assertTrue(ticketEntity1.toString().equals( ticketEntity1.getShop()+"\nTotale: "+ ticketEntity1.getAmount()));
     }
 //TODO getUri, setUri test
 // TODO Needed a mock test to test ID access method (even MissionID needs mock test)

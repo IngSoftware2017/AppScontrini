@@ -29,7 +29,7 @@ public class TicketEntity {
     @PrimaryKey(autoGenerate = true)
     private long ID;
     private Uri fileUri;
-    private BigDecimal amountTicket;    //the total amount in the ticket
+    private BigDecimal amount;    //the total amount in the ticket
     private String shop="";
     private Date date;
     private String title="";
@@ -37,7 +37,6 @@ public class TicketEntity {
     private float[] corners;
     private Date insertionDate;
     private short tagPlaces;    //the number of place setting in the ticket
-    private BigDecimal pricePerson; //the single total for person (amountTicket/tagPlaces)
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
@@ -54,14 +53,14 @@ public class TicketEntity {
      * Parametric constructor
      *
      * @param fileUri Path associated with the the ticket file stored in the memory
-     * @param amountTicket total amountTicket
+     * @param amount total amount
      * @param shop Name of the shop in which the ticket was issued
      * @param date the issue date of the ticket
      * @param title name given
      * @param missionID code of the mission
      */
-    public TicketEntity(Uri fileUri, BigDecimal amountTicket, String shop, Date date, String title, int missionID, short tagPlaces) {
-        this.amountTicket = amountTicket;
+    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID, short tagPlaces) {
+        this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
         this.shop = shop;
@@ -100,16 +99,16 @@ public class TicketEntity {
 
     /** Created by Marco Olivieri
      * Returns ticket amount
-     * @return amountTicket
+     * @return amount
      */
-    public  BigDecimal getAmountTicket() { return amountTicket; }
+    public  BigDecimal getAmount() { return amount; }
 
     /** Created by Marco Olivieri
      * Sets ticket amount
-     * @param amountTicket not null
+     * @param amount not null
      */
-    public void setAmountTicket(BigDecimal amountTicket) {
-        this.amountTicket = amountTicket;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     /** Created by Marco Olivieri
@@ -240,23 +239,20 @@ public class TicketEntity {
      * @return price Person
      */
     public BigDecimal getPricePerson() {
-        if(tagPlaces == 1)
-            pricePerson = amountTicket;
-        else if(tagPlaces == 0)
-            pricePerson = BigDecimal.ZERO;
-        else if(tagPlaces > 1 && amountTicket != null) //divide amountTicket for the number of place setting
-            pricePerson = amountTicket.divide(new BigDecimal(tagPlaces));
-        return pricePerson;
+        if (amount != null) {
+            if (tagPlaces == 1)
+                return amount;
+            else if (tagPlaces == 0)
+                return BigDecimal.ZERO;
+            else if (tagPlaces > 1) //divide amount for the number of place setting
+                return amount.divide(new BigDecimal(tagPlaces));
+            else
+                return null;
+        }
+        else
+            return null;
     }
 
-    @Deprecated
-    /** This method should no exists, the single price if automatic set
-     * Sets price Person
-     * @param pricePerson not negative
-     */
-    public void setPricePerson(BigDecimal pricePerson) {
-        this.pricePerson = pricePerson;
-    }
 
     /**
      * Returns a String with TicketEntity data formatted as follows:
@@ -267,7 +263,7 @@ public class TicketEntity {
      */
     @Override
     public String toString(){
-        return getShop()+"\nTotale: "+ getAmountTicket();
+        return getShop()+"\nTotale: "+ getAmount();
     }
 
 }
