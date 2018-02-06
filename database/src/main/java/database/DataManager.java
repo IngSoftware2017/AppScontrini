@@ -331,6 +331,24 @@ public class DataManager {
     public List<PersonEntity> getPersonWithLastName(String lastName){
         return database.ticketDao().getPersonWithLastName(lastName);
     }
+
+    /**Created by Federico Taschin
+     * All tickets ordered by the date of their insertion into the database
+     * @return List<TicketEntity> of all TicketEntity
+     */
+    public List<TicketEntity> getTicketForMissionOrderedByInsertionDate(int missionId){
+        return database.ticketDao().getTicketsForMissionOrderedByDate(missionId);
+    }
+
+
+    /**Created by Stefano Elardo
+     * Gets the number of active missions for the given person
+     * @param personID long, identifier of the person
+     * @return the amount of active missions
+     */
+    public int getActiveMissionsNumberForPerson(long personID){
+        return database.ticketDao().getActiveMissionsNumberForPerson(personID);
+    }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null

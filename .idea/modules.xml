@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/App.iml" filepath="$PROJECT_DIR$/App.iml" />
-      <module fileurl="file://D:\MARCO\Android\GitHub\App\AppScontrini.iml" filepath="D:\MARCO\Android\GitHub\App\AppScontrini.iml" />
       <module fileurl="file://D:\MARCO\Android\GitHub\comune\.idea\modules\AppScontrini.iml" filepath="D:\MARCO\Android\GitHub\comune\.idea\modules\AppScontrini.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\App\AppScontrini.iml" filepath="D:\MARCO\Android\GitHub\App\AppScontrini.iml" />
       <module fileurl="file://C:\Users\Task\Desktop\AppScontrini\app\app.iml" filepath="C:\Users\Task\Desktop\AppScontrini\app\app.iml" />
       <module fileurl="file://C:\Users\fedet\StudioProjects\AppScontrini\comune.iml" filepath="C:\Users\fedet\StudioProjects\AppScontrini\comune.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />

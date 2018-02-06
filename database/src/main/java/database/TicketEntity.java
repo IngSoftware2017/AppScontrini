@@ -30,11 +30,12 @@ public class TicketEntity {
     private long ID;
     private Uri fileUri;
     private BigDecimal amount;
-    private String shop;
+    private String shop="";
     private Date date;
-    private String title;
+    private String title="";
     private List<String> category;
     private float[] corners;
+    private Date insertionDate;
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
@@ -174,7 +175,8 @@ public class TicketEntity {
         this.missionID = missionID;
     }
 
-    /**
+
+    /** Created by Marco Olivieri
      * Returns the corners of the ticket
      * 8 float point of the rectangle coordinate
      * @return corners
@@ -183,7 +185,7 @@ public class TicketEntity {
         return corners;
     }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets corners of the ticket
      * Must be an array of 8 elements: the rectangle coordinate of the ticket
      * @param corners
@@ -192,6 +194,20 @@ public class TicketEntity {
         this.corners = corners;
     }
 
+    /**Created by Federico Taschin
+     * @return insertion date (not null) of the ticket
+     */
+    public Date getInsertionDate() {
+        return insertionDate;
+    }
+
+    /**Created by Federico Taschin
+     *
+     * @param insertionDate
+     */
+    public void setInsertionDate(Date insertionDate) {
+        this.insertionDate = insertionDate;
+    }
 
     /**
      * Returns a String with TicketEntity data formatted as follows:

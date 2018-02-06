@@ -23,6 +23,7 @@ public final class Constants {
         public static final String TICKET_PRIMARY_KEY = "ID";
         public static final String TICKET_FIELD_DATE = "date";
         public static final String TICKET_FIELD_CATEGORY = "category";
+        public static final String TICKET_INSERTION_DATE = "insertionDate";
 
         //Mission's constants
         public static final String MISSION_PRIMARY_KEY = "ID";

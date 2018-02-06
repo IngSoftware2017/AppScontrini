@@ -285,4 +285,20 @@ public interface DAO {
      */
     @Query("SELECT * FROM "+Constants.PERSON_TABLE_NAME+" WHERE "+Constants.PERSON_FIELD_LAST_NAME+" =:lastName")
     List<PersonEntity> getPersonWithLastName(String lastName);
+
+    /**Created by Federico Taschin
+     * All tickets ordered by the date of their insertion into the database
+     * @return all TicketEntity
+     */
+    @Query("SELECT * FROM "+ Constants.TICKET_TABLE_NAME+" WHERE " + Constants.MISSION_CHILD_COLUMNS +"= " +
+            ":missionId ORDER BY "+Constants.TICKET_INSERTION_DATE+" DESC")
+    List<TicketEntity> getTicketsForMissionOrderedByDate(int missionId);
+
+    /**Created by Stefano Elardo
+     * Gets the number of active missions for the given person
+     * @param personID long, identifier of the person
+     * @return the amount of active missions
+     */
+    @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_REPAID+"=0")
+    int getActiveMissionsNumberForPerson(long personID);
 }
