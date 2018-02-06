@@ -37,9 +37,12 @@ public class TicketEntity {
     private float[] corners;
     private Date insertionDate;
     private short tagPlaces;    //the number of place setting in the ticket
+    private int[] ipErrorArray;
+    private int[] ocrErrorArray;
+
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
-    private int missionID;
+    private long missionID;
 
     @Ignore
     /**
@@ -59,7 +62,7 @@ public class TicketEntity {
      * @param title name given
      * @param missionID code of the mission
      */
-    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID, short tagPlaces) {
+    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, long missionID, short tagPlaces) {
         this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
@@ -168,7 +171,7 @@ public class TicketEntity {
      * Returns the mission id of this ticket
      * @return missionID
      */
-    public int getMissionID() {
+    public long getMissionID() {
         return missionID;
     }
 
@@ -176,7 +179,7 @@ public class TicketEntity {
      * Sets mission id of this TicketEntity
      * @param missionID
      */
-    public void setMissionID(int missionID) {
+    public void setMissionID(long missionID) {
         this.missionID = missionID;
     }
 
@@ -251,6 +254,39 @@ public class TicketEntity {
         }
         else
             return null;
+    }
+
+    /** Created by Marco Olivieri
+     * Returns an integer array that contains ImageProcessor's error
+     * @return IpErrorArray
+     */
+    public int[] getIpErrorArray() {
+        return ipErrorArray;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets an integer array that contains ImageProcessor's error
+     * @param ipErrorArray
+     */
+    public void setIpErrorArray(int[] ipErrorArray) {
+        this.ipErrorArray = ipErrorArray;
+    }
+
+
+    /** Created by Marco Olivieri
+     * Returns an integer array that contains OCRmanager's error
+     * @return OcrErrorArray
+     */
+    public int[] getOcrErrorArray() {
+        return ocrErrorArray;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets an integer array that contains OCRmanager's error
+     * @param ocrErrorArray
+     */
+    public void setOcrErrorArray(int[] ocrErrorArray) {
+        this.ocrErrorArray = ocrErrorArray;
     }
 
 

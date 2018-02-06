@@ -38,7 +38,7 @@ public class MissionEntity {
     private String name;
 
     @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
-    private int personID;
+    private long personID;
 
     @Ignore
     /**
@@ -55,7 +55,7 @@ public class MissionEntity {
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public MissionEntity(String name, Date startDate, Date endDate, String location, int personID) {
+    public MissionEntity(String name, Date startDate, Date endDate, String location, long personID) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.location = location;
@@ -166,7 +166,7 @@ public class MissionEntity {
      * Returns person id of this mission
      * @return personID
      */
-    public int getPersonID() {
+    public long getPersonID() {
         return personID;
     }
 
@@ -174,7 +174,7 @@ public class MissionEntity {
      * Sets person id of this mission
      * @param personID
      */
-    public void setPersonID(int personID) {
+    public void setPersonID(long personID) {
         this.personID = personID;
     }
 
