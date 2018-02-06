@@ -171,8 +171,8 @@ public class TestFunctions {
             int childsTot = line.children().size();
             if (!matched && childsTot >= 2) { // merge only last two words and try again
                 matcher = PRICE_NO_THOUSAND_MARK.matcher(
-                        line.children().get(childsTot - 1).textSanitizedNum()
-                                + line.children().get(childsTot - 2).textSanitizedNum());
+                        line.children().get(childsTot - 2).textSanitizedNum()
+                                + line.children().get(childsTot - 1).textSanitizedNum());
                 matched = matcher.find();
             }
             if (matched) {
