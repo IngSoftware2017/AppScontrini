@@ -150,11 +150,19 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Executes a SELECT of all the PersonEntity in the database in alphabetical order
+     * Executes a SELECT of all the PersonEntity with last name in the database in alphabetical order
      * @return List<PersonEntity>
      */
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_LAST_NAME + " ASC")
     List<PersonEntity> getAllPersonOrder();
+
+    /**
+     * @author Marco Olivieri
+     * Executes a SELECT of all the PersonEntity with name in the database in alphabetical order
+     * @return List<PersonEntity>
+     */
+    @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_NAME + " ASC")
+    List<PersonEntity> getAllPersonNameOrder();
 
     //SELECT FROM ID
 
@@ -244,21 +252,23 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions. Those ones that weren't repaid
-     * @return List<MissionEntity> not null with all active missions
+     * Gets only active or closed missions.
+     * @param closed, boolean - true if you want mission closed, false if you want active mission
+     * @return List<MissionEntity> not null with all active or closed missions.
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = 'FALSE' ")
-    List<MissionEntity> getActiveMission();
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed")
+    List<MissionEntity> getMissionClosed(boolean closed);
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * Gets only active or closed missions of a specific person.
+     * @param closed, boolean - true if you want mission closed, false if you want active mission
      * @param personId Long not null, the person's id
-     * @return List<MissionEntity> not null with all active missions of the specific person
+     * @return List<MissionEntity> not null all active or closed missions of the specific person
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = 'FALSE' AND "
-            + Constants.PERSON_CHILD_COLUMNS + " =:personId")
-    List<MissionEntity> getActiveMissionForPerson(long personId);
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed AND "
+            + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_NAME+" ASC")
+    List<MissionEntity> getMissionClosedForPerson(boolean closed, long personId);
 
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name
@@ -275,4 +285,21 @@ public interface DAO {
      */
     @Query("SELECT * FROM "+Constants.PERSON_TABLE_NAME+" WHERE "+Constants.PERSON_FIELD_LAST_NAME+" =:lastName")
     List<PersonEntity> getPersonWithLastName(String lastName);
+
+    /**Created by Federico Taschin
+     * All tickets ordered by the date of their insertion into the database
+     * @return all TicketEntity
+     */
+    @Query("SELECT * FROM "+ Constants.TICKET_TABLE_NAME+" WHERE " + Constants.MISSION_CHILD_COLUMNS +"= " +
+            ":missionId ORDER BY "+Constants.TICKET_INSERTION_DATE+" DESC")
+    List<TicketEntity> getTicketsForMissionOrderedByDate(int missionId);
+
+    /**Created by Stefano Elardo
+     * Gets the number of active missions for the given person
+     * @param personID long, identifier of the person
+     * @return the amount of active missions
+     */
+    @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+
+            Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_CLOSED+"=0")
+    int getActiveMissionsNumberForPerson(long personID);
 }

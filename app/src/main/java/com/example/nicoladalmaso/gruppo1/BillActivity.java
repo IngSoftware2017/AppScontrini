@@ -175,7 +175,7 @@ public class BillActivity extends AppCompatActivity {
             }
         });
 
-        if(thisMission.isRepay()) {
+        if(thisMission.isClosed()) {
             fab.setVisibility(View.INVISIBLE);
         }
         else{
@@ -278,7 +278,7 @@ public class BillActivity extends AppCompatActivity {
         //If there aren't tickets show message
         TextView noBills = (TextView)findViewById(R.id.noBills);
         String noBillsError=getResources().getString(R.string.noBills);
-        if(!thisMission.isRepay())
+        if(!thisMission.isClosed())
             noBillsError+=getResources().getString(R.string.noBillsOpen);
         noBills.setText(noBillsError);
         if(count == 0){
@@ -308,7 +308,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void onResume(){
         super.onResume();
-        if(thisMission.isRepay()) {
+        if(thisMission.isClosed()) {
             fab.setVisibility(View.INVISIBLE);
         }
         else{

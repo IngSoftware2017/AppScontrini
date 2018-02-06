@@ -181,7 +181,7 @@ public class EditMission extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                thisMission.setRepay(chkIsClosed.isChecked());
+                thisMission.setClosed(chkIsClosed.isChecked());
                 DB.updateMission(thisMission);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -204,7 +204,7 @@ public class EditMission extends AppCompatActivity {
         txtMissionLocation.setText(thisMission.getLocation());
         txtMissionStart.setText(formatter.format(thisMission.getStartDate()));
         txtMissionEnd.setText(formatter.format(thisMission.getEndDate()));
-        chkIsClosed.setChecked(thisMission.isRepay());
+        chkIsClosed.setChecked(thisMission.isClosed());
     }
 
     public static void hideSoftKeyboard(Activity activity) {

@@ -64,7 +64,7 @@ public class MissionsClosed extends Fragment {
         int count = 0;
         for (int i = 0; i < missions.size(); i++)
         {
-            if(missions.get(i).isRepay()) {
+            if(missions.get(i).isClosed()) {
                 count++;
                 listMission.add(missions.get(i));
             }

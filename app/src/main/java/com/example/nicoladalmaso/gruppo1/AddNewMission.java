@@ -163,7 +163,7 @@ public class AddNewMission extends AppCompatActivity{
         miss.setName(name);
         miss.setPersonID(personID);
         miss.setLocation(location);
-        miss.setRepay(false);
+        miss.setClosed(false);
 
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
         try {

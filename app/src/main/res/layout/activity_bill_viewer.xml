@@ -112,6 +112,39 @@
                 android:layout_marginTop="8dp" />
 
             <TextView
+                android:id="@+id/totalUnTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="Totale unitario"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/billTotalUn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/peopleTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/titlePeople"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/billPeople"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="" />
+
+            <TextView
                 android:id="@+id/ticketDate"
                 android:layout_marginTop="22dp"
                 android:layout_marginLeft="32dp"

@@ -161,6 +161,16 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
+     * Return a list of the all Persons with name in alphabetical order
+     *
+     * @return List<PersonEntity>
+     */
+    public List<PersonEntity> getAllPersonNameOrder(){
+        return database.ticketDao().getAllPersonNameOrder();
+    }
+
+    /**
      * Return a list of the tickets associate to a specific Mission
      *
      * @param id identifier of the Mission
@@ -214,17 +224,16 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Gets the total amount of all tickets associate to a specific Mission
+     * Gets the total amount (for repayment) of all tickets associate to a specific Mission
      * @param id
      * @return
      */
     public BigDecimal getTotalAmountForMission(long id){
         List<TicketEntity> tickets = getTicketsForMission(id);
         BigDecimal totAmount = BigDecimal.ZERO;
-        for(int i=0; i<tickets.size(); i++){
-            if(tickets.get(i).getAmount() != null)
-                totAmount = totAmount.add(tickets.get(i).getAmount());
-        }
+        for(int i=0; i<tickets.size(); i++)
+            if(tickets.get(i).getPricePerson() != null && tickets.get(i).getTagPlaces() != 0)
+                totAmount = totAmount.add(tickets.get(i).getPricePerson());
         return totAmount;
     }
 
@@ -284,22 +293,25 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions. Those ones that weren't repaid
-     * @return List<MissionEntity> not null with all active missions
+     * Gets only active or closed missions.
+     *
+     * @param closed, boolean not null - true if you want mission closed, false if you want active mission.
+     * @return List<MissionEntity> not null with all active or closed missions.
      */
-    List<MissionEntity> getActiveMission(){
-        return database.ticketDao().getActiveMission();
+    public List<MissionEntity> getMissionClosed(boolean closed){
+        return database.ticketDao().getMissionClosed(closed);
     }
 
 
     /**
      * @author Marco Olivieri
-     * Gets only the active missions of a specific person. Those ones that weren't repaid
+     * Gets only active or closed missions of a specific person.
+     * @param closed, boolean not null - true if you want mission closed, false if you want active mission
      * @param personId Long not null, the person's id
-     * @return List<MissionEntity> not null with all active missions of the specific person
+     * @return List<MissionEntity> not null all active or closed missions of the specific person
      */
-    List<MissionEntity> getActiveMissionForPerson(long personId){
-        return database.ticketDao().getActiveMissionForPerson(personId);
+    public List<MissionEntity> getMissionClosedForPerson(boolean closed, long personId){
+        return database.ticketDao().getMissionClosedForPerson(closed, personId);
     }
 
     /**Created by Federico Taschin
@@ -318,6 +330,24 @@ public class DataManager {
      */
     public List<PersonEntity> getPersonWithLastName(String lastName){
         return database.ticketDao().getPersonWithLastName(lastName);
+    }
+
+    /**Created by Federico Taschin
+     * All tickets ordered by the date of their insertion into the database
+     * @return List<TicketEntity> of all TicketEntity
+     */
+    public List<TicketEntity> getTicketForMissionOrderedByInsertionDate(int missionId){
+        return database.ticketDao().getTicketsForMissionOrderedByDate(missionId);
+    }
+
+
+    /**Created by Stefano Elardo
+     * Gets the number of active missions for the given person
+     * @param personID long, identifier of the person
+     * @return the amount of active missions
+     */
+    public int getActiveMissionsNumberForPerson(long personID){
+        return database.ticketDao().getActiveMissionsNumberForPerson(personID);
     }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity

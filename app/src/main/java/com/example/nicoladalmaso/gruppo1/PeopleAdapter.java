@@ -82,7 +82,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         List<MissionEntity> missions = DB.getMissionsForPerson(person.getID());
         int openMissionCounter = 0;
         for(MissionEntity i:missions){
-            if(!(i.isRepay())){
+            if(!(i.isClosed())){
                 openMissionCounter++;
             }
         }

@@ -276,7 +276,7 @@ public class ExcelExport extends Export {
             cell4.setCellValue(new HSSFRichTextString(m.getLocation()));
 
             HSSFCell cell5 = irow.createCell(5);
-            cell5.setCellValue(new HSSFRichTextString(String.valueOf(m.isRepay())));
+            cell5.setCellValue(new HSSFRichTextString(String.valueOf(m.isClosed())));
 
             HSSFCell cell6 = irow.createCell(6);
             cell6.setCellValue(new HSSFRichTextString(String.valueOf(m.getPersonID())));

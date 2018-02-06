@@ -63,7 +63,7 @@ public class BillViewer extends AppCompatActivity {
     Context context;
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
-    String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = ""; // ticketDate = ""
+    String ticketTitle = "", ticketAmount = "", ticketPeople = "", ticketAmountUn = "", ticketShop = "", ticketPath = ""; // ticketDate = ""
     Date ticketDate;
     ImageView imgView;
 
@@ -93,6 +93,7 @@ public class BillViewer extends AppCompatActivity {
         ticketId = Singleton.getInstance().getTicketID();
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
+        ticketPeople = ""+thisTicket.getTagPlaces();
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate();
         if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
@@ -103,9 +104,12 @@ public class BillViewer extends AppCompatActivity {
         }
         if(thisTicket.getAmount() == null || thisTicket.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
             ticketAmount = getString(R.string.string_NoAmountFull);
+            ticketAmountUn = getString(R.string.string_NoAmountFull);
         }
-        else
-            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString()+" €";
+        else {
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
+            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
+        }
 
         //Title
         setTitle(ticketTitle);
@@ -120,6 +124,14 @@ public class BillViewer extends AppCompatActivity {
         //Total price
         TextView billPrice = (TextView)findViewById(R.id.billTotal);
         billPrice.setText(ticketAmount);
+
+        //Total per person
+        TextView billPriceUn = (TextView)findViewById(R.id.billTotalUn);
+        billPriceUn.setText(ticketAmountUn);
+
+        //Number of people
+        TextView billPeople = (TextView)findViewById(R.id.billPeople);
+        billPeople.setText(ticketPeople);
 
         //Shop
         TextView billShop = (TextView)findViewById(R.id.billShop);
