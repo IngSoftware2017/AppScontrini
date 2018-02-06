@@ -32,8 +32,8 @@ public class MissionEntity {
     private Date endDate;
     private String location;
 
-    @ColumnInfo(name = Constants.MISSION_FIELD_REPAID)
-    private boolean isRepay;
+    @ColumnInfo(name = Constants.MISSION_FIELD_CLOSED)
+    private boolean isClosed;
     private Uri excel;
     private String name;
 
@@ -59,7 +59,7 @@ public class MissionEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.location = location;
-        isRepay = false;
+        isClosed = false;
         excel = null;
         this.personID = personID;
         this.name = name;
@@ -134,16 +134,16 @@ public class MissionEntity {
      * Returns if this mission is repay or not
      * @return
      */
-    public boolean isRepay() {
-        return isRepay;
+    public boolean isClosed() {
+        return isClosed;
     }
 
     /**
      * Sets the boolean value if this mission is repay or not
-     * @param isRepay
+     * @param isClosed
      */
-    public void setRepay(boolean isRepay) {
-        this.isRepay = isRepay;
+    public void setClosed(boolean isClosed) {
+        this.isClosed = isClosed;
     }
 
     /**

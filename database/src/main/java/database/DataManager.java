@@ -295,23 +295,23 @@ public class DataManager {
      * @author Marco Olivieri
      * Gets only active or repaid missions.
      *
-     * @param repaid, boolean not null - true if you want mission repaid, false if you want active mission.
-     * @return List<MissionEntity> not null with all active or repaid missions.
+     * @param closed, boolean not null - true if you want mission closed, false if you want active mission.
+     * @return List<MissionEntity> not null with all active or closed missions.
      */
-    public List<MissionEntity> getMissionRepaid(boolean repaid){
-        return database.ticketDao().getMissionRepaid(repaid);
+    public List<MissionEntity> getMissionClosed(boolean closed){
+        return database.ticketDao().getMissionClosed(closed);
     }
 
 
     /**
      * @author Marco Olivieri
      * Gets only active or repaid missions of a specific person.
-     * @param repaid, boolean not null - true if you want mission repaid, false if you want active mission
+     * @param closed, boolean not null - true if you want mission closed, false if you want active mission
      * @param personId Long not null, the person's id
-     * @return List<MissionEntity> not null all active or repaid missions of the specific person
+     * @return List<MissionEntity> not null all active or closed missions of the specific person
      */
-    public List<MissionEntity> getMissionRepaidForPerson(boolean repaid, long personId){
-        return database.ticketDao().getMissionRepaidForPerson(repaid, personId);
+    public List<MissionEntity> getMissionClosedForPerson(boolean closed, long personId){
+        return database.ticketDao().getMissionClosedForPerson(closed, personId);
     }
 
     /**Created by Federico Taschin

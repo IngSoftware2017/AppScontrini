@@ -252,23 +252,23 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Gets only active or repaid missions.
-     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
-     * @return List<MissionEntity> not null with all active or repaid missions.
+     * Gets only active or closed missions.
+     * @param closed, boolean - true if you want mission closed, false if you want active mission
+     * @return List<MissionEntity> not null with all active or closed missions.
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid")
-    List<MissionEntity> getMissionRepaid(boolean repaid);
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed")
+    List<MissionEntity> getMissionClosed(boolean closed);
 
     /**
      * @author Marco Olivieri
      * Gets only active or repaid missions of a specific person.
-     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
+     * @param closed, boolean - true if you want mission repaid, false if you want active mission
      * @param personId Long not null, the person's id
      * @return List<MissionEntity> not null all active or repaid missions of the specific person
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid AND "
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed AND "
             + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_NAME+" ASC")
-    List<MissionEntity> getMissionRepaidForPerson(boolean repaid, long personId);
+    List<MissionEntity> getMissionClosedForPerson(boolean closed, long personId);
 
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name
@@ -299,6 +299,7 @@ public interface DAO {
      * @param personID long, identifier of the person
      * @return the amount of active missions
      */
-    @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_REPAID+"=0")
+    @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+
+            Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_CLOSED+"=0")
     int getActiveMissionsNumberForPerson(long personID);
 }
