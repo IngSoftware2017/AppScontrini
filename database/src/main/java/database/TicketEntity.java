@@ -29,13 +29,15 @@ public class TicketEntity {
     @PrimaryKey(autoGenerate = true)
     private long ID;
     private Uri fileUri;
-    private BigDecimal amount;
+    private BigDecimal amountTicket;    //the total amount in the ticket
     private String shop="";
     private Date date;
     private String title="";
     private List<String> category;
     private float[] corners;
     private Date insertionDate;
+    private short tagPlaces = 1;    //the number of place setting in the ticket
+    private BigDecimal pricePerson; //the single total for person (amountTicket/tagPlaces)
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private int missionID;
@@ -51,20 +53,21 @@ public class TicketEntity {
      * Parametric constructor
      *
      * @param fileUri Path associated with the the ticket file stored in the memory
-     * @param amount total amount
+     * @param amountTicket total amountTicket
      * @param shop Name of the shop in which the ticket was issued
      * @param date the issue date of the ticket
      * @param title name given
      * @param missionID code of the mission
      */
-    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
-        this.amount = amount;
+    public TicketEntity(Uri fileUri, BigDecimal amountTicket, String shop, Date date, String title, int missionID, short tagPlaces) {
+        this.amountTicket = amountTicket;
         this.date = date;
         this.fileUri = fileUri;
         this.shop = shop;
         this.title = title;
         this.missionID = missionID;
         corners = new float[8];
+        this.tagPlaces = tagPlaces;
     }
 
     /**
@@ -81,77 +84,84 @@ public class TicketEntity {
      */
     public void setID(long ID) { this.ID = ID; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the date of the issue of the ticket
      *
      * @return date
      */
     public  Date getDate() { return date; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket date
      * @param date not null
      */
     public void setDate(Date date) { this.date = date; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns ticket amount
-     * @return amount
+     * @return amountTicket
      */
-    public  BigDecimal getAmount() { return amount; }
+    public  BigDecimal getAmountTicket() { return amountTicket; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket amount
-     * @param amount not null
+     * @param amountTicket not null
      */
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public void setAmountTicket(BigDecimal amountTicket) {
+        this.amountTicket = amountTicket;
+        if(tagPlaces == 0)
+            pricePerson = BigDecimal.ZERO;
+        //divide amountTicket for the number of place setting
+        if(tagPlaces > 0)
+            pricePerson = amountTicket.divide(new BigDecimal(tagPlaces));
+    }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns ticket file path
      * @return fileUri
      */
     public Uri getFileUri() { return fileUri; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket file path
      * @param fileUri not null
      */
     public void setFileUri(Uri fileUri) { this.fileUri = fileUri; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the shop
      * @return shop
      */
     public String getShop() { return shop; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket shop
      * @param shop not null
      */
     public void setShop (String shop) { this.shop = shop; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the title of the ticket
      *
      * @return title
      */
     public String getTitle() { return title; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets the title of the ticket
      *
      * @param title not null
      */
     public void setTitle (String title) { this.title = title; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the list of categories of the ticket
      *
      * @return category
      */
     public List<String> getCategory() { return category; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets the list of categories of the ticket
      * @param categories
      */
@@ -159,7 +169,7 @@ public class TicketEntity {
         this.category = categories;
     }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the mission id of this ticket
      * @return missionID
      */
@@ -167,7 +177,7 @@ public class TicketEntity {
         return missionID;
     }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets mission id of this TicketEntity
      * @param missionID
      */
@@ -209,6 +219,47 @@ public class TicketEntity {
         this.insertionDate = insertionDate;
     }
 
+    /** Created by Marco Olivieri
+     * Returns the numer of place setting of the ticket.
+     * If return 0 this ticket must not to be in the final repayment
+     * @return the numer of place setting
+     */
+    public short getTagPlaces() {
+        return tagPlaces;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets the numer of place setting of the ticket.
+     * This number had not to be negative.
+     * If tagPlaces is 0 it's means this ticket must not to be in the final repayment.
+     * @param tagPlaces not negative
+     */
+    public void setTagPlaces(short tagPlaces) {
+        this.tagPlaces = tagPlaces;
+        if(tagPlaces == 0)
+            pricePerson = BigDecimal.ZERO;
+        //divide amountTicket for the number of place setting
+        if(tagPlaces > 0)
+            pricePerson = amountTicket.divide(new BigDecimal(tagPlaces));
+    }
+
+    /** Created by Marco Olivieri
+     * Returns the price of the single person
+     * @return price Person
+     */
+    public BigDecimal getPricePerson() {
+        return pricePerson;
+    }
+
+    @Deprecated
+    /** This method should no exists, the single price if automatic set
+     * Sets price Person
+     * @param pricePerson not negative
+     */
+    public void setPricePerson(BigDecimal pricePerson) {
+        this.pricePerson = pricePerson;
+    }
+
     /**
      * Returns a String with TicketEntity data formatted as follows:
      * "Shop"
@@ -218,7 +269,7 @@ public class TicketEntity {
      */
     @Override
     public String toString(){
-        return getShop()+"\nTotale: "+getAmount();
+        return getShop()+"\nTotale: "+ getAmountTicket();
     }
 
 }

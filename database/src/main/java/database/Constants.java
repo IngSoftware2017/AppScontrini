@@ -2,7 +2,7 @@ package database;
 
 /**
  * Created by Federico Taschin on 12/11/2017.
- * Modified by Marco Olivieri on 26/11/2017
+ * Modified by Marco Olivieri
  */
 
 public final class Constants {
@@ -24,6 +24,7 @@ public final class Constants {
         public static final String TICKET_FIELD_DATE = "date";
         public static final String TICKET_FIELD_CATEGORY = "category";
         public static final String TICKET_INSERTION_DATE = "insertionDate";
+        public static final String TICKET_TAG_PLACES = "tagPlaces";
 
         //Mission's constants
         public static final String MISSION_PRIMARY_KEY = "ID";
