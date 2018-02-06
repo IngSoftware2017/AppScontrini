@@ -140,7 +140,6 @@ public class TestFunctions {
         return Stream.of(lines).filter(line -> PRICE_UPSIDEDOWN.matcher(line.textNoSpaces()).find()).toList();
     }
 
-
     /**
      * Choose the OcrText that most probably contains the amount price and return it as a BigDecimal.
      * Criteria: lower distance from center of strip; least character size difference from amount string
