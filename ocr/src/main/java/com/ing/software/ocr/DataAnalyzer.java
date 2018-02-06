@@ -11,6 +11,7 @@ import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -30,7 +31,7 @@ public class DataAnalyzer {
      * @return list of texts containing amount string with its score
      */
     static List<Scored<OcrText>> getAmountTexts(@NonNull List<OcrText> texts) {
-        return findAllMatchedStrings(texts, IT_AMOUNT_MATCHERS);
+        return findAllMatchingTexts(texts, IT_AMOUNT_MATCHERS);
     }
 
     /**
@@ -46,15 +47,17 @@ public class DataAnalyzer {
     }
 
     /**
-    * Find all TextLines which text is matched by any of the list of matchers.
-    * @param lines list of TextLines. Can be empty
-    * @return TextLines matched. Can be empty if no match is found.
-    * @author Riccardo Zaglia
-    */
-    private static List<Scored<OcrText>> findAllMatchedStrings(List<OcrText> lines, List<WordMatcher> matchers) {
+     * Find all OcrText which text is matched by any of the list of matchers.
+     * @param lines list of OcrLines. Can be empty
+     * @return OcrTexts matched. Can be empty if no match is found.
+     *
+     * @author Riccardo Zaglia
+     */
+    static List<Scored<OcrText>> findAllMatchingTexts(List<OcrText> lines, List<WordMatcher> matchers) {
         return Stream.of(lines)
                 .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
-                .filter(s -> s.getScore() != 0).toList();
+                .filter(s -> s.getScore() != 0)
+                .toList();
     }
 
     /**
@@ -63,44 +66,39 @@ public class DataAnalyzer {
      * @return text containing amount price and it's decoded value
      */
     static Pair<OcrText, BigDecimal>  getMatchingAmount(@NonNull List<Scored<OcrText>> texts) {
-        for (Scored<OcrText> singleText : texts) {
-            BigDecimal amount = trySingleMatch(singleText.obj());
-            if (amount != null)
-                return new Pair<>(singleText.obj(), amount);
-        }
+        List<Pair<OcrText, String>> prices = findAllPricesRegex(Stream.of(texts).map(Scored::obj).toList());
+        if (prices.size() > 0)
+            return new Pair<>(prices.get(0).first, new BigDecimal(prices.get(0).second));
+        //ZAGLIA: you should not return the first valid BigDecimal, you should evaluate all matches
+        // then choose one with a score function or reject all. Refer to TestFunctions.findAmountPrice
         return null;
     }
 
     /**
-     * Get amount for single text from word matcher and regex
-     * @param line text containing amount price. Not null.
-     * @return Decoded value. Null if nothing found.
+     * Find all OcrTexts that matches a price with regex
+     * @param lines List of OcrTexts
+     * @return list of pairs of OcrText and associated price string
+     *
      * @author Zaglia
      */
-    private static BigDecimal trySingleMatch(@NonNull OcrText line) {
-        /*
-        Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numNoSpaces());
-        if (!matcher.find()) { // try again using a dot to concatenate words
-            matcher = PRICE_NO_THOUSAND_MARK.matcher(line.numConcatDot());
-           if (matcher.find())
-               return new BigDecimal(matcher.group());
-        } else
-            return new BigDecimal(matcher.group());
-        return null;
-        */
-        Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.textSanitizedNum());
-        boolean matched = matcher.find();
-        int childsTot = line.children().size();
-        if (!matched && childsTot >= 2) { // merge only last two words and try again
-            matcher = PRICE_NO_THOUSAND_MARK.matcher(
-                    line.children().get(childsTot - 2).textSanitizedNum()
-                            + line.children().get(childsTot - 1).textSanitizedNum());
-            matched = matcher.find();
+    static List<Pair<OcrText, String>> findAllPricesRegex(List<OcrText> lines) {
+        List<Pair<OcrText, String>> prices = new ArrayList<>();
+        for (OcrText line : lines) {
+            Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.textSanitizedNum());
+            boolean matched = matcher.find();
+            int childsTot = line.children().size();
+            if (!matched && childsTot >= 2) { // merge only last two words and try again
+                matcher = PRICE_NO_THOUSAND_MARK.matcher(
+                        line.children().get(childsTot - 2).textSanitizedNum()
+                                + line.children().get(childsTot - 1).textSanitizedNum());
+                matched = matcher.find();
+            }
+            if (matched) {
+                // Convert space or dot + space to dot, it is necessary knowing how the amount matcher is designed
+                prices.add(new Pair<>(line, matcher.group().replaceAll("(\\. | )", ".")));
+            }
         }
-        if (matched) {
-            return new BigDecimal(matcher.group().replace(" ", ""));
-        }
-        return null;
+        return prices;
     }
 
     /**

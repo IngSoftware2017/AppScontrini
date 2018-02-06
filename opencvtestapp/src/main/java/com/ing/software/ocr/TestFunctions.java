@@ -60,20 +60,6 @@ public class TestFunctions {
     }
 
     /**
-     * Find all OcrLines which text is matched by any of the list of matchers.
-     * @param lines list of OcrLines. Can be empty
-     * @return OcrLines matched. Can be empty if no match is found.
-     *
-     * @author Riccardo Zaglia
-     */
-    // todo: find most meaningful way to combine score criteria.
-    private static List<Scored<OcrText>> findAllMatchingTexts(List<OcrText> lines, List<WordMatcher> matchers) {
-        return Stream.of(lines)
-                .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
-                .filter(s -> s.getScore() != 0).toList();
-    }
-
-    /**
      * Choose the OcrText that most probably contains the amount string.
      * Criteria: AMOUNT_MATCHER score; character size; higher in the photo
      * @param lines list of OcrLines. Can be empty
@@ -85,7 +71,7 @@ public class TestFunctions {
     // Do not order. Use max() to get best scored Text, otherwise if you have to read all these texts anyway,
     // ordering it's useless.
     private static List<Scored<OcrText>> findAllScoredAmountStrings(List<OcrText> lines, SizeF bmSize) {
-        List<Scored<OcrText>> matchedLines = findAllMatchingTexts(lines, IT_AMOUNT_MATCHERS);
+        List<Scored<OcrText>> matchedLines = DataAnalyzer.findAllMatchingTexts(lines, IT_AMOUNT_MATCHERS);
         // modify score for each matched line
         for (Scored<OcrText> line : matchedLines) {
             double score = line.getScore();
@@ -154,34 +140,6 @@ public class TestFunctions {
         return Stream.of(lines).filter(line -> PRICE_UPSIDEDOWN.matcher(line.textNoSpaces()).find()).toList();
     }
 
-    private static String removeSpaces(String str) {
-        return str.replace(" ", "");
-    }
-
-    /**
-     * Find all OcrTexts that certainly matches a price
-     * @param lines List of OcrTexts
-     * @return list of pairs of OcrText and associated price string
-     */
-    private static List<Pair<OcrText, String>> findAllCertainPrices(List<OcrText> lines) {
-        List<Pair<OcrText, String>> prices = new ArrayList<>();
-        for (OcrText line : lines) {
-            Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.textSanitizedNum());
-            boolean matched = matcher.find();
-            int childsTot = line.children().size();
-            if (!matched && childsTot >= 2) { // merge only last two words and try again
-                matcher = PRICE_NO_THOUSAND_MARK.matcher(
-                        line.children().get(childsTot - 2).textSanitizedNum()
-                                + line.children().get(childsTot - 1).textSanitizedNum());
-                matched = matcher.find();
-            }
-            if (matched) {
-                // I convert spaces to dots because the matcher is designed to accept spaces as dots
-                prices.add(new Pair<>(line, removeSpaces(matcher.group())));
-            }
-        }
-        return prices;
-    }
 
     /**
      * Choose the OcrText that most probably contains the amount price and return it as a BigDecimal.
@@ -194,7 +152,7 @@ public class TestFunctions {
     // todo: find most meaningful way to combine score criteria.
     // todo: reject false positives adding a lower limit to the score > 0.
     private static BigDecimal findAmountPrice (List<OcrText> lines, OcrText amountStr, RectF stripRect) {
-        List<Pair<OcrText, String>> prices = findAllCertainPrices(lines);
+        List<Pair<OcrText, String>> prices = DataAnalyzer.findAllPricesRegex(lines);
         BigDecimal price = null;
         double bestScore = 0;
         for (Pair<OcrText, String> priceLine : prices) {

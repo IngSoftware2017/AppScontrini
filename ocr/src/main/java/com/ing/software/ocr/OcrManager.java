@@ -2,8 +2,10 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.Pair;
+import android.util.SizeF;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
@@ -11,6 +13,7 @@ import com.ing.software.ocr.OcrObjects.TicketSchemes.TicketScheme;
 import com.ing.software.ocr.OperativeObjects.AmountComparator;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.RawImage;
+
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,6 +27,7 @@ import com.annimon.stream.Stream;
 
 import static com.ing.software.ocr.OcrOptions.REDO_OCR_3;
 import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OcrAnalyzer.*;
 
 /**
  * Class to control ocr analysis
@@ -125,16 +129,19 @@ public class OcrManager {
             List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountTexts); //2
             Collections.sort(amountList, Collections.reverseOrder());
             if (!amountList.isEmpty()) {
-                List<Scored<OcrText>> amountPrice;
+                List<Scored<OcrText>> amountPrice; //ZAGLIA: the identifier is misleading, use amountTexts instead
                 int i = 0;
                 int maxScan = options.getPrecision() >= REDO_OCR_3 ? 3 : 1;
                 while (i < amountList.size()) {
+                    OcrText amountStringText = amountList.get(i).getSourceText().obj();
+                    RectF stripBoundingBox = getAmountExtendedBox(amountStringText, mainImage.getWidth());
                     if (options.getPrecision() >= OcrOptions.REDO_OCR_PRECISION && i <= maxScan) {
                         //Redo ocr on first element of list. todo: add scan for more sources if precision > 4
-                        amountPrice = analyzer.getAmountStripTexts(procCopy, amountList.get(i).getSourceText().obj());//3
+                        amountPrice = analyzer.getAmountStripTexts(procCopy, new SizeF(mainImage.getWidth(), mainImage.getHeight()),
+                                amountStringText, stripBoundingBox);//3
                     } else {
                         //Use current texts to search target texts (with price)
-                        amountPrice = OcrAnalyzer.getAmountOrigTexts(amountList.get(i).getSourceText().obj());
+                        amountPrice = OcrAnalyzer.getAmountOrigTexts(amountStringText, stripBoundingBox);
                     }
                     //set target texts (lines) to first source text
                     amountList.get(i).setAmountTargetTexts(amountPrice); //4

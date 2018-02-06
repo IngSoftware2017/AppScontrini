@@ -79,7 +79,7 @@ public class ScoreFunc {
         OcrUtils.log(7, "getDistFromSource:", "Partial diff is: " + diffCenter);
         diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
         double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
-        heightDiff = (1-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;  //<- always 0, why?
+        heightDiff = (1.-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;  //<- always 0, why? ZAGLIA: should be good now
         OcrUtils.log(5, "getDistFromSourceScore", "Score for text: " + target.text() +
             " with source: " + source.text() + " is: (diffCenter) " + diffCenter + " + (heightDiff) " + heightDiff);
         return diffCenter + heightDiff;

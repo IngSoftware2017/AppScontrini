@@ -16,6 +16,8 @@ import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.*;
 import com.ing.software.ocr.OperativeObjects.RawImage;
 
+import static com.ing.software.common.CommonUtils.rectFromSize;
+import static com.ing.software.common.CommonUtils.size;
 import static com.ing.software.ocr.OcrUtils.extendRect;
 import static com.ing.software.ocr.OcrVars.*;
 
@@ -48,16 +50,22 @@ public class OcrAnalyzer {
     void release() { ocrEngine.release(); }
 
     /**
-     * Get an OcrResult from a Bitmap
-     * @param frame Bitmap used to create an OcrResult. Not null.
-     * @return OcrResult containing raw data to be further analyzed.
+     * @author Michelon
+     * @author Riccardo Zaglia
+     *
+     * Run the ocr detection on the given bitmap.
+     * @param bm input bitmap
+     * //@param ocrEngine TextRecognizer
+     * @return list of OcrText
      */
-    List<OcrText> analyze(@NonNull Bitmap frame){
+    //ZAGLIA: to simplify the code architecture, consider merging OcrAnalyzer with OcrManager.
+    // ocrEngine is holding back methods to become static, consider passing it by parameter
+    List<OcrText> analyze(@NonNull Bitmap bm){
         long startTime = 0;
         long endTime = 1;
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(frame).build());
+        SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
             double duration = ((double) (endTime - startTime)) / 1000000000;
@@ -65,67 +73,54 @@ public class OcrAnalyzer {
         }
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        List<OcrText> rawOrigTexts = getTexts(tempArray);
+        List<OcrText> rawTexts = new ArrayList<>();
+        for (int i = 0; i < tempArray.size(); i++) {
+            for (Text line : tempArray.valueAt(i).getComponents()) {
+                OcrUtils.log(7, "GETTEXTS: ", "Text: " + line.getValue());
+                rawTexts.add(new OcrText(line));
+            }
+        }
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
             double duration = ((double) (endTime - startTime)) / 1000000000;
             OcrUtils.log(1, "OCR ANALYZER: ", "EXECUTION TIME: " + duration + " seconds");
         }
-        return rawOrigTexts;
-    }
-
-
-    /**
-     * @author Michelon
-     * @author Riccardo Zaglia
-     * Adds TextBlock decoded by detector in a list of Texts
-     * @param origTextBlocks detected texts. Not null.
-     * @return list of Texts
-     */
-    private static List<OcrText> getTexts(@NonNull SparseArray<TextBlock> origTextBlocks) {
-        List<OcrText> texts = new ArrayList<>();
-        for (int i = 0; i < origTextBlocks.size(); ++i) {
-            //for (Text currentText : origTextBlocks.valueAt(i).getComponents()) {
-            //    texts.add(new OcrText(currentText));
-            //}
-            TextBlock block = origTextBlocks.valueAt(i);
-            for (Text text : block.getComponents()) {
-                OcrUtils.log(7, "GETTEXTS: ", "Text: " + text.getValue());
-                texts.add(new OcrText(text));
-            }
-        }
-        return texts;
+        return rawTexts;
     }
 
     /**
-     * Get texts inside rect
-     * @param processor processor containing source image
-     * @param boundingBox rect to analyze
-     * @return list of detected texts
-     */
-    private List<OcrText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
-        Bitmap region = processor.undistortedSubregion(new SizeF(OcrManager.mainImage.getWidth(), OcrManager.mainImage.getHeight()),
-                boundingBox, boundingBox.width()/boundingBox.height()); //original aspect ratio
-        SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(region).build());
-        List<OcrText> distortedTexts = getTexts(tempArray);
-        return Stream.of(distortedTexts)
-                .map(text -> new OcrText(text, new RectF(0,0,region.getWidth(), region.getHeight()), boundingBox))
-                .toList();
-    }
-
-    /**
+     * @author Mihelon
+     *
      * Get extended rect from half of source rect (x axis) to right of pic and with height extended by AMOUNT_RECT_HEIGHT_EXTENDER
      * @param amountText source text containing amount string
      * @return rect extended from source text
      */
-    private static RectF getAmountExtendedBox(OcrText amountText) {
+    static RectF getAmountExtendedBox(OcrText amountText, float imageWidth) {
         float newTop = amountText.box().top - amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
         float newBottom = amountText.box().bottom + amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
-        return new RectF(amountText.box().centerX(), newTop,
-                OcrManager.mainImage.getWidth(), newBottom);
+        return new RectF(amountText.box().centerX(), newTop, imageWidth, newBottom);
     }
 
     /**
+     * @author Zaglia
+     *
+     * Create a new bitmap optimized for amount price, from the chosen strip rect.
+     * @param processor processor containing source image and valid corners
+     * @param bmSize original bitmap size
+     * @param amountStr amount string text
+     * @param origStripRect strip rect in the original bitmap space
+     * @return bitmap strip
+     */
+    private static Bitmap getStrip(
+            ImageProcessor processor, SizeF bmSize, OcrText amountStr, RectF origStripRect) {
+        return processor.undistortedSubregion(bmSize, origStripRect,
+                origStripRect.width() / origStripRect.height() * CHAR_ASPECT_RATIO
+                        / (amountStr.charWidth() / amountStr.charHeight()));
+    }
+
+    /**
+     * @author Michelon
+     *
      * Replace texts in rawImage inside passed rect with new texts passed
      * @param texts new texts to add
      * @param rect rect containing texts to remove
@@ -143,35 +138,46 @@ public class OcrAnalyzer {
     }
 
     /**
+     * @author Michelon
+     * @author EDIT: Zaglia
+     *
      * Get Texts in amount extended box
      * @param processor processor containing source image
-     * @param amountText source text containing amount string
+     * @param origBmSize original bitmap size
+     * @param amountStringText source text containing amount string
+     * @param stripRect strip bounding box in original bitmap space
      * @return list of scored texts containing decoded values
      */
-    List<Scored<OcrText>> getAmountStripTexts(ImageProcessor processor, OcrText amountText) {
-        List<Scored<OcrText>> texts = Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
-                .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
+    List<Scored<OcrText>> getAmountStripTexts(
+            ImageProcessor processor, SizeF origBmSize, OcrText amountStringText, RectF stripRect) {
+        Bitmap strip = getStrip(processor, origBmSize, amountStringText, stripRect);
+        RectF undistortedStripRect = rectFromSize(size(strip));
+        List<Scored<OcrText>> texts = Stream.of(analyze(strip))
+                .map(text -> new OcrText(text, undistortedStripRect, stripRect))
+                .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountStringText, text), text))
                 .sorted(Collections.reverseOrder())
                 .toList();
         //Collections.sort(texts, Collections.reverseOrder());
         for (Scored<OcrText> tt : texts) {
             OcrUtils.log(3, "getAmountStripTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
         }
-        replaceTexts(texts, getAmountExtendedBox(amountText));
+        replaceTexts(texts, stripRect);
         return texts;
     }
 
     /**
+     * @author Michelon
+     *
      * Get original texts from extended amount rect
      * @param amountText text containing amount string
+     * @param stripRect strip bounding box
      * @return list of scored texts containing possible price
      */
-    static List<Scored<OcrText>> getAmountOrigTexts(OcrText amountText) {
-        RectF extendedRect = getAmountExtendedBox(amountText);
-        extendedRect.set(amountText.box().left, extendedRect.top, extendedRect.right, extendedRect.bottom);
+    static List<Scored<OcrText>> getAmountOrigTexts(OcrText amountText, RectF stripRect) {
+        stripRect.set(amountText.box().left, stripRect.top, stripRect.right, stripRect.bottom);
         //copy texts that are inside extended rect. todo Check if it'a a copy or if it modifies original list
         List<Scored<OcrText>> texts = Stream.of(OcrManager.mainImage.getAllTexts())
-                                            .filter(text -> extendedRect.contains(text.box()))
+                                            .filter(text -> stripRect.contains(text.box()))
                                             .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
                                             .sorted(Collections.reverseOrder())
                                             .toList();
@@ -184,6 +190,8 @@ public class OcrAnalyzer {
     }
 
     /**
+     * @author Michelon
+     *
      * Get all texts on left of source text
      * @param source source product price rect
      * @return list of texts on left of source rect
