@@ -22,6 +22,7 @@ import static com.ing.software.ocr.OcrVars.*;
 /**
  * Class used only to perform ocr-library related operations or Text search. No more no less.
  */
+//ZAGLIA: Consider moving this into OperativeObjects
 public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
@@ -44,9 +45,7 @@ public class OcrAnalyzer {
     /**
      * Release internal resources.
      */
-    void release() {
-        ocrEngine.release();
-    }
+    void release() { ocrEngine.release(); }
 
     /**
      * Get an OcrResult from a Bitmap

@@ -6,10 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import com.ing.software.common.Scored;
-import com.ing.software.ocr.OcrObjects.OcrError;
-import com.ing.software.ocr.OcrObjects.OcrOptions;
 import com.ing.software.ocr.OcrObjects.OcrText;
-import com.ing.software.ocr.OcrObjects.OcrTicket;
 import com.ing.software.ocr.OcrObjects.TicketSchemes.TicketScheme;
 import com.ing.software.ocr.OperativeObjects.AmountComparator;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
@@ -25,7 +22,7 @@ import java.util.List;
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.Stream;
 
-import static com.ing.software.ocr.OcrObjects.OcrOptions.REDO_OCR_3;
+import static com.ing.software.ocr.OcrOptions.REDO_OCR_3;
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
@@ -64,14 +61,10 @@ public class OcrManager {
 
     /**
      * Get a Ticket from an ImageProcessor. Some fields of the new ticket can be null.
-     * <p> Possible errors inside Ticket.errors can be: </p>
-     * <ul> INVALID_STATE: this OcrManager has not been properly initialized. </ul>
-     * <ul> INVALID_PROCESSOR: the ImageProcessor passed as parameter is not valid. </ul>
-     * <ul> AMOUNT_NOT_FOUND: the amount has not been found. </ul>
-     * <ul> DATE_NOT_FOUND: the date has not been found. </ul>
-     * @param imgProc ImageProcessor which has been set an image. Not null.
-     * @param options define which operations to execute
-     * @return Ticket. Never null.
+     * <p> All possible errors inside {@link OcrTicket#errors} are listed in {@link OcrError}. </p>
+     * @param imgProc {{@link ImageProcessor} which has been set an image. Not modified by this method. Not null.
+     * @param options define which operations to execute and detection accuracy. Not Null
+     * @return {@link OcrTicket} Never null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
@@ -94,11 +87,7 @@ public class OcrManager {
 
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        Bitmap frame;
-        if (options.getPrecision() == 0)
-            frame = procCopy.undistortForOCR(1. / 3.);
-        else
-            frame = procCopy.undistortForOCR(options.getPrecision()>1 ? 1. : 1. / 2.);
+        Bitmap frame = procCopy.undistortForOCR(options.getResolutionMultiplier());
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return ticket;
@@ -113,13 +102,13 @@ public class OcrManager {
         OcrUtils.listEverything();
 
         OcrTicket newTicket = new OcrTicket();
-        if (options.isFindDate()) {
+        if (options.shouldFindDate()) {
             Date newDate = null;
             //todo add date search
             newTicket.date = newDate;
         }
         Scored<TicketScheme> bestTicket = null;
-        if (options.isFindTotal()) {
+        if (options.shouldFindTotal()) {
             /*
             Steps:
             1- search string in texts --> Data Analyzer --> Word Matcher
@@ -183,7 +172,7 @@ public class OcrManager {
                 }
             }
         }
-        if (options.isFindProducts()) {
+        if (options.shouldFindProducts()) {
             List<Pair<String, BigDecimal>> newProducts = null;
             if (bestTicket != null) {
                 List<Pair<OcrText, BigDecimal>> prices = bestTicket.obj().getPricesList();
@@ -215,8 +204,10 @@ public class OcrManager {
     }
 
     /**
-     * Asynchronous version of getTicket(imgProc). The ticket is passed by the callback parameter.
-     * @param imgProc ImageProcessor which has been set an image. Not null.
+     * Asynchronous version of {@link #getTicket(ImageProcessor, OcrOptions)}.
+     * The ticket is passed by the callback parameter.
+     * @param imgProc {{@link ImageProcessor} which has been set an image. Not modified by this method. Not null.
+     * @param options define which operations to execute and detection accuracy. Not Null
      * @param ticketCb callback to get the ticket. Not null.
      *
      * @author Riccardo Zaglia

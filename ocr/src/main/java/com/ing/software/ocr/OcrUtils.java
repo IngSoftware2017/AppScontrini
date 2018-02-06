@@ -15,7 +15,7 @@ import static com.ing.software.ocr.OcrVars.*;
 /**
  * Utility class
  */
-
+//ZAGLIA: we could move extendRect elsewhere and use this class only for debugging purposes.
 public class OcrUtils {
 
     /**
@@ -25,6 +25,7 @@ public class OcrUtils {
      * @param tag tag of the message to log, must be less than 24 chars long
      * @param message message to log
      */
+    // ZAGLIA: Consider moving this inside CommonUtils
     public static void log(@IntRange(from = 0) int level, @Size(max = 23) String tag, String message) {
         if (OcrVars.IS_DEBUG_ENABLED && level <= LOG_LEVEL)
             Log.d(tag, message);

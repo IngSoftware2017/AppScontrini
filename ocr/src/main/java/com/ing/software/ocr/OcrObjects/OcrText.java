@@ -14,17 +14,14 @@ import com.ing.software.ocr.OcrUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ing.software.common.CommonUtils.dist;
-import static com.ing.software.common.CommonUtils.pointToPointF;
-import static com.ing.software.common.CommonUtils.transform;
+import static com.ing.software.common.CommonUtils.*;
 import static java.util.Arrays.asList;
-import static java.util.Collections.max;
-import static java.util.Collections.min;
+import static java.util.Collections.*;
 
 /**
  * @author Zaglia
  * @author (Edit) Michelon
- * Main object used by this module. It represents a text with its absolute position in the image,
+ * Main object used by this module. It represents a text line or a word, with its absolute position in the image,
  * the result of ocr analysis and a first raw analysis of the string extracted.
  */
 
@@ -34,13 +31,19 @@ public class OcrText implements Comparable<OcrText> {
     private static final List<Pair<String, String>> NUM_SANITIZE_LIST = asList(
             new Pair<>("O", "0"),
             new Pair<>("o", "0"),
+            new Pair<>("D", "0"),
+            new Pair<>("U", "0"),
+            new Pair<>("I", "1"),
+            new Pair<>("l", "1"), // lowercase L
             new Pair<>("S", "5"),
             new Pair<>("s", "5"),
+            new Pair<>("?", "7"),
+            new Pair<>("B", "8"),
             new Pair<>(",", ".")
     );
 
     private boolean isWord;
-    private Lazy<List<OcrText>> children;
+    private Lazy<List<OcrText>> children; // if this OcrText instance is a text line, its children are words
     private Lazy<List<PointF>> corners; // corners of a rotated rectangle containing the line of text
     //these values are always used, so no need for lazy
     private float height, width; // width, height of entire line
@@ -48,6 +51,7 @@ public class OcrText implements Comparable<OcrText> {
     private Lazy<RectF> box;
     private String text;
     private Lazy<String> textUppercase; // uppercase text
+    private Lazy<String> uppercaseAlphaNum; // uppercase text where all non alphanumeric characters are removed. No spaces between words
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
     private Lazy<String> textSanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
     private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
@@ -55,23 +59,23 @@ public class OcrText implements Comparable<OcrText> {
 
     public OcrText(Text text) {
         isWord = text instanceof Element;
-        OcrUtils.log(7, "TEMPTEXT: ", "I'm a word: " + isWord);
+        OcrUtils.log(7, "OCRTEXT: ", "I'm a word: " + isWord);
         children = new Lazy<>(() -> Stream.of(text.getComponents()).map(OcrText::new).toList());
-        corners = new Lazy<>(() -> pointToPointF(asList(text.getCornerPoints())));
+        corners = new Lazy<>(() -> pointsToPointFs(asList(text.getCornerPoints())));
 
         // width and height are respectively the longest and shortest side of the rotated rectangle
         width =  dist(corners().get(0), corners().get(1));
         height = dist(corners().get(0), corners().get(3));
-
         box = new Lazy<>(() -> new RectF(text.getBoundingBox()));
+
         this.text = text.getValue();
-        OcrUtils.log(7, "TEMPTEXT:", "Text is: " + text.getValue());
+        OcrUtils.log(7, "OCRTEXT:", "Text is: " + text.getValue());
         textUppercase = new Lazy<>(() -> text().toUpperCase());
         textSanitizedNum = new Lazy<>(() -> {
             String res = text();
             for (Pair<String, String> p : NUM_SANITIZE_LIST)
-                res = res.replaceAll(p.first, p.second);
-            return res;
+                res = res.replace(p.first, p.second);
+            return/*textSanitizedNum*/ res;
         });
 
         // I used .reduce() to concatenate every result of the lambda expression
@@ -88,7 +92,10 @@ public class OcrText implements Comparable<OcrText> {
             // length of the shortest side of the rotated rectangle
             charHeight = min(asList(dist(corners().get(0), corners().get(3)),
                     dist(corners().get(1), corners().get(2))));
-        } else {
+
+            uppercaseAlphaNum = new Lazy<>(() -> textUppercase().replaceAll("[^A-Z0-9]", ""));
+        }
+        else {
             // average of individual words char width, weighted on word length.
             // I do not use directly line width because sometimes it's greater than the actual font width
             charWidth = Stream.of(children()).reduce(0f, (sum, currentChild) ->
@@ -97,6 +104,9 @@ public class OcrText implements Comparable<OcrText> {
             // average of individual words char height, weighted on word length
             charHeight = Stream.of(children()).reduce(0f, (sum, currentChild) ->
                     sum + currentChild.charHeight() * currentChild.length()) / textNoSpaces().length();
+
+            uppercaseAlphaNum = new Lazy<>(() -> Stream.of(children())
+                    .reduce("", (str, c) -> str + c.uppercaseAlphaNum()));
         }
         tags = new ArrayList<>();
     }
@@ -110,24 +120,26 @@ public class OcrText implements Comparable<OcrText> {
     public OcrText(OcrText ocrText, RectF srcImgRect, RectF dstImgRect) {
         isWord = ocrText.isWord;
         //apply bitmap space transformation for each word in ocrText
-        children = new Lazy<>(() -> Stream.of(ocrText.children()).map(child -> new OcrText(child, srcImgRect, dstImgRect)).toList());
+        children = new Lazy<>(() -> Stream.of(ocrText.children())
+                .map(child -> new OcrText(child, srcImgRect, dstImgRect))
+                .toList());
         corners = new Lazy<>(() -> transform(ocrText.corners(), srcImgRect, dstImgRect));
 
         // to calculate the width and height I should use the transformed corners, but this would lead to
         // a distorted rectangle that would not give a proper width and height.
-        width = transform(ocrText.width(), srcImgRect.width(), srcImgRect.width());
-        width = transform(ocrText.height(), srcImgRect.height(), srcImgRect.height());
-        charWidth = transform(ocrText.charWidth(), srcImgRect.width(), srcImgRect.width());
-        charHeight = transform(ocrText.charHeight(), srcImgRect.height(), srcImgRect.height());
+        width = transform(ocrText.width(), srcImgRect.width(), dstImgRect.width());
+        height = transform(ocrText.height(), srcImgRect.height(), dstImgRect.height());
+        charWidth = transform(ocrText.charWidth(), srcImgRect.width(), dstImgRect.width());
+        charHeight = transform(ocrText.charHeight(), srcImgRect.height(), dstImgRect.height());
         box = new Lazy<>(() -> transform(ocrText.box(), srcImgRect, dstImgRect));
-        OcrUtils.log(9, "TEMPTEXT", "Analyze: " + ocrText.text());
-        OcrUtils.log(9, "TEMPTEXT", "Mapping rect (l,t,r,b): (" + ocrText.box().left + "," +
+        OcrUtils.log(9, "OCRTEXT", "Analyze: " + ocrText.text());
+        OcrUtils.log(9, "OCRTEXT", "Mapping rect (l,t,r,b): (" + ocrText.box().left + "," +
                 ocrText.box().top + "," + ocrText.box().right + "," + ocrText.box().bottom + ")");
-        OcrUtils.log(9, "TEMPTEXT", "FROM (source): (" + srcImgRect.left + "," +
+        OcrUtils.log(9, "OCRTEXT", "FROM (source): (" + srcImgRect.left + "," +
                 srcImgRect.top + "," + srcImgRect.right + "," + srcImgRect.bottom + ")");
-        OcrUtils.log(9, "TEMPTEXT", "TO (dest): (" + dstImgRect.left + "," +
+        OcrUtils.log(9, "OCRTEXT", "TO (dest): (" + dstImgRect.left + "," +
                 dstImgRect.top + "," + dstImgRect.right + "," + dstImgRect.bottom + ")");
-        OcrUtils.log(9, "TEMPTEXT", "RESULT: (" + box().left + "," +
+        OcrUtils.log(9, "OCRTEXT", "RESULT: (" + box().left + "," +
                 box().top + "," + box().right + "," + box().bottom + ")");
 
         // the text fields remain unchanged
@@ -136,6 +148,7 @@ public class OcrText implements Comparable<OcrText> {
         textUppercase = ocrText.textUppercase;
         textNoSpaces = ocrText.textNoSpaces;
         numNoSpaces = ocrText.numNoSpaces;
+        uppercaseAlphaNum = ocrText.uppercaseAlphaNum;
         tags = ocrText.getTags();
     }
 
@@ -155,10 +168,13 @@ public class OcrText implements Comparable<OcrText> {
 
     // string properties
     public String text() { return text; }
-    public String textSanitizedNum() { return textSanitizedNum.get(); }
     public String textUppercase() { return textUppercase.get(); }
+    public String uppercaseAlphaNum() { return uppercaseAlphaNum.get(); }
     // available only if isWord() == false:
     public String textNoSpaces() { return textNoSpaces.get(); }
+    public String textSanitizedNum() { return textSanitizedNum.get(); }
+
+    @Deprecated
     public String numNoSpaces() { return numNoSpaces.get(); }
 
     public List<String> getTags() {

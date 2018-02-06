@@ -27,6 +27,7 @@ public class OcrSchemer {
     private static final int AREA_DIVIDER = 4; //used to calculate density. (total_area/AREA_DIVIDER) is the area under the current rect to analyze
     private static final int WAVE_TAGGER_HEIGHT_EXTEND = 20; //percentage of the height of source rect to extend to include other rects
     private static final int DENSITY_SNAKE_MISS_RECTS = 15; //for density limit we accept 1/MISS_RECTS wrong rects
+    //ZAGLIA: consider using normalized doubles ( 0 to 1) for percentages
 
     /**
      * Organize a list of rawTexts adding tags according to their position.

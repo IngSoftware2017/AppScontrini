@@ -8,6 +8,7 @@ import com.annimon.stream.function.Supplier;
  * Please mind that everything before :: operator is executed in place.
  * Ex: instead of (...::toList) use (() -> ... .toList()).
  * @param <T> object
+ * @author Riccardo Zaglia
  */
 public class Lazy<T> {
     private T value;
