@@ -261,10 +261,10 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Gets only active or repaid missions of a specific person.
-     * @param closed, boolean - true if you want mission repaid, false if you want active mission
+     * Gets only active or closed missions of a specific person.
+     * @param closed, boolean - true if you want mission closed, false if you want active mission
      * @param personId Long not null, the person's id
-     * @return List<MissionEntity> not null all active or repaid missions of the specific person
+     * @return List<MissionEntity> not null all active or closed missions of the specific person
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed AND "
             + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_NAME+" ASC")

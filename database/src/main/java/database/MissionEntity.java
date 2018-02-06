@@ -131,7 +131,7 @@ public class MissionEntity {
     }
 
     /**
-     * Returns if this mission is repay or not
+     * Returns if this mission is closed or not
      * @return
      */
     public boolean isClosed() {
@@ -139,7 +139,7 @@ public class MissionEntity {
     }
 
     /**
-     * Sets the boolean value if this mission is repay or not
+     * Sets the boolean value if this mission is closed or not
      * @param isClosed
      */
     public void setClosed(boolean isClosed) {

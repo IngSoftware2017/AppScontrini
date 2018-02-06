@@ -293,7 +293,7 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Gets only active or repaid missions.
+     * Gets only active or closed missions.
      *
      * @param closed, boolean not null - true if you want mission closed, false if you want active mission.
      * @return List<MissionEntity> not null with all active or closed missions.
@@ -305,7 +305,7 @@ public class DataManager {
 
     /**
      * @author Marco Olivieri
-     * Gets only active or repaid missions of a specific person.
+     * Gets only active or closed missions of a specific person.
      * @param closed, boolean not null - true if you want mission closed, false if you want active mission
      * @param personId Long not null, the person's id
      * @return List<MissionEntity> not null all active or closed missions of the specific person
