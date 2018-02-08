@@ -39,10 +39,10 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile project(':database')
     implementation project(':ocr')
+    implementation project(':database')
     compile 'com.sergiocasero.revealfab:revealfab:1.0'
-    compile "com.daimajia.swipelayout:library:1.2.0@aar"
+    compile 'com.daimajia.swipelayout:library:1.2.0@aar'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.github.bumptech.glide:glide:3.8.0'
     implementation 'com.ing.software:opencv-android:1.0.0'

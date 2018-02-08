@@ -49,6 +49,7 @@ public class CheckPhotoActivity extends Activity {
     Ticket OCR_result;
     EditText checkName;
     EditText checkPrice;
+    EditText checkPeople;
     Bitmap finalBitmap;
     ProgressBar waitOCR;
     Button btnOK;
@@ -78,6 +79,7 @@ public class CheckPhotoActivity extends Activity {
         //elements initialize
         checkPhotoView = (ImageView)findViewById(R.id.checkPhoto_image);
         checkPrice = (EditText)findViewById(R.id.input_checkTotal);
+        checkPeople = (EditText)findViewById(R.id.input_numPeople);
         checkName = (EditText)findViewById(R.id.input_checkName);
         btnRedo = (Button)findViewById(R.id.btnCheck_retry);
         btnOK = (Button)findViewById(R.id.btnCheck_allow);
@@ -178,14 +180,13 @@ public class CheckPhotoActivity extends Activity {
             FileOutputStream outOriginal = new FileOutputStream(originalPhoto);
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
-
             TicketEntity thisTicket = new TicketEntity();
 
             if(OCR_result.date == null)
                 thisTicket.setDate(Calendar.getInstance().getTime());
             else
                 thisTicket.setDate(OCR_result.date);
-
+            thisTicket.setTagPlaces(Short.parseShort(checkPeople.getText().toString()));
             thisTicket.setFileUri(uri);
             try {
                 thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(checkPrice.getText().toString())));

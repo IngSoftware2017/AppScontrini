@@ -87,7 +87,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         Date finish = mission.getEndDate();
         String finishDate =tr.format(finish);
 
-        if(mission.isRepay()) {
+        if(mission.isClosed()) {
             int textColor = context.getResources().getColor(R.color.white);
             card.setBackgroundColor(Color.parseColor("#7c7c7c"));
             total.setTextColor(textColor);
@@ -141,7 +141,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                     DB.deleteTicket((int) list.get(i).getID());
                 }
                 DB.deleteMission(mission.getID());
-                if(!mission.isRepay())
+                if(!mission.isClosed())
                     ((MissionsTabbed)context).updateThisAdapter(0, v, position);
                 else
                     ((MissionsTabbed)context).updateThisAdapter(1, v, position);
