@@ -37,6 +37,7 @@ public class TicketEntity {
     private float[] corners;
     private Date insertionDate;
     private short tagPlaces;    //the number of place setting in the ticket
+    private boolean isRefundable; //a ticket can be refundable or not
     private int[] ipErrorArray;
     private int[] ocrErrorArray;
 
@@ -219,7 +220,6 @@ public class TicketEntity {
 
     /** Created by Marco Olivieri
      * Returns the numer of place setting of the ticket.
-     * If return 0 this ticket must not to be in the final repayment
      * @return the numer of place setting
      */
     public short getTagPlaces() {
@@ -228,13 +228,27 @@ public class TicketEntity {
 
     /** Created by Marco Olivieri
      * Sets the numer of place setting of the ticket.
-     * This number had not to be negative.
-     * If tagPlaces is 0 it's means this ticket must not to be in the final repayment.
-     * @param tagPlaces not negative
+     * @param tagPlaces had to be > 0
      */
     public void setTagPlaces(short tagPlaces) {
         this.tagPlaces = tagPlaces;
 
+    }
+
+    /** Created by Marco Olivieri
+     * Returns if the ticket is refundable
+     * @return isRefundable - boolean
+     */
+    public boolean isRefundable() {
+        return isRefundable;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets if the ticket is refundable
+     * @param refundable
+     */
+    public void setRefundable(boolean refundable) {
+        isRefundable = refundable;
     }
 
     /** Created by Marco Olivieri
@@ -245,8 +259,6 @@ public class TicketEntity {
         if (amount != null) {
             if (tagPlaces == 1)
                 return amount;
-            else if (tagPlaces == 0)
-                return BigDecimal.ZERO;
             else if (tagPlaces > 1) //divide amount for the number of place setting
                 return amount.divide(new BigDecimal(tagPlaces));
             else
