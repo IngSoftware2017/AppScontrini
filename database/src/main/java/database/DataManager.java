@@ -231,9 +231,11 @@ public class DataManager {
     public BigDecimal getTotalAmountForMission(long id){
         List<TicketEntity> tickets = getTicketsForMission(id);
         BigDecimal totAmount = BigDecimal.ZERO;
-        for(int i=0; i<tickets.size(); i++)
-            if(tickets.get(i).getPricePerson() != null && tickets.get(i).getTagPlaces() != 0)
-                totAmount = totAmount.add(tickets.get(i).getPricePerson());
+        for(int i=0; i<tickets.size(); i++) {
+            BigDecimal iPrice = tickets.get(i).getPricePerson();
+            if (tickets.get(i).isRefundable() == true && iPrice != null)
+                totAmount = totAmount.add(iPrice);
+        }
         return totAmount;
     }
 

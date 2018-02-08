@@ -228,7 +228,7 @@ public class TicketEntity {
 
     /** Created by Marco Olivieri
      * Sets the numer of place setting of the ticket.
-     * @param tagPlaces had to be > 0
+     * @param tagPlaces has to be > 0
      */
     public void setTagPlaces(short tagPlaces) {
         this.tagPlaces = tagPlaces;
