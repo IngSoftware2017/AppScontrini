@@ -104,36 +104,6 @@ public class EditMission extends AppCompatActivity {
         });
 
         setMissionValues();
-        defaultOutputPath = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        manager = new ExportManager(DB, defaultOutputPath.getPath());
-        Spinner fileTypesSpinner= (Spinner) findViewById(R.id.spinner_formats);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
-        fileTypesSpinner.setAdapter(spinnerAdapter);
-
-       /* ArrayList<String> fileTypes=manager.exportTags();
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.fileTypes, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        fileTypesSpinner.setAdapter(adapter);*/
-        Button btnExport =(Button) findViewById(R.id.button_export);
-        btnExport.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-
-
-                try {
-                    Log.d("exportDebug","formato: "+fileTypesSpinner.getSelectedItem().toString());
-                    ExportedFile exported = manager.exportMission(missionID,fileTypesSpinner.getSelectedItem().toString());
-                    Uri toExport = Uri.fromFile(exported.file);
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, toExport);
-                    shareIntent.setType("file/"+fileTypesSpinner.getSelectedItem().toString());
-                    startActivity(Intent.createChooser(shareIntent,getResources().getString(R.string.text_ExportMissionTo)));
-                } catch (ExportTypeNotSupportedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     /** Dal Maso

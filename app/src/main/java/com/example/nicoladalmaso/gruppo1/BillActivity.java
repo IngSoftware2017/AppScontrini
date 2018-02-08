@@ -2,8 +2,10 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -25,14 +27,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.ing.software.ocr.OcrManager;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,6 +47,9 @@ import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 import database.TicketEntity;
+import export.ExportManager;
+import export.ExportTypeNotSupportedException;
+import export.ExportedFile;
 
 public class BillActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
@@ -57,6 +67,8 @@ public class BillActivity extends AppCompatActivity {
     CustomAdapter adapter;
     Camera mCamera;
     ListView listView;
+    ExportManager manager;
+
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int PICK_PHOTO_FOR_AVATAR = 2;
@@ -98,7 +110,7 @@ public class BillActivity extends AppCompatActivity {
         initializeComponents();
     }
 
-    /** Dal Maso
+    /** Dal Maso, Piccolo
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
@@ -109,7 +121,31 @@ public class BillActivity extends AppCompatActivity {
         Intent intent = new Intent();
         switch (item.getItemId()) {
             case R.id.action_export:
-                //TODO: show from bottom export mission
+               //Piccolo 
+                manager = new ExportManager(DB, getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getPath());
+                Log.d("export debug","click");
+                ArrayList<String> formats=manager.exportTags();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item,formats);
+                builder.setTitle(R.string.text_ExportMission)
+                        .setAdapter(adapter,new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dialog, int which) {
+                                try{
+                                    Log.d("export debug",formats.get(which));
+                                    ExportedFile exported = manager.exportMission(missionID,formats.get(which));
+                                    Uri toExport = Uri.fromFile(exported.file);
+                                    Intent shareIntent = new Intent();
+                                    shareIntent.setAction(Intent.ACTION_SEND);
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, toExport);
+                                    shareIntent.setType("file/"+formats.get(which));
+                                    startActivity(Intent.createChooser(shareIntent,getResources().getString(R.string.text_ExportMissionTo)));
+                                } catch (ExportTypeNotSupportedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
                 break;
 
             default:
