@@ -126,12 +126,12 @@ public class DataAnalyzer {
                     manipulatedAmount = new StringBuilder(temp);
                 }
                 manipulatedAmount.append(singleChar);
-            //} else if (isExp(targetAmount, i)) { //Removes previous exponents
-            //    String temp = manipulatedAmount.toString().replaceAll("E", "");
-            //    temp = temp.replaceAll("\\+", "");
-            //    temp = temp.replaceAll("-", "");
-            //    manipulatedAmount = new StringBuilder(temp);
-            //    manipulatedAmount.append(getExp(targetAmount, i));
+                //} else if (isExp(targetAmount, i)) { //Removes previous exponents
+                //    String temp = manipulatedAmount.toString().replaceAll("E", "");
+                //    temp = temp.replaceAll("\\+", "");
+                //    temp = temp.replaceAll("-", "");
+                //    manipulatedAmount = new StringBuilder(temp);
+                //    manipulatedAmount.append(getExp(targetAmount, i));
             } else if (singleChar == '-' && manipulatedAmount.length() == 0) { //If negative number
                 manipulatedAmount.append(singleChar);
             }
@@ -335,10 +335,10 @@ public class DataAnalyzer {
         if (text.charAt(startingPoint)!='E')
             return false;
         else
-            if (Character.isDigit(text.charAt(startingPoint + 1)))
-                return true;
-            else if (text.charAt(startingPoint + 1) == '+' || text.charAt(startingPoint + 1) == '-')
-                return Character.isDigit(text.charAt(startingPoint + 2));
+        if (Character.isDigit(text.charAt(startingPoint + 1)))
+            return true;
+        else if (text.charAt(startingPoint + 1) == '+' || text.charAt(startingPoint + 1) == '-')
+            return Character.isDigit(text.charAt(startingPoint + 2));
         return false;
     }
 

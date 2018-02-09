@@ -14,11 +14,18 @@ import com.annimon.stream.function.Consumer;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.*;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Matcher;
+
+import com.ing.software.common.*;
 import com.ing.software.ocr.OcrObjects.*;
 
+import static com.ing.software.common.CommonUtils.size;
+import static java.util.Collections.*;
 import static com.ing.software.ocr.OcrUtils.log;
 import static com.ing.software.ocr.OcrVars.*;
+import static java.lang.Math.*;
 
 /**
  * Class containing different methods to analyze a picture
@@ -71,7 +78,7 @@ public class OcrAnalyzer {
         listEverything(rawOrigTexts);
         List<RawStringResult> valuedTexts = new ArrayList<>();
         for (String amountString : AMOUNT_STRINGS) {
-        	valuedTexts.addAll(searchContinuousString(rawOrigTexts, amountString));
+            valuedTexts.addAll(searchContinuousString(rawOrigTexts, amountString));
         }
         valuedTexts = searchContinuousStringExtended(rawOrigTexts, valuedTexts, targetPrecision);
         List<RawGridResult> dateList = getDateList(rawOrigTexts);
@@ -246,8 +253,8 @@ public class OcrAnalyzer {
         texts = OcrSchemer.findTextsOnRight(texts);
         if (IS_DEBUG_ENABLED)
             //for (RawBlock block : blocks)
-                for (RawText text : texts)
-                    OcrUtils.log(3,"getProductPrices", "Product found: " + text.getDetection());
+            for (RawText text : texts)
+                OcrUtils.log(3,"getProductPrices", "Product found: " + text.getDetection());
         return texts;
     }
 

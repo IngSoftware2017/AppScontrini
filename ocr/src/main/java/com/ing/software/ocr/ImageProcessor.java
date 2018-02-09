@@ -83,7 +83,7 @@ public class ImageProcessor {
             new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
             new int[] { 255, 225, 255, 255, 255, 255, 255, 255, 255},
             new int[] {   0,   0, 255, 255, 255, 255, 255,   0,   0},
-            };
+    };
     private static Mat ERODE_KER; // assigned in the static block
 
     //Median kernel size
@@ -559,7 +559,7 @@ public class ImageProcessor {
 
         Mat finalImg = new Mat();
         resize(undistorted.submat((int) region.top, (int) region.bottom,
-                    (int) region.left, (int) region.right), finalImg, newSize);
+                (int) region.left, (int) region.right), finalImg, newSize);
         return matToBitmap(finalImg);
     }
 
