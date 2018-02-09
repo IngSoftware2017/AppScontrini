@@ -29,13 +29,13 @@ public abstract class Database extends RoomDatabase {
     public static Database getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), Database.class, Constants.DATABASE_NAME)
-                            .allowMainThreadQueries().build();
+                    .allowMainThreadQueries().build();
         }
         return INSTANCE;
     }
-    
+
     /**Destroys the Database instance (by setting it to null). getAppDatabase(context) must be called before using the saved instance of Database again
-    **/
+     **/
     public static void destroyInstance() {
         INSTANCE = null;
     }

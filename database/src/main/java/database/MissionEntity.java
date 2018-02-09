@@ -32,13 +32,13 @@ public class MissionEntity {
     private Date endDate;
     private String location;
 
-    @ColumnInfo(name = Constants.MISSION_FIELD_REPAID)
-    private boolean isRepay=false;
+    @ColumnInfo(name = Constants.MISSION_FIELD_CLOSED)
+    private boolean isClosed;
     private Uri excel;
     private String name;
 
     @ColumnInfo(name = Constants.PERSON_CHILD_COLUMNS)
-    private int personID;
+    private long personID;
 
     @Ignore
     /**
@@ -55,11 +55,11 @@ public class MissionEntity {
      * @param location Name of location where the mission took place
      * @param personID code of the person of this mission
      */
-    public MissionEntity(String name, Date startDate, Date endDate, String location, int personID) {
+    public MissionEntity(String name, Date startDate, Date endDate, String location, long personID) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.location = location;
-        isRepay = false;
+        isClosed = false;
         excel = null;
         this.personID = personID;
         this.name = name;
@@ -131,19 +131,19 @@ public class MissionEntity {
     }
 
     /**
-     * Returns if this mission is repay or not
+     * Returns if this mission is closed or not
      * @return
      */
-    public boolean isRepay() {
-        return isRepay;
+    public boolean isClosed() {
+        return isClosed;
     }
 
     /**
-     * Sets the boolean value if this mission is repay or not
-     * @param isRepay
+     * Sets the boolean value if this mission is closed or not
+     * @param isClosed
      */
-    public void setRepay(boolean isRepay) {
-        this.isRepay = isRepay;
+    public void setClosed(boolean isClosed) {
+        this.isClosed = isClosed;
     }
 
     /**
@@ -166,7 +166,7 @@ public class MissionEntity {
      * Returns person id of this mission
      * @return personID
      */
-    public int getPersonID() {
+    public long getPersonID() {
         return personID;
     }
 
@@ -174,7 +174,7 @@ public class MissionEntity {
      * Sets person id of this mission
      * @param personID
      */
-    public void setPersonID(int personID) {
+    public void setPersonID(long personID) {
         this.personID = personID;
     }
 

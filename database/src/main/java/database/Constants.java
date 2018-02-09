@@ -2,7 +2,7 @@ package database;
 
 /**
  * Created by Federico Taschin on 12/11/2017.
- * Modified by Marco Olivieri on 26/11/2017
+ * Modified by Marco Olivieri
  */
 
 public final class Constants {
@@ -19,23 +19,24 @@ public final class Constants {
     public static final String MISSION_CHILD_COLUMNS = "mission_ID";
 
     //Entity constants
-        //Tickets constants
-        public static final String TICKET_PRIMARY_KEY = "ID";
-        public static final String TICKET_FIELD_DATE = "date";
-        public static final String TICKET_FIELD_CATEGORY = "category";
-        public static final String TICKET_INSERTION_DATE = "insertionDate";
+    //Tickets constants
+    public static final String TICKET_PRIMARY_KEY = "ID";
+    public static final String TICKET_FIELD_DATE = "date";
+    public static final String TICKET_FIELD_CATEGORY = "category";
+    public static final String TICKET_INSERTION_DATE = "insertionDate";
+    public static final String TICKET_TAG_PLACES = "tagPlaces";
 
-        //Mission's constants
-        public static final String MISSION_PRIMARY_KEY = "ID";
-        public static final String MISSION_FIELD_START_DATE = "startDate";
-        public static final String MISSION_FIELD_END_DATE = "endDate";
-        public static final String MISSION_FIELD_LOCATION = "location";
-        public static final String MISSION_FIELD_REPAID = "isRepay";
-        public static final String MISSION_FIELD_NAME = "name";
-        //Person's constants
-        public static final String PERSON_PRIMARY_KEY = "ID";
-        public static final String PERSON_FIELD_NAME = "name";
-        public static final String PERSON_FIELD_LAST_NAME = "lastName";
+    //Mission's constants
+    public static final String MISSION_PRIMARY_KEY = "ID";
+    public static final String MISSION_FIELD_START_DATE = "startDate";
+    public static final String MISSION_FIELD_END_DATE = "endDate";
+    public static final String MISSION_FIELD_LOCATION = "location";
+    public static final String MISSION_FIELD_CLOSED = "isClosed";
+    public static final String MISSION_FIELD_NAME = "name";
+    //Person's constants
+    public static final String PERSON_PRIMARY_KEY = "ID";
+    public static final String PERSON_FIELD_NAME = "name";
+    public static final String PERSON_FIELD_LAST_NAME = "lastName";
 
 
 }

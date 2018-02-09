@@ -161,14 +161,14 @@ public class ReportDB extends AppCompatActivity {
         List<PersonEntity> person = DB.getAllPerson();
         txtNumPerson.setText(txtNumPerson.getText()+" "+ String.valueOf(person.size()));
 
-        List<MissionEntity> activeMission = DB.getMissionRepaid(false);
+        List<MissionEntity> activeMission = DB.getMissionClosed(false);
         txtActiveMission.setText(txtActiveMission.getText()+" "+ String.valueOf(activeMission.size()));
 
         //List<MissionEntity> allMission = DB.getAllMission();
         //MissionEntity m = allMission.get(0);
         //boolean repaid = m.isRepay();
         //int closeM = allMission.size()-activeMission.size();
-        List<MissionEntity> closeMission = DB.getMissionRepaid(true);
+        List<MissionEntity> closeMission = DB.getMissionClosed(true);
         txtCloseMission.setText(txtCloseMission.getText()+" "+ String.valueOf(closeMission.size()));
 
         List<TicketEntity> ticket = DB.getAllTickets();

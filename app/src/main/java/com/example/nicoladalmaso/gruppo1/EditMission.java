@@ -163,7 +163,7 @@ public class EditMission extends AppCompatActivity {
                 }
                 //thisMission.setStartMission(missionStart);
                 //thisMission.setEndMission(missionEnd);
-                thisMission.setRepay(chkIsClosed.isChecked());
+                thisMission.setClosed(chkIsClosed.isChecked());
                 DB.updateMission(thisMission);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -195,7 +195,7 @@ public class EditMission extends AppCompatActivity {
         txtMissionLocation.setText(thisMission.getLocation());
         txtMissionStart.setText(formatter.format(thisMission.getStartDate()));
         txtMissionEnd.setText(formatter.format(thisMission.getEndDate()));
-        chkIsClosed.setChecked(thisMission.isRepay());
+        chkIsClosed.setChecked(thisMission.isClosed());
 
         //Elardo mission summary
         List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);

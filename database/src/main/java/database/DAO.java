@@ -6,9 +6,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
-import android.content.Context;
 import android.provider.SyncStateContract;
-import android.widget.ListView;
 
 import java.util.Date;
 import java.util.List;
@@ -22,7 +20,7 @@ import java.util.concurrent.CompletionService;
  */
 
 /*Data Access Objects Interface. Defines the queries using Room libraries
-  These methods won't be implemented in any class, since the Room library takes care of doing the SQL operatoins by taking the  
+  These methods won't be implemented in any class, since the Room library takes care of doing the SQL operatoins by taking the
   methods parameters and executing the SQL operation defined in the correspondent '@' annotation.
   For instance, when the method addTicket(TicketEntity ticketEntity) is called, the Room library takes the ticketEntity object
   in the parameters and executes the correspondent SQL INSERT query. The use of these methods can be seen in the DataManager class.
@@ -150,7 +148,6 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME)
     List<PersonEntity> getAllPerson();
 
-
     /**
      * @author Marco Olivieri
      * Executes a SELECT of all the PersonEntity with last name in the database in alphabetical order
@@ -170,10 +167,10 @@ public interface DAO {
     //SELECT FROM ID
 
     /**
-    *Gets all the TicketEnt of a MissionEntity
-    *@param id long, the id of the MissionEntity
-    *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets for the given mission id
-    */
+     *Gets all the TicketEnt of a MissionEntity
+     *@param id long, the id of the MissionEntity
+     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets for the given mission id
+     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
     List<TicketEntity> getTicketsForMission(long id);
 
@@ -184,24 +181,15 @@ public interface DAO {
      * @return List<MissionEntity> not null (at least of 0 size) which contains all the missions for the given person id
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+" = :id")
-    List<MissionEntity> getMissionsForPerson(long id);
+    public List<MissionEntity> getMissionsForPerson(long id);
 
     /**
-     * @author Federico Taschin
-     * Return a list of the missions done by a specific Person, ordered by start date
-     *
-     * @param id identifier of the Person
-     * @return List<MissionEntity>
+     *Executes a SELECT query for a specified TicketEntity id
+     *@param id long, the id of the TicketEntity
+     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+" = :id ORDER BY "+Constants.MISSION_FIELD_START_DATE)
-    List<MissionEntity> getMissionsForPersonOrderByStartDate(long id);
-    /**
-    *Executes a SELECT query for a specified TicketEntity id
-    *@param id long, the id of the TicketEntity
-    *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
-    */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY+" =:id")
-    TicketEntity getTicket(long id);
+    public TicketEntity getTicket(long id);
 
     /**
      * @author Marco Olivieri
@@ -264,23 +252,23 @@ public interface DAO {
 
     /**
      * @author Marco Olivieri
-     * Gets only active or repaid missions.
-     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
-     * @return List<MissionEntity> not null with all active or repaid missions.
+     * Gets only active or closed missions.
+     * @param closed, boolean - true if you want mission closed, false if you want active mission
+     * @return List<MissionEntity> not null with all active or closed missions.
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid")
-    List<MissionEntity> getMissionRepaid(boolean repaid);
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed")
+    List<MissionEntity> getMissionClosed(boolean closed);
 
     /**
      * @author Marco Olivieri
-     * Gets only active or repaid missions of a specific person.
-     * @param repaid, boolean - true if you want mission repaid, false if you want active mission
+     * Gets only active or closed missions of a specific person.
+     * @param closed, boolean - true if you want mission closed, false if you want active mission
      * @param personId Long not null, the person's id
-     * @return List<MissionEntity> not null all active or repaid missions of the specific person
+     * @return List<MissionEntity> not null all active or closed missions of the specific person
      */
-    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_REPAID +" = :repaid AND "
+    @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed AND "
             + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_NAME+" ASC")
-    List<MissionEntity> getMissionRepaidForPerson(boolean repaid, long personId);
+    List<MissionEntity> getMissionClosedForPerson(boolean closed, long personId);
 
     /**Created by Federico Taschin
      * Gets all the PersonEntity with the given name
@@ -298,7 +286,12 @@ public interface DAO {
     @Query("SELECT * FROM "+Constants.PERSON_TABLE_NAME+" WHERE "+Constants.PERSON_FIELD_LAST_NAME+" =:lastName")
     List<PersonEntity> getPersonWithLastName(String lastName);
 
-    @Query("SELECT * FROM "+ Constants.TICKET_TABLE_NAME+" WHERE " + Constants.MISSION_CHILD_COLUMNS +"= :missionId ORDER BY "+Constants.TICKET_INSERTION_DATE+" DESC")
+    /**Created by Federico Taschin
+     * All tickets ordered by the date of their insertion into the database
+     * @return all TicketEntity
+     */
+    @Query("SELECT * FROM "+ Constants.TICKET_TABLE_NAME+" WHERE " + Constants.MISSION_CHILD_COLUMNS +"= " +
+            ":missionId ORDER BY "+Constants.TICKET_INSERTION_DATE+" DESC")
     List<TicketEntity> getTicketsForMissionOrderedByDate(int missionId);
 
     /**Created by Stefano Elardo
@@ -306,6 +299,7 @@ public interface DAO {
      * @param personID long, identifier of the person
      * @return the amount of active missions
      */
-    @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_REPAID+"=0")
+    @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+
+            Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_CLOSED+"=0")
     int getActiveMissionsNumberForPerson(long personID);
 }

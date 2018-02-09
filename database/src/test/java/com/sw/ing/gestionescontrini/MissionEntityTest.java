@@ -21,7 +21,7 @@ public class MissionEntityTest {
     public void beforeTest(){
         dateI = new Date(2017,11,20);
         dateF = new Date(2017,11,30);
-        missionEntity1 = new MissionEntity(dateI,dateF,"Venice",1);
+        missionEntity1 = new MissionEntity("MissionName",dateI,dateF,"Venice",1);
         missionEntity2 = new MissionEntity();
     }
 
@@ -59,13 +59,13 @@ public class MissionEntityTest {
 
     @Test
     public void isRepayInitializedFalse(){
-        assertTrue(!missionEntity1.isRepay());
+        assertTrue(!missionEntity1.isClosed());
     }
 
     @Test
     public void setRepaySetIsRepayCondition(){
-        missionEntity2.setRepay(true);
-        assertTrue(missionEntity2.isRepay());
+        missionEntity2.setClosed(true);
+        assertTrue(missionEntity2.isClosed());
     }
 
     //TODO test excel URI with mock test

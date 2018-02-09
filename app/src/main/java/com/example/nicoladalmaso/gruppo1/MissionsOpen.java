@@ -92,7 +92,7 @@ public class MissionsOpen extends Fragment {
     public void printAllMissions(){
         //List<MissionEntity> missions = DB.getMissionsForPerson(personID);
         //int count = 0;
-        List<MissionEntity> missions = DB.getMissionRepaidForPerson(false, personID);
+        List<MissionEntity> missions = DB.getMissionClosedForPerson(false, personID);
         TextView noMissions = (TextView)rootView.findViewById(R.id.noMissions);
         for (int i = 0; i < missions.size(); i++)
         {

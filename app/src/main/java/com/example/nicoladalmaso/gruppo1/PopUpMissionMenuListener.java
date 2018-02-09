@@ -96,7 +96,7 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
 
             // Close the mission
             case R.id.close_mission:
-                mission.setRepay(true);
+                mission.setClosed(true);
                 DB.updateMission(mission);
                 adapterDB.notifyDataSetChanged();
                 break;

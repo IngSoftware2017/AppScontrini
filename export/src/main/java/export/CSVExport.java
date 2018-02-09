@@ -250,7 +250,7 @@ public class CSVExport extends Export {
                 fileMissions.append(SEMICOLON_DELIMITER);
                 fileMissions.append(m.getLocation());
                 fileMissions.append(SEMICOLON_DELIMITER);
-                fileMissions.append(String.valueOf(m.isRepay()));
+                fileMissions.append(String.valueOf(m.isClosed()));
                 fileMissions.append(SEMICOLON_DELIMITER);
                 fileMissions.append(String.valueOf(m.getPersonID()));
                 fileMissions.append(NEW_LINE_SEPARATOR);
