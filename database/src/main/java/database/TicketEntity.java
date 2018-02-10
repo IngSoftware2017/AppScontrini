@@ -260,7 +260,7 @@ public class TicketEntity {
             if (tagPlaces == 1)
                 return amount;
             else if (tagPlaces > 1) //divide amount for the number of place setting
-                return amount.divide(new BigDecimal(tagPlaces));
+                return amount.divide(new BigDecimal(tagPlaces), 2, BigDecimal.ROUND_HALF_EVEN);
             else
                 return null;
         }
