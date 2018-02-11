@@ -18,6 +18,8 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import database.DataManager;
 import database.MissionEntity;
 
 /**
@@ -29,6 +31,7 @@ import database.MissionEntity;
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
+    DataManager DB;
     Activity activity;
     String path = "";
     int missionID = 0;
@@ -39,6 +42,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         super(activity.getActivity(), textViewResourceId, objects);
         this.activity = activity.getActivity();
         missions = objects;
+        DB = new DataManager(getContext());
     }
 
     @Override
@@ -121,6 +125,17 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         inflater.inflate(R.menu.popup_mission_menu, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopUpMissionMenuListener(MissionAdapterDB.this,view, missionID));
+
+        // Dynamic menu construction based on the open or not of a mission
+        MissionEntity missionEntity = DB.getMission(missionID);
+        if (missionEntity.isClosed()) {
+            popup.getMenu().findItem(R.id.close_mission).setEnabled(false);
+            popup.getMenu().findItem(R.id.export_mission).setEnabled(true);
+        } else {
+            popup.getMenu().findItem(R.id.close_mission).setEnabled(true);
+            popup.getMenu().findItem(R.id.export_mission).setEnabled(false);
+        }
+
         popup.show();
     }
 }
