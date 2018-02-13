@@ -49,7 +49,7 @@ public class MissionEntity {
 
     /**
      * Parametric constructor
-     *
+     * @param name Name given to the mission
      * @param startDate Date of the beginning of the mission
      * @param endDate Date of the end of the mission
      * @param location Name of location where the mission took place
@@ -195,4 +195,3 @@ public class MissionEntity {
     }
 
 }
-
