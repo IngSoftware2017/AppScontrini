@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="BillViewer">
+    tools:context="com.ing.software.ticketapp.BillViewer">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -21,38 +21,27 @@
             android:scaleType="centerCrop" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabEdit"
+            android:id="@+id/fabDelete"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
             android:layout_gravity="end"
-            android:layout_marginBottom="12dp"
-            android:layout_marginStart="20dp"
-            app:srcCompat="@drawable/ic_mode_edit_white_24px" />
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="16dp"
+            app:srcCompat="@drawable/ic_clear_white_24px" />
 
-        <!--
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabCrop"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_gravity="end"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="88dp"
+            app:backgroundTint="#D81B60"
             app:srcCompat="@drawable/ic_content_cut_white_24px" />
-        -->
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabOcr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/fabEdit"
-            android:layout_marginEnd="21dp"
-            android:clickable="true"
-            android:src="@drawable/ic_action_scan" />
 
     </RelativeLayout>
 
@@ -121,6 +110,39 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dp"
                 android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/totalUnTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="Totale unitario"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/billTotalUn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/peopleTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/titlePeople"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/billPeople"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="8dp"
+                android:text="" />
 
             <TextView
                 android:id="@+id/ticketDate"

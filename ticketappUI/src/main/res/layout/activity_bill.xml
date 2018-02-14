@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="MainActivity"
-    android:background="#DFDFDF">
+    android:background="#DFDFDF"
+    tools:context="com.ing.software.ticketapp.MainActivity">
 
     <TextView
         android:id="@+id/noBills"
@@ -16,8 +16,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/noBills"
-        android:visibility="invisible"
         android:textAlignment="center"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/relativeLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,38 +31,12 @@
         <ListView
             android:id="@+id/list1"
             android:layout_width="match_parent"
-            android:layout_marginTop="3dp"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="3dp"
             android:divider="#00000000"
             android:listSelector="@android:color/transparent" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab2"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="140dp"
-            android:layout_marginRight="16dp"
-            android:clickable="true"
-            android:visibility="invisible"
-            app:backgroundTint="@color/colorFAB2"
-            app:srcCompat="@mipmap/ic_image_white_24dp" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab1"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="80dp"
-            android:layout_marginRight="16dp"
-            android:clickable="true"
-            android:visibility="invisible"
-            app:backgroundTint="@color/colorFAB1"
-            app:srcCompat="@drawable/camera" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -74,7 +48,7 @@
             android:layout_marginRight="16dp"
             android:background="@color/colorPrimary"
             android:clickable="true"
-            app:srcCompat="@mipmap/ic_add_white_24dp" />
+            app:srcCompat="@mipmap/ic_camera_white_48dp" />
     </RelativeLayout>
 
 

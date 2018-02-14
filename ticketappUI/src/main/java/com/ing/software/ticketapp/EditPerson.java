@@ -35,12 +35,13 @@ public class EditPerson extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
-        //TODO: use string.xml
-        setTitle("Modifica persona");
+        context = this.getApplicationContext();
+        setTitle(context.getString(R.string.action_editPerson));
         setContentView(R.layout.activity_edit_person);
 
-        context = this.getApplicationContext();
         DB = new DataManager(context);
+        personID = Singleton.getInstance().getPersonID();
+        thisPerson = DB.getPerson(personID);
 
         //Get data from parent view
         setPersonValues();
@@ -59,6 +60,7 @@ public class EditPerson extends AppCompatActivity{
         inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
+
     /** Dal Maso, adapted by Piccolo
      * Catch events on toolbar
      * @param item object on the toolbar
@@ -70,7 +72,6 @@ public class EditPerson extends AppCompatActivity{
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_confirm:
-                //TODO set the right intent
                 thisPerson.setName(txtName.getText().toString());
                 thisPerson.setLastName(txtLastName.getText().toString());
                 thisPerson.setAcademicTitle(txtAcademicTitle.getText().toString());
@@ -91,16 +92,9 @@ public class EditPerson extends AppCompatActivity{
      * set the values of the person
      */
     private void setPersonValues(){
-        Intent intent = getIntent();
-        personID = intent.getExtras().getInt("personID");
-        Log.d("personID", "Edit person "+personID);
-        thisPerson = DB.getPerson(personID);
-        //TODO: fix the crash
         personName = thisPerson.getName();
         personLastName = thisPerson.getLastName();
         personAcademicTitle = thisPerson.getAcademicTitle();
-        Log.d("DBPerson",personID+" "+personName+" "+personLastName);
-        //set those values to the edittext
     }
 
     /**Dal Maso, adapted by Piccolo
