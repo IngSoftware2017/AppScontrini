@@ -149,6 +149,11 @@ public class CommonUtils {
                 transform(rect.bottom, srcRect.top, srcRect.bottom, dstRect.top, dstRect.bottom));
     }
 
+    public static RectF offset(RectF rect, float x, float y) {
+        return new RectF(rect.left + x, rect.top + y,
+                rect.right + x, rect.bottom + y);
+    }
+
     /**
      * Overwrite masked bits in a pattern with "value"
      * @param pattern bit pattern

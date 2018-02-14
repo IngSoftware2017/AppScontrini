@@ -2,12 +2,19 @@ package com.ing.software.ocr;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.*;
 
 import static com.ing.software.common.Reflect.*;
 import static com.ing.software.ocr.OcrVars.DATE_DMY;
+import static com.ing.software.ocr.OcrVars.POTENTIAL_PRICE;
+import static com.ing.software.ocr.OcrVars.PRICE_UPSIDEDOWN;
+import static com.ing.software.ocr.OcrVars.PRICE_WITH_SPACES;
 import static org.junit.Assert.*;
 
 /**
@@ -29,19 +36,28 @@ public class RegexTest {
         assertEquals(null, match(DATE_DMY, "abc"));
     }
 
-
     @Test
     public void potentialPriceTest1() {
-        assertEquals(null, match(DATE_DMY, "abc"));
+        assertEquals(null, match(POTENTIAL_PRICE, "abc"));
     }
 
     @Test
-    public void priceNoThousandMarkTest1() {
-        assertEquals(null, match(DATE_DMY, "abc"));
+    public void priceWithSpacesTest1() {
+        assertEquals(null, match(PRICE_WITH_SPACES, "abc"));
     }
 
     @Test
     public void priceUpsideDownTest1() {
-        assertEquals(null, match(DATE_DMY, "abc"));
+        assertEquals(null, match(PRICE_UPSIDEDOWN, "abc"));
     }
+
+    @Test
+    public void mfkdlfmdsl() {
+        int month = 3;
+
+//        assertEquals(true, Arrays.asList(1, 2, 3, 4, 5).contains(month));
+//        Date date = new GregorianCalendar(2000, 1, 29).getTime();
+        assertEquals(3, (int)Integer.valueOf("03"));
+    }
+
 }

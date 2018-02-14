@@ -29,7 +29,6 @@ public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
 
-
     /**
      * Initialize the component.
      * If this method returns -1, check if the device has enough free disk space.

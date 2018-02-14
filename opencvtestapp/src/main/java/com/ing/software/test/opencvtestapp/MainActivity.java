@@ -2,6 +2,7 @@ package com.ing.software.test.opencvtestapp;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -44,12 +45,15 @@ import static java.util.Collections.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    // aliases
+    private static final Class<?> IP = ImageProcessor.class;
+    private static final Class<?> TF = TestFunctions.class;
+
+    private static final DecimalFormat NUM_FMT = new DecimalFormat("#.##");
+
+
     private static final String FOLDER = "/TestOCR";
     private static final int CAMERA_REQUEST = 110;
-
-    // aliases
-    private static final Class<?> IP_CLASS = ImageProcessor.class;
-    private static final Class<?> OA_CLASS = TestFunctions.class;
 
     private static final int DEF_THICKNESS = 6;
     private static final int LINE_THICKNESS = 6;
@@ -138,11 +142,9 @@ public class MainActivity extends AppCompatActivity {
      * @param color Scalar with 4 channels
      * @return output RGBA Mat
      */
-    static Mat drawContour(Mat rgba, MatOfPoint contour, Scalar color, int thickness) {
-        Mat img = rgba.clone();
+    static void drawContour(Mat rgba, MatOfPoint contour, Scalar color, int thickness) {
         List<MatOfPoint> ctrList = Collections.singletonList(contour);
-        drawContours(img, ctrList, 0, color, thickness);
-        return img;
+        drawContours(rgba, ctrList, 0, color, thickness);
     }
 
 
@@ -174,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     static List<MatOfPoint> pts2matArr(List<PointF> pts) throws Exception {
-        List<Point> cvPts = invoke(IP_CLASS, "androidPtsToCV", pts);
+        List<Point> cvPts = invoke(IP, "androidPtsToCV", pts);
         return singletonList(new MatOfPoint(cvPts.toArray(new Point[4])));
     }
 
@@ -196,34 +198,31 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Draw lines contained in a MatOfInt4
-     * @param rgba input RGBA Mat
+     * @param rgba in-out RGBA Mat
      * @param lines MatOfInt4 containing the lines
      * @param color Scalar with 4 channels
-     * @return output RGBA Mat
      */
-    static Mat drawLines(Mat rgba, MatOfInt4 lines, Scalar color) {
-        Mat img = rgba.clone();
+    static void drawLines(Mat rgba, MatOfInt4 lines, Scalar color) {
         if (lines.rows() > 0) {
             int[] coords = lines.toArray();
             for (int i = 0; i < lines.rows(); i++) {
-                line(img, new Point(coords[i * 4], coords[i * 4 + 1]),
+                line(rgba, new Point(coords[i * 4], coords[i * 4 + 1]),
                         new Point(coords[i * 4 + 2], coords[i * 4 + 3]), color, 3);
             }
         }
-        return img;
     }
 
     private Mat classifyAndDrawTexts(Bitmap bm, List<OcrText> lines, double fontSize) throws Exception {
         Mat img = bitmapToMat(bm);
 
         // first of all, find best amount string and draw strip rect
-        List<Scored<OcrText>> amountStrs = invoke(OA_CLASS, "findAllScoredAmountStrings",
+        List<Scored<OcrText>> amountStrs = invoke(TF, "findAllScoredAmountStrings",
                 lines, size(bm));
         if (amountStrs.size() != 0) { //Note: size != 0 is more readable than !...isEmpty()
             OcrText amountStr = max(amountStrs).obj();
-            RectF amountSripRect = invoke(OA_CLASS, "getAmountStripRect", amountStr, size(bm));
-            List<Point> cvPts = invoke(IP_CLASS, "androidPtsToCV", rectToPts(amountSripRect));
-            MatOfPoint2f ptsMat = invoke(IP_CLASS, "ptsToMat", cvPts);
+            RectF amountSripRect = invoke(TF, "getAmountStripRect", amountStr, size(bm));
+            List<Point> cvPts = invoke(IP, "androidPtsToCV", rectToPts(amountSripRect));
+            MatOfPoint2f ptsMat = invoke(IP, "ptsToMat", cvPts);
             drawPoly(img, ptsMat, GREEN, DEF_THICKNESS);
         }
 
@@ -233,24 +232,23 @@ public class MainActivity extends AppCompatActivity {
         drawTextLines(img, lines, BLUE, fontSize);
 
         // draw potential prices
-        List<OcrText> potPrices = invoke(OA_CLASS, "findAllPotentialPrices", lines);
+        List<OcrText> potPrices = invoke(TF, "findAllPotentialPrices", lines);
         drawTextLines(img, potPrices, ORANGE, fontSize);
 
         // draw all dates
-        List<Pair<OcrText, Date>> dates = invoke(OA_CLASS, "findAllDates", lines);
+        List<Pair<OcrText, Date>> dates = invoke(TF, "findAllDates", lines);
         drawTextLines(img, Stream.of(dates).map(p -> p.first).toList(), PURPLE, fontSize);
 
         // draw all amount strings
         drawTextLines(img, Stream.of(amountStrs).map(Scored::obj).toList(), DARK_GREEN, fontSize);
 
         // draw certain prices
-        List<Pair<OcrText, String>> prices = invoke(OA_CLASS, "findAllCertainPrices", lines);
+        List<Pair<OcrText, BigDecimal>> prices = invoke(DataAnalyzer.class, "findAllPricesRegex", lines);
         drawTextLines(img, Stream.of(prices).map(p -> p.first).toList(), DARK_RED, fontSize);
 
         // draw upside down prices
-        List<OcrText> udPrices = invoke(OA_CLASS, "findAllUpsideDownPrices", lines);
+        List<OcrText> udPrices = invoke(TF, "findAllUpsideDownPrices", lines);
         drawTextLines(img, udPrices, RED, fontSize);
-
 
         return img;
     }
@@ -357,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("unchecked")
     private void processImage(Bitmap bm, ThrowableConsumer<Bitmap, Exception> show) throws Exception {
         ThrowableConsumer<Mat, Exception> showMat = img ->
-                show.accept(invoke(IP_CLASS, "matToBitmap", img));
+                show.accept(invoke(IP, "matToBitmap", img));
 
         ImageProcessor imgProc = new ImageProcessor(bm);
 
@@ -366,47 +364,70 @@ public class MainActivity extends AppCompatActivity {
 
         if (check(showFlags, SHOW_OPENCV)) {
             Mat srcImg = getField(imgProc, "srcImg");
-            double shortSide = getField(IP_CLASS, "SHORT_SIDE");
-            Mat grayResized = invoke(IP_CLASS, "toGrayResized", srcImg, shortSide);
+            double shortSide = getField(IP, "SHORT_SIDE");
+            Mat grayResized = invoke(IP, "toGrayResized", srcImg, shortSide);
             Swap<Mat> graySwap = new Swap<>(grayResized.clone(), new Mat());
-            Mat binary = ((Mat)invoke(IP_CLASS, "prepareBinaryImg", graySwap)).clone();
+            Mat binary = ((Mat)invoke(IP, "prepareBinaryImg", graySwap)).clone();
             showMat.accept(binary);
 
-            int openingIters = getField(IP_CLASS, "OPEN_ITERS");
-            invoke(IP_CLASS, "opening", graySwap, openingIters);
+            int openingIters = getField(IP, "OPEN_ITERS");
+            invoke(IP, "opening", graySwap, openingIters);
             List<Scored<MatOfPoint>> contours =
-                    invoke(IP_CLASS, "findBiggestContours", graySwap, 2);
-            int closingIters = getField(IP_CLASS, "CLOSE_ITERS");
-            MatOfPoint contour = ((Scored<MatOfPoint>)invoke(IP_CLASS, "contourClosing",
+                    invoke(IP, "findBiggestContours", graySwap, 2);
+            int closingIters = getField(IP, "CLOSE_ITERS");
+            MatOfPoint contour = ((Scored<MatOfPoint>)invoke(IP, "contourClosing",
                     contours.get(0).obj(), graySwap, closingIters)).obj();
 
             graySwap.first = binary;
-            invoke(IP_CLASS, "toEdges", graySwap);
-            invoke(IP_CLASS, "removeBackground", graySwap, contour);
+            invoke(IP, "toEdges", graySwap);
+            invoke(IP, "removeBackground", graySwap, contour);
             showMat.accept(graySwap.first);
 
-            MatOfInt4 lines = invoke(IP_CLASS, "houghLines", graySwap);
-            MatOfPoint2f corners = invoke(IP_CLASS, "findPolySimple", contour);
+            MatOfInt4 lines = invoke(IP, "houghLines", graySwap);
+            MatOfPoint2f corners = invoke(IP, "findPolySimple", contour);
+
+            double angle = invoke(IP, "predominantAngle", lines, new Ref<Double>());
+
+            MatOfPoint2f rect = new MatOfPoint2f();
+            if (corners.rows() == 4) {
+                corners.copyTo(rect);
+            } else {
+                rect = invoke(IP, "rotatedBoundingBox", contour, angle, grayResized.size());
+            }
+
+
+            double bgThresh = getField(IP, "BG_CONTRAST_THRESHOLD");
+            double bgContrast = invoke(IP, "getBackgroundContrast", rect, contour);
+
+            StringBuilder titleStr = new StringBuilder();
+            titleStr.append(imgIdx).append("  BGC=").append(NUM_FMT.format(bgContrast));
+            if (bgContrast < bgThresh) {
+                titleStr.append(" BAD");
+            }
+            asyncSetTitle(titleStr.toString());
+
             // show both contours and hough lines
             Mat rgbaResized = new Mat();
             cvtColor(grayResized, rgbaResized, COLOR_GRAY2RGBA);
-            Mat contourImg = drawContour(rgbaResized, contours.get(1).obj(), ORANGE, DEF_THICKNESS);
-            contourImg = drawContour(contourImg, contours.get(0).obj(), YELLOW, DEF_THICKNESS);
-            contourImg = drawLines(drawContour(contourImg, contour, BLUE, DEF_THICKNESS), lines, PURPLE);
-            drawPoly(contourImg, corners, corners.rows() == 4 ? GREEN : RED, DEF_THICKNESS);
-            showMat.accept(contourImg);
+            drawPoly(rgbaResized, rect, BLACK, DEF_THICKNESS);
+            drawContour(rgbaResized, contours.get(1).obj(), ORANGE, DEF_THICKNESS);
+            drawContour(rgbaResized, contours.get(0).obj(), YELLOW, DEF_THICKNESS);
+            drawContour(rgbaResized, contour, BLUE, DEF_THICKNESS);
+            drawLines(rgbaResized, lines, PURPLE);
+            drawPoly(rgbaResized, corners, corners.rows() == 4 ? GREEN : RED, DEF_THICKNESS);
+            showMat.accept(rgbaResized);
         }
 
         if (check(showFlags, SHOW_OCR)) {
             Bitmap textLinesBm = invoke(imgProc, "undistortForOCR", 1. / 3.);
-            List<OcrText> lines = invoke(OA_CLASS, "runOCR", textLinesBm, ocrEngine);
+            List<OcrText> lines = invoke(TF, "runOCR", textLinesBm, ocrEngine);
 
             //find amount strings
-            List<Scored<OcrText>> amountStrs = invoke(OA_CLASS, "findAllScoredAmountStrings",
+            List<Scored<OcrText>> amountStrs = invoke(TF, "findAllScoredAmountStrings",
                     lines, size(textLinesBm));
 
             // find dates
-            List<Pair<OcrText, Date>> dates = invoke(OA_CLASS, "findAllDates", lines);
+            List<Pair<OcrText, Date>> dates = invoke(TF, "findAllDates", lines);
 
             // draw
             StringBuilder titleStr = new StringBuilder();
@@ -423,17 +444,17 @@ public class MainActivity extends AppCompatActivity {
             // find amount price
             if (amountStrs.size() != 0) {
                 OcrText amountStr = max(amountStrs).obj();
-                RectF srcAmountStripRect = invoke(OA_CLASS, "getAmountStripRect",
+                RectF srcAmountStripRect = invoke(TF, "getAmountStripRect",
                         amountStr, size(textLinesBm));
-                Bitmap amountStrip = invoke(OA_CLASS, "getAmountStrip",
+                Bitmap amountStrip = invoke(TF, "getAmountStrip",
                         imgProc, size(textLinesBm), amountStr, srcAmountStripRect);
                 RectF dstAmountStripRect = rectFromSize(size(amountStrip));
-                List<OcrText> amountLinesStripSpace = invoke(OA_CLASS, "runOCR",
+                List<OcrText> amountLinesStripSpace = invoke(TF, "runOCR",
                         amountStrip, ocrEngine);
                 List<OcrText> amountLinesBmSpace = Stream.of(amountLinesStripSpace)
                         .map(line -> new OcrText(line, dstAmountStripRect, srcAmountStripRect))
                         .toList();
-                BigDecimal price = invoke(OA_CLASS, "findAmountPrice",
+                BigDecimal price = invoke(TF, "findAmountPrice",
                         amountLinesBmSpace, amountStr, srcAmountStripRect);
 
                 // draw strip

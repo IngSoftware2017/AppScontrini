@@ -442,8 +442,8 @@ public class BillActivity extends AppCompatActivity { //  implements OcrResultRe
             Bitmap bm = BitmapFactory.decodeFile(new File(root, fname).getAbsolutePath());
             ImageProcessor imgProc = new ImageProcessor(bm);
             imgProc.setCorners(ticket.getCornerPoints());
-            ocrManager.getTicket(imgProc, OcrOptions.getDefaultOptions(), t -> {
-                ticket.setAmount(t.amount);
+            ocrManager.getTicket(imgProc, OcrOptions.getDefault(), t -> {
+                ticket.setAmount(t.total);
                 ticket.setDate(t.date);
                 DB.updateTicket(ticket);
                 asyncRefresh();
@@ -485,8 +485,8 @@ public class BillActivity extends AppCompatActivity { //  implements OcrResultRe
             FileOutputStream out = new FileOutputStream(file);
 
             ImageProcessor imgProc = new ImageProcessor(imageToSave);
-            ocrManager.getTicket(imgProc, OcrOptions.getDefaultOptions(), t -> {
-                TicketEntity te = new TicketEntity(uri, t.amount, null, t.date, null, missionID);
+            ocrManager.getTicket(imgProc, OcrOptions.getDefault(), t -> {
+                TicketEntity te = new TicketEntity(uri, t.total, null, t.date, null, missionID);
                 te.setCornerPoints(t.rectangle);
                 DB.addTicket(te);
                 asyncRefresh();

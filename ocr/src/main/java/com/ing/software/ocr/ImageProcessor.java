@@ -2,7 +2,6 @@ package com.ing.software.ocr;
 
 import android.graphics.*;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 import android.util.SizeF;
 
 import com.annimon.stream.Stream;
@@ -19,7 +18,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 import com.annimon.stream.function.*;
 
@@ -73,6 +71,8 @@ public class ImageProcessor {
 
     private static final int WHITE = 255;
     private static final int BLACK = 0;
+    private static final Size NORMALIZED_SIZE = new Size(1, 1);
+    private static final RectF NORMALIZED_RECT = new RectF(0, 0, 1, 1);
 
     // length of smallest side of downscaled image
     // must be chosen to limit side effects of resampling, on both 16:9 and 4:3 aspect ratio images
@@ -139,6 +139,9 @@ public class ImageProcessor {
     private static final double SCORE_AREA_MUL = 0.001;
     private static final double SCORE_RECT_FOUND = 1;
 
+    //
+    private static final double BG_CONTRAST_THRESHOLD = 0.9;
+
 
     // Anything inside here is run once per app execution and before any other code.
     static {
@@ -203,10 +206,16 @@ public class ImageProcessor {
         return bm;
     }
 
+    /**
+     *
+     * @param inpSize
+     * @param shortSide
+     * @return
+     */
     private static Size calcScaledSize(Size inpSize, double shortSide) {
         double aspectRatio = inpSize.width / inpSize.height;
-        // find the shortest dimension, set it to "shortSide" and consequently set the other dimension
-        // to keep the original aspect ratio
+        // find the shortest dimension, set it to "shortSide" and set the other dimension in order to
+        // keep the original aspect ratio
         return aspectRatio < 1 ? new Size(shortSide, shortSide / aspectRatio)
                 : new Size(shortSide * aspectRatio, shortSide);
     }
@@ -495,6 +504,13 @@ public class ImageProcessor {
         return newPts;
     }
 
+    private static MatOfPoint2f convexHull(MatOfPoint contour) {
+        MatOfInt indices = new MatOfInt();
+        Imgproc.convexHull(contour, indices);
+        Point[] contourPts = contour.toArray();
+        return ptsToMat(Stream.of(indices.toList()).map(idx -> contourPts[idx]).toList());
+    }
+
     /**
      * Get a score proportional to exposure
      * @param img gray Mat. Not null
@@ -523,18 +539,17 @@ public class ImageProcessor {
     }
 
     /**
-     * Get a score proportional to contrast from background
+     * Get a score proportional to contrast relative to background
      * @param rect perspective rectangle containing the ticket
      * @param contour contour containing the ticket
-     * @return
+     * @return contrast value in range [0, 1], higher is better
      */
     //Problem: Sometimes, if the contrast of the ticket with background is poor, the contour bleeds
-    // into the background. Sometimes if the text is too close to the edge of the ticked, a carving
-    // happens instead. So, to detect the first case and reject the second, I can use a convex hull
+    // into the background. Sometimes if the text is too close to the edge of the ticket, a carving
+    // happens instead. So, to detect the first case and reject the second, I use a convex hull
     // on the contour, then find the ratio between the area of the convex hull with the bounding rectangle one.
-    // if the ratio is too low (ex: 0.7/1.0) then communicate bad contrast.
-    private static double getBackgroundCoontrast(MatOfPoint2f rect, MatOfPoint contour) {
-        return 1; // stub
+    private static double getBackgroundContrast(MatOfPoint2f rect, MatOfPoint contour) {
+        return contourArea(convexHull(contour)) / contourArea(rect);
     }
 
     /**
@@ -556,6 +571,10 @@ public class ImageProcessor {
         List<Scored<MatOfPoint>> contours = findBiggestContours(imgSwap, 1);
         // no contours found if image side is < than 2 * iters
         return contours.size() > 0 ? contours.get(0) : null;
+    }
+
+    private static double getMargin(double width, double height, double marginMul) {
+        return marginMul * min(width, height);
     }
 
     /**
@@ -585,11 +604,11 @@ public class ImageProcessor {
             Mat srcImg, MatOfPoint2f corners, double marginMul, double sizeMulOrShortSide, boolean isSizeMul) {
         Mat dstImg = new Mat();
         if (corners.rows() == 4) { // at this point "corners" should have always 4 points.
-            MatOfPoint2f srcRect = scale(corners, new Size(1, 1), srcImg.size());
+            MatOfPoint2f srcRect = scale(corners, NORMALIZED_SIZE, srcImg.size());
 
             // dstRect has approximately the same size as srcRect, but is aligned with the axes and translated by margin
             Size dstSize = rectSizeSimple(srcRect);
-            double mrg = marginMul * min(dstSize.width, dstSize.height);
+            double mrg = getMargin(dstSize.width, dstSize.height, marginMul);
             MatOfPoint2f dstRect = createRectMatWithMargin(dstSize, mrg);
 
             // find the output bitmap size and scale it if requested
@@ -612,6 +631,27 @@ public class ImageProcessor {
         return dstImg;
     }
 
+    /**
+     *
+     * @param imgSize
+     * @param marginMul
+     * @return
+     */
+    private static RectF removeMargin(SizeF imgSize, double marginMul) {
+        return rectFromSize(new SizeF(imgSize.getWidth() / (float) (1. + OCR_MARGIN_MUL),
+                imgSize.getWidth() / (float) (1. + OCR_MARGIN_MUL)));
+    }
+
+    /**
+     * Convenience class to group some contour related properties
+     */
+    private class ContourResult {
+        MatOfPoint2f rect;
+        double angle, angleConfidence;
+        double exposure, focus, backgroundContrast;
+    }
+
+
     //INSTANCE FIELDS:
 
     private Mat srcImg;
@@ -620,6 +660,14 @@ public class ImageProcessor {
 
 
     //PACKAGE PRIVATE:
+
+    static RectF normalizeCoordinates(RectF textRect, SizeF bmSize) {
+        RectF origBmRectNoMargin = removeMargin(bmSize, OCR_MARGIN_MUL);
+        float margin = (float)getMargin(origBmRectNoMargin.width(), origBmRectNoMargin.height(), OCR_MARGIN_MUL);
+        RectF textRectNoMargin = offset(textRect, -margin, -margin);
+        //normalized rect:
+        return CommonUtils.transform(textRectNoMargin, origBmRectNoMargin, NORMALIZED_RECT);
+    }
 
     synchronized Bitmap undistortForOCR(double sizeMul) {
         if (quickCorners || corners == null) {
@@ -653,7 +701,7 @@ public class ImageProcessor {
         );
 
         // redo undistort steps to calculate dstRect and dstSize
-        MatOfPoint2f srcRect = scale(corners, new Size(1, 1), srcImg.size());
+        MatOfPoint2f srcRect = scale(corners, NORMALIZED_SIZE, srcImg.size());
         Size dstSize = rectSizeSimple(srcRect);
         double mrg = OCR_MARGIN_MUL * min(dstSize.width, dstSize.height);
         MatOfPoint2f dstRect = createRectMatWithMargin(dstSize, mrg);
@@ -686,20 +734,6 @@ public class ImageProcessor {
         warpPerspective(srcImg, dstImg, mtx, newDstRegSize);
         return matToBitmap(dstImg);
     }
-
-    /**
-     * Convenience class to group some contour related properties
-     */
-    private class ContourResult {
-        MatOfPoint2f rect;
-        double angle, angleConfidence;
-        ContourResult(MatOfPoint2f rect, double angle, double angleConfidence) {
-            this.rect = rect;
-            this.angle = angle;
-            this.angleConfidence = angleConfidence;
-        }
-    }
-
 
     //PUBLIC:
 
@@ -791,7 +825,12 @@ public class ImageProcessor {
                 if (size.width > size.height)
                     rect = shiftMatPoints(rect, angle > 0 ? 1 : 3); // 1 -> rotate clockwise
             }                                                       // 3 -> rotate counter clockwise
-            candidates.add(new Scored<>(0., new ContourResult(rect, angle, angleConfidence.val)));
+            ContourResult result = new ContourResult();
+            result.rect = rect;
+            result.angle = angle;
+            result.angleConfidence = angleConfidence.val;
+            result.backgroundContrast = getBackgroundContrast(rect, contour.obj());
+            candidates.add(new Scored<>(0., result));
         }
         List<IPError> errors = new ArrayList<>();
 
@@ -802,7 +841,7 @@ public class ImageProcessor {
             ContourResult winner = candidates.get(0).obj();
 
             //normalize the corners in the space [0, 1]^2
-            corners = scale(winner.rect, grayResized.size(), new Size(1, 1));
+            corners = scale(winner.rect, grayResized.size(), NORMALIZED_SIZE);
 
             // find and return errors
             if (corners.rows() != 4)
@@ -812,11 +851,8 @@ public class ImageProcessor {
                 errors.add(IPError.UNCERTAIN_DIRECTION);
             if (abs(winner.angle) > CROOCKED_THRESH)
                 errors.add(IPError.CROOKED_TICKET);
-//        if (!isFocused(grayResized))
-//            errors.add(IPError.OUT_OF_FOCUS);
-//        IPError exposureErr = checkExposure(grayResized);
-//        if (exposureErr != IPError.NONE)
-//            errors.add(exposureErr);
+            if (winner.backgroundContrast < BG_CONTRAST_THRESHOLD)
+                errors.add(IPError.POOR_BG_CONTRAST);
         } else {
             errors.add(IPError.INVALID_CORNERS);
         }
@@ -891,10 +927,13 @@ public class ImageProcessor {
     }
 
     /**
-     * Rotate corners, so when undistort is called, the resulting image is rotated 180deg.
+     * Rotate corners, so when undistort is called, the resulting image is rotated according to angle specified.
+     * @param angle90step integer corresponding to the number of 90 deg turns to apply.
+     *                    <ul> Positive: clockwise </ul>
+     *                    <ul> Negative: counter clockwise </ul>
      */
-    public void rotateUpsideDown() {
-        corners = shiftMatPoints(corners, 2); // in a rectangle, opposite corner is 2 corners away
+    public void rotate(int angle90step) {
+        corners = shiftMatPoints(corners, angle90step);
     }
 
 
@@ -928,5 +967,20 @@ public class ImageProcessor {
         MatOfPoint2f dstPts = new MatOfPoint2f();
         perspectiveTransform(pts, dstPts, getPerspectiveTransform(rect1, rect2));
         return cvPtsToAndroid(dstPts.toList());
+    }
+
+    /**
+     * Expand normalized rectangle to desired destination space
+     * @param normalizedRect total rectangle obtained from OcrTicket
+     * @param bmSize target image size
+     * @param marginMul same margin multiplier passed to undistort.
+     * @return rectangle in destination space
+     */
+    public static RectF expandRectCoordinates(RectF normalizedRect, SizeF bmSize, double marginMul) {
+        RectF origBmRectNoMargin = removeMargin(bmSize, marginMul);
+        RectF origRect = CommonUtils.transform(normalizedRect, NORMALIZED_RECT, origBmRectNoMargin);
+        float margin = (float) getMargin(origBmRectNoMargin.width(), origBmRectNoMargin.height(), marginMul);
+        //origRectWithMargin:
+        return offset(origRect, margin, margin);
     }
 }

@@ -15,14 +15,12 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
-import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Locale;
 
 import static com.ing.software.common.CommonUtils.rectFromSize;
 import static com.ing.software.common.CommonUtils.size;
@@ -70,13 +68,13 @@ public class TestFunctions {
     // todo: find most meaningful way to combine score criteria.
     // Do not order. Use max() to get best scored Text, otherwise if you have to read all these texts anyway,
     // ordering it's useless.
-    private static List<Scored<OcrText>> findAllScoredAmountStrings(List<OcrText> lines, SizeF bmSize) {
-        List<Scored<OcrText>> matchedLines = DataAnalyzer.findAllMatchingTexts(lines, IT_AMOUNT_MATCHERS);
+    private static List<Scored<Pair<OcrText, Locale>>> findAllScoredAmountStrings(List<OcrText> lines, SizeF bmSize) {
+        List<Scored<Pair<OcrText, Locale>>> matchedLines = DataAnalyzer.findAmountStringTexts(lines);
         // modify score for each matched line
-        for (Scored<OcrText> line : matchedLines) {
+        for (Scored<Pair<OcrText, Locale>> line : matchedLines) {
             double score = line.getScore();
-            score *= line.obj().charWidth() + line.obj().charHeight(); // <- todo normalize with all texts average
-            score *= 1. - line.obj().box().centerY() / bmSize.getHeight(); // <- todo find a better way
+            score *= line.obj().first.charWidth() + line.obj().first.charHeight(); // <- todo normalize with all texts average
+            score *= 1. - line.obj().first.box().centerY() / bmSize.getHeight(); // <- todo find a better way
             // (relative position with cash and change)
             line.setScore(score);
         }
@@ -151,104 +149,76 @@ public class TestFunctions {
     // todo: find most meaningful way to combine score criteria.
     // todo: reject false positives adding a lower limit to the score > 0.
     private static BigDecimal findAmountPrice (List<OcrText> lines, OcrText amountStr, RectF stripRect) {
-        List<Pair<OcrText, String>> prices = DataAnalyzer.findAllPricesRegex(lines);
+        List<Pair<OcrText, BigDecimal>> prices = DataAnalyzer.findAllPricesRegex(lines);
         BigDecimal price = null;
         double bestScore = 0;
-        for (Pair<OcrText, String> priceLine : prices) {
+        for (Pair<OcrText, BigDecimal> priceLine : prices) {
             OcrText line = priceLine.first;
             double score = 1. - abs(line.box().centerY() - stripRect.centerY()) / stripRect.height(); // y position diff
             score *= 1. - abs(line.charWidth() - amountStr.charWidth()) / amountStr.charWidth(); // char width diff
             score *= 1. - abs(line.charHeight() - amountStr.charHeight()) / amountStr.charHeight(); // char height diff
-            if (score > bestScore) {
+            if (score > bestScore && priceLine.second != null) {
                 bestScore = score;
-                //todo check behaviour if a the string cannot be converted to BigDecimal for some reason
-                price = new BigDecimal(priceLine.second);
+                price = priceLine.second;
             }
         }
         return price;
     }
 
-    /**
-     * Find all dates in the format DMY.
-     * @param lines list of OcrLines
-     * @return date instance or null if not found or multiple
-     */
-    private static List<Pair<OcrText, Date>> findAllDates(List<OcrText> lines) {
-        List<Pair<OcrText, Date>> dates = new ArrayList<>();
-        for (OcrText line : lines) {
-            Matcher matcher = DATE_DMY.matcher(line.textSanitizedNum());
-            if (matcher.find()) {
-                int day = Integer.valueOf(matcher.group(DMY_DAY));
-                int month = Integer.valueOf(matcher.group(DMY_MONTH));
-                int year = Integer.valueOf(matcher.group(DMY_YEAR));
-
-                //todo check if day is compatible with month (29-30-31)
-
-                if (year < 100)
-                    year += year > YEAR_CUT ? 1900 : 2000;
-                // correct for 0 based month
-                dates.add(new Pair<>(line, new GregorianCalendar(year, month - 1, day).getTime()));
-            }
-            // It's better to avoid word concatenation because it could match a wrong date.
-            // Ex: 1/1/20 14:30 -> 1/1/2014:30
-        }
-        return dates;
-    }
-
-    /**
-     * Extract a Ticket from an ImageProcessor loaded with a bitmap.
-     * @param imgProc ImagePreprocessor with at least an image assigned (corners can be set manually).
-     * @return Ticket containing any information found, and/or a list of errors occurred.
-     *
-     * @author Riccardo Zaglia
-     */
-    // todo: integrate schemer and other heuristics
-    public synchronized OcrTicket analyzeTicket(@NonNull ImageProcessor imgProc, boolean advanced) {
-        OcrTicket ticket = new OcrTicket();
-        ticket.errors = new ArrayList<>();
-
-        Bitmap bm = imgProc.undistortForOCR(advanced ? OCR_ADVANCED_SCALE : OCR_NORMAL_SCALE);
-        if (bm == null) {
-            ticket.errors.add(OcrError.INVALID_PROCESSOR);
-            return ticket;
-        }
-        ticket.rectangle = imgProc.getCorners();
-        List<OcrText> lines = runOCR(bm, ocrEngine);
-
-        //find amount
-        List<Scored<OcrText>> amountStrs = findAllScoredAmountStrings(lines, size(bm));
-        if (amountStrs.size() > 0) {
-            OcrText amountStr = max(amountStrs).obj();
-            RectF srcAmountStripRect = getAmountStripRect(amountStr, size(bm));
-            Bitmap amountStrip = getAmountStrip(imgProc, size(bm), amountStr, srcAmountStripRect);
-            RectF dstAmountStripRect = rectFromSize(size(amountStrip));
-            List<OcrText> amountLinesStripSpace = runOCR(amountStrip, ocrEngine);
-
-            // transform texts from destination to source space (I swap source and destination rect).
-            List<OcrText> amountLinesBmSpace = Stream.of(amountLinesStripSpace)
-                    .map(line -> new OcrText(line, dstAmountStripRect, srcAmountStripRect)).toList();
-            ticket.amount = findAmountPrice(amountLinesBmSpace, amountStr, srcAmountStripRect);
-        }
-        if (ticket.amount == null)
-            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
-
-        List<Pair<OcrText, Date>> dates = findAllDates(lines);
-        if (dates.size() == 1) {
-            ticket.date = dates.get(0).second;
-        } else {
-            ticket.errors.add(OcrError.DATE_NOT_FOUND);
-        }
-
-        return ticket;
-    }
-
-    /**
-     * Asynchronous version of analyzeTicket(imgProc). The ticket is passed by the callback parameter.
-     * @param imgProc ImagePreprocessor
-     * @param ticketCb Callback
-     */
-    public void analyzeTicket(
-            @NonNull ImageProcessor imgProc, boolean advanced, @NonNull Consumer<OcrTicket> ticketCb) {
-        new Thread(() -> ticketCb.accept(analyzeTicket(imgProc, advanced))).start();
-    }
+//    /**
+//     * Extract a Ticket from an ImageProcessor loaded with a bitmap.
+//     * @param imgProc ImagePreprocessor with at least an image assigned (corners can be set manually).
+//     * @return Ticket containing any information found, and/or a list of errors occurred.
+//     *
+//     * @author Riccardo Zaglia
+//     */
+//    // todo: integrate schemer and other heuristics
+//    public synchronized OcrTicket analyzeTicket(@NonNull ImageProcessor imgProc, boolean advanced) {
+//        OcrTicket ticket = new OcrTicket();
+//        ticket.errors = new ArrayList<>();
+//
+//        Bitmap bm = imgProc.undistortForOCR(advanced ? OCR_ADVANCED_SCALE : OCR_NORMAL_SCALE);
+//        if (bm == null) {
+//            ticket.errors.add(OcrError.INVALID_PROCESSOR);
+//            return ticket;
+//        }
+//        ticket.rectangle = imgProc.getCorners();
+//        List<OcrText> lines = runOCR(bm, ocrEngine);
+//
+//        //find amount
+//        List<Scored<OcrText>> amountStrs = findAllScoredAmountStrings(lines, size(bm));
+//        if (amountStrs.size() > 0) {
+//            OcrText amountStr = max(amountStrs).obj();
+//            RectF srcAmountStripRect = getAmountStripRect(amountStr, size(bm));
+//            Bitmap amountStrip = getAmountStrip(imgProc, size(bm), amountStr, srcAmountStripRect);
+//            RectF dstAmountStripRect = rectFromSize(size(amountStrip));
+//            List<OcrText> amountLinesStripSpace = runOCR(amountStrip, ocrEngine);
+//
+//            // transform texts from destination to source space (I swap source and destination rect).
+//            List<OcrText> amountLinesBmSpace = Stream.of(amountLinesStripSpace)
+//                    .map(line -> new OcrText(line, dstAmountStripRect, srcAmountStripRect)).toList();
+//            ticket.total = findAmountPrice(amountLinesBmSpace, amountStr, srcAmountStripRect);
+//        }
+//        if (ticket.total == null)
+//            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
+//
+//        List<Pair<OcrText, Date>> dates = invoke((lines);
+//        if (dates.size() == 1) {
+//            ticket.date = dates.get(0).second;
+//        } else {
+//            ticket.errors.add(OcrError.DATE_NOT_FOUND);
+//        }
+//
+//        return ticket;
+//    }
+//
+//    /**
+//     * Asynchronous version of analyzeTicket(imgProc). The ticket is passed by the callback parameter.
+//     * @param imgProc ImagePreprocessor
+//     * @param ticketCb Callback
+//     */
+//    public void analyzeTicket(
+//            @NonNull ImageProcessor imgProc, boolean advanced, @NonNull Consumer<OcrTicket> ticketCb) {
+//        new Thread(() -> ticketCb.accept(analyzeTicket(imgProc, advanced))).start();
+//    }
 }

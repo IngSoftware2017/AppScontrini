@@ -4,34 +4,232 @@ package com.ing.software.ocr;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 import android.util.Pair;
+import android.util.Range;
+import android.util.SparseIntArray;
 
 import com.ing.software.common.Scored;
+import com.ing.software.common.Triple;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.annimon.stream.Stream;
 
 import static com.ing.software.ocr.OcrVars.*;
-import static java.util.Collections.max;
+import static java.util.Collections.*;
+import static java.util.Arrays.*;
+import static java.util.regex.Pattern.compile;
 
 /**
  * Class used to extract information from raw data
  */
 public class DataAnalyzer {
 
+    /*
+        @author Zaglia
+        CONSTANTS:
+     */
+
+    // day 1 to 31 with or without 0 tens.
+    // month 1 to 12 with or without 0 tens.
+    // year 1900 to 2099 if format YYYY, year 1960 to 2059 if format YY.
+    // go to https://regex101.com/ to check the behaviour of these regular expressions.
+    //back reference/forward reference not supported in lookbehind but is supported in lookahead
+    static final Pattern DATE_DMY = compile(
+            "(?<!\\d)(0?[1-9]|[12]\\d|3[01])([-\\/.])(0?[1-9]|1[012])\\2((?:19)?[6-9]\\d|(?:20)?[0-5]\\d)(?!\\2|\\d)");
+
+    static final Pattern DATE = compile(
+            "(?<!\\d)(\\d{1,4})([-\\/.])(\\d{1,2})\\2(\\d{1,4})(?!\\2|\\d)");
+    // group 0 is the whole match, 2 is the delimiter
+    static final List<Integer> DATE_GROUPS = asList(1, 3, 4);
+    static final Range<Integer> YEAR_RANGE = new Range<>(1900, 2099);
+    static final int YEAR_CUT = 60; // YY < 60 -> 20YY;  YY >= 60 -> 19YY
+
+    enum DateType {
+        DMY,
+        MDY;
+
+        private static Map<Locale, DateType> DATE_TYPES =  new HashMap<>();
+        static {
+            DATE_TYPES.put(Locale.ITALY, DateType.DMY);
+            DATE_TYPES.put(Locale.UK, DateType.DMY);
+            DATE_TYPES.put(Locale.US, DateType.MDY);
+        }
+
+        static DateType fromCountry(Locale locale) {
+            return DATE_TYPES.get(locale);
+        }
+
+        static List<DateType> all() {
+            return asList(DMY, MDY);
+        }
+    }
+
+    //In principle, multiple words should be matched with a space between them,
+    //but since sometimes some words are split into multiple words, I remove all spaces all together
+    //and match the words without spaces, even if there were in origin effectively distinct words.
+    //The accepted errors (ex: O -> U,D) are based on common errors of the ocr scanning the dataset.
+    //todo: consider importing this data from an external file
+    private static final List<Pair<Locale, List<WordMatcher>>> TOTAL_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("T[OUD]TALE", 1),
+                    new WordMatcher("T[OUD]TALEE[UI]R[OD]", 3),
+                    new WordMatcher("IMP[OU]RT[OD]", 1),
+                    new WordMatcher("TOT", 0),
+                    new WordMatcher("TOTE[UI]R[OD]", 1),
+                    new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 3)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("T[OUD]TAL", 1),
+                    new WordMatcher("AMOUNT", 1),
+                    new WordMatcher("GRANDTOTAL", 2)
+            ))
+    );
+
+    private static final  List<Pair<Locale, List<WordMatcher>>> SUBTOTAL_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("SUBT[OD]TALE", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("SUBTOTAL", 1)
+            ))
+    );
+
+    private static final  List<Pair<Locale, List<WordMatcher>>> CASH_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("CONTANT[EI]", 1),
+                    new WordMatcher("CARTADICREDITO", 3),
+                    new WordMatcher("PAGAMENTOCONTANTE", 4),
+                    new WordMatcher("CCRED", 0),
+                    new WordMatcher("ASSEGNI", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("CASH", 0)
+            ))
+    );
+
+    //NB: change can be negative
+    private static final  List<Pair<Locale, List<WordMatcher>>> CHANGE_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("RESTO", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("CHANGE", 1)
+            ))
+    );
+
+
+    private static final  List<Pair<Locale, List<WordMatcher>>> COVER_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("COPERT[OI]", 1),
+                    new WordMatcher("TAVOL[OI]", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("COVER", 0),
+                    new WordMatcher("TABLE", 0)
+            ))
+    );
+
+    //searching tax with ITALIAN locale will return 0 matches
+    private static final  List<Pair<Locale, List<WordMatcher>>> TAX_MATCHERS = asList(
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("TAX", 0),
+                    new WordMatcher("SALESTAX", 1)
+            ))
+    );
+
+    //NB: these matchers use country locale instead of language locale
+    private static final  List<Pair<Locale, List<WordMatcher>>> CURRENCY_MATCHERS = asList(
+            new Pair<>(Locale.ITALY, asList(
+                    new WordMatcher("EUR[OD]", 0),
+                    new WordMatcher("EUR", 0)
+            )),
+            new Pair<>(Locale.UK, asList(
+                    new WordMatcher("GBP", 0)
+            )),
+            new Pair<>(Locale.US, asList(
+                    new WordMatcher("USD", 0)
+            ))
+    );
+
     /**
      * Get a list of texts where amount string is present
      * @param texts list of texts to analyze. Not null.
      * @return list of texts containing amount string with its score
      */
-    static List<Scored<OcrText>> getAmountTexts(@NonNull List<OcrText> texts) {
-        return findAllMatchingTexts(texts, IT_AMOUNT_MATCHERS);
+    static List<Scored<Pair<OcrText, Locale>>> findAmountStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, TOTAL_MATCHERS);
+    }
+
+    static List<Scored<Pair<OcrText, Locale>>> findSubtotalStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, SUBTOTAL_MATCHERS);
+    }
+
+    static List<Scored<Pair<OcrText, Locale>>> findCashStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, CASH_MATCHERS);
+    }
+
+    static List<Scored<Pair<OcrText, Locale>>> findChangeStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, CHANGE_MATCHERS);
+    }
+
+    static List<Scored<Pair<OcrText, Locale>>> findCoverStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, COVER_MATCHERS);
+    }
+
+    static List<Scored<Pair<OcrText, Locale>>> findTaxStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, TAX_MATCHERS);
+    }
+
+    /**
+     * @author Zaglia
+     *
+     * @param matches
+     * @return
+     */
+    // not using varargs because of possible heap pollution??
+    static Locale getBestLanguage(List<List<Scored<Pair<OcrText, Locale>>>> matches) {
+        Locale bestLanguage = null;
+        int bestScore = 0;
+        Map<Locale, Integer> accumulator = new HashMap<>();
+        for (int i = 0; i < matches.size(); i++) {
+            for (int j = 0; j < matches.get(i).size(); j++) {
+                Locale match = matches.get(i).get(j).obj().second;
+                Integer counter = accumulator.get(match);
+                int score = counter != null ? counter + 1 : 1;
+                accumulator.put(match, score);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestLanguage = match;
+                }
+            }
+        }
+        return bestLanguage;
+    }
+
+    /**
+     * @author Zaglia
+     *
+     * @param matches
+     * @param language
+     * @return
+     */
+    static List<Scored<OcrText>> filterForLanguage(List<Scored<Pair<OcrText, Locale>>> matches, Locale language) {
+        return Stream.of(matches)
+                .filter(match -> match.obj().second == language)
+                .map(scored -> new Scored<>(scored.getScore(), scored.obj().first))
+                .toList();
     }
 
     /**
@@ -47,17 +245,66 @@ public class DataAnalyzer {
     }
 
     /**
+     * @author Riccardo Zaglia
      * Find all OcrText which text is matched by any of the list of matchers.
      * @param lines list of OcrLines. Can be empty
      * @return OcrTexts matched. Can be empty if no match is found.
-     *
-     * @author Riccardo Zaglia
      */
+    @Deprecated
     static List<Scored<OcrText>> findAllMatchingTexts(List<OcrText> lines, List<WordMatcher> matchers) {
         return Stream.of(lines)
                 .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
-                .filter(s -> s.getScore() != 0)
+                .filter(s -> s.getScore() > 0)
                 .toList();
+    }
+
+    /**
+     * @author Zaglia
+     *
+     * @param texts
+     * @param languageMatchers
+     * @return
+     */
+    private static List<Scored<Pair<OcrText, Locale>>> findAllMatchesWithLanguage(
+            List<OcrText> texts, List<Pair<Locale, List<WordMatcher>>> languageMatchers) {
+        List<Scored<Pair<OcrText, Locale>>> matches = new ArrayList<>();
+        for (OcrText text : texts) {
+            List<Scored<Locale>> scoredLocales = Stream.of(languageMatchers)
+                    .map(pair -> new Scored<>(
+                            max(Stream.of(pair.second).map(m -> m.match(text)).toList()),
+                            pair.first))
+                    .filter(s -> s.getScore() > 0)
+                    .toList();
+            if (scoredLocales.size() > 0) {
+                matches.add(new Scored<>(scoredLocales.get(0).getScore(),
+                        new Pair<>(text, scoredLocales.get(0).obj())));
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * @author Zaglia
+     *
+     * @param texts
+     * @return
+     */
+    static Locale getCurrencyCountry(List<OcrText> texts) {
+        List<Scored<Pair<OcrText, Locale>>> matches = findAllMatchesWithLanguage(texts, CURRENCY_MATCHERS);
+        Locale bestCountry = null;
+        int bestScore = 0;
+        Map<Locale, Integer> accumulator = new HashMap<>();
+        for (int i = 0; i < matches.size(); i++) {
+            Locale match = matches.get(i).obj().second;
+            Integer counter = accumulator.get(match);
+            int score = counter != null ? counter + 1 : 1;
+            accumulator.put(match, score);
+            if (score > bestScore) {
+                bestScore = score;
+                bestCountry = match;
+            }
+        }
+        return bestCountry;
     }
 
     /**
@@ -66,12 +313,31 @@ public class DataAnalyzer {
      * @return text containing amount price and it's decoded value
      */
     static Pair<OcrText, BigDecimal>  getMatchingAmount(@NonNull List<Scored<OcrText>> texts) {
-        List<Pair<OcrText, String>> prices = findAllPricesRegex(Stream.of(texts).map(Scored::obj).toList());
+        List<Pair<OcrText, BigDecimal>> prices = findAllPricesRegex(Stream.of(texts).map(Scored::obj).toList());
         if (prices.size() > 0)
-            return new Pair<>(prices.get(0).first, new BigDecimal(prices.get(0).second));
+            return prices.get(0);
         //ZAGLIA: you should not return the first valid BigDecimal, you should evaluate all matches
         // then choose one with a score function or reject all. Refer to TestFunctions.findAmountPrice
         return null;
+    }
+
+    /**
+     * @author Zaglia
+     * Convert a price regex match into a BigDecimal
+     * @param match regex match
+     * @return BigDecimal or null if error
+     */
+    private static BigDecimal getRegexPriceValue(String match) {
+        String sanitized = match.replaceAll(DECIMAL_SEPARATOR, ".");
+        sanitized = sanitized.replaceAll(THOUSAND_SEPARATOR, "");
+        //since price regex accept dots, commas and spaces for both decimal and thousands symbol,
+        //the sanitized string could still be an invalid number.
+        try {
+            return new BigDecimal(sanitized);
+        }
+        catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     /**
@@ -81,21 +347,15 @@ public class DataAnalyzer {
      *
      * @author Zaglia
      */
-    static List<Pair<OcrText, String>> findAllPricesRegex(List<OcrText> lines) {
-        List<Pair<OcrText, String>> prices = new ArrayList<>();
+    static List<Pair<OcrText, BigDecimal>> findAllPricesRegex(List<OcrText> lines) {
+        List<Pair<OcrText, BigDecimal>> prices = new ArrayList<>();
         for (OcrText line : lines) {
-            Matcher matcher = PRICE_NO_THOUSAND_MARK.matcher(line.textSanitizedNum());
-            boolean matched = matcher.find();
-            int childsTot = line.children().size();
-            if (!matched && childsTot >= 2) { // merge only last two words and try again
-                matcher = PRICE_NO_THOUSAND_MARK.matcher(
-                        line.children().get(childsTot - 2).textSanitizedNum()
-                                + line.children().get(childsTot - 1).textSanitizedNum());
-                matched = matcher.find();
-            }
-            if (matched) {
-                // Convert space or dot + space to dot, it is necessary knowing how the amount matcher is designed
-                prices.add(new Pair<>(line, matcher.group().replaceAll("(\\. | )", ".")));
+            Matcher matcher = PRICE_WITH_SPACES.matcher(line.textSanitizedCommonNum());
+            if (matcher.find()) {
+                BigDecimal price = getRegexPriceValue(matcher.group());
+                if (price != null) {
+                    prices.add(new Pair<>(line, price));
+                }
             }
         }
         return prices;
@@ -120,6 +380,105 @@ public class DataAnalyzer {
             }
         }
         return null;
+    }
+
+    /**
+     * @author Zaglia
+     * Find all dates in the format DMY.
+     * @param texts list of OcrTexts
+     * @param forcedCountry forced country locale. If null then all date formats are tried to match.
+     * @return list of triple containing the date, country and OcrText. The same OcrText could be included
+     * in multiple triples if the date match could be interpreted in multiple formats.
+     */
+    private static List<Triple<OcrText, Date, DateType>> findAllDatesRegex(List<OcrText> texts, Locale forcedCountry) {
+        List<DateType> formats = forcedCountry != null
+                ? singletonList(DateType.fromCountry(forcedCountry))
+                : DateType.all();
+
+        Map<Date, Pair<OcrText, DateType>> dates = new HashMap<>();
+        for (OcrText text : texts) {
+            Matcher matcher = DATE.matcher(text.textSanitizedCommonNum());
+            if (matcher.find()) {
+                SparseIntArray groups = new SparseIntArray(3);
+                for (Integer idx : DATE_GROUPS) {
+                    groups.append(idx, Integer.valueOf(matcher.group(idx)));
+                }
+                for (DateType fmt : formats) {
+                    int year = 0, month = 0, day = 0;
+                    if (fmt == DateType.DMY) {
+                        day = groups.get(DATE_GROUPS.get(0));
+                        month = groups.get(DATE_GROUPS.get(1));
+                        year = groups.get(DATE_GROUPS.get(2));
+                    } else if (fmt == DateType.MDY) {
+                        month = groups.get(DATE_GROUPS.get(0));
+                        day = groups.get(DATE_GROUPS.get(1));
+                        year = groups.get(DATE_GROUPS.get(2));
+                    }
+
+                    // here I define some constants inline because they are not meant to be changed ever.
+                    //Eg: any 2 digit year is always < 100; the months are always 12, etc.
+                    boolean validYear = year < 100 || YEAR_RANGE.contains(year);
+                    boolean validMonth = month >= 1 && month <= 12;
+                    boolean validDay = day >= 1 && (asList(4, 6, 9, 11).contains(month)
+                            ? day < 30 : (month == 2 ? day < 29 : day < 31));
+                    //for convenience I do not check for leap years and other date exceptions, in the rare
+                    // occurrence of a matched date with a non leap year, february month and 29th day,
+                    // the gregorian calendar overflows to march 1st without throwing exceptions.
+                    if (validYear && validMonth && validDay) {
+                        if (year < 100)
+                            year += year > YEAR_CUT ? 1900 : 2000;
+                        // correct for 0 based month
+                        Date date = new GregorianCalendar(year, month - 1, day).getTime();
+
+                        //check if same date is already found to avoid duplication
+                        if (!dates.containsKey(date)) {
+                            dates.put(date, new Pair<>(text, fmt));
+                        }
+                    }
+                }
+            }
+            // It's better to avoid word concatenation because it could match a wrong date.
+            // Ex: 1/1/20 14:30 -> 1/1/2014:30
+        }
+        return Stream.of(dates)
+                .map(entry -> new Triple<>(entry.getValue().first, entry.getKey(), entry.getValue().second))
+                .toList();
+    }
+
+    /**
+     * Find date. Date is rejected if there are multiple and disambiguation has failed.
+     * @param texts List of OcrTexts.
+     * @param suggestedCountry country locale used for disambiguation. Can be null.
+     * @param forcedCountry forced country locale. Can be null.
+     * @return triple containing OcrText, date and locale. Can be null if no date found or multiple.
+     */
+    static Pair<OcrText, Date> findDate(
+            List<OcrText> texts, Locale suggestedCountry, Locale forcedCountry) {
+        List<Triple<OcrText, Date, DateType>> matches = findAllDatesRegex(texts, forcedCountry);
+        if (matches.size() > 1) {
+            Triple<OcrText, Date, DateType> firstMatch = matches.get(0);
+            if (forcedCountry != null || suggestedCountry == null) {
+                return matches.size() == 1 ? new Pair<>(firstMatch.first, firstMatch.second) : null;
+            }
+            DateType suggestedType = DateType.fromCountry(suggestedCountry);
+            //map containing pairs of (first: match counter, second: last match index).
+            Map<DateType, Pair<Integer, Integer>> accumulator = new HashMap<>();
+            for (int i = 0; i < matches.size(); i++) {
+                DateType type = matches.get(i).third;
+                Pair<Integer, Integer> pair = accumulator.get(type);
+                accumulator.put(type, new Pair<>(pair.first != null ? pair.first + 1 : 1, i));
+            }
+            Pair<Integer, Integer> pair = accumulator.get(suggestedType);
+            if (pair != null) {
+                Triple<OcrText, Date, DateType> match = matches.get(pair.second);
+                // discard match if counter is > 1 -> date is ambiguous
+                return pair.first == 1 ? new Pair<>(match.first, match.second) : null;
+            } else {
+                return matches.size() == 1 ? new Pair<>(firstMatch.first, firstMatch.second) : null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /*
