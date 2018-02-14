@@ -65,29 +65,6 @@ public class OcrUtils {
         }
 
     /**
-     * List in debug log blocks parsed (detection + grid)
-     */
-    static void listEverything() {
-        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
-        for (OcrText text : OcrManager.mainImage.getIntroTexts()) {
-                OcrUtils.log(2, "introduction", text.text());
-        }
-        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRODUCTS");
-        for (OcrText text : OcrManager.mainImage.getProductsTexts()) {
-                OcrUtils.log(2, "products", text.text());
-        }
-        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRICES");
-        for (OcrText text : OcrManager.mainImage.getPricesTexts()) {
-                OcrUtils.log(2, "prices", text.text());
-        }
-        OcrUtils.log(2, "LIST EVERYTHING", "###########################\nCONCLUSION");
-        for (OcrText text : OcrManager.mainImage.getConclusionTexts()) {
-                OcrUtils.log(2, "conclusion", text.text());
-        }
-        OcrUtils.log(2, "LIST EVERYTHING", "###########################");
-    }
-
-    /**
      * @author Michelon
      * Create a new rect extending source rect with chosen percentage (on width and height of chosen rect)
      * Or extending of chosen pixels on both sides (if param is negative)

@@ -26,7 +26,7 @@ import static com.ing.software.ocr.OcrVars.*;
 public class OcrAnalyzer {
 
     private TextRecognizer ocrEngine = null;
-
+    private RawImage mainImage;
 
     /**
      * Initialize the component.
@@ -40,6 +40,15 @@ public class OcrAnalyzer {
         ocrEngine = new TextRecognizer.Builder(ctx).build();
         return ocrEngine.isOperational() ? 0 : -1;
         //failure causes: GSM package is not yet downloaded due to lack of time or lack of space.
+    }
+
+    /**
+     * Sets mainImage for current analyzer. Must be called every time you change your source image
+     * (not if you use strip search on an already initialized analyzer with the same source image)
+     * @param mainImage image to set. Not null.
+     */
+    void setMainImage(RawImage mainImage) {
+        this.mainImage = mainImage;
     }
 
     /**
@@ -106,7 +115,7 @@ public class OcrAnalyzer {
      * @return list of detected texts
      */
     private List<OcrText> getStripTexts(ImageProcessor processor, RectF boundingBox) {
-        Bitmap region = processor.undistortedSubregion(new SizeF(OcrManager.mainImage.getWidth(), OcrManager.mainImage.getHeight()),
+        Bitmap region = processor.undistortedSubregion(new SizeF(mainImage.getWidth(), mainImage.getHeight()),
                 boundingBox, boundingBox.width()/boundingBox.height()); //original aspect ratio
         SparseArray<TextBlock> tempArray = ocrEngine.detect(new Frame.Builder().setBitmap(region).build());
         List<OcrText> distortedTexts = getTexts(tempArray);
@@ -120,11 +129,11 @@ public class OcrAnalyzer {
      * @param amountText source text containing amount string
      * @return rect extended from source text
      */
-    private static RectF getAmountExtendedBox(OcrText amountText) {
+    private static RectF getAmountExtendedBox(OcrText amountText, RawImage mainImage) {
         float newTop = amountText.box().top - amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
         float newBottom = amountText.box().bottom + amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
         return new RectF(amountText.box().centerX(), newTop,
-                OcrManager.mainImage.getWidth(), newBottom);
+                mainImage.getWidth(), newBottom);
     }
 
     /**
@@ -132,16 +141,16 @@ public class OcrAnalyzer {
      * @param texts new texts to add
      * @param rect rect containing texts to remove
      */
-    private static void replaceTexts(List<Scored<OcrText>> texts, RectF rect) {
+    private void replaceTexts(List<Scored<OcrText>> texts, RectF rect) {
         RectF extendedRect = extendRect(rect, 5, 5);
         List<OcrText> newTexts = Stream.of(texts)
-                                    .map(text -> RawImage.mapText(text.obj()))
+                                    .map(text -> mapText(text.obj()))
                                     .toList();
-        OcrManager.mainImage.removeText(extendedRect);
+        mainImage.removeText(extendedRect);
         for (OcrText text : newTexts)
-            OcrManager.mainImage.addText(text);
+            mainImage.addText(text);
         OcrUtils.log(3, "replaceTexts", "NEW REPLACED TEXTS");
-        OcrUtils.listEverything();
+        OcrUtils.listEverything(mainImage.getAllTexts());
     }
 
     /**
@@ -151,7 +160,7 @@ public class OcrAnalyzer {
      * @return list of scored texts containing decoded values
      */
     List<Scored<OcrText>> getAmountStripTexts(ImageProcessor processor, OcrText amountText) {
-        List<Scored<OcrText>> texts = Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText)))
+        List<Scored<OcrText>> texts = Stream.of(getStripTexts(processor, getAmountExtendedBox(amountText, mainImage)))
                 .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
                 .sorted(Collections.reverseOrder())
                 .toList();
@@ -159,7 +168,7 @@ public class OcrAnalyzer {
         for (Scored<OcrText> tt : texts) {
             OcrUtils.log(3, "getAmountStripTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
         }
-        replaceTexts(texts, getAmountExtendedBox(amountText));
+        replaceTexts(texts, getAmountExtendedBox(amountText, mainImage));
         return texts;
     }
 
@@ -168,11 +177,11 @@ public class OcrAnalyzer {
      * @param amountText text containing amount string
      * @return list of scored texts containing possible price
      */
-    static List<Scored<OcrText>> getAmountOrigTexts(OcrText amountText) {
-        RectF extendedRect = getAmountExtendedBox(amountText);
+    List<Scored<OcrText>> getAmountOrigTexts(OcrText amountText) {
+        RectF extendedRect = getAmountExtendedBox(amountText, mainImage);
         extendedRect.set(amountText.box().left, extendedRect.top, extendedRect.right, extendedRect.bottom);
         //copy texts that are inside extended rect.
-        List<Scored<OcrText>> texts = Stream.of(OcrManager.mainImage.getAllTexts())
+        List<Scored<OcrText>> texts = Stream.of(mainImage.getAllTexts())
                                             .filter(text -> extendedRect.contains(text.box()))
                                             .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
                                             .sorted(Collections.reverseOrder())
@@ -190,12 +199,46 @@ public class OcrAnalyzer {
      * @param source source product price rect
      * @return list of texts on left of source rect
      */
-    static List<OcrText> getTextsOnleft(OcrText source) {
+    List<OcrText> getTextsOnleft(OcrText source) {
         float newTop = source.box().top - source.height()* PRODUCT_RECT_HEIGHT_EXTENDER;
         float newBottom = source.box().bottom + source.height()* PRODUCT_RECT_HEIGHT_EXTENDER;
         RectF extendedRect = new RectF(0, newTop, source.box().centerX(), newBottom);
-        return Stream.of(OcrManager.mainImage.getAllTexts())
+        return Stream.of(mainImage.getAllTexts())
                         .filter(text -> extendedRect.contains(text.box()))
                         .toList();
+    }
+
+    /**
+     * Add tag to text according to its position (must call textFitter before)
+     * @param text text to tag
+     * @return text with added tag
+     */
+    private OcrText mapText(OcrText text) {
+        if (mainImage.getIntroRect().contains(text.box()))
+            text.addTag(INTRODUCTION_TAG);
+        else if (mainImage.getProductsRect().contains(text.box()))
+            text.addTag(PRODUCTS_TAG);
+        else if (mainImage.getPricesRect().contains(text.box()))
+            text.addTag(PRICES_TAG);
+        else if (mainImage.getConclusionRect().contains(text.box()))
+            text.addTag(CONCLUSION_TAG);
+        else {
+            float productsTop = Math.min(mainImage.getProductsRect().top, mainImage.getPricesRect().top);
+            float productsBottom = Math.max(mainImage.getProductsRect().bottom, mainImage.getPricesRect().bottom);
+            RectF middleRect = new RectF(mainImage.getProductsRect().left, productsTop, mainImage.getPricesRect().right, productsBottom);
+            //Check its y coordinate
+            float centerY = text.box().centerY();
+            if (centerY < productsTop)
+                text.addTag(INTRODUCTION_TAG);
+            else if (centerY > productsBottom)
+                text.addTag(CONCLUSION_TAG);
+            else {
+                if (text.box().centerX() < middleRect.width()/2)
+                    text.addTag(PRODUCTS_TAG);
+                else
+                    text.addTag(PRICES_TAG);
+            }
+        }
+        return text;
     }
 }

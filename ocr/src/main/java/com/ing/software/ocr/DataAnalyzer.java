@@ -8,6 +8,7 @@ import android.util.Pair;
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
 import java.math.BigDecimal;
@@ -71,9 +72,9 @@ public class DataAnalyzer {
      * @param texts list of scored source texts
      * @return list of listAmountOrganizer containing source texts
      */
-    static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts) {
+    static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts, RawImage mainImage) {
         return Stream.of(texts)
-                    .map(ListAmountOrganizer::new)
+                    .map(source -> new ListAmountOrganizer(source, mainImage))
                     .toList();
     }
 

@@ -1,10 +1,11 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OperativeObjects;
 
 import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
 import com.ing.software.ocr.OcrObjects.OcrText;
+import com.ing.software.ocr.OcrUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,10 +17,11 @@ import static com.ing.software.ocr.OcrVars.*;
 
 /**
  * @author Michelon
- * Manages a receipt trying to find its elements (introduction, products, prices, conclusion)
+ * Manages a receipt trying to find its elements (introduction, products, prices, conclusion).
+ * Only methods that don't change mainImage (rects included) are static, as it should be.
  */
 
-public class OcrSchemer {
+class OcrSchemer {
 
     private static final int X_DIVIDER = 13; //divider for rect to choose left-center-right tag
     private static final int X_DIVIDER_LEFT = 4; //where to end left tags, must be <= X_DIVIDER_RIGTH
@@ -28,14 +30,19 @@ public class OcrSchemer {
     private static final int WAVE_TAGGER_HEIGHT_EXTEND = 20; //percentage of the height of source rect to extend to include other rects
     private static final int DENSITY_SNAKE_MISS_RECTS = 15; //for density limit we accept 1/MISS_RECTS wrong rects
     //ZAGLIA: consider using normalized doubles ( 0 to 1) for percentages
+    private RawImage mainImage;
+
+    OcrSchemer(RawImage mainImage) {
+        this.mainImage = mainImage;
+    }
 
     /**
-     * Organize a list of rawTexts adding tags according to their position.
-     * @param textList list of rawTexts to organize. Not null
+     * Organize a list of Texts adding tags according to their position.
      */
-    static void prepareScheme(@NonNull List<OcrText> textList) {
+    void prepareScheme() {
+        List<OcrText> textList = mainImage.getAllTexts();
         for (OcrText rawText : textList) {
-            switch (getPosition(rawText)) {
+            switch (getPosition(rawText, mainImage)) {
                 case 0: rawText.addTag(LEFT_TAG);
                     OcrUtils.log(6, "prepareScheme", "Text: "+rawText.text() + " is left");
                     break;
@@ -48,7 +55,7 @@ public class OcrSchemer {
                 default: OcrUtils.log(3, "prepareScheme", "Could not find position for text: " + rawText.text());
             }
         }
-        float targetHeight = getBestCentralArea(textList);
+        float targetHeight = getBestCentralArea(textList, mainImage);
         centralTagger(textList, targetHeight);
         missTagger(textList);
         Collections.sort(textList);
@@ -66,7 +73,6 @@ public class OcrSchemer {
         } else
             startingConclusion = textList.size(); // -1?
         intervalTagger(textList, PRODUCTS_TAG, PRODUCTS_TAG, PRICES_TAG, endingIntroduction + 1, startingConclusion -1);
-        OcrManager.mainImage.textFitter(); //save configuration from prepareScheme in rawimage
     }
 
     /**
@@ -74,9 +80,9 @@ public class OcrSchemer {
      * @param text target text. Not null.
      * @return 0,1,2 according to position (left, center, right)
      */
-    static private int getPosition(@NonNull OcrText text) {
+    private static int getPosition(@NonNull OcrText text, RawImage mainImage) {
         //int width = text.getRawImage().getWidth();
-        RectF maxRect = OcrManager.mainImage.getExtendedRect();
+        RectF maxRect = mainImage.getExtendedRect();
         float width = maxRect.width();
         float position = (text.box().centerX() - maxRect.left)*X_DIVIDER/width;
         if (0<=position && position<=X_DIVIDER_LEFT)
@@ -105,12 +111,12 @@ public class OcrSchemer {
      * @param texts list of all texts
      * @return y coordinate of central point
      */
-    private static float getBestCentralArea(List<OcrText> texts) {
+    private static float getBestCentralArea(List<OcrText> texts, RawImage mainImage) {
         Collections.sort(texts);
         if (texts.size() == 0)
             return -1;
-        RectF maximRect = OcrManager.mainImage.getExtendedRect();
-        float targetHeight = OcrManager.mainImage.getExtendedRect().height()/AREA_DIVIDER;
+        RectF maximRect = mainImage.getExtendedRect();
+        float targetHeight = mainImage.getExtendedRect().height()/AREA_DIVIDER;
         SortedMap<Double, Integer> map = new TreeMap<>();
         for (int i = 0; i < texts.size(); ++i) {
             OcrText rawText = texts.get(i);
@@ -144,8 +150,8 @@ public class OcrSchemer {
      * @param texts ordered list of Texts. Not null.
      * @param source source Text. Not null.
      */
-    private static void waveTagger(@NonNull List<OcrText> texts, @NonNull OcrText source) {
-        RectF extendedRect = OcrUtils.extendRect(source.box(), WAVE_TAGGER_HEIGHT_EXTEND, -OcrManager.mainImage.getWidth());
+    private void waveTagger(@NonNull List<OcrText> texts, @NonNull OcrText source) {
+        RectF extendedRect = OcrUtils.extendRect(source.box(), WAVE_TAGGER_HEIGHT_EXTEND, -mainImage.getWidth());
         for (OcrText text : texts) {
             if (!text.getTags().contains(CENTER_TAG)) { //here we are excluding source
                 if (extendedRect.contains(text.box())) {
@@ -166,7 +172,7 @@ public class OcrSchemer {
      * @param texts ordered list of Texts. Not null.
      * @param targetHeight center (y coordinate) of the ticket
      */
-    private static void centralTagger(@NonNull List<OcrText> texts, float targetHeight) {
+    private void centralTagger(@NonNull List<OcrText> texts, float targetHeight) {
         for (OcrText rawText : texts) {
             if (rawText.getTags().contains(CENTER_TAG)) { //here we are excluding source
                 if (isHalfUp(rawText, targetHeight)) {
@@ -185,7 +191,7 @@ public class OcrSchemer {
      * Tag rawTexts without a introduction\conclusion tag, as products\prices
      * @param texts list of Texts. Not null.
      */
-    private static void missTagger(@NonNull List<OcrText> texts) {
+    private void missTagger(@NonNull List<OcrText> texts) {
         for (OcrText text : texts) {
             if (!text.getTags().contains(INTRODUCTION_TAG) && !text.getTags().contains(CONCLUSION_TAG)) {
                 if (text.getTags().contains(LEFT_TAG)) {
@@ -220,7 +226,7 @@ public class OcrSchemer {
             totalArea += getRectArea(text.box());
             OcrUtils.log(7, "densitySnake", "Text: " + text.text() + "\ncurrent density is: "
                 + targetArea/totalArea + "\nand tag: " + tag);
-            map.put(targetArea/totalArea, i); // if we have same density but bigger area, let's choose biggest area
+            map.put(targetArea/totalArea, i); // if we have same density but bigger area, choose biggest area
         }
         //here We have a list of ordered density and area, to choose the best we define a variable
         // N = {(area of 1 rect)*[(n° of rect)-(n° of rect/DENSITY_SNAKE_MISS_RECTS)]/(total area)}
@@ -270,7 +276,7 @@ public class OcrSchemer {
      * @param start index of first element. Int >= 0.
      * @param end index of last element. Int >= 0.
      */
-    private static void intervalTagger(@NonNull List<OcrText> textList, @NonNull String tag, @IntRange(from = 0) int start, @IntRange(from = 0) int end) {
+    private void intervalTagger(@NonNull List<OcrText> textList, @NonNull String tag, @IntRange(from = 0) int start, @IntRange(from = 0) int end) {
         if (end < start)
             return;
         for (int i = start; i <= end; ++i) {
@@ -293,7 +299,7 @@ public class OcrSchemer {
      * @param start index of first element. Int >= 0.
      * @param end index of last element. Int >= 0.
      */
-    private static void intervalTagger(@NonNull List<OcrText> textList, @NonNull String tagLeft, @NonNull String tagCenter,
+    private void intervalTagger(@NonNull List<OcrText> textList, @NonNull String tagLeft, @NonNull String tagCenter,
                                        @NonNull String tagRight, @IntRange(from = 0) int start, @IntRange(from = 0) int end) {
         if (end < start)
             return;
@@ -326,7 +332,7 @@ public class OcrSchemer {
      * Remove all tags (excluded left-center-right) from a Text
      * @param text source text. Not Null.
      */
-    private static void removeOldTags(@NonNull OcrText text) {
+    private void removeOldTags(@NonNull OcrText text) {
         text.removeTag(INTRODUCTION_TAG);
         text.removeTag(CONCLUSION_TAG);
         text.removeTag(PRODUCTS_TAG);

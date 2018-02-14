@@ -4,6 +4,7 @@ import android.graphics.RectF;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 
 import static com.ing.software.ocr.OcrVars.*;
 
@@ -40,8 +41,8 @@ public class ScoreFunc {
      * @param target text to score
      * @return new score for text + old score
      */
-    public static double getAmountScore(Scored<OcrText> target) {
-        double positionScore = getAmountBlockScore(target.obj());
+    public static double getAmountScore(Scored<OcrText> target, RawImage mainImage) {
+        double positionScore = getAmountBlockScore(target.obj(), mainImage);
         //todo: add score for height etc.
         return positionScore + target.getScore();
     }
@@ -51,11 +52,11 @@ public class ScoreFunc {
      * @param source text containing amount string
      * @return new score + old score
      */
-    public static double getSourceAmountScore(Scored<OcrText> source) {
-        double average = OcrManager.mainImage.getAverageCharHeight();
+    public static double getSourceAmountScore(Scored<OcrText> source, RawImage mainImage) {
+        double average = mainImage.getAverageCharHeight();
         double heightDiff = source.obj().charHeight() - average;
         heightDiff = heightDiff/average*HEIGHT_CHAR_MULTIPLIER;
-        average = OcrManager.mainImage.getAverageCharWidth();
+        average = mainImage.getAverageCharWidth();
         double widthDiff = source.obj().charWidth() - average;
         widthDiff = widthDiff/average*WIDTH_CHAR_MULTIPLIER;
         OcrUtils.log(5, "getSourceAmountScore", "Score for text: " + source.obj().text()
@@ -90,15 +91,15 @@ public class ScoreFunc {
      * @param text source text
      * @return score of the rect in its block.
 	 */
-    private static int getAmountBlockScore(OcrText text) {
+    private static int getAmountBlockScore(OcrText text, RawImage mainImage) {
         if (text.getTags().contains(INTRODUCTION_TAG))
-            return amountBlockIntroduction[getTextBlockPosition(text, OcrManager.mainImage.getIntroRect())];
+            return amountBlockIntroduction[getTextBlockPosition(text, mainImage.getIntroRect())];
         else if (text.getTags().contains(PRODUCTS_TAG))
-            return amountBlockProducts[getTextBlockPosition(text, OcrManager.mainImage.getProductsRect())];
+            return amountBlockProducts[getTextBlockPosition(text, mainImage.getProductsRect())];
         else if (text.getTags().contains(PRICES_TAG))
-            return amountBlockProducts[getTextBlockPosition(text, OcrManager.mainImage.getPricesRect())];
+            return amountBlockProducts[getTextBlockPosition(text, mainImage.getPricesRect())];
         else if (text.getTags().contains(CONCLUSION_TAG))
-            return amountBlockConclusion[getTextBlockPosition(text, OcrManager.mainImage.getConclusionRect())];
+            return amountBlockConclusion[getTextBlockPosition(text, mainImage.getConclusionRect())];
         else
             return -1;
     }
