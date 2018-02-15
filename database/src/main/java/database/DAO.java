@@ -20,7 +20,7 @@ import java.util.concurrent.CompletionService;
  */
 
 /*Data Access Objects Interface. Defines the queries using Room libraries
-  These methods won't be implemented in any class, since the Room library takes care of doing the SQL operatoins by taking the  
+  These methods won't be implemented in any class, since the Room library takes care of doing the SQL operatoins by taking the
   methods parameters and executing the SQL operation defined in the correspondent '@' annotation.
   For instance, when the method addTicket(TicketEntity ticketEntity) is called, the Room library takes the ticketEntity object
   in the parameters and executes the correspondent SQL INSERT query. The use of these methods can be seen in the DataManager class.
@@ -167,10 +167,10 @@ public interface DAO {
     //SELECT FROM ID
 
     /**
-    *Gets all the TicketEnt of a MissionEntity
-    *@param id long, the id of the MissionEntity
-    *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets for the given mission id
-    */
+     *Gets all the TicketEnt of a MissionEntity
+     *@param id long, the id of the MissionEntity
+     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets for the given mission id
+     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME+" WHERE "+Constants.MISSION_CHILD_COLUMNS+" = :id")
     List<TicketEntity> getTicketsForMission(long id);
 
@@ -184,10 +184,10 @@ public interface DAO {
     public List<MissionEntity> getMissionsForPerson(long id);
 
     /**
-    *Executes a SELECT query for a specified TicketEntity id
-    *@param id long, the id of the TicketEntity
-    *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
-    */
+     *Executes a SELECT query for a specified TicketEntity id
+     *@param id long, the id of the TicketEntity
+     *@return List<TicketEntity> not null (at least of 0 size) which contains all the tickets with the given id
+     */
     @Query("SELECT * FROM "+Constants.TICKET_TABLE_NAME +" WHERE "+Constants.TICKET_PRIMARY_KEY+" =:id")
     public TicketEntity getTicket(long id);
 
@@ -302,4 +302,25 @@ public interface DAO {
     @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+
             Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_CLOSED+"=0")
     int getActiveMissionsNumberForPerson(long personID);
+
+    /**
+     * Gets the number of the refoundable Tickets in the DB
+     * @return the number of refoundable tickets
+     *
+     * @author Matteo Mascotto
+     */
+    @Query("SELECT COUNT(*) FROM " + Constants.TICKET_TABLE_NAME + " WHERE " +
+            Constants.TICKET_IS_REFUNDABLE)
+    int countRefundableTickets();
+
+    /**
+     * Gets the number of the not refoundable Tickets in the DB
+     * @return the number of not refoundable tickets
+     *
+     * @author Matteo Mascotto
+     */
+    @Query("SELECT COUNT(*) FROM " + Constants.TICKET_TABLE_NAME + " WHERE NOT " +
+            Constants.TICKET_IS_REFUNDABLE)
+    int countNotRefundableTickets();
+
 }
