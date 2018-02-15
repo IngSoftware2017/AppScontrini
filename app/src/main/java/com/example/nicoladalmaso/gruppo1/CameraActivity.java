@@ -67,6 +67,7 @@ public class CameraActivity extends Activity {
 
     public void initializeComponents(){
         mCamera = getCameraInstance();
+        mCamera.setDisplayOrientation(90);
         Camera.Parameters p = mCamera.getParameters();
         p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         p.setJpegQuality(100);

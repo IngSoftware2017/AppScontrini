@@ -37,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import database.DataManager;
+import database.MissionEntity;
 import database.TicketEntity;
 
 /**
@@ -185,9 +186,10 @@ public class CheckPhotoActivity extends Activity {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
             TicketEntity thisTicket = new TicketEntity();
+            MissionEntity ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
 
             if(OCR_result.date == null)
-                thisTicket.setDate(Calendar.getInstance().getTime());
+                thisTicket.setDate(ticketMission.getStartDate());
             else
                 thisTicket.setDate(OCR_result.date);
 

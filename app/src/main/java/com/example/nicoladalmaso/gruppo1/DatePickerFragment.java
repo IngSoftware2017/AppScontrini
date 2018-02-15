@@ -97,10 +97,24 @@ public class  DatePickerFragment extends DialogFragment
         return dialog;
     }
 
+    /** Dal Maso
+     * When the date is set print this in the edittext
+     * @param view view who called the method
+     * @param year selected yyyy
+     * @param month selected mm
+     * @param day selected dd
+     */
     public void onDateSet(DatePicker view, int year, int month, int day) {
         Log.d("TextInputEditTextID", "ID: "+id+", R.id: "+R.id.input_missionStart);
+        String dayS = "" + day, monthS = "" + (month + 1);
         TextView textView = (TextView) getActivity().findViewById(id);
-        textView.setText(day + "/" + (month+1) + "/" + year);
+        if(dayS.length() == 1){
+            dayS = "0" + day;
+        }
+        if(monthS.length() == 1){
+            monthS = "0" + (month + 1);
+        }
+        textView.setText(dayS + "/" + monthS + "/" + year);
         //lazzarin
         SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
         if(check)
