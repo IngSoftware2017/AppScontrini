@@ -11,6 +11,7 @@ import com.ing.software.common.Scored;
 import com.ing.software.common.Triple;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
 import java.math.BigDecimal;
@@ -238,9 +239,9 @@ public class DataAnalyzer {
      * @param texts list of scored source texts
      * @return list of listAmountOrganizer containing source texts
      */
-    static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts) {
+    static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts, RawImage mainImage) {
         return Stream.of(texts)
-                    .map(ListAmountOrganizer::new)
+                    .map(source -> new ListAmountOrganizer(source, mainImage))
                     .toList();
     }
 
@@ -312,8 +313,8 @@ public class DataAnalyzer {
      * @param texts list of scored target texts (prices). Not null.
      * @return text containing amount price and it's decoded value
      */
-    static Pair<OcrText, BigDecimal>  getMatchingAmount(@NonNull List<Scored<OcrText>> texts) {
-        List<Pair<OcrText, BigDecimal>> prices = findAllPricesRegex(Stream.of(texts).map(Scored::obj).toList());
+    static Pair<OcrText, BigDecimal>  getMatchingAmount(@NonNull List<Scored<OcrText>> texts, boolean advanced) {
+        List<Pair<OcrText, BigDecimal>> prices = findAllPricesRegex(Stream.of(texts).map(Scored::obj).toList(), advanced);
         if (prices.size() > 0)
             return prices.get(0);
         //ZAGLIA: you should not return the first valid BigDecimal, you should evaluate all matches
@@ -347,10 +348,11 @@ public class DataAnalyzer {
      *
      * @author Zaglia
      */
-    static List<Pair<OcrText, BigDecimal>> findAllPricesRegex(List<OcrText> lines) {
+    static List<Pair<OcrText, BigDecimal>> findAllPricesRegex(List<OcrText> lines, boolean advanced) {
         List<Pair<OcrText, BigDecimal>> prices = new ArrayList<>();
         for (OcrText line : lines) {
-            Matcher matcher = PRICE_WITH_SPACES.matcher(line.textSanitizedCommonNum());
+            Matcher matcher = PRICE_WITH_SPACES.matcher(advanced ? line.sanitizedAdvancedNum()
+                    : line.sanitizedNum());
             if (matcher.find()) {
                 BigDecimal price = getRegexPriceValue(matcher.group());
                 if (price != null) {
@@ -373,8 +375,8 @@ public class DataAnalyzer {
     */
     static Pair<OcrText, BigDecimal> getRestoredAmount(@NonNull List<Scored<OcrText>> texts) {
         for (Scored<OcrText> singleText : texts) {
-            if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().numNoSpaces()) < NUMBER_MIN_VALUE) {
-                BigDecimal amount = analyzeAmount(singleText.obj().numNoSpaces());
+            if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().sanitizedNum()) < NUMBER_MIN_VALUE) {
+                BigDecimal amount = analyzeAmount(singleText.obj().sanitizedAdvancedNum());
                 if (amount != null)
                     return new Pair<>(singleText.obj(), amount);
             }
@@ -397,7 +399,7 @@ public class DataAnalyzer {
 
         Map<Date, Pair<OcrText, DateType>> dates = new HashMap<>();
         for (OcrText text : texts) {
-            Matcher matcher = DATE.matcher(text.textSanitizedCommonNum());
+            Matcher matcher = DATE.matcher(text.sanitizedNum());
             if (matcher.find()) {
                 SparseIntArray groups = new SparseIntArray(3);
                 for (Integer idx : DATE_GROUPS) {

@@ -1,11 +1,15 @@
 package com.ing.software.ticketapp;
 
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,7 +27,9 @@ public class MissionsClosed extends Fragment {
     PersonEntity thisPerson;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     View rootView;
+    MissionAdapterDB adapter;
     ListView listView;
+    TextView noMissions;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,6 +39,7 @@ public class MissionsClosed extends Fragment {
         DB = new DataManager(getContext());
 
         listView = (ListView)rootView.findViewById(R.id.listMission);
+        noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
         personID = getArguments().getInt("personID", 0);
         Log.d("TAB1", ""+personID);
 
@@ -42,30 +49,10 @@ public class MissionsClosed extends Fragment {
 
     /** PICCOLO
      * Adds in the database the new mission
-     * @param mission the mission to be added
      */
-    public void addToListDB(MissionEntity mission){
-        listMission.add(mission);
-        ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
-        listView.setAdapter(adapter);
-    }
-
     public void addToListDB(){
-        MissionAdapterDB adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
-    }
-
-    /**Lazzarin
-     * clear the view after I've eliminated a mission(before to call printAllMissions)
-     */
-    public void clearAllMissions()
-    {
-        ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB emptyAdapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
-        emptyAdapter.clear();
-        emptyAdapter.notifyDataSetChanged();
-        listView.setAdapter(emptyAdapter);
     }
 
     /** Dal Maso
@@ -74,14 +61,12 @@ public class MissionsClosed extends Fragment {
     public void printAllMissions(){
         listMission.clear();
         List<MissionEntity> missions = DB.getMissionsForPerson(personID);
-        TextView noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
         int count = 0;
         for (int i = 0; i < missions.size(); i++)
         {
-            if(missions.get(i).isRepay()) {
+            if(missions.get(i).isClosed()) {
                 count++;
                 listMission.add(missions.get(i));
-                //addToListDB(missions.get(i));
             }
         }
         addToListDB();
@@ -91,6 +76,26 @@ public class MissionsClosed extends Fragment {
         else{
             noMissions.setVisibility(View.INVISIBLE);
         }
+    }
 
+    /** Dal Maso
+     * Delete one listview cell
+     * @param v view to animate after deleting
+     * @param index item position
+     */
+    public void deleteCell(final View v, final int index) {
+        Animation.AnimationListener al = new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                listMission.remove(index);
+                adapter.notifyDataSetChanged();
+                if(listMission.size() == 0){
+                    noMissions.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override public void onAnimationRepeat(Animation animation) {}
+            @Override public void onAnimationStart(Animation animation) {}
+        };
+        AppUtilities.collapse(v, al);
     }
 }

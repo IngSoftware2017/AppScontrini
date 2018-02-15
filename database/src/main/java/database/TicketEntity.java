@@ -6,14 +6,10 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.ColumnInfo;
-import android.graphics.PointF;
 import android.net.Uri;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 
 /**
@@ -33,21 +29,28 @@ public class TicketEntity {
     @PrimaryKey(autoGenerate = true)
     private long ID;
     private Uri fileUri;
-    private BigDecimal amount;
-    private String shop;
+    private BigDecimal amount;    //the total amount in the ticket
+    private String shop="";
     private Date date;
-    private String title;
+    private String title="";
     private List<String> category;
     private float[] corners;
+    private Date insertionDate;
+    private short tagPlaces;    //the number of place setting in the ticket
+    private boolean isRefundable; //a ticket can be refundable or not
+    private int[] ipErrorArray;
+    private int[] ocrErrorArray;
+
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
-    private int missionID;
+    private long missionID;
 
     @Ignore
     /**
      * Non parametric constructor to use when you don't want set all fields
      */
     public TicketEntity() {
+        tagPlaces = 1;
     }
 
     /**
@@ -60,7 +63,7 @@ public class TicketEntity {
      * @param title name given
      * @param missionID code of the mission
      */
-    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, int missionID) {
+    public TicketEntity(Uri fileUri, BigDecimal amount, String shop, Date date, String title, long missionID, short tagPlaces) {
         this.amount = amount;
         this.date = date;
         this.fileUri = fileUri;
@@ -68,6 +71,7 @@ public class TicketEntity {
         this.title = title;
         this.missionID = missionID;
         corners = new float[8];
+        this.tagPlaces = tagPlaces;
     }
 
     /**
@@ -84,77 +88,79 @@ public class TicketEntity {
      */
     public void setID(long ID) { this.ID = ID; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the date of the issue of the ticket
      *
      * @return date
      */
     public  Date getDate() { return date; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket date
      * @param date not null
      */
     public void setDate(Date date) { this.date = date; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns ticket amount
      * @return amount
      */
     public  BigDecimal getAmount() { return amount; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket amount
      * @param amount not null
      */
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns ticket file path
      * @return fileUri
      */
     public Uri getFileUri() { return fileUri; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket file path
      * @param fileUri not null
      */
     public void setFileUri(Uri fileUri) { this.fileUri = fileUri; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the shop
      * @return shop
      */
     public String getShop() { return shop; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets ticket shop
      * @param shop not null
      */
     public void setShop (String shop) { this.shop = shop; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the title of the ticket
      *
      * @return title
      */
     public String getTitle() { return title; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets the title of the ticket
      *
      * @param title not null
      */
     public void setTitle (String title) { this.title = title; }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the list of categories of the ticket
      *
      * @return category
      */
     public List<String> getCategory() { return category; }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets the list of categories of the ticket
      * @param categories
      */
@@ -162,24 +168,24 @@ public class TicketEntity {
         this.category = categories;
     }
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the mission id of this ticket
      * @return missionID
      */
-    public int getMissionID() {
+    public long getMissionID() {
         return missionID;
     }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets mission id of this TicketEntity
      * @param missionID
      */
-    public void setMissionID(int missionID) {
+    public void setMissionID(long missionID) {
         this.missionID = missionID;
     }
 
 
-    /**
+    /** Created by Marco Olivieri
      * Returns the corners of the ticket
      * 8 float point of the rectangle coordinate
      * @return corners
@@ -188,7 +194,7 @@ public class TicketEntity {
         return corners;
     }
 
-    /**
+    /** Created by Marco Olivieri
      * Sets corners of the ticket
      * Must be an array of 8 elements: the rectangle coordinate of the ticket
      * @param corners
@@ -197,32 +203,104 @@ public class TicketEntity {
         this.corners = corners;
     }
 
-    /**
-     * Return the corners of the ticket.
-     * @return List of 4 points of a rectangle, ordered ordered counter-clockwise.
+    /**Created by Federico Taschin
+     * @return insertion date (not null) of the ticket
      */
-    @Ignore
-    public List<PointF> getCornerPoints() {
-        float[] corners = getCorners();
-        List<PointF> pointCorners = new ArrayList<>();
-        for (int i = 0; i < 4; i++)
-            pointCorners.add(new PointF(corners[i * 2], corners[i * 2 + 1]));
-        return pointCorners;
+    public Date getInsertionDate() {
+        return insertionDate;
     }
 
-    /**
-     * Set the corners of the ticket rectangle.
-     * @param pointCorners List of 4 points a rectangle, ordered counter-clockwise.
+    /**Created by Federico Taschin
+     *
+     * @param insertionDate
      */
-    @Ignore
-    public void setCornerPoints(List<PointF> pointCorners) {
-        float[] corners = new float[8];
-        for (int i = 0; i < 4; i++) {
-            corners[i * 2] = pointCorners.get(i).x;
-            corners[i * 2 + 1] = pointCorners.get(i).y;
-        }
-        setCorners(corners);
+    public void setInsertionDate(Date insertionDate) {
+        this.insertionDate = insertionDate;
     }
+
+    /** Created by Marco Olivieri
+     * Returns the numer of place setting of the ticket.
+     * @return the numer of place setting
+     */
+    public short getTagPlaces() {
+        return tagPlaces;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets the numer of place setting of the ticket.
+     * @param tagPlaces has to be > 0
+     */
+    public void setTagPlaces(short tagPlaces) {
+        this.tagPlaces = tagPlaces;
+
+    }
+
+    /** Created by Marco Olivieri
+     * Returns if the ticket is refundable
+     * @return isRefundable - boolean
+     */
+    public boolean isRefundable() {
+        return isRefundable;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets if the ticket is refundable
+     * @param refundable
+     */
+    public void setRefundable(boolean refundable) {
+        isRefundable = refundable;
+    }
+
+    /** Created by Marco Olivieri
+     * Returns the price of the single person
+     * @return price Person
+     */
+    public BigDecimal getPricePerson() {
+        if (amount != null) {
+            if (tagPlaces == 1)
+                return amount;
+            else if (tagPlaces > 1) //divide amount for the number of place setting
+                return amount.divide(new BigDecimal(tagPlaces), 2, BigDecimal.ROUND_HALF_EVEN);
+            else
+                return null;
+        }
+        else
+            return null;
+    }
+
+    /** Created by Marco Olivieri
+     * Returns an integer array that contains ImageProcessor's error
+     * @return IpErrorArray
+     */
+    public int[] getIpErrorArray() {
+        return ipErrorArray;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets an integer array that contains ImageProcessor's error
+     * @param ipErrorArray
+     */
+    public void setIpErrorArray(int[] ipErrorArray) {
+        this.ipErrorArray = ipErrorArray;
+    }
+
+
+    /** Created by Marco Olivieri
+     * Returns an integer array that contains OCRmanager's error
+     * @return OcrErrorArray
+     */
+    public int[] getOcrErrorArray() {
+        return ocrErrorArray;
+    }
+
+    /** Created by Marco Olivieri
+     * Sets an integer array that contains OCRmanager's error
+     * @param ocrErrorArray
+     */
+    public void setOcrErrorArray(int[] ocrErrorArray) {
+        this.ocrErrorArray = ocrErrorArray;
+    }
+
 
     /**
      * Returns a String with TicketEntity data formatted as follows:
@@ -233,9 +311,7 @@ public class TicketEntity {
      */
     @Override
     public String toString(){
-        return getShop()+"\nTotale: "+getAmount();
+        return getShop()+"\nTotale: "+ getAmount();
     }
-
-
 
 }

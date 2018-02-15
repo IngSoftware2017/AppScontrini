@@ -23,7 +23,7 @@ public final class Converters {
 
     /**
      * Converts from a timestamp to a Date object
-     * @param value the timestamp
+     * @param Long value the timestamp
      * @return the corresponding Date object, null if value is null
      */
     @TypeConverter
@@ -33,7 +33,7 @@ public final class Converters {
 
     /**
      * Converts from Date to the corresponding timestamp
-     * @param date, the Date object to be converted
+     * @param Date date, the Date object to be converted
      * @return the corresponding timestamp, null if date is null
      */
     @TypeConverter
@@ -43,7 +43,7 @@ public final class Converters {
 
     /**
      * Converts from a double to a BigDecimal object
-     * @param value the value to be converted
+     * @param Double value the value to be converted
      * @return the corresponding BigDecimal, null if value is null
      */
     @TypeConverter
@@ -53,7 +53,7 @@ public final class Converters {
 
     /**
      * Converts from BigDecimal to double
-     * @param value to be converted
+     * @param BigDecimal value to be converted
     * @return Double with the correspondent value, null if value is null
      */
     @TypeConverter
@@ -63,7 +63,7 @@ public final class Converters {
 
     /**
     * Converts from Uri to String
-    * @param uri to be converted
+    * @param Uri uri to be converted
     * @return String with the Uri path, null if Uri is null
     */
     @TypeConverter
@@ -74,7 +74,7 @@ public final class Converters {
 
     /**
     * Converts from String to Uri
-    * @param path to be converted
+    * @param String path to be converted
     * @return Uri with the given path, null if path is null
     */
     @TypeConverter
@@ -85,7 +85,7 @@ public final class Converters {
     /**
      * @author Marco Olivieri
      * Converts from a List<String> to a String for db
-     * @param list of category
+     * @param List<String> list of category
      * @return the corresponding String object, null if value is null
      */
     @TypeConverter
@@ -104,7 +104,7 @@ public final class Converters {
     /**
      * @author Marco Olivieri
      * Converts from a String to List<String>
-     * @param value of categories separeted from ;
+     * @param String value of categories separeted from ;
      * @return the corresponding List<String> object, null if value is null
      */
     @TypeConverter
@@ -122,7 +122,7 @@ public final class Converters {
     /**
      * @author Marco Olivieri
      * Converts from a float[] to a String for db
-     * @param corners array of corners
+     * @param float[] array of corners
      * @return the corresponding String object, null if value is null
      */
     @TypeConverter
@@ -140,9 +140,9 @@ public final class Converters {
 
     /**
      * @author Marco Olivieri
-     * Converts from a String to List<String>
-     * @param value of categories separeted from ;
-     * @return the corresponding List<String> object, null if value is null
+     * Converts from a String to float[]
+     * @param String value of corners separeted from ;
+     * @return the corresponding float[] object, null if value is null
      */
     @TypeConverter
     public float[] toArrayOfCorners(String value) {
@@ -156,6 +156,48 @@ public final class Converters {
                 corners[i]=Float.parseFloat(s_corners[i]);
             }
             return corners;
+        }
+    }
+
+    //-------------------------
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a int[] to a String for db
+     * @param int[] array of errors
+     * @return the corresponding String object, null if value is null
+     */
+    @TypeConverter
+    public String intToString(int[] errors) {
+        if (errors == null)
+            return null;
+        else
+        {
+            String s="";
+            for (int i=0; i<errors.length; i++)
+                s+=errors[i]+";";
+            return s;
+        }
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Converts from a String to int[]
+     * @param String value of errors separeted from ;
+     * @return the corresponding int[] object, null if value is null
+     */
+    @TypeConverter
+    public int[] toArrayOfErrors(String value) {
+        if (value == null)
+            return null;
+        else
+        {
+            String[] e = value.split(";");
+            int[] error = new int[e.length];
+            for (int i=0; i<error.length; i++) {
+                error[i]=Integer.parseInt(e[i]);
+            }
+            return error;
         }
     }
 }

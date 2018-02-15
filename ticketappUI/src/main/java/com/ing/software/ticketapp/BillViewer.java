@@ -1,48 +1,70 @@
 package com.ing.software.ticketapp;
 
+import android.support.v7.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Debug;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.ing.software.ocr.ImageProcessor;
+import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import database.DataManager;
+import database.MissionEntity;
 import database.TicketEntity;
 
-import static com.ing.software.ticketapp.StatusVars.REDO_OCR;
-
-
 public class BillViewer extends AppCompatActivity {
-    public FloatingActionButton fabEdit, fabEditor, fabCrop, fabConfirmEdit, fabOcr;
+    public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
-    long ticketId;
+    int ticketId;
+    int missionID;
     Context context;
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
-    String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
+    String ticketTitle = "", ticketAmount = "", ticketPeople = "", ticketAmountUn = "", ticketShop = "", ticketPath = ""; // ticketDate = ""
+    Date ticketDate;
+    ImageView imgView;
 
     //Dal Maso
     @Override
@@ -53,62 +75,46 @@ public class BillViewer extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_bill_viewer);
-        DB = DataManager.getInstance(this.getApplicationContext());
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#66000000")));
+        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
 
         initialize();
-
-        //fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
-        fabEditor =(FloatingActionButton)findViewById(R.id.fabEdit);
-        fabOcr = findViewById(R.id.fabOcr);
-        /*
-        fabCrop.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                cropPhoto(ticketId);
-           }//onClick
-        });
-        */
-        fabEditor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Open Edit Ticket Activity
-                Intent editTicket = new Intent(context, EditTicket.class);
-                editTicket.putExtra("ticketID", thisTicket.getID());
-                startActivityForResult(editTicket, TICKET_MOD);
-            }//onClick
-        });
-        fabOcr.setOnClickListener(view -> {
-            Intent intent = new Intent();
-            intent.putExtra("ticketID", String.valueOf(ticketId));
-            Log.d("TICKETID_REDO_OCR", "ID is: " + ticketId);
-            setResult(REDO_OCR, intent);
-            finish();
-        });
     }
 
+    /** Dal Maso
+     * Initialize components
+     */
     public void initialize(){
         //Get data from parent view
         Intent intent = getIntent();
-        ticketId = intent.getExtras().getLong("ID");
+        ticketId = Singleton.getInstance().getTicketID();
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
+        ticketPeople = ""+thisTicket.getTagPlaces();
         ticketTitle = thisTicket.getTitle();
-        if (thisTicket.getDate() != null) {
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-            ticketDate = df.format(thisTicket.getDate());
-        } else
-            ticketDate = getString(R.string.no_date);
-        ticketShop = thisTicket.getShop();
-        if (thisTicket.getAmount() != null)
-            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_UP).toString();
-        else
-            ticketAmount = getString(R.string.no_amount);
+        ticketDate = thisTicket.getDate();
+        if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
+            ticketShop = getString(R.string.string_NoShop);
+        }
+        else {
+            ticketShop = thisTicket.getShop();
+        }
+        if(thisTicket.getAmount() == null || thisTicket.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
+            ticketAmount = getString(R.string.string_NoAmountFull);
+            ticketAmountUn = getString(R.string.string_NoAmountFull);
+        }
+        else {
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
+            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
+        }
 
         //Title
         setTitle(ticketTitle);
         TextView billLastMod = (TextView)findViewById(R.id.billDate);
-        billLastMod.setText(ticketDate);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        billLastMod.setText(formatter.format(ticketDate));
 
         //ImageName
         TextView billName = (TextView)findViewById(R.id.billName);
@@ -118,25 +124,40 @@ public class BillViewer extends AppCompatActivity {
         TextView billPrice = (TextView)findViewById(R.id.billTotal);
         billPrice.setText(ticketAmount);
 
+        //Total per person
+        TextView billPriceUn = (TextView)findViewById(R.id.billTotalUn);
+        billPriceUn.setText(ticketAmountUn);
+
+        //Number of people
+        TextView billPeople = (TextView)findViewById(R.id.billPeople);
+        billPeople.setText(ticketPeople);
+
         //Shop
         TextView billShop = (TextView)findViewById(R.id.billShop);
         billShop.setText(ticketShop);
 
         //Full image view
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        //BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        //Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
-        //imgView.setImageBitmap(bitmap);
-        Glide
-                .with(context)
+        imgView = (ImageView)findViewById(R.id.billImage);
+
+        Glide.with(context)
                 .load(ticketPath)
-                .thumbnail(0.1f)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .into(imgView);
 
-        imgView.setOnClickListener(v -> {
-            Intent fullImgIntent = new Intent(this, FullImageActivity.class);
-            fullImgIntent.putExtra("ID", ticketId);
-            startActivity(fullImgIntent);
+        fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
+        fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
+        fabCrop.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                cropPhoto(ticketId);
+            }//onClick
+        });
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteTicket(ticketId);
+            }//onClick
         });
     }
 
@@ -148,12 +169,7 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.bill_viewer_menu, menu);
-        /*
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(false); //remove back button, or redo ocr doesn't work
-            */
+        inflater.inflate(R.menu.editticket_menu, menu);
         return true;
     }
 
@@ -168,8 +184,10 @@ public class BillViewer extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
 
-            case R.id.action_deleteBill:
-                deleteTicket(ticketId);
+            case R.id.action_editTicket:
+                //Open Edit Ticket Activity
+                Intent editTicket = new Intent(context, EditTicket.class);
+                startActivityForResult(editTicket, TICKET_MOD);
                 break;
 
             default:
@@ -197,17 +215,11 @@ public class BillViewer extends AppCompatActivity {
                     initialize();
                     break;
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
+                    DB.updateTicket(thisTicket);
                     initialize();
                     break;
             }
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent mIntent = new Intent();
-        setResult(RESULT_OK, mIntent);
-        super.onBackPressed();
     }
 
 
@@ -233,7 +245,7 @@ public class BillViewer extends AppCompatActivity {
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
-                } //todo log error
+                }
             }
         });
         builder.setNegativeButton(this.getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -246,28 +258,30 @@ public class BillViewer extends AppCompatActivity {
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }//deleteTicket
 
-    /**PICCOLO
-     * Method that lets the user crop and/or rotate the original photo
+    /**PICCOLO, problems fixes and edit by Dal Maso
+     * Method that lets the user crop and/or rotate the original photo, once the crop is confirmed,
+     * the ocr is run to get data that it couldn't have red the first time
      * @param id the id of the TicketEntity in the db
      */
-    private void cropPhoto(long id) {
-        TicketEntity ticket = DB.getTicket((int) id);
-        Uri toCropUri = ticket.getFileUri();
+    private void cropPhoto(int id) {
+        Uri toCropUri = thisTicket.getFileUri();
         File originalFile = new File(toCropUri.toString().substring(7)+"orig");
         Uri originalUri=Uri.fromFile(originalFile);
         CropImage.activity(originalUri)
                 .setOutputUri(toCropUri).start(this);
-        ticket.setFileUri(toCropUri);
-
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        //BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        //Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
-        //imgView.setImageBitmap(bitmap);
-        Glide
-                .with(context)
-                .load(toCropUri.toString().substring(7))
-                .thumbnail(0.1f)
-                .into(imgView);
     }//cropPhoto
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
 

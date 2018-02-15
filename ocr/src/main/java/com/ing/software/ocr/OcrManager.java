@@ -2,7 +2,6 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.util.SizeF;
@@ -12,33 +11,34 @@ import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrObjects.TicketSchemes.TicketScheme;
 import com.ing.software.ocr.OperativeObjects.*;
 
-import java.math.*;
 import java.util.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Collections;
+import java.util.List;
 
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.Stream;
 
 import static com.ing.software.common.CommonUtils.*;
-import static com.ing.software.ocr.OcrOptions.REDO_OCR_3;
 import static com.ing.software.ocr.OcrVars.*;
-import static com.ing.software.ocr.OcrAnalyzer.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
 import static java.util.Arrays.*;
+import static com.ing.software.ocr.OcrOptions.*;
 
 /**
  * Class to control ocr analysis
  * <p> This class is thread-safe. </p>
  *
  * <p>USAGE:</p>
- * <ol> Instantiate OcrManager; </ol>
- * <ol> Call initialize(context) until it returns 0;</ol>
- * <ol> Call getTicket(preproc, callback) ad libitum to extract information (Ticket object) from a photo of a ticket.</ol>
- * <ol> Call release() to release internal resources.</ol>
+ * <ol> Instantiate {@link OcrManager}; </ol>
+ * <ol> Call {@link #initialize(Context)} until it returns 0;</ol>
+ * <ol> Call {@link #getTicket(ImageProcessor, OcrOptions)} ad libitum to extract information (Ticket object) from a photo of a ticket.</ol>
+ * <ol> Call {@link #release()} to release internal resources.</ol>
  */
 public class OcrManager {
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
-    public static RawImage mainImage;
     private boolean operative = false;
 
     /**
@@ -64,30 +64,42 @@ public class OcrManager {
     /**
      * Single run ocr analysis.
      * @param ticket in-out ticket. Not null.
-     * @param processor image processor. Not modified. Not null.
+     * @param imgProc image processor. Not modified. Not null.
      * @param options ocr options. Not modified. Not null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
-    private void analysis(OcrTicket ticket, ImageProcessor processor, OcrOptions options) {
+    private void extractTicket(OcrTicket ticket, ImageProcessor imgProc, OcrOptions options) {
         long startTime;
         long endTime;
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        Bitmap frame = processor.undistortForOCR(options.getResolutionMultiplier());
+        Bitmap frame = imgProc.undistortForOCR(options.getResolutionMultiplier());
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return;
         }
-        ticket.rectangle = processor.getCorners();
+        ticket.rectangle = imgProc.getCorners();
 
-        mainImage = new RawImage(frame); //set main properties of image
+        if (IS_DEBUG_ENABLED) {
+            endTime = System.nanoTime();
+            double duration = ((double) (endTime - startTime)) / 1000000000;
+            OcrUtils.log(1, "EXECUTION TIME: ", "Processor: " + duration + " seconds");
+        }
+
+        ticket.errors = new HashSet<>();
+        if (IS_DEBUG_ENABLED)
+            startTime = System.nanoTime();
+
+        RawImage mainImage = new RawImage(frame);
+        analyzer.setMainImage(mainImage);
         OcrUtils.log(1, "MANAGER: ", "Starting image analysis...");
         List<OcrText> texts = analyzer.analyze(frame); //Get main texts
         mainImage.setLines(texts); //save rect configuration in rawimage
-        OcrSchemer.prepareScheme(texts); //Prepare scheme of the ticket
-        OcrUtils.listEverything();
+        //OcrSchemer schemer = new OcrSchemer(mainImage);
+        //OcrSchemer.prepareScheme(texts); //Prepare scheme of the ticket
+        OcrUtils.listEverything(mainImage.getAllTexts());
 
         Locale country = null, language = null;
         if (options.suggestedCountry != null
@@ -96,7 +108,7 @@ public class OcrManager {
             language = COUNTRY_TO_LANGUAGE.get(country);
         }
 
-        {   // if found, currency is a great estimator for the country locale
+        { // if found, currency is a great estimator for the country locale
             Locale currencyCountry = getCurrencyCountry(texts);
             if (currencyCountry != null)
                 country = currencyCountry;
@@ -105,8 +117,11 @@ public class OcrManager {
         //todo: update locale if text locale does not match currency locale
 
         OcrTicket newTicket = new OcrTicket();
+        BigDecimal restoredAmount = null;
+        OcrText amountPriceText = null; //ZAGLIA: todo integrate OcrText return in AmountComparator and TicketSchemes
+                                        // in order to return total location in OcrTicket
         Scored<TicketScheme> bestTicket = null;
-        if (options.shouldFindTotal) {
+        if (options.totalSearch != TotalSearch.SKIP) {
             /*
             Steps:
             1- search string in texts --> Data Analyzer --> Word Matcher. Find ticket language
@@ -140,30 +155,29 @@ public class OcrManager {
 
 
 
-            List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountStrings); //2
+            List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountStrings, mainImage); //2
             Collections.sort(amountList, Collections.reverseOrder());
             if (!amountList.isEmpty()) {
                 List<Scored<OcrText>> amountPrice; //ZAGLIA: the identifier is misleading, use amountStringTexts instead
                 int i = 0;
-                int maxScan = options.precision >= REDO_OCR_3 ? 3 : 1;
+                int maxScan = (options.totalSearch == TotalSearch.EXTENDED_SEARCH ? 3 : 1);
                 while (i < amountList.size()) {
                     OcrText amountStringText = amountList.get(i).getSourceText().obj();
-                    RectF stripBoundingBox = getAmountExtendedBox(amountStringText, mainImage.getWidth());
-                    if (options.precision >= OcrOptions.REDO_OCR_PRECISION && i <= maxScan) {
-                        //Redo ocr on first element of list. todo: add scan for more sources if precision > 4
-                        amountPrice = analyzer.getAmountStripTexts(processor,
-                                new SizeF(mainImage.getWidth(), mainImage.getHeight()), amountStringText, stripBoundingBox);//3
+                    if (options.totalSearch.ordinal() >= TotalSearch.DEEP.ordinal() && i <= maxScan) {
+                        //Redo ocr on first element of list.
+                        amountPrice = analyzer.getAmountStripTexts(imgProc,
+                                new SizeF(mainImage.getWidth(), mainImage.getHeight()), amountStringText);//3
                     } else {
                         //Use current texts to search target texts (with price)
-                        amountPrice = OcrAnalyzer.getAmountOrigTexts(amountStringText, stripBoundingBox);
+                        amountPrice = analyzer.getAmountOrigTexts(amountStringText);
                     }
                     //set target texts (lines) to first source text
                     amountList.get(i).setAmountTargetTexts(amountPrice); //4
                     AmountComparator amountComparator;
-                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts()); //5
+                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), false); //5
                     if (amountT != null && newTicket.total == null) {
                         newTicket.total = amountT.second;
-                        amountComparator = new AmountComparator(newTicket.total, amountT.first); //8
+                        amountComparator = new AmountComparator(newTicket.total, amountT.first, mainImage); //8
                         bestTicket = amountComparator.getBestAmount(true);
                         if (bestTicket != null) {
                             OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
@@ -174,21 +188,21 @@ public class OcrManager {
                     //todo: Redo ocr on prices strip if enabled //7
 
                     //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
-                    if (restoredAmountT != null && newTicket.total == null) {
-                        newTicket.total = restoredAmountT.second;
-                        amountComparator = new AmountComparator(newTicket.total, restoredAmountT.first);
+                    if (restoredAmountT != null && restoredAmount == null) {
+                        restoredAmount = restoredAmountT.second;
+                        amountComparator = new AmountComparator(restoredAmount, restoredAmountT.first, mainImage);
                         Scored<TicketScheme> bestRestoredTicket = amountComparator.getBestAmount(false);
                         if (bestRestoredTicket != null) {
                             OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
                                     "\nwith scheme: " + bestRestoredTicket.obj().toString() + "\nand score: " + bestRestoredTicket.getScore());
-                            newTicket.total = bestRestoredTicket.obj().getBestAmount(); //9
-                            newTicket.errors.add(OcrError.UNCERTAIN_AMOUNT);
                             if (bestTicket == null || bestRestoredTicket.getScore() > bestTicket.getScore()) {
                                 bestTicket = bestRestoredTicket;
                             }
                         }
                     }
-                    if (newTicket.total != null) //temporary
+                    if (bestTicket != null)
+                        restoredAmount = bestTicket.obj().getBestAmount(); //9
+                    if (newTicket.total != null && restoredAmount != null) //temporary
                         break;
                     ++i;
                 }
@@ -197,22 +211,20 @@ public class OcrManager {
             ticket.containsCover = coverStrings.size() > 0;
         }
 
-        //todo: from total price text:
-        {
-            OcrText totalPriceT = null;
-            if (totalPriceT != null) {
-                ticket.totalRect = ImageProcessor.normalizeCoordinates(totalPriceT.box(), size(frame));
-            }
+        if (amountPriceText != null) {
+            ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));
         }
 
-        if (options.shouldFindProducts && false) { // disable for now
+        if (options.productsSearch != ProductsSearch.SKIP) {
             List<Pair<String, BigDecimal>> newProducts = null;
             if (bestTicket != null) {
                 List<Pair<OcrText, BigDecimal>> prices = bestTicket.obj().getPricesList();
-                newProducts = Stream.of(prices)
-                        .map(price -> new Pair<>(Stream.of(OcrAnalyzer.getTextsOnleft(price.first)) //get texts for product name and concatenate these texts
-                                .reduce("", (string, text) -> string + text.text() + " "), price.second))
-                        .toList();
+                if (prices != null) {
+                    newProducts = Stream.of(prices)
+                            .map(price -> new Pair<>(Stream.of(analyzer.getTextsOnleft(price.first)) //get texts for product name and concatenate these texts
+                                    .reduce("", (string, text) -> string + text.text() + " "), price.second))
+                            .toList();
+                }
             }
             newTicket.products = newProducts;
         }
@@ -228,7 +240,7 @@ public class OcrManager {
         //update ticket currency
         ticket.currency = Currency.getInstance(country);
 
-        if (options.shouldFindDate) {
+        if (options.dateSearch != DateSearch.SKIP) {
             //todo: depending on the level of country certainty, choose suggested or forced country:
             Pair<OcrText, Date> pair = findDate(texts, null, country);
             if (pair != null)
@@ -238,7 +250,7 @@ public class OcrManager {
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
             double duration = ((double) (endTime - startTime)) / 10e9;
-            OcrUtils.log(1, "EXECUTION TIME: ", duration + " seconds");
+            OcrUtils.log(1, "EXECUTION TIME: ", "Core: " + duration + " seconds");
         }
     }
 
@@ -261,27 +273,28 @@ public class OcrManager {
             return ticket;
         }
 
-        analysis(ticket, procCopy, options);
+        if (options.orientation != Orientation.FORCE_UPSIDE_DOWN)
+            extractTicket(ticket, procCopy, options);
 
-        //if should find total and total is null, or should not find total but should find date and date is null,
-        // then redo analysis
         boolean upsideDownAnlaysis = false;
-        if (options.canRetryUpsideDown
-                && ((options.shouldFindTotal && ticket.total == null)
-                || (!options.shouldFindTotal && options.shouldFindDate && ticket.date != null))) {
+        //if should find total and total is null, or should not find total but should find date and date is null
+        boolean retryNeeded = (options.totalSearch != TotalSearch.SKIP && ticket.total == null)
+                || (options.totalSearch == TotalSearch.SKIP
+                && options.dateSearch != DateSearch.SKIP && ticket.date != null);
+        if (options.orientation != Orientation.NORMAL && retryNeeded) {
             procCopy.rotate(2);
-            analysis(ticket, procCopy, options);
+            extractTicket(ticket, procCopy, options);
             upsideDownAnlaysis = true;
         }
 
-        if (options.shouldFindTotal && ticket.total == null) {
+        if (options.totalSearch != TotalSearch.SKIP && ticket.total == null) {
             ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
         }
-        if (options.shouldFindDate && ticket.date == null) {
+        if (options.dateSearch != DateSearch.SKIP && ticket.date == null) {
             ticket.errors.add(OcrError.DATE_NOT_FOUND);
         }
         if (upsideDownAnlaysis && !ticket.errors.contains(OcrError.AMOUNT_NOT_FOUND)
-                && !ticket.errors.contains(OcrError.AMOUNT_NOT_FOUND)) {
+                && !ticket.errors.contains(OcrError.DATE_NOT_FOUND)) {
             ticket.errors.add(OcrError.UPSIDE_DOWN);
         }
         return ticket;

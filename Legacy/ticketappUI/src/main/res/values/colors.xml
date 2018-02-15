@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#616161</color>
+    <color name="colorPrimaryDark">#424242</color>
+    <color name="colorAccent">#e65100</color>
+    <color name="colorAccentLight">#e57373</color>
+
+    <color name="colorPrimaryMission">#2196f3</color>
+    <color name="colorPrimaryDarkMission">#1976d2</color>
+    <color name="colorAccentMission">#7C4dff</color>
+    <color name="colorAccentLightMission">#b39ddb</color>
+
+    <color name="colorPrimaryBill">#8bc34a</color>
+    <color name="colorPrimaryDarkBill">#689f38</color>
+    <color name="colorAccentBill">#009688</color>
+    <color name="colorFAB1">#00bcd4</color>
+    <color name="colorFAB2">#03a9f4</color>
+    <color name="colorAccentLightBill">#80deea</color>
+
+    <color name="black_overlay">#66000000</color>
+</resources>

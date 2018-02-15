@@ -1,1 +1,1 @@
-include ':opencvtestapp', ':ocr', ':common', ':ocrtestapp', ':ticketappUI', ':database'
+include ':opencvtestapp', ':ocr', ':common', ':ocrtestapp', ':ticketappUI', ':database', ':export'
