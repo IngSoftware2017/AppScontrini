@@ -3,6 +3,7 @@ package com.example.nicoladalmaso.gruppo1;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +59,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
 
+        CardView card = (CardView)convertView.findViewById(R.id.ticketViewer);
+
         TicketEntity c = getItem(position);
         ticketTitle.setText(c.getTitle());
 
@@ -70,6 +73,13 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         else {
             Double a = c.getAmount().doubleValue();
             tot.setText("Totale: "+a+"€");
+        }
+
+        // Check if the Ticket is or not refundable and color the card's background with different colors
+        if (c.isRefundable()) {
+            card.setCardBackgroundColor(context.getResources().getColor(R.color.colorRef));
+        } else {
+            card.setCardBackgroundColor(context.getResources().getColor(R.color.colorNotRef));
         }
 
         //Bitmap image = bitmaps.get(new Integer((int)c.getID()));

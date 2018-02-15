@@ -86,5 +86,7 @@
     <string name="popup_export_xml">xml</string>
     <string name="popup_export_xls">xls</string>
 
+    <string name="text_isRefoundable">Scontrino Rimborsabile?</string>
+
 </resources>
 

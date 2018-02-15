@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,6 +27,12 @@ import database.DataManager;
 import database.MissionEntity;
 import database.TicketEntity;
 
+/**
+ * Class for Edit the Ticket's data
+ *
+ * Modified: Improve refoundable Ticket
+ * @author matteo.mascotto
+ */
 public class EditTicket extends AppCompatActivity {
 
     public DataManager DB;
@@ -37,6 +44,7 @@ public class EditTicket extends AppCompatActivity {
     TextView txtAmount;
     TextView txtShop;
     TextView txtDate;
+    CheckBox chkIsRefoundable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +78,9 @@ public class EditTicket extends AppCompatActivity {
      * @return flag of success
      *
      * Modify by Marco Olivieri: fixed amount error
+     *
+     * Modified: Improve refoundable Ticket
+     * @author: Matteo Mascotto on 15-02-2018
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -96,6 +107,7 @@ public class EditTicket extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                thisTicket.setRefundable(chkIsRefoundable.isChecked());
                 DB.updateTicket(thisTicket);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -129,11 +141,18 @@ public class EditTicket extends AppCompatActivity {
         setTicketValuesOnScreen();
     }
 
+    /**
+     * It set the value on Activity
+     *
+     * Modified: Improved Refoundable Ticket
+     * @author Matteo Mascotto on 15-02-2018
+     */
     private void setTicketValuesOnScreen(){
         txtTitle = (TextView)findViewById(R.id.input_ticketTitleMod);
         txtAmount = (TextView)findViewById(R.id.input_ticketAmountMod);
         txtShop = (TextView)findViewById(R.id.input_ticketShopMod);
         txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
+        chkIsRefoundable = (CheckBox)findViewById(R.id.check_isRefoundable);
         LinearLayout btnModifyDate = (LinearLayout) findViewById(R.id.btn_modify_date);
         btnModifyDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,5 +166,6 @@ public class EditTicket extends AppCompatActivity {
         txtDate.setText(ticketDate);
         txtShop.setText(ticketShop);
         txtAmount.setText(ticketAmount);
+        chkIsRefoundable.setChecked(thisTicket.isRefundable());
     }
 }
