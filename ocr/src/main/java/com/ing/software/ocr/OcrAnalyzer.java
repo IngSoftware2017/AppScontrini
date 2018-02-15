@@ -27,6 +27,9 @@ import static com.ing.software.ocr.OcrVars.*;
 //ZAGLIA: Consider moving this into OperativeObjects
 public class OcrAnalyzer {
 
+    // ideal character width / height
+    private static final double CHAR_ASPECT_RATIO = 5. / 8.;
+
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
 

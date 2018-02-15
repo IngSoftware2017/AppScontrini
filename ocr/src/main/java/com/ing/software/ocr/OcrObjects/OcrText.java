@@ -23,8 +23,8 @@ import static java.util.Collections.*;
  * @author (Edit) Michelon
  * Main object used by this module. It represents a text line or a word, with its absolute position in the image,
  * the result of ocr analysis and a first raw analysis of the string extracted.
+ * Some fileds are declared as Lazy to avoid computation of these fields when its value is never accessed.
  */
-
 public class OcrText implements Comparable<OcrText> {
 
     // List of substitutions used to correct common ocr mistakes in the reading of a price.
@@ -45,6 +45,7 @@ public class OcrText implements Comparable<OcrText> {
             new Pair<>("B", "8")
     );
 
+    //Immutable fields:
     private boolean isWord;
     private Lazy<List<OcrText>> children; // if this OcrText instance is a text line, its children are words
     private Lazy<List<PointF>> corners; // corners of a rotated rectangle containing the line of text
@@ -58,8 +59,14 @@ public class OcrText implements Comparable<OcrText> {
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
     private Lazy<String> sanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
     private Lazy<String> sanitizedAdvanced; // text where it was applied the NUM_SANITIZE_LIST and NUM_SANITIZE_ADVANCED substitutions
+
+    //Mutable fields
     private List<String> tags;
 
+    /**
+     * Create a new OcrText from a Vision API Text object
+     * @param text Text object
+     */
     public OcrText(Text text) {
         isWord = text instanceof Element;
         OcrUtils.log(7, "OCRTEXT: ", "I'm a word: " + isWord);
@@ -118,7 +125,7 @@ public class OcrText implements Comparable<OcrText> {
     }
 
     /**
-     * Create a new OcrText with dimensions converted from one bitmap space to another
+     * Create a new OcrText from another, with its dimensions converted from one bitmap space to another
      * @param ocrText OcrText to convert
      * @param srcImgRect source bitmap space. Eg: optimized amount strip, from (0, 0)
      * @param dstImgRect destination space. Eg: amount strip in original bitmap space.
@@ -180,6 +187,10 @@ public class OcrText implements Comparable<OcrText> {
     public String textNoSpaces() { return textNoSpaces.get(); }
     public String sanitizedNum() { return sanitizedNum.get(); }
     public String sanitizedAdvancedNum() { return sanitizedAdvanced.get(); }
+
+    /**
+     * @author Michelon
+     */
 
     public List<String> getTags() {
         return tags;

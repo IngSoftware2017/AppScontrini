@@ -15,6 +15,7 @@ public class Lazy<T> {
     private Supplier<T> instCb;
 
     /**
+     * New Lazy object
      * @param instantiationCb callback used to instantiate the object
      */
     public Lazy(Supplier<T> instantiationCb) {

@@ -8,7 +8,6 @@ import java.util.Locale;
  * Object passed to the manager to avoid performing unnecessary operations
  * and consequently reduce time (time depends primarily on image scale)
  */
-
 public class OcrOptions {
 
     //NB: the flags inside these enums are ordered in a certain way to make use of ordinal().
@@ -100,7 +99,7 @@ public class OcrOptions {
     public DateSearch dateSearch = DateSearch.SKIP;
     public ProductsSearch productsSearch = ProductsSearch.SKIP;
     public Orientation orientation = Orientation.NORMAL;
-    public Locale suggestedCountry = DEFAULT_COUNTRY;
+    public Locale suggestedCountry = null;
 
     /**
      * Return default Options
@@ -167,16 +166,19 @@ public class OcrOptions {
     }
 
     /**
-     * Set suggested country.
-     * @param locale ISO country
+     * Set suggested country, used to resolve ambiguities.
+     * Can be extracted from current location or location history.
+     * @param country ISO locale country
      * @return OcrOptions instance
      */
-    public OcrOptions suggestedCountry(Locale locale) {
-        suggestedCountry = locale;
+    public OcrOptions suggestedCountry(Locale country) {
+        suggestedCountry = country;
         return this;
     }
 
-    double getResolutionMultiplier() {
-        return 1. / (resolution.ordinal() + 1);
-    }
+    /**
+     * Translate resolution enum value into a numeric multiplier
+     * @return multiplier
+     */
+    double getResolutionMultiplier() { return 1. / (resolution.ordinal() + 1); }
 }

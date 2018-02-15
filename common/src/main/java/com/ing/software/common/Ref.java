@@ -7,7 +7,14 @@ package com.ing.software.common;
 public class Ref<T> {
     public T val;
 
+    /**
+     * New Ref with null value
+     */
     public Ref() { val = null; }
 
-    public Ref(T obj) { val = obj; }
+    /**
+     * New Ref with specified value
+     * @param value new value
+     */
+    public Ref(T value) { val = value; }
 }

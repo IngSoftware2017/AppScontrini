@@ -32,7 +32,7 @@ public class OcrTicket implements Cloneable {
     /**
      * Language of the ticket
      */
-    public Locale locale;
+    public Locale language;
 
     /**
      * Purchase date.

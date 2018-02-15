@@ -33,10 +33,32 @@ import static com.ing.software.ocr.OcrOptions.*;
  * <p>USAGE:</p>
  * <ol> Instantiate {@link OcrManager}; </ol>
  * <ol> Call {@link #initialize(Context)} until it returns 0;</ol>
- * <ol> Call {@link #getTicket(ImageProcessor, OcrOptions)} ad libitum to extract information (Ticket object) from a photo of a ticket.</ol>
+ * <ol> Call {@link #getTicket(ImageProcessor, OcrOptions)} ad libitum to extract an {@link OcrTicket} from a photo of a ticket.</ol>
  * <ol> Call {@link #release()} to release internal resources.</ol>
+ *
+ * <p> For a code usage example follow this link: https://github.com/IngSoftware2017/AppScontrini/wiki/OCR </p>
  */
 public class OcrManager {
+
+    /*
+     @author Zaglia
+     */
+    private static final double MIN_LANGUAGE_SCORE = 10;
+
+    //todo: use a more general function
+    private static final Map<Locale, Locale> LANGUAGE_TO_COUNTRY = new HashMap<>();
+    private static final Map<Locale, Locale> COUNTRY_TO_LANGUAGE = new HashMap<>();
+
+    static {
+        LANGUAGE_TO_COUNTRY.put(Locale.ITALIAN, Locale.ITALY);
+        LANGUAGE_TO_COUNTRY.put(Locale.ENGLISH, Locale.UK);
+        //adding US would overwrite UK.
+
+        COUNTRY_TO_LANGUAGE.put(Locale.ITALY, Locale.ITALIAN);
+        COUNTRY_TO_LANGUAGE.put(Locale.UK, Locale.ENGLISH);
+        COUNTRY_TO_LANGUAGE.put(Locale.US, Locale.ENGLISH);
+    }
+
 
     private final OcrAnalyzer analyzer = new OcrAnalyzer();
     private boolean operative = false;
@@ -102,6 +124,7 @@ public class OcrManager {
         OcrUtils.listEverything(mainImage.getAllTexts());
 
         Locale country = null, language = null;
+        double languageScore = 0;
         if (options.suggestedCountry != null
                 && COUNTRY_TO_LANGUAGE.keySet().contains(options.suggestedCountry)) {
             country = options.suggestedCountry;
@@ -139,9 +162,11 @@ public class OcrManager {
             List<Scored<Pair<OcrText, Locale>>> coverStringsWithLocale = findCoverStringTexts(texts); //1
             List<Scored<Pair<OcrText, Locale>>> taxStringsWithLocale = findTaxStringTexts(texts); //1
 
-            language = getBestLanguage(asList(amountStringsWithLocale, subtotalStringsWithLocale,
-                    cashStringsWithLocale, changeStringsWithLocale, coverStringsWithLocale,
-                    taxStringsWithLocale));
+            Scored<Locale> scoredLanguage = getBestLanguage(asList(amountStringsWithLocale,
+                    subtotalStringsWithLocale, cashStringsWithLocale, changeStringsWithLocale,
+                    coverStringsWithLocale, taxStringsWithLocale));
+            language = scoredLanguage.obj();
+            languageScore = scoredLanguage.getScore();
 
             if (language != null) {
                 List<Scored<OcrText>> amountStrings = filterForLanguage(amountStringsWithLocale, language);
@@ -233,6 +258,7 @@ public class OcrManager {
         ticket.total = newTicket.total;
         ticket.products = newTicket.products;
         ticket.errors.addAll(newTicket.errors);
+        ticket.language = language;
 
         if (options.dateSearch != DateSearch.SKIP) {
             Pair<OcrText, Date> pair = findDate(texts, language != null
@@ -242,13 +268,11 @@ public class OcrManager {
         }
 
         //NB: this is a fallback, a language could be associated to multiple countries, only one is chosen.
-        if (country == null && language != null) {
+        if (country == null && languageScore > MIN_LANGUAGE_SCORE) {
             country = LANGUAGE_TO_COUNTRY.get(language);
-        }
-        //update ticket currency
-        if (country != null)
+            //update ticket currency
             ticket.currency = Currency.getInstance(country);
-
+        }
 
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
@@ -260,7 +284,7 @@ public class OcrManager {
     /**
      * Get a Ticket from an ImageProcessor. Some fields of the new ticket can be null.
      * <p> All possible errors inside {@link OcrTicket#errors} are listed in {@link OcrError}. </p>
-     * @param imgProc {{@link ImageProcessor} which has been set an image. Not modified by this method. Not null.
+     * @param imgProc {@link ImageProcessor} which has been set an image. Not modified by this method. Not null.
      * @param options define which operations to execute and detection accuracy. Not Null
      * @return {@link OcrTicket} Never null.
      *
