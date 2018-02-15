@@ -21,14 +21,19 @@ public enum OcrError {
      * The amount has been found, but with a low confidence.
      * It could be the wrong price inside the ticket or some digits could have been misidentified.
      */
-    UNCERTAIN_AMOUNT,
+    UNCERTAIN_TOTAL,
 
     /**
      * The total amount has not been found.
      * The amount field is null.
      */
-    AMOUNT_NOT_FOUND, // on the user end, the check of the presence of this flag can be replaced with a null check
+    TOTAL_NOT_FOUND, // on the user end, the check of the presence of this flag can be replaced with a null check
                       // but checking against this flag makes the code more readable
+
+    /**
+     * The total has been edited
+     */
+    TOTAL_EDITED,
 
     /**
      * The date has been found, but with a low confidence.

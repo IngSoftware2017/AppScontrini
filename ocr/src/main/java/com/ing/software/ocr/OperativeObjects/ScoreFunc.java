@@ -1,12 +1,12 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OperativeObjects;
 
 import android.graphics.RectF;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
-import com.ing.software.ocr.OperativeObjects.RawImage;
+import com.ing.software.ocr.OcrUtils;
 
-import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OperativeObjects.OcrSchemer.*;
 
 /**
  * Class used to calculate scores for texts
@@ -70,7 +70,7 @@ public class ScoreFunc {
      * @param target target text
      * @return score for chosen texts
      */
-    static double getDistFromSourceScore(OcrText source, OcrText target) {
+    public static double getDistFromSourceScore(OcrText source, OcrText target) {
         OcrUtils.log(7, "getDistFromSource:", "Source rect is (l,t,r,b): (" + source.box().left + "," +
             source.box().top + "," + source.box().right + "," + source.box().bottom + ") \n Target is: ("+
                 target.box().left + "," + target.box().top + "," + target.box().right + "," + target.box().bottom + ")");
@@ -80,7 +80,7 @@ public class ScoreFunc {
         OcrUtils.log(7, "getDistFromSource:", "Partial diff is: " + diffCenter);
         diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
         double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
-        heightDiff = (1.-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;  //<- always 0, why? ZAGLIA: should be good now
+        heightDiff = (1.-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;
         OcrUtils.log(5, "getDistFromSourceScore", "Score for text: " + target.text() +
             " with source: " + source.text() + " is: (diffCenter) " + diffCenter + " + (heightDiff) " + heightDiff);
         return diffCenter + heightDiff;
@@ -131,7 +131,7 @@ public class ScoreFunc {
      * otherwise number of non-digit chars (*0.5 if special)/length
      */
     public static double isPossiblePriceNumber(String originalNoSpace, String sanitized) {
-        sanitized = sanitized.replace(" ", "");
+        sanitized = sanitized.replace(" ", "").replace(",", ".");
         double specialCharsMultiplier = 0.5;
         if (sanitized.length() >= NUMBER_MAX_LENGTH)
             return Integer.MAX_VALUE;

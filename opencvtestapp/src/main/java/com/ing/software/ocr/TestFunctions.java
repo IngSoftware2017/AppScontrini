@@ -189,7 +189,7 @@ public class TestFunctions {
 //            ticket.total = findAmountPrice(amountLinesBmSpace, amountStr, srcAmountStripRect);
 //        }
 //        if (ticket.total == null)
-//            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
+//            ticket.errors.add(OcrError.TOTAL_NOT_FOUND);
 //
 //        List<Pair<OcrText, Date>> dates = invoke((lines);
 //        if (dates.size() == 1) {

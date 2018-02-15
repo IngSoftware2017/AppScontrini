@@ -2,28 +2,28 @@ package com.ing.software.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.Pair;
-import android.util.SizeF;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrObjects.TicketSchemes.TicketScheme;
-import com.ing.software.ocr.OperativeObjects.*;
+import com.ing.software.ocr.OperativeObjects.AmountComparator;
+import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 
-import java.util.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.List;
-
+import java.util.*;
 import com.annimon.stream.function.Consumer;
+
 import com.annimon.stream.Stream;
 
-import static com.ing.software.common.CommonUtils.*;
 import static com.ing.software.ocr.OcrVars.*;
+import static java.util.Arrays.asList;
+import static com.ing.software.common.CommonUtils.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
-import static java.util.Arrays.*;
 import static com.ing.software.ocr.OcrOptions.*;
 
 /**
@@ -65,6 +65,7 @@ public class OcrManager {
 
     /**
      * Initialize OcrAnalyzer
+     *
      * @param context Android context
      * @return 0 if everything ok, negative number if an error occurred
      */
@@ -75,9 +76,6 @@ public class OcrManager {
         return r;
     }
 
-    /**
-     * Release internal resources
-     */
     public synchronized void release() {
         operative = false;
         analyzer.release();
@@ -118,10 +116,8 @@ public class OcrManager {
         analyzer.setMainImage(mainImage);
         OcrUtils.log(1, "MANAGER: ", "Starting image analysis...");
         List<OcrText> texts = analyzer.analyze(frame); //Get main texts
-        mainImage.setLines(texts); //save rect configuration in rawimage
-        //OcrSchemer schemer = new OcrSchemer(mainImage);
-        //OcrSchemer.prepareScheme(texts); //Prepare scheme of the ticket
-        OcrUtils.listEverything(mainImage.getAllTexts());
+        mainImage.setLines(texts); //save rect configuration in rawimage and Prepare scheme of the ticket
+        OcrUtils.listEverything(mainImage);
 
         Locale country = null, language = null;
         double languageScore = 0;
@@ -139,13 +135,15 @@ public class OcrManager {
         }
 
         OcrTicket newTicket = new OcrTicket();
+
         BigDecimal restoredAmount = null;
         OcrText amountPriceText = null;
+        OcrText restoredAmountPriceText = null;
         Scored<TicketScheme> bestTicket = null;
         if (options.totalSearch != TotalSearch.SKIP) {
             /*
             Steps:
-            1- search string in texts --> Data Analyzer --> Word Matcher. Find ticket language
+            1- search string in texts --> Data Analyzer --> Word Matcher
             2- add score to chosen texts --> Score Func
             3- if enabled redo ocr on source strip --> OcrAnalyzer
             4- add score to target texts --> Score Func
@@ -155,42 +153,44 @@ public class OcrManager {
             8- check amount and restored amount against cash and products prices --> Amount Comparator
             9- set restored amount retrieving best amount from amount comparator
              */
-            List<Scored<Pair<OcrText, Locale>>> amountStringsWithLocale = findAmountStringTexts(texts); //1
-            List<Scored<Pair<OcrText, Locale>>> subtotalStringsWithLocale = findSubtotalStringTexts(texts); //1
-            List<Scored<Pair<OcrText, Locale>>> cashStringsWithLocale = findCashStringTexts(texts); //1
-            List<Scored<Pair<OcrText, Locale>>> changeStringsWithLocale = findChangeStringTexts(texts); //1
-            List<Scored<Pair<OcrText, Locale>>> coverStringsWithLocale = findCoverStringTexts(texts); //1
-            List<Scored<Pair<OcrText, Locale>>> taxStringsWithLocale = findTaxStringTexts(texts); //1
 
-            Scored<Locale> scoredLanguage = getBestLanguage(asList(amountStringsWithLocale,
+            List<Scored<Pair<OcrText, Locale>>> amountStringsWithLocale = DataAnalyzer.findAmountStringTexts(texts); //1
+            List<Scored<Pair<OcrText, Locale>>> subtotalStringsWithLocale = DataAnalyzer.findSubtotalStringTexts(texts); //1
+            List<Scored<Pair<OcrText, Locale>>> cashStringsWithLocale = DataAnalyzer.findCashStringTexts(texts); //1
+            List<Scored<Pair<OcrText, Locale>>> changeStringsWithLocale = DataAnalyzer.findChangeStringTexts(texts); //1
+            List<Scored<Pair<OcrText, Locale>>> coverStringsWithLocale = DataAnalyzer.findCoverStringTexts(texts); //1
+            List<Scored<Pair<OcrText, Locale>>> taxStringsWithLocale = DataAnalyzer.findTaxStringTexts(texts); //1
+
+            Scored<Locale> scoredLanguage = DataAnalyzer.getBestLanguage(asList(amountStringsWithLocale,
                     subtotalStringsWithLocale, cashStringsWithLocale, changeStringsWithLocale,
                     coverStringsWithLocale, taxStringsWithLocale));
             language = scoredLanguage.obj();
             languageScore = scoredLanguage.getScore();
 
             if (language != null) {
-                List<Scored<OcrText>> amountStrings = filterForLanguage(amountStringsWithLocale, language);
-                List<Scored<OcrText>> subtotalStrings = filterForLanguage(subtotalStringsWithLocale, language);
-                List<Scored<OcrText>> cashStrings = filterForLanguage(cashStringsWithLocale, language);
-                List<Scored<OcrText>> changeStrings = filterForLanguage(changeStringsWithLocale, language);
-                List<Scored<OcrText>> coverStrings = filterForLanguage(coverStringsWithLocale, language);
-                List<Scored<OcrText>> taxStrings = filterForLanguage(taxStringsWithLocale, language);
+
+                List<Scored<OcrText>> amountStrings = DataAnalyzer.filterForLanguage(amountStringsWithLocale, language);
+                List<Scored<OcrText>> subtotalStrings = DataAnalyzer.filterForLanguage(subtotalStringsWithLocale, language);
+                List<Scored<OcrText>> cashStrings = DataAnalyzer.filterForLanguage(cashStringsWithLocale, language);
+                List<Scored<OcrText>> changeStrings = DataAnalyzer.filterForLanguage(changeStringsWithLocale, language);
+                List<Scored<OcrText>> coverStrings = DataAnalyzer.filterForLanguage(coverStringsWithLocale, language);
+                List<Scored<OcrText>> taxStrings = DataAnalyzer.filterForLanguage(taxStringsWithLocale, language);
 
                 List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountStrings, mainImage); //2
                 Collections.sort(amountList, Collections.reverseOrder());
                 if (!amountList.isEmpty()) {
-                    List<Scored<OcrText>> amountPrice; //ZAGLIA: the identifier is misleading, use amountStringTexts instead
+                    List<Scored<OcrText>> amountPrice;
                     int i = 0;
                     int maxScan = (options.totalSearch == TotalSearch.EXTENDED_SEARCH ? 3 : 1);
                     while (i < amountList.size()) {
                         OcrText amountStringText = amountList.get(i).getSourceText().obj();
+                        RectF stripBoundingBox = OcrAnalyzer.getAmountExtendedBox(amountStringText, mainImage.getWidth());
                         if (options.totalSearch.ordinal() >= TotalSearch.DEEP.ordinal() && i <= maxScan) {
-                            //Redo ocr on first element of list.
-                            amountPrice = analyzer.getAmountStripTexts(imgProc,
-                                    new SizeF(mainImage.getWidth(), mainImage.getHeight()), amountStringText);//3
+                            //Redo ocr on i element of list.
+                            amountPrice = analyzer.getTextsInStrip(imgProc, OcrUtils.imageToSize(mainImage), amountStringText, stripBoundingBox);//3
                         } else {
                             //Use current texts to search target texts (with price)
-                            amountPrice = analyzer.getAmountOrigTexts(amountStringText);
+                            amountPrice = analyzer.getOrigTexts(amountStringText, stripBoundingBox);
                         }
                         //set target texts (lines) to first source text
                         amountList.get(i).setAmountTargetTexts(amountPrice); //4
@@ -214,31 +214,34 @@ public class OcrManager {
                         //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
                         if (restoredAmountT != null && restoredAmount == null) {
                             restoredAmount = restoredAmountT.second;
-                            amountPriceText = restoredAmountT.first;
+                            restoredAmountPriceText = restoredAmountT.first;
                             amountComparator = new AmountComparator(restoredAmount, restoredAmountT.first, mainImage);
                             Scored<TicketScheme> bestRestoredTicket = amountComparator.getBestAmount(false);
                             if (bestRestoredTicket != null) {
                                 OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
                                         "\nwith scheme: " + bestRestoredTicket.obj().toString() + "\nand score: " + bestRestoredTicket.getScore());
                                 if (bestTicket == null || bestRestoredTicket.getScore() > bestTicket.getScore()) {
-                                    bestTicket = bestRestoredTicket;
+                                    bestTicket = bestRestoredTicket; //choose total with highest score
                                 }
                             }
                         }
                         if (bestTicket != null)
                             restoredAmount = bestTicket.obj().getBestAmount(); //9
-                        if (newTicket.total != null && restoredAmount != null) //temporary
+                        if (newTicket.total != null)
                             break;
                         ++i;
                     }
+                    if (options.priceEditing == PriceEditing.ALLOW) {
+                        newTicket.total = restoredAmount;
+                        amountPriceText = restoredAmountPriceText;
+                        newTicket.errors.add(OcrError.TOTAL_EDITED);
+                    }
                 }
-
                 ticket.containsCover = coverStrings.size() > 0;
+                if (amountPriceText != null) {
+                    ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));
+                }
             }
-        }
-
-        if (amountPriceText != null) {
-            ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));
         }
 
         if (options.productsSearch != ProductsSearch.SKIP) {
@@ -315,12 +318,12 @@ public class OcrManager {
         }
 
         if (options.totalSearch != TotalSearch.SKIP && ticket.total == null) {
-            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
+            ticket.errors.add(OcrError.TOTAL_NOT_FOUND);
         }
         if (options.dateSearch != DateSearch.SKIP && ticket.date == null) {
             ticket.errors.add(OcrError.DATE_NOT_FOUND);
         }
-        if (upsideDownAnlaysis && !ticket.errors.contains(OcrError.AMOUNT_NOT_FOUND)
+        if (upsideDownAnlaysis && !ticket.errors.contains(OcrError.TOTAL_NOT_FOUND)
                 && !ticket.errors.contains(OcrError.DATE_NOT_FOUND)) {
             ticket.errors.add(OcrError.UPSIDE_DOWN);
         }

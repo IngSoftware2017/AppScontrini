@@ -87,19 +87,28 @@ public class OcrOptions {
         FORCE_UPSIDE_DOWN,
     }
 
-    public static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
-    public static final TotalSearch DEFAULT_TOTAL_SEARCH = TotalSearch.DEEP;
-    public static final DateSearch DEFAULT_DATE_SEARCH = DateSearch.NORMAL;
-    public static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.DEEP;
-    public static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
-    public static final Locale DEFAULT_COUNTRY = Locale.ITALY;
+    public enum PriceEditing {
 
-    public Resolution resolution = Resolution.NORMAL;
-    public TotalSearch totalSearch = TotalSearch.SKIP;
-    public DateSearch dateSearch = DateSearch.SKIP;
-    public ProductsSearch productsSearch = ProductsSearch.SKIP;
-    public Orientation orientation = Orientation.NORMAL;
-    public Locale suggestedCountry = null;
+        SKIP,
+
+        ALLOW,
+    }
+
+    private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
+    private static final TotalSearch DEFAULT_TOTAL_SEARCH = TotalSearch.DEEP;
+    private static final DateSearch DEFAULT_DATE_SEARCH = DateSearch.NORMAL;
+    private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.DEEP;
+    private static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
+    private static final Locale DEFAULT_COUNTRY = Locale.ITALY;
+    private static final PriceEditing DEFAULT_EDIT = PriceEditing.SKIP;
+
+    Resolution resolution = Resolution.NORMAL;
+    TotalSearch totalSearch = TotalSearch.SKIP;
+    DateSearch dateSearch = DateSearch.SKIP;
+    ProductsSearch productsSearch = ProductsSearch.SKIP;
+    Orientation orientation = Orientation.NORMAL;
+    PriceEditing priceEditing = DEFAULT_EDIT;
+    Locale suggestedCountry = null;
 
     /**
      * Return default Options
@@ -173,6 +182,11 @@ public class OcrOptions {
      */
     public OcrOptions suggestedCountry(Locale country) {
         suggestedCountry = country;
+        return this;
+    }
+
+    public OcrOptions priceEditing(PriceEditing edit) {
+        priceEditing = edit;
         return this;
     }
 

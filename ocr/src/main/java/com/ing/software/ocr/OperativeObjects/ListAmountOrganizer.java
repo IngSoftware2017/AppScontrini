@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrUtils;
-import com.ing.software.ocr.ScoreFunc;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -5,17 +5,16 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 import android.util.Log;
+import android.util.SizeF;
 
 import com.ing.software.ocr.OcrObjects.OcrText;
-
-import java.util.List;
+import com.ing.software.ocr.OperativeObjects.RawImage;
 
 import static com.ing.software.ocr.OcrVars.*;
 
 /**
  * Utility class
  */
-//ZAGLIA: we could move extendRect elsewhere and use this class only for debugging purposes.
 public class OcrUtils {
 
     /**
@@ -25,44 +24,43 @@ public class OcrUtils {
      * @param tag tag of the message to log, must be less than 24 chars long
      * @param message message to log
      */
-    // ZAGLIA: Consider moving this inside CommonUtils
     public static void log(@IntRange(from = 0) int level, @Size(max = 23) String tag, String message) {
         if (OcrVars.IS_DEBUG_ENABLED && level <= LOG_LEVEL)
             Log.d(tag, message);
     }
 
     /**
-     * List in debug log blocks parsed (detection + grid)
-     * @param texts List of texts. Not null.
+     * List in debug log blocks parsed
+     * @param rawImage image containing blocks
      */
-    static void listEverything(@NonNull List<OcrText> texts) {
-            /*
-            for (RawText text : texts) {
-                OcrUtils.log(2, "FULL LIST: ", text.getValue());
-            }
-            */
+    static void listEverything(@NonNull RawImage rawImage) {
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
-            for (OcrText text : texts) {
-                if (text.getTags().contains(INTRODUCTION_TAG))
-                    OcrUtils.log(2, "introduction", text.text());
+            for (OcrText text : rawImage.getIntroTexts()) {
+                OcrUtils.log(2, "introduction", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRODUCTS");
-            for (OcrText text : texts) {
-                if (text.getTags().contains(PRODUCTS_TAG))
-                    OcrUtils.log(2, "products", text.text());
+            for (OcrText text : rawImage.getProductsTexts()) {
+                OcrUtils.log(2, "products", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nPRICES");
-            for (OcrText text : texts) {
-                if (text.getTags().contains(PRICES_TAG))
-                    OcrUtils.log(2, "prices", text.text());
+            for (OcrText text : rawImage.getPricesTexts()) {
+                OcrUtils.log(2, "prices", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nCONCLUSION");
-            for (OcrText text : texts) {
-                if (text.getTags().contains(CONCLUSION_TAG))
-                    OcrUtils.log(2, "conclusion", text.text());
+            for (OcrText text : rawImage.getConclusionTexts()) {
+                OcrUtils.log(2, "conclusion", text.text());
             }
             OcrUtils.log(2, "LIST EVERYTHING", "###########################");
         }
+
+    /**
+     * Extract size of rawImage
+     * @param image source rawimage. Not null.
+     * @return size of source rawimage
+     */
+    public static SizeF imageToSize(RawImage image) {
+        return new SizeF(image.getWidth(), image.getHeight());
+    }
 
     /**
      * @author Michelon

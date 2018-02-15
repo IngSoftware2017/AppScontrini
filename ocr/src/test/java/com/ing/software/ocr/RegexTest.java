@@ -2,16 +2,9 @@ package com.ing.software.ocr;
 
 import org.junit.Test;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.regex.*;
 
-import static com.ing.software.common.Reflect.*;
-import static com.ing.software.ocr.OcrVars.DATE_DMY;
+import static com.ing.software.ocr.DataAnalyzer.*;
 import static com.ing.software.ocr.OcrVars.POTENTIAL_PRICE;
 import static com.ing.software.ocr.OcrVars.PRICE_UPSIDEDOWN;
 import static com.ing.software.ocr.OcrVars.PRICE_WITH_SPACES;

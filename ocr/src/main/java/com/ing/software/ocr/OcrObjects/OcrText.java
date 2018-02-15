@@ -32,6 +32,7 @@ public class OcrText implements Comparable<OcrText> {
             new Pair<>("O", "0"),
             new Pair<>("o", "0"),
             new Pair<>("S", "5"),
+            new Pair<>(",", "."),
             new Pair<>("s", "5")
     );
 

@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import com.annimon.stream.Stream;
-import com.ing.software.ocr.ScoreFunc;
 
 import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
