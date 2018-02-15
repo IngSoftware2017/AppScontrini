@@ -13,7 +13,8 @@
         android:background="@drawable/appbar"
         android:elevation="15dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout">
 
         <Button
             android:id="@+id/btnCheck_retry"
@@ -90,7 +91,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="14dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="14dp"
@@ -146,6 +146,39 @@
 
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Rimborsare"
+                android:textColor="#FFF"
+                android:textSize="21dp" />
+
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:checked="true"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:textColorHighlight="@color/colorPrimary"
+                android:textColorLink="@color/colorPrimaryDark" />
+        </LinearLayout>
+
 
     </LinearLayout>
 
