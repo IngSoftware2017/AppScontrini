@@ -242,7 +242,7 @@ public class BillActivity extends AppCompatActivity {
     public void setBitmaps(){
        for(int i = 0; i<list.size(); i++){
            TicketEntity ticketEntity = list.get(i);
-           if(!bitmaps.containsKey(new Integer((int)ticketEntity.getID()))){
+           if(!bitmaps.containsKey((int)ticketEntity.getID())) {
 
                BitmapFactory.Options options = new BitmapFactory.Options();
                options.inPreferredConfig = Bitmap.Config.ARGB_8888;

@@ -18,8 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/TextLabel">
 
             <EditText
@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
                 android:textColor="#FFF"
-                android:textSize="22dp" />
+                android:textSize="22sp" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -38,8 +38,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/TextLabel">
 
             <EditText
@@ -48,7 +48,7 @@
                 android:layout_height="60dp"
                 android:hint="@string/location"
                 android:textColor="#FFF"
-                android:textSize="22dp"
+                android:textSize="22sp"
                 android:singleLine="true"/>
 
         </android.support.design.widget.TextInputLayout>
@@ -87,7 +87,7 @@
                     android:layout_weight="8"
                     android:orientation="vertical"
                     android:text="@string/dateStart"
-                    android:textSize="21dp"
+                    android:textSize="21sp"
                     android:singleLine="true"/>
 
             </LinearLayout>
@@ -115,7 +115,7 @@
                     android:layout_weight="8"
                     android:orientation="vertical"
                     android:text="@string/dateFinish"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:singleLine="true"/>
 
             </LinearLayout>
@@ -127,20 +127,20 @@
 
                 <TextView
                     android:id="@+id/msgIsRepaid"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:minHeight="40dp"
                     android:minWidth="40dp"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:text="@string/text_isRepaid"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:singleLine="true"/>
                 <CheckBox
                     android:id="@+id/check_isRepaid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"/>
+                    android:layout_marginEnd="20dp"/>
             </LinearLayout>
             <LinearLayout
             android:layout_width="match_parent"
@@ -149,21 +149,21 @@
             android:orientation="horizontal">
                 <TextView
                     android:id="@+id/ticket_count_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:minHeight="40dp"
                     android:minWidth="40dp"
                     android:text="@string/ticket_count_text"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:singleLine="true"/>
                 <TextView
                     android:id="@+id/ticket_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    android:textSize="20dp"/>
+                    android:layout_marginEnd="20dp"
+                    android:textSize="20sp"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -172,14 +172,14 @@
                 android:orientation="horizontal">
                 <TextView
                     android:id="@+id/mission_total_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:minHeight="20dp"
                     android:minWidth="40dp"
                     android:text="@string/mission_total_text"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:singleLine="true"/>
             </LinearLayout>
             <LinearLayout
@@ -193,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="20dp"
                     android:layout_marginLeft="20dp"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textAlignment="textEnd"/>
             </LinearLayout>
             <LinearLayout

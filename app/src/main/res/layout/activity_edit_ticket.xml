@@ -19,8 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/TextLabel">
 
             <EditText
@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
                 android:textColor="#FFF"
-                android:textSize="23dp"
+                android:textSize="23sp"
                 android:layout_marginBottom="15dp"
                 android:singleLine="true"/>
 
@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:orientation="horizontal"
-                android:layout_marginRight="10dp">
+                android:layout_marginEnd="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -83,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:orientation="horizontal"
-                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
                 android:id="@+id/btn_modify_date">
 
                 <ImageView
@@ -116,7 +116,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:orientation="horizontal"
-                android:layout_marginRight="10dp">
+                android:layout_marginEnd="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -151,14 +151,14 @@
 
                 <TextView
                     android:id="@+id/msgIsRefoundable"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:minHeight="40dp"
                     android:minWidth="40dp"
                     android:layout_marginStart="20dp"
                     android:text="@string/text_isRefoundable"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:singleLine="true"/>
 
                 <CheckBox

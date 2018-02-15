@@ -13,18 +13,13 @@
         android:background="@color/colorPrimary"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"></LinearLayout>
-
         <android.support.design.widget.TextInputLayout
             android:id="@+id/input_layout_personName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/TextLabel">
 
             <EditText
@@ -44,8 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/TextLabel">
 
             <EditText
@@ -75,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:orientation="horizontal"
-                android:layout_marginRight="10dp">
+                android:layout_marginEnd="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -108,7 +103,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:orientation="horizontal"
-                android:layout_marginRight="10dp">
+                android:layout_marginEnd="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
