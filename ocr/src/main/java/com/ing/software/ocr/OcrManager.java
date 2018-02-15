@@ -117,8 +117,7 @@ public class OcrManager {
 
         OcrTicket newTicket = new OcrTicket();
         BigDecimal restoredAmount = null;
-        OcrText amountPriceText = null; //ZAGLIA: todo integrate OcrText return in AmountComparator and TicketSchemes
-                                        // in order to return total location in OcrTicket
+        OcrText amountPriceText = null;
         Scored<TicketScheme> bestTicket = null;
         if (options.totalSearch != TotalSearch.SKIP) {
             /*
@@ -174,6 +173,7 @@ public class OcrManager {
                         Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), false); //5
                         if (amountT != null && newTicket.total == null) {
                             newTicket.total = amountT.second;
+                            amountPriceText = amountT.first;
                             amountComparator = new AmountComparator(newTicket.total, amountT.first, mainImage); //8
                             bestTicket = amountComparator.getBestAmount(true);
                             if (bestTicket != null) {
@@ -189,6 +189,7 @@ public class OcrManager {
                         //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
                         if (restoredAmountT != null && restoredAmount == null) {
                             restoredAmount = restoredAmountT.second;
+                            amountPriceText = restoredAmountT.first;
                             amountComparator = new AmountComparator(restoredAmount, restoredAmountT.first, mainImage);
                             Scored<TicketScheme> bestRestoredTicket = amountComparator.getBestAmount(false);
                             if (bestRestoredTicket != null) {
@@ -209,11 +210,6 @@ public class OcrManager {
 
                 ticket.containsCover = coverStrings.size() > 0;
             }
-
-
-
-
-
         }
 
         if (amountPriceText != null) {
