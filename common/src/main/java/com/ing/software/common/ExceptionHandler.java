@@ -18,6 +18,10 @@ public class ExceptionHandler {
     private Consumer<Exception> handler;
     private boolean exceptionOccurred;
 
+    /**
+     * New Exception
+     * @param handler
+     */
     public ExceptionHandler(Consumer<Exception> handler) { this.handler = handler; }
 
     /**

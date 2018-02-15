@@ -95,12 +95,12 @@ public class OcrOptions {
     public static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
     public static final Locale DEFAULT_COUNTRY = Locale.ITALY;
 
-    public Resolution resolution;
-    public TotalSearch totalSearch;
-    public DateSearch dateSearch;
-    public ProductsSearch productsSearch;
-    public Orientation orientation;
-    public Locale suggestedCountry;
+    public Resolution resolution = Resolution.NORMAL;
+    public TotalSearch totalSearch = TotalSearch.SKIP;
+    public DateSearch dateSearch = DateSearch.SKIP;
+    public ProductsSearch productsSearch = ProductsSearch.SKIP;
+    public Orientation orientation = Orientation.NORMAL;
+    public Locale suggestedCountry = DEFAULT_COUNTRY;
 
     /**
      * Return default Options
