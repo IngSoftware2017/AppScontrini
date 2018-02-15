@@ -12,6 +12,7 @@ import com.ing.software.common.Triple;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.RawImage;
+import com.ing.software.ocr.OperativeObjects.ScoreFunc;
 import com.ing.software.ocr.OperativeObjects.WordMatcher;
 
 import java.math.BigDecimal;

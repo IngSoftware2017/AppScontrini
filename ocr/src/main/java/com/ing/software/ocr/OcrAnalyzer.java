@@ -15,6 +15,7 @@ import com.annimon.stream.Stream;
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.*;
 import com.ing.software.ocr.OperativeObjects.RawImage;
+import com.ing.software.ocr.OperativeObjects.ScoreFunc;
 
 import static com.ing.software.common.CommonUtils.rectFromSize;
 import static com.ing.software.common.CommonUtils.size;

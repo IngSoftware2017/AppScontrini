@@ -1,12 +1,12 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OperativeObjects;
 
 import android.graphics.RectF;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
-import com.ing.software.ocr.OperativeObjects.RawImage;
+import com.ing.software.ocr.OcrUtils;
 
-import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OperativeObjects.OcrSchemer.*;
 
 /**
  * Class used to calculate scores for texts
@@ -70,7 +70,7 @@ public class ScoreFunc {
      * @param target target text
      * @return score for chosen texts
      */
-    static double getDistFromSourceScore(OcrText source, OcrText target) {
+    public static double getDistFromSourceScore(OcrText source, OcrText target) {
         OcrUtils.log(7, "getDistFromSource:", "Source rect is (l,t,r,b): (" + source.box().left + "," +
             source.box().top + "," + source.box().right + "," + source.box().bottom + ") \n Target is: ("+
                 target.box().left + "," + target.box().top + "," + target.box().right + "," + target.box().bottom + ")");
