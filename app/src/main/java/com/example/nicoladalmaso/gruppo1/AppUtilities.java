@@ -1,6 +1,7 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.view.inputmethod.InputMethodManager;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;

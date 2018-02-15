@@ -51,23 +51,23 @@ public class  DatePickerFragment extends DialogFragment
 
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
+
         /**
          * edit by Lazzarin
          * check if we are set Start or End date, and set min/max date
          */
 
         //variable check is used to communicate with OnDataSet method about the DatePicker chosen.
-        check=false;
+        check = false;
         int flag=Singleton.getInstance().getStartFlag();
         Log.d("flag read by datePicker",flag+"");
         switch(flag) {
-
-            case 1:   //DatePicker of end Date..set min date
+            //DatePicker of end Date..set min date
+            case 1:
             {
                 dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 if (Singleton.getInstance().getStartDate() != null)
                 {
-
                     long start = Singleton.getInstance().getStartDate().getTime();
                     dialog.getDatePicker().setMinDate(start);
                 }
@@ -75,20 +75,17 @@ public class  DatePickerFragment extends DialogFragment
                     Log.d("error on StartDate", "date is null");
                 break;
             }
-            case 0: //DatePicker of startDate
-
-
+            //DatePicker of startDate
+            case 0:
             {
                 dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 Singleton.getInstance().setStartFlag(1);
                 check = true;   // tell onDateSet to write on startDate
                 break;
             }
+            //DatePicker of editTicket(2)
             case 2:
-                //DatePicker of editTicket(2)
             {
-
-
                 long start = Singleton.getInstance().getStartDate().getTime();
                 dialog.getDatePicker().setMinDate(start);
                 long end = Singleton.getInstance().getEndDate().getTime();
@@ -116,7 +113,5 @@ public class  DatePickerFragment extends DialogFragment
             }
             check=false;
         }
-
-
     }
 }
