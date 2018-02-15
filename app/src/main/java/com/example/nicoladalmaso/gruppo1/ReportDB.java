@@ -42,10 +42,10 @@ public class ReportDB extends AppCompatActivity {
 
     public DataManager DB;
     Context context;
-    TextView txtNumPerson;
+
     TextView txtActiveMission;
     TextView txtCloseMission;
-    TextView txtNumTicket;
+    TextView txtRefoundableTicket, txtNotRefoundableTicket;
     Spinner exportSpiner;
     Button exportButton;
     ExportManager manager;
@@ -62,10 +62,11 @@ public class ReportDB extends AppCompatActivity {
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
 
-        txtNumPerson=(TextView)findViewById(R.id.msgNumPersone);
         txtActiveMission=(TextView)findViewById(R.id.msgNumActiveMission);
         txtCloseMission=(TextView)findViewById(R.id.msgNumCloseMission);
-        txtNumTicket=(TextView)findViewById(R.id.msgNumTicket);
+        txtRefoundableTicket = (TextView)findViewById(R.id.msgNumTicketRefoundable);
+        txtNotRefoundableTicket = (TextView)findViewById(R.id.msgNumTicketNotRefoundable);
+
         exportSpiner = findViewById(R.id.export_spinner);
         exportButton = findViewById(R.id.export_button);
 
@@ -155,11 +156,16 @@ public class ReportDB extends AppCompatActivity {
     /**
      * @author Marco Olivieri
      * Inizializes all fields with db numbers
+     *
+     * Modify: Improve count of refoundable (and not) Tickets
+     * @author Matteo Mascotto
      */
 
     private void initializeValues(){
+        /*
         List<PersonEntity> person = DB.getAllPerson();
         txtNumPerson.setText(txtNumPerson.getText()+" "+ String.valueOf(person.size()));
+        */
 
         List<MissionEntity> activeMission = DB.getMissionClosed(false);
         txtActiveMission.setText(txtActiveMission.getText()+" "+ String.valueOf(activeMission.size()));
@@ -171,9 +177,11 @@ public class ReportDB extends AppCompatActivity {
         List<MissionEntity> closeMission = DB.getMissionClosed(true);
         txtCloseMission.setText(txtCloseMission.getText()+" "+ String.valueOf(closeMission.size()));
 
-        List<TicketEntity> ticket = DB.getAllTickets();
-        txtNumTicket.setText(txtNumTicket.getText()+" "+ String.valueOf(ticket.size()));
+        int refoundableTickets = DB.getNumberOfRefundableTickets();
+        txtRefoundableTicket.setText(txtRefoundableTicket.getText()+" "+ String.valueOf(refoundableTickets));
 
+        int notRefoundableTickets = DB.getNumberOfNotRefundableTickets();
+        txtNotRefoundableTicket.setText(txtNotRefoundableTicket.getText()+" "+ String.valueOf(notRefoundableTickets));
     }
 
 }

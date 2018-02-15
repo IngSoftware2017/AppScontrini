@@ -58,9 +58,8 @@
     <string name="delete_title_person">Cancellazione</string>
     <!--Olivieri-->
     <string name="text_numPerson">Persone presenti:</string>
-    <string name="text_activeMission">Missioni attive:</string>
+    <string name="text_activeMission">Missioni aperte:</string>
     <string name="text_closeMission">Missioni chiuse:</string>
-    <string name="text_ticket">Scontrini totali:</string>
     <string name="ticket_count_text">Scontrini presenti :</string>
     <string name="mission_total_text">Spese totali missione:</string>
 
@@ -87,6 +86,8 @@
     <string name="popup_export_xls">xls</string>
 
     <string name="text_isRefoundable">Scontrino Rimborsabile?</string>
+    <string name="text_refoundable_ticket">Scontrini rimborsabili:</string>
+    <string name="text_notrefoundable_ticket">Scontrini non rimborsabili:</string>
 
 </resources>
 

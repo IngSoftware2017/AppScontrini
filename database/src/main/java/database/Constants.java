@@ -3,6 +3,9 @@ package database;
 /**
  * Created by Federico Taschin on 12/11/2017.
  * Modified by Marco Olivieri
+ *
+ * Modified: improve refundable Ticket
+ * @author Matteo Mascotto
  */
 
 public final class Constants {
@@ -25,6 +28,7 @@ public final class Constants {
     public static final String TICKET_FIELD_CATEGORY = "category";
     public static final String TICKET_INSERTION_DATE = "insertionDate";
     public static final String TICKET_TAG_PLACES = "tagPlaces";
+    public static final String TICKET_IS_REFUNDABLE = "isRefundable";
 
     //Mission's constants
     public static final String MISSION_PRIMARY_KEY = "ID";

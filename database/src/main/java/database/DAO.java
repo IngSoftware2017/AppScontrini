@@ -302,4 +302,25 @@ public interface DAO {
     @Query("SELECT COUNT(*) FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+
             Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_CLOSED+"=0")
     int getActiveMissionsNumberForPerson(long personID);
+
+
+    /**
+     * Gets the number of the refoundable Tickets in the DB
+     * @return the number of refoundable tickets
+     *
+     * @author Matteo Mascotto
+     */
+    @Query("SELECT COUNT(*) FROM " + Constants.TICKET_TABLE_NAME + " WHERE " +
+            Constants.TICKET_IS_REFUNDABLE)
+    int countRefundableTickets();
+
+    /**
+     * Gets the number of the not refoundable Tickets in the DB
+     * @return the number of not refoundable tickets
+     *
+     * @author Matteo Mascotto
+     */
+    @Query("SELECT COUNT(*) FROM " + Constants.TICKET_TABLE_NAME + " WHERE NOT " +
+            Constants.TICKET_IS_REFUNDABLE)
+    int countNotRefundableTickets();
 }

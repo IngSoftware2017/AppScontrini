@@ -351,6 +351,26 @@ public class DataManager {
     public int getActiveMissionsNumberForPerson(long personID){
         return database.ticketDao().getActiveMissionsNumberForPerson(personID);
     }
+
+    /**
+     * Gets the number of the refoundable Tickets in the DB
+     * @return the number of refoundable tickets
+     *
+     * @author Matteo Mascotto
+     */
+    public int getNumberOfRefundableTickets() {
+        return database.ticketDao().countRefundableTickets();
+    }
+
+    /**
+     * Gets the number of the not refoundable Tickets in the DB
+     * @return the number of not refoundable tickets
+     *
+     * @author Matteo Mascotto
+     */
+    public int getNumberOfNotRefundableTickets() {
+        return database.ticketDao().countNotRefundableTickets();
+    }
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null
