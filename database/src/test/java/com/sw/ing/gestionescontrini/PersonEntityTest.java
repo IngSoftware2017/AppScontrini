@@ -8,7 +8,7 @@ import database.PersonEntity;
 
 
 /**
- * Created by Step on 28/11/2017.
+ * Created by Stefano Elardo on 28/11/2017.
  */
 
 public class PersonEntityTest {
@@ -16,11 +16,10 @@ public class PersonEntityTest {
 
     @Before
     public void beforeTest() {
-        personEntity1 = new PersonEntity("Name","LastName","student");
+        personEntity1 = new PersonEntity("Name","LastName","student","mail@mail.com",null);
         personEntity2 = new PersonEntity();
     }
 
-    //TODO test person ID with mock test
 
     @Test
     public void getNameReturnTheName(){
@@ -54,4 +53,16 @@ public class PersonEntityTest {
         assertTrue(personEntity2.getAcademicTitle().equals(personEntity1.getAcademicTitle()));
     }
 
+    @Test
+    public void getEmailReturnThePersonMail(){
+        assertTrue(personEntity1.getEmail().equals("mail@mail.com"));
+    }
+
+    @Test
+    public void setEmailSetThePersonMail(){
+        personEntity2.setEmail("mail@mail.com");
+        assertTrue(personEntity2.getEmail().equals(personEntity1.getEmail()));
+    }
+
+    //Uri fields are not tested
 }

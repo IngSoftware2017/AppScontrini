@@ -9,7 +9,7 @@ import java.util.Date;
 import database.MissionEntity;
 
 /**
- * Created by Step on 28/11/2017.
+ * Created by Stefano Elardo on 28/11/2017.
  */
 
 public class MissionEntityTest {
@@ -21,7 +21,10 @@ public class MissionEntityTest {
     public void beforeTest(){
         dateI = new Date(2017,11,20);
         dateF = new Date(2017,11,30);
-        missionEntity1 = new MissionEntity(dateI,dateF,"Venice",1);
+        String name="mission1";
+        String location="Venice";
+        long personID=1;
+        missionEntity1 = new MissionEntity(name,dateI,dateF,location,personID);
         missionEntity2 = new MissionEntity();
     }
 
@@ -58,17 +61,16 @@ public class MissionEntityTest {
     }
 
     @Test
-    public void isRepayInitializedFalse(){
-        assertTrue(!missionEntity1.isRepay());
+    public void isClosedInitializedFalse(){
+        assertTrue(!missionEntity1.isClosed());
     }
 
     @Test
-    public void setRepaySetIsRepayCondition(){
-        missionEntity2.setRepay(true);
-        assertTrue(missionEntity2.isRepay());
+    public void setClosedSetIsClosedCondition(){
+        missionEntity2.setClosed(true);
+        assertTrue(missionEntity2.isClosed());
     }
 
-    //TODO test excel URI with mock test
 
     @Test
     public void getPersonIDReturnThePersonID(){
@@ -81,5 +83,14 @@ public class MissionEntityTest {
         assertTrue(missionEntity2.getPersonID()== missionEntity1.getPersonID());
     }
 
-    //TODO test personID method with mock
+    @Test
+    public void getNameReturnTheMissionName(){assertTrue(missionEntity1.getName().equals("mission1"));}
+
+    @Test
+    public void setNameSetTheMissionName(){
+        missionEntity2.setName("mission1");
+        assertTrue(missionEntity2.getName().equals(missionEntity1.getName()));
+    }
+
+    //Uri fields are not tested
 }

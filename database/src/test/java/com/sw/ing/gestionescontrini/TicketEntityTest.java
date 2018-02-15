@@ -12,7 +12,7 @@ import database.TicketEntity;
 import static org.junit.Assert.*;
 
 /**
- * Created by Step on 20/11/2017.
+ * Created by Stefano Elardo on 20/11/2017.
  */
 
 public class TicketEntityTest {
@@ -25,7 +25,8 @@ public class TicketEntityTest {
     public void beforeTest(){
         amount = new BigDecimal(100);
         date = new Date(2017,11,20);
-        ticketEntity1 =new TicketEntity(null,amount,"Shop",date,"Title",1);
+        short s=1;
+        ticketEntity1 =new TicketEntity(null,amount,"Shop",date,"Title",1,s);
 
         ticketEntity2 =new TicketEntity();
     }
@@ -89,6 +90,7 @@ public class TicketEntityTest {
     public void toStringReturnTheExactStringForm(){
         assertTrue(ticketEntity1.toString().equals( ticketEntity1.getShop()+"\nTotale: "+ ticketEntity1.getAmount()));
     }
-//TODO getUri, setUri test
-// TODO Needed a mock test to test ID access method (even MissionID needs mock test)
+
+    //Uri fields are not tested
+    //OCR support fields are not tested
 }
