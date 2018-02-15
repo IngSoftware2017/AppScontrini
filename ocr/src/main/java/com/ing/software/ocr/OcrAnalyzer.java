@@ -92,7 +92,6 @@ public class OcrAnalyzer {
         return rawTexts;
     }
 
-
     /**
      * @author Michelon
      * @author Riccardo Zaglia
@@ -120,14 +119,13 @@ public class OcrAnalyzer {
      *
      * Get extended rect from half of source rect (x axis) to right of pic and with height extended by AMOUNT_RECT_HEIGHT_EXTENDER
      * @param amountText source text containing amount string
-     * @param mainImage source rawimage
+     * @param bmWidth source rawimage width
      * @return rect extended from source text
      */
-    static RectF getAmountExtendedBox(OcrText amountText, RawImage mainImage) {
+    static RectF getAmountExtendedBox(OcrText amountText, float bmWidth) {
         float newTop = amountText.box().top - amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
         float newBottom = amountText.box().bottom + amountText.height()* AMOUNT_RECT_HEIGHT_EXTENDER;
-        return new RectF(amountText.box().centerX(), newTop,
-                mainImage.getWidth(), newBottom);
+        return new RectF(amountText.box().centerX(), newTop, bmWidth, newBottom);
     }
 
     /**
@@ -174,7 +172,7 @@ public class OcrAnalyzer {
      * @param processor processor containing source image
      * @param origBmSize original bitmap size
      * @param amountStringText source text containing amount string
-     * @param stripRect strip bounding box in original bitmap space
+     * //@param stripRect strip bounding box in original bitmap space
      * @return list of scored texts containing decoded values
      */
     List<Scored<OcrText>> getTextsInStrip(ImageProcessor processor, SizeF origBmSize, OcrText amountStringText, RectF stripRect) {
@@ -185,7 +183,6 @@ public class OcrAnalyzer {
                 .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountStringText, text), text))
                 .sorted(Collections.reverseOrder())
                 .toList();
-        //Collections.sort(texts, Collections.reverseOrder());
         for (Scored<OcrText> tt : texts) {
             OcrUtils.log(3, "getTextsInStrip: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
         }
@@ -208,7 +205,6 @@ public class OcrAnalyzer {
                 .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountText, text), text))
                 .sorted(Collections.reverseOrder())
                 .toList();
-        //Collections.sort(texts, Collections.reverseOrder());
         if (IS_DEBUG_ENABLED)
             for (Scored<OcrText> tt : texts) {
                 OcrUtils.log(4, "getOrigTexts: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());

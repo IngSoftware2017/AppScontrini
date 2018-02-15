@@ -140,13 +140,13 @@ public class CheckPhotoActivity extends Activity {
     private void startOCRProcess(){
         // OCR asynchronous implementation:
         ImageProcessor imgProc = new ImageProcessor(finalBitmap);
-        ocrManager.getTicket(imgProc, OcrOptions.getDefaultOptions(), result -> {
+        ocrManager.getTicket(imgProc, OcrOptions.getDefault(), result -> {
             //Thread UI control reservation
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(result.amount != null) {
-                        checkPrice.setText(result.amount.toString());
+                    if(result.total != null) {
+                        checkPrice.setText(result.total.toString());
                     }
                     waitOCR.setVisibility(View.INVISIBLE);
                 }

@@ -149,7 +149,7 @@ public class TestFunctions {
     // todo: find most meaningful way to combine score criteria.
     // todo: reject false positives adding a lower limit to the score > 0.
     private static BigDecimal findAmountPrice (List<OcrText> lines, OcrText amountStr, RectF stripRect) {
-        List<Pair<OcrText, BigDecimal>> prices = DataAnalyzer.findAllPricesRegex(lines);
+        List<Pair<OcrText, BigDecimal>> prices = DataAnalyzer.findAllPricesRegex(lines, true);
         BigDecimal price = null;
         double bestScore = 0;
         for (Pair<OcrText, BigDecimal> priceLine : prices) {

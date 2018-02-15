@@ -1,13 +1,6 @@
 package com.ing.software.ocr;
 
-import android.support.annotation.NonNull;
-
-import java.util.Arrays;
-import java.util.List;
-
 import java.util.Locale;
-
-import static com.ing.software.ocr.OcrLevels.*;
 
 /**
  * @author Michelon
@@ -18,77 +11,186 @@ import static com.ing.software.ocr.OcrLevels.*;
 
 public class OcrOptions {
 
-    private List<OcrLevels> levels;
-    private Locale locale;
+    //NB: the flags inside these enums are ordered in a certain way to make use of ordinal().
+    // Do not reorder.
+    public enum Resolution {
+
+        /**
+         * Use original image
+         */
+        NORMAL,
+
+        /**
+         * Downscale image to 1/2
+         */
+        HALF,
+
+        /**
+         * Downscale image to 1/3
+         */
+        THIRD,
+    }
+
+    public enum DateSearch {
+
+        SKIP,
+
+        /**
+         * Use fast detected texts
+         */
+        NORMAL,
+    }
+
+    public enum TotalSearch {
+
+        SKIP,
+
+        /**
+         * Use fast detected texts
+         */
+        NORMAL,
+
+        /**
+         * Redo ocr on target strip
+         */
+        DEEP,
+
+        /**
+         * Redo search if first amount target is not a valid amount (up to 3 searches).
+         */
+        EXTENDED_SEARCH,
+    }
+
+    public enum ProductsSearch {
+
+        SKIP,
+
+        /**
+         * Use fast detected texts
+         */
+        NORMAL,
+
+        /**
+         * Redo ocr on target strip
+         */
+        DEEP,
+    }
+
+    public enum Orientation {
+
+        NORMAL,
+
+        /**
+         * Rescan image upside down if nothing was found
+         */
+        ALLOW_UPSIDE_DOWN,
+
+        FORCE_UPSIDE_DOWN,
+    }
+
+    public enum Edit {
+
+        SKIP,
+
+        ALLOW_TOTAL_EDIT,
+    }
+
+    private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
+    private static final TotalSearch DEFAULT_TOTAL_SEARCH = TotalSearch.DEEP;
+    private static final DateSearch DEFAULT_DATE_SEARCH = DateSearch.NORMAL;
+    private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.DEEP;
+    private static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
+    private static final Locale DEFAULT_COUNTRY = Locale.ITALY;
+    private static final Edit DEFAULT_EDIT = Edit.SKIP;
+
+    Resolution resolution = Resolution.NORMAL;
+    TotalSearch totalSearch = TotalSearch.SKIP;
+    DateSearch dateSearch = DateSearch.SKIP;
+    ProductsSearch productsSearch = ProductsSearch.SKIP;
+    Orientation orientation = Orientation.NORMAL;
+    Locale suggestedCountry = DEFAULT_COUNTRY;
+    Edit allowEdit = DEFAULT_EDIT;
 
     /**
-     * Constructor
-     * @param levels list of actions to perform
+     * Return default Options
+     * @return default options
      */
-    public OcrOptions(@NonNull List<OcrLevels> levels, Locale locale) {
-        this.levels = levels;
-        this.locale = locale;
+    public static OcrOptions getDefault() {
+        return new OcrOptions()
+                .total(DEFAULT_TOTAL_SEARCH)
+                .resolution(DEFAULT_RESOLUTION)
+                .date(DEFAULT_DATE_SEARCH)
+                .products(DEFAULT_PRODUCTS_SEARCH)
+                .orientation(DEFAULT_ORIENTATION)
+                .suggestedCountry(DEFAULT_COUNTRY);
     }
 
-    public static OcrOptions getDefaultOptions() {
-        return new OcrOptions(Arrays.asList(FULL_RES, AMOUNT_DEEP, DATE_NORMAL, PRICES_DEEP, VOID_SEARCH), Locale.ITALY);
-    }
-
-    public OcrOptions add(Locale locale) {
-        this.locale = locale;
+    /**
+     * Set resolution level
+     * @param level resolution level
+     * @return OcrOptions instance
+     */
+    public OcrOptions resolution(Resolution level) {
+        resolution = level;
         return this;
     }
 
-    public OcrOptions add(@NonNull List<OcrLevels> levels) {
-        this.levels.addAll(levels);
+    /**
+     * Set total search criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions total(TotalSearch criteria) {
+        totalSearch = criteria;
         return this;
     }
 
-    public OcrOptions add(OcrLevels level) {
-        this.levels.add(level);
+    /**
+     * Set date search criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions date(DateSearch criteria) {
+        dateSearch = criteria;
         return this;
     }
 
-    boolean findTotal() {
-        return levels.contains(AMOUNT_DEEP) || levels.contains(OcrLevels.AMOUNT_NORMAL) || levels.contains(OcrLevels.EXTENDED_SEARCH);
+    /**
+     * Set products search criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions products(ProductsSearch criteria) {
+        productsSearch = criteria;
+        return this;
     }
 
-    boolean findDate() {
-        return levels.contains(OcrLevels.DATE_NORMAL);
+    /**
+     * Set orientation criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions orientation(Orientation criteria) {
+        orientation = criteria;
+        return this;
     }
 
-    boolean findProducts() {
-        return levels.contains(OcrLevels.PRICES_DEEP) || levels.contains(OcrLevels.PRICES_NORMAL);
+    /**
+     * Set suggested country.
+     * @param locale ISO country
+     * @return OcrOptions instance
+     */
+    public OcrOptions suggestedCountry(Locale locale) {
+        suggestedCountry = locale;
+        return this;
     }
 
-    boolean redoUpsideDown() {
-        return levels.contains(UPSIDE_DOWN_SEARCH);
-    }
-
-    boolean voidSearch() {
-        return levels.contains(VOID_SEARCH);
-    }
-
-    boolean fixTotal() {
-        return levels.contains(FIX_PRICE);
-    }
-
-    Locale getLocale() {
-        return locale;
-    }
-
-    boolean contains(OcrLevels setting) {
-        return levels.contains(setting);
+    public OcrOptions allowEdit(Edit allowEdit) {
+        this.allowEdit = allowEdit;
+        return this;
     }
 
     double getResolutionMultiplier() {
-        if (levels.contains(FULL_RES))
-            return 1;
-        else if (levels.contains(HALF_RES))
-            return 1./2.;
-        else if (levels.contains(LOW_RES))
-            return 1./3.;
-        else
-            return 1.;
+        return 1. / (resolution.ordinal() + 1);
     }
 }

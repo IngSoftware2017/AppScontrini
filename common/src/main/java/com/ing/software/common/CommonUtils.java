@@ -166,7 +166,7 @@ public class CommonUtils {
     }
 
     /**
-     * Check if patterns has flag set.
+     * Check if patterns has all bits of flag set.
      * @param pattern bit pattern
      * @param flag bit flag
      * @return true if flag is contained in pattern, false if it is not
