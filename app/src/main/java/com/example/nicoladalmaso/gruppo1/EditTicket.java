@@ -31,7 +31,7 @@ import database.TicketEntity;
  * Class for Edit the Ticket's data
  *
  * Modified: Improve refoundable Ticket
- * @author matteo.mascotto
+ * @author Matteo Mascotto
  */
 public class EditTicket extends AppCompatActivity {
 

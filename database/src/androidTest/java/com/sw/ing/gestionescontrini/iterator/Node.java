@@ -4,7 +4,7 @@ package com.sw.ing.gestionescontrini.iterator;
  * Define the the single node of a LinkedList that will contain the bitmap of the TicketEntity and the
  * most important info extract from the xml file.
  *
- * Created by matteo.mascotto on 18/11/2017.
+ * Created by Matteo Mascotto on 18/11/2017.
  */
 
 public class Node<Bundle> {

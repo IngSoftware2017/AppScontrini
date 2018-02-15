@@ -26,7 +26,7 @@ import database.MissionEntity;
  * Created by nicoladalmaso on 30/11/17.
  * 
  * Modified: Add pop-up menu for the card view
- * @author matteo.mascotto on 13-01-2018
+ * @author Matteo Mascotto on 13-01-2018
  */
 
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
@@ -98,7 +98,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         /**
          * Listener for the pupUp menu of the mission's cardView
-         * @author matteo.mascotto
+         * @author Matteo Mascotto
          */
         menuCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +112,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
     /**
      * It show the popUp menu for the mission
-     * @author matteo.mascotto
+     * @author Matteo Mascotto
      *
      * @param view Viewer of the Mission's Card
      * @param missionID position inside the popUp menu list

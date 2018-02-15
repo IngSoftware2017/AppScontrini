@@ -29,7 +29,7 @@ import database.PersonEntity;
  * Created by nicoladalmaso on 29/12/17.
  *
  * Modified: remove Academic Title view
- * @author matteo.mascotto on 12-01-2018
+ * @author Matteo Mascotto on 12-01-2018
  */
 
 public class PeopleAdapter extends ArrayAdapter<PersonEntity> {

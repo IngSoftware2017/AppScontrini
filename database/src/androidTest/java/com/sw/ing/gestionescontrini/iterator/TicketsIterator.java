@@ -17,7 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Linkedlist iterator of bitmap for simplify the code testing of OCR module
  *
- * Created by matteo.mascotto on 18/11/2017.
+ * Created by Matteo Mascotto on 18/11/2017.
  */
 
 public class TicketsIterator<Type> implements Iterable<Type> {
@@ -161,7 +161,7 @@ public class TicketsIterator<Type> implements Iterable<Type> {
     /*
      * Iterator of Type for the iterable class TicketsIterator
      *
-     * Created by matteo.mascotto on 18/11/2017.
+     * Created by Matteo Mascotto on 18/11/2017.
      */
     private class LinkedListIterator implements Iterator<Type> {
 

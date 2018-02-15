@@ -88,7 +88,7 @@ public class BillViewer extends AppCompatActivity {
      * Modify by Marco Olivieri: fixed amount and shop error
      *
      * Modified: Remove billName view
-     * @author matteo.mascotto on 12-01-2018
+     * @author Matteo Mascotto on 12-01-2018
      */
     public void initialize(){
         //Get data from parent view

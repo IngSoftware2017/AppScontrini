@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 /**
  * Test class for the data structure TicketsIterator
  *
- * Created by matteo.mascotto on 18/11/2017.
+ * Created by Matteo Mascotto on 18/11/2017.
  */
 public class TicketsIteratorTest {
 
@@ -34,7 +34,7 @@ public class TicketsIteratorTest {
         int numIMG = 50;
         Bitmap[] IMG_Generated;
         IMG_Generated = new Bitmap[100];
-        String path_IMG = "C:\\Users\\matteo.mascotto\\Pictures\\Tickets\\";
+        String path_IMG = "C:\\Users\\Matteo Mascotto\\Pictures\\Tickets\\";
 
         // Generate numIMG of imagine to insert into the Iterator and it save each one of it into an
         // Bitmap array usefull for testing of the get method

@@ -26,7 +26,7 @@ import export.ExportedFile;
 /**
  * Class for the PopUp menu of the Mission's CardView
  *
- * Created by matteo.mascotto on 13/01/2018.
+ * Created by Matteo Mascotto on 13/01/2018.
  */
 
 public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListener {
