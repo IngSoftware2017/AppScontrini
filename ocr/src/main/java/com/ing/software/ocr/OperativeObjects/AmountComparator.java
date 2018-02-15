@@ -79,8 +79,8 @@ public class AmountComparator {
     private List<Pair<OcrText, BigDecimal>> getAboveTotalPrices(OcrText amountText) {
         return Stream.of(mainImage.getPricesTexts())
                 .filter(price -> price.box().centerY() < amountText.box().centerY())
-                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.textSanitizedNum()) < NUMBER_MIN_VALUE)
-                .map(price -> new Pair<>(price, DataAnalyzer.analyzeAmount(price.textSanitizedForced())))
+                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.textSanitizedCommonNum()) < NUMBER_MIN_VALUE)
+                .map(price -> new Pair<>(price, DataAnalyzer.analyzeAmount(price.textSanitizedAdvancedNum())))
                 .filter(price -> price.second != null)
                 .withoutNulls()
                 .toList();
@@ -94,8 +94,8 @@ public class AmountComparator {
     private List<BigDecimal> getBelowTotalPrices(OcrText amountText) {
         return Stream.of(mainImage.getPricesTexts())
                 .filter(price -> price.box().centerY() > amountText.box().centerY())
-                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.textSanitizedNum()) < NUMBER_MIN_VALUE)
-                .map(price -> DataAnalyzer.analyzeAmount(price.textSanitizedForced()))
+                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.textSanitizedCommonNum()) < NUMBER_MIN_VALUE)
+                .map(price -> DataAnalyzer.analyzeAmount(price.textSanitizedAdvancedNum()))
                 .withoutNulls()
                 .toList();
     }

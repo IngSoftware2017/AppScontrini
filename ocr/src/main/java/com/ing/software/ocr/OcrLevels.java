@@ -1,6 +1,10 @@
 package com.ing.software.ocr;
 
 /**
+ *
+ */
+
+/**
  * Levels of scan
  * If more than 1 are present for the same target (eg VERY_QUICK and NORMAL) higher level is used.
  * One of VERY_QUICK, QUICK and NORMAL must be specified
@@ -10,17 +14,17 @@ public enum OcrLevels {
     /**
      * Downscale image to 1/3
      */
-    VERY_QUICK,
+    LOW_RES,
 
     /**
      * Downscale image to 1/2
      */
-    QUICK,
+    HALF_RES,
 
     /**
      * Use original image
      */
-    NORMAL,
+    FULL_RES,
 
     /**
      * Use fast detected texts
@@ -57,4 +61,15 @@ public enum OcrLevels {
      * Scan image upside down if nothing was found
      */
     UPSIDE_DOWN_SEARCH,
+
+    /**
+     * Apply correction to total (according to scheme of ticket with cash, change etc.)
+     */
+    FIX_PRICE,
+
+    /**
+     * Try to find a price even if no string for amount was found
+     */
+    VOID_SEARCH,
 }
+

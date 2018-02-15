@@ -2,7 +2,6 @@ package com.ing.software.ocr;
 
 import android.graphics.*;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 import android.util.SizeF;
 
 import com.annimon.stream.Stream;
@@ -19,7 +18,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 import com.annimon.stream.function.*;
 
@@ -72,6 +70,9 @@ import static com.ing.software.common.CommonUtils.*;
 public class ImageProcessor {
 
     private static final int WHITE = 255;
+    private static final int BLACK = 0;
+    private static final Size NORMALIZED_SIZE = new Size(1, 1);
+    private static final RectF NORMALIZED_RECT = new RectF(0, 0, 1, 1);
 
     // length of smallest side of downscaled image
     // must be chosen to limit side effects of resampling, on both 16:9 and 4:3 aspect ratio images
@@ -81,8 +82,11 @@ public class ImageProcessor {
     private static final int BF_KER_SZ = 9; // kernel size, must be odd
     private static final int BF_SIGMA = 30; // space/color variance
 
-    //Erode/Dilate iterations
-    private static final int E_D_ITERS = 5;
+    //Opening iterations
+    private static final int OPEN_ITERS = 5;
+
+    //Closing iterations
+    private static final int CLOSE_ITERS = 30;
 
     //Erode for hugh lines
     private static int[][] ERODE_KER_DATA = new int [][] {
@@ -134,6 +138,9 @@ public class ImageProcessor {
     // Score values
     private static final double SCORE_AREA_MUL = 0.001;
     private static final double SCORE_RECT_FOUND = 1;
+
+    //
+    private static final double BG_CONTRAST_THRESHOLD = 0.9;
 
 
     // Anything inside here is run once per app execution and before any other code.
@@ -199,10 +206,16 @@ public class ImageProcessor {
         return bm;
     }
 
+    /**
+     *
+     * @param inpSize
+     * @param shortSide
+     * @return
+     */
     private static Size calcScaledSize(Size inpSize, double shortSide) {
         double aspectRatio = inpSize.width / inpSize.height;
-        // find the shortest dimension, set it to "shortSide" and consequently set the other dimension
-        // to keep the original aspect ratio
+        // find the shortest dimension, set it to "shortSide" and set the other dimension in order to
+        // keep the original aspect ratio
         return aspectRatio < 1 ? new Size(shortSide, shortSide / aspectRatio)
                 : new Size(shortSide * aspectRatio, shortSide);
     }
@@ -224,7 +237,7 @@ public class ImageProcessor {
     /**
      * Erode a mask with a 3x3 kernel.
      * @param imgSwap in-out swap of B&W Mat. Not null.
-     * @param iters number of iterations
+     * @param iters number of iterations.
      */
     private static void erode(Swap<Mat> imgSwap, int iters) {
         Imgproc.erode(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters);
@@ -233,10 +246,20 @@ public class ImageProcessor {
     /**
      * Dilate a mask with a 3x3 kernel.
      * @param imgSwap in-out swap of B&W Mat. Not null.
-     * @param iters number of iterations
+     * @param iters number of iterations.
      */
     private static void dilate(Swap<Mat> imgSwap, int iters) {
         Imgproc.dilate(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters);
+    }
+
+    /**
+     * Erode then dilate a mask with a 3x3 kernel.
+     * @param imgSwap in-out swap of B&W Mat. Not null.
+     * @param iters number of iterations.
+     */
+    private static void opening(Swap<Mat> imgSwap, int iters) {
+        erode(imgSwap, iters);
+        dilate(imgSwap, iters);
     }
 
     /**
@@ -260,12 +283,9 @@ public class ImageProcessor {
      * @return Contour-area pairs with biggest area. Never null.
      */
     private static List<Scored<MatOfPoint>> findBiggestContours(Swap<Mat> imgSwap, int k) {
-        erode(imgSwap, E_D_ITERS);
-        dilate(imgSwap, E_D_ITERS);
-        //median(imgRef);
-
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
+        //NB: findContours mangles the image!
         findContours(imgSwap.first, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
         Podium<Scored<MatOfPoint>> podium = new Podium<>(k);
@@ -294,14 +314,23 @@ public class ImageProcessor {
     }
 
     /**
+     * Get a mask from a contour
+     * @param imgSwap out swap of B&W Mat. Not null.
+     * @param contour MatOfPoint containing a contour. Not null.
+     */
+    private static void maskFromContour(Swap<Mat> imgSwap, MatOfPoint contour) {
+        imgSwap.first.setTo(new Scalar(BLACK));
+        fillPoly(imgSwap.first, singletonList(contour), new Scalar(WHITE));
+    }
+
+    /**
      * Set to white everything outside contour.
      * @param imgSwap in-out swap of B&W Mat. Not null.
      * @param contour MatOfPoint containing a contour. Not null.
      */
     private static void removeBackground(Swap<Mat> imgSwap, MatOfPoint contour) {
         Mat binary = imgSwap.first.clone();
-        imgSwap.first.setTo(new Scalar(0));
-        fillPoly(imgSwap.first, singletonList(contour), new Scalar(255));
+        maskFromContour(imgSwap, contour);
         erode(imgSwap, ERODE_KER_DATA[0].length + 1);
         bitwise_and(binary, imgSwap.first, imgSwap.swap());
     }
@@ -475,6 +504,13 @@ public class ImageProcessor {
         return newPts;
     }
 
+    private static MatOfPoint2f convexHull(MatOfPoint contour) {
+        MatOfInt indices = new MatOfInt();
+        Imgproc.convexHull(contour, indices);
+        Point[] contourPts = contour.toArray();
+        return ptsToMat(Stream.of(indices.toList()).map(idx -> contourPts[idx]).toList());
+    }
+
     /**
      * Get a score proportional to exposure
      * @param img gray Mat. Not null
@@ -503,18 +539,42 @@ public class ImageProcessor {
     }
 
     /**
-     * Get a score proportional to contrast from background
+     * Get a score proportional to contrast relative to background
      * @param rect perspective rectangle containing the ticket
      * @param contour contour containing the ticket
-     * @return
+     * @return contrast value in range [0, 1], higher is better
      */
     //Problem: Sometimes, if the contrast of the ticket with background is poor, the contour bleeds
-    // into the background. Sometimes if the text is too close to the edge of the ticked, a carving
-    // happens instead. So, to detect the first case and reject the second, I can use a convex hull
+    // into the background. Sometimes if the text is too close to the edge of the ticket, a carving
+    // happens instead. So, to detect the first case and reject the second, I use a convex hull
     // on the contour, then find the ratio between the area of the convex hull with the bounding rectangle one.
-    // if the ratio is too low (ex: 0.7/1.0) then communicate bad contrast.
-    private static double getBackgroundCoontrast(MatOfPoint2f rect, MatOfPoint contour) {
-        return 1; // stub
+    private static double getBackgroundContrast(MatOfPoint2f rect, MatOfPoint contour) {
+        return contourArea(convexHull(contour)) / contourArea(rect);
+    }
+
+    /**
+     * Apply dilation followed by erosion on a contour to remove creeks.
+     * Not to be confused with closing a curve into a contour.
+     * @param contour input contour. Not null.
+     * @param imgSwap in swap of B&W Mat. Modified by this function. Not null.
+     * @return new contour or null if no contour found.
+     */
+    private static Scored<MatOfPoint> contourClosing(MatOfPoint contour, Swap<Mat> imgSwap, int iters) {
+        maskFromContour(imgSwap, contour);
+        //closing
+        dilate(imgSwap, iters);
+        // I have to force erode to consider the outside of the image all black.
+        medianBlur(imgSwap.first, imgSwap.swap(), MED_SZ);
+        Imgproc.erode(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters,
+                BORDER_CONSTANT, new Scalar(BLACK));
+//        erode(imgSwap, iters);
+        List<Scored<MatOfPoint>> contours = findBiggestContours(imgSwap, 1);
+        // no contours found if image side is < than 2 * iters
+        return contours.size() > 0 ? contours.get(0) : null;
+    }
+
+    private static double getMargin(double width, double height, double marginMul) {
+        return marginMul * min(width, height);
     }
 
     /**
@@ -544,11 +604,11 @@ public class ImageProcessor {
             Mat srcImg, MatOfPoint2f corners, double marginMul, double sizeMulOrShortSide, boolean isSizeMul) {
         Mat dstImg = new Mat();
         if (corners.rows() == 4) { // at this point "corners" should have always 4 points.
-            MatOfPoint2f srcRect = scale(corners, new Size(1, 1), srcImg.size());
+            MatOfPoint2f srcRect = scale(corners, NORMALIZED_SIZE, srcImg.size());
 
             // dstRect has approximately the same size as srcRect, but is aligned with the axes and translated by margin
             Size dstSize = rectSizeSimple(srcRect);
-            double mrg = marginMul * min(dstSize.width, dstSize.height);
+            double mrg = getMargin(dstSize.width, dstSize.height, marginMul);
             MatOfPoint2f dstRect = createRectMatWithMargin(dstSize, mrg);
 
             // find the output bitmap size and scale it if requested
@@ -571,6 +631,27 @@ public class ImageProcessor {
         return dstImg;
     }
 
+    /**
+     *
+     * @param imgSize
+     * @param marginMul
+     * @return
+     */
+    private static RectF removeMargin(SizeF imgSize, double marginMul) {
+        return rectFromSize(new SizeF(imgSize.getWidth() / (float) (1. + OCR_MARGIN_MUL),
+                imgSize.getWidth() / (float) (1. + OCR_MARGIN_MUL)));
+    }
+
+    /**
+     * Convenience class to group some contour related properties
+     */
+    private class ContourResult {
+        MatOfPoint2f rect;
+        double angle, angleConfidence;
+        double exposure, focus, backgroundContrast;
+    }
+
+
     //INSTANCE FIELDS:
 
     private Mat srcImg;
@@ -579,6 +660,14 @@ public class ImageProcessor {
 
 
     //PACKAGE PRIVATE:
+
+    static RectF normalizeCoordinates(RectF textRect, SizeF bmSize) {
+        RectF origBmRectNoMargin = removeMargin(bmSize, OCR_MARGIN_MUL);
+        float margin = (float)getMargin(origBmRectNoMargin.width(), origBmRectNoMargin.height(), OCR_MARGIN_MUL);
+        RectF textRectNoMargin = offset(textRect, -margin, -margin);
+        //normalized rect:
+        return CommonUtils.transform(textRectNoMargin, origBmRectNoMargin, NORMALIZED_RECT);
+    }
 
     synchronized Bitmap undistortForOCR(double sizeMul) {
         if (quickCorners || corners == null) {
@@ -612,7 +701,7 @@ public class ImageProcessor {
         );
 
         // redo undistort steps to calculate dstRect and dstSize
-        MatOfPoint2f srcRect = scale(corners, new Size(1, 1), srcImg.size());
+        MatOfPoint2f srcRect = scale(corners, NORMALIZED_SIZE, srcImg.size());
         Size dstSize = rectSizeSimple(srcRect);
         double mrg = OCR_MARGIN_MUL * min(dstSize.width, dstSize.height);
         MatOfPoint2f dstRect = createRectMatWithMargin(dstSize, mrg);
@@ -646,29 +735,16 @@ public class ImageProcessor {
         return matToBitmap(dstImg);
     }
 
-    /**
-     * Convenience class to group some contour related properties
-     */
-    private class ContourResult {
-        MatOfPoint2f rect;
-        double angle, angleConfidence;
-        ContourResult(MatOfPoint2f rect, double angle, double angleConfidence) {
-            this.rect = rect;
-            this.angle = angle;
-            this.angleConfidence = angleConfidence;
-        }
-    }
-
-
     //PUBLIC:
 
     /**
-     * You need to call setBitmap().
+     * To make this {@link ImageProcessor} instance valid, you still need to call {@link #setImage(Bitmap)}.
      */
     public ImageProcessor() {}
 
     /**
      * Copy constructor
+     * @param otherInstance instance to be copied.
      */
     public ImageProcessor(ImageProcessor otherInstance) {
         srcImg = otherInstance.srcImg.clone();
@@ -678,17 +754,15 @@ public class ImageProcessor {
     }
 
     /**
-     * No need to call setBitmap().
+     * Constructor that calls {@link #setImage(Bitmap)}.
      * @param bm ticket bitmap. Not null.
      */
-    public ImageProcessor(@NonNull Bitmap bm) {
-        setImage(bm);
-    }
+    public ImageProcessor(@NonNull Bitmap bm) { setImage(bm); }
 
     /**
-     * Constructor that calls setImage() and setCorners().
+     * Constructor that calls {@link #setImage(Bitmap)}, {@link #setCorners(List)}.
      * @param bm ticket bitmap. Not null.
-     * @param corners pre-calculated ticket corners with findTicket().
+     * @param corners pre-calculated ticket corners with {@link #findTicket(boolean)}.
      */
     public ImageProcessor(@NonNull Bitmap bm, @NonNull List<PointF> corners) {
         setImage(bm);
@@ -712,7 +786,7 @@ public class ImageProcessor {
      * @param quick <ul> true: faster but more inaccurate, good for real time visual feedback. </ul>
      *              <ul> false: slower but more accurate, good for recalculating the rectangle after the shot
      *                                                    or for analyzing an imported image. </ul>
-     * @return list of IPError, all possible errors are listed in {@link IPError}.
+     * @return list of {@link IPError}.
      *         <p> The rectangle corners are always found (unless the error list contains INVALID_CORNERS),
      *             but they can be useless, depending on the presence of other errors. </p>
      */
@@ -725,12 +799,15 @@ public class ImageProcessor {
         Swap<Mat> graySwap = new Swap<>(grayResized.clone(), new Mat());
         Mat binary = prepareBinaryImg(graySwap).clone(); // I use clone because otherwise
         Mat edges = toEdges(graySwap).clone();           // they will be recycled by the swap.
-        graySwap.first = binary; // not cloning the image, it will be overwritten with findBiggestContours.
+        graySwap.first = binary; // not cloning the image, it will be overwritten
+        opening(graySwap, OPEN_ITERS);
+        List<Scored<MatOfPoint>> contours = findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS);
 
         // select the contour that most likely contains a Ticket
         List<Scored<ContourResult>> candidates = new ArrayList<>();
-        for (Scored<MatOfPoint> contour : findBiggestContours(graySwap, quick ? 1 : MAX_CONTOURS)) {
-            MatOfPoint2f rect = findPolySimple(contour.obj());
+        for (Scored<MatOfPoint> contour : contours) {
+            Scored<MatOfPoint> sanitizedCtr = contourClosing(contour.obj(), graySwap, CLOSE_ITERS);
+            MatOfPoint2f rect = findPolySimple((sanitizedCtr != null ? sanitizedCtr : contour).obj());
             // find Hough lines of ticket text
             graySwap.first = edges.clone();
             removeBackground(graySwap, contour.obj());
@@ -748,8 +825,12 @@ public class ImageProcessor {
                 if (size.width > size.height)
                     rect = shiftMatPoints(rect, angle > 0 ? 1 : 3); // 1 -> rotate clockwise
             }                                                       // 3 -> rotate counter clockwise
-            //todo use RANSAC to find undistort transform matrix
-            candidates.add(new Scored<>(0., new ContourResult(rect, angle, angleConfidence.val)));
+            ContourResult result = new ContourResult();
+            result.rect = rect;
+            result.angle = angle;
+            result.angleConfidence = angleConfidence.val;
+            result.backgroundContrast = getBackgroundContrast(rect, contour.obj());
+            candidates.add(new Scored<>(0., result));
         }
         List<IPError> errors = new ArrayList<>();
 
@@ -760,7 +841,7 @@ public class ImageProcessor {
             ContourResult winner = candidates.get(0).obj();
 
             //normalize the corners in the space [0, 1]^2
-            corners = scale(winner.rect, grayResized.size(), new Size(1, 1));
+            corners = scale(winner.rect, grayResized.size(), NORMALIZED_SIZE);
 
             // find and return errors
             if (corners.rows() != 4)
@@ -770,11 +851,8 @@ public class ImageProcessor {
                 errors.add(IPError.UNCERTAIN_DIRECTION);
             if (abs(winner.angle) > CROOCKED_THRESH)
                 errors.add(IPError.CROOKED_TICKET);
-//        if (!isFocused(grayResized))
-//            errors.add(IPError.OUT_OF_FOCUS);
-//        IPError exposureErr = checkExposure(grayResized);
-//        if (exposureErr != IPError.NONE)
-//            errors.add(exposureErr);
+            if (winner.backgroundContrast < BG_CONTRAST_THRESHOLD)
+                errors.add(IPError.POOR_BG_CONTRAST);
         } else {
             errors.add(IPError.INVALID_CORNERS);
         }
@@ -782,12 +860,12 @@ public class ImageProcessor {
     }
 
     /**
-     * Asynchronous version of findTicket(quick). The errors are passed by the callback parameter.
+     * Asynchronous version of {@link #findTicket(boolean)}. The errors are passed by the callback parameter.
      * @param quick true: fast mode; false: slow mode.
      * @param callback Callback
      */
     public void findTicket(boolean quick, @NonNull Consumer<List<IPError>> callback) {
-        //in a new thread, run findTicket, then return the result calling the callback.
+        //in a new thread, run findTicket, then return the result executing the callback.
         new Thread(() -> callback.accept(findTicket(quick))).start();
     }
 
@@ -817,7 +895,7 @@ public class ImageProcessor {
     }
 
     /**
-     * Get a Bitmap of a ticket with a perspective correction applied, with a margin.
+     * Get a {@link Bitmap} of a ticket with a perspective correction applied, with a margin.
      * @param marginMul Fraction of length of shortest side of the rectangle of the ticket.
      *                  A good value is 0.02.
      * @param shortSide set the shortest side of the output bitmap,
@@ -834,15 +912,13 @@ public class ImageProcessor {
     }
 
     /**
-     * Convenience overload for undistort(0, 0)
+     * Convenience overload for undistort(0, 0).
      * @return Bitmap, null if error.
      */
-    public synchronized Bitmap undistort() {
-        return undistort(0, 0);
-    }
+    public synchronized Bitmap undistort() { return undistort(0, 0); }
 
     /**
-     * Asynchronous version of undistort(marginMul). The bitmap is passed by the callback parameter.
+     * Asynchronous version of {@link #undistort(double, int)}. The bitmap is passed by the callback parameter.
      * @param marginMul Margin multiplier
      * @param callback Callback
      */
@@ -851,10 +927,13 @@ public class ImageProcessor {
     }
 
     /**
-     * Rotate corners, so when undistort is called, the resulting image is rotated 180deg.
+     * Rotate corners, so when undistort is called, the resulting image is rotated according to angle specified.
+     * @param angle90step integer corresponding to the number of 90 deg turns to apply.
+     *                    <ul> Positive: clockwise </ul>
+     *                    <ul> Negative: counter clockwise </ul>
      */
-    public void rotateUpsideDown() {
-        corners = shiftMatPoints(corners, 2); // in a rectangle, opposite corner is 2 corners away
+    public void rotate(int angle90step) {
+        corners = shiftMatPoints(corners, angle90step);
     }
 
 
@@ -888,5 +967,20 @@ public class ImageProcessor {
         MatOfPoint2f dstPts = new MatOfPoint2f();
         perspectiveTransform(pts, dstPts, getPerspectiveTransform(rect1, rect2));
         return cvPtsToAndroid(dstPts.toList());
+    }
+
+    /**
+     * Expand normalized rectangle to desired destination space
+     * @param normalizedRect total rectangle obtained from OcrTicket
+     * @param bmSize target image size
+     * @param marginMul same margin multiplier passed to undistort.
+     * @return rectangle in destination space
+     */
+    public static RectF expandRectCoordinates(RectF normalizedRect, SizeF bmSize, double marginMul) {
+        RectF origBmRectNoMargin = removeMargin(bmSize, marginMul);
+        RectF origRect = CommonUtils.transform(normalizedRect, NORMALIZED_RECT, origBmRectNoMargin);
+        float margin = (float) getMargin(origBmRectNoMargin.width(), origBmRectNoMargin.height(), marginMul);
+        //origRectWithMargin:
+        return offset(origRect, margin, margin);
     }
 }

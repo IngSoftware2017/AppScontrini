@@ -12,14 +12,14 @@ import com.annimon.stream.function.Supplier;
  */
 public class Lazy<T> {
     private T value;
-    private Supplier<T> inst;
+    private Supplier<T> instCb;
 
     /**
-     * @param instantiation code to instantiate the object
+     * @param instantiationCb callback used to instantiate the object
      */
-    public Lazy(Supplier<T> instantiation) {
+    public Lazy(Supplier<T> instantiationCb) {
         value = null;
-        inst = instantiation;
+        instCb = instantiationCb;
     }
 
     /**
@@ -28,7 +28,7 @@ public class Lazy<T> {
      */
     public T get() {
         if (value == null) {
-            value = inst.get();
+            value = instCb.get();
         }
         return value;
     }

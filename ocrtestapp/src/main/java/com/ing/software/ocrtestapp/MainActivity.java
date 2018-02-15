@@ -235,29 +235,29 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     //String rectString = (err.isEmpty() ? "found" : "not found");
                     //OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);
                     //bundle.putString(RECTANGLE_RECEIVED, rectString);
-                    OcrTicket result = ocrAnalyzer.getTicket(preproc, OcrOptions.getDefaultOptions());
+                    OcrTicket result = ocrAnalyzer.getTicket(preproc, OcrOptions.getDefault());
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     long endTime = System.nanoTime();
                     double duration = ((double) (endTime - startTime)) / 1000000000;
                     durationSum.val += duration;
-                    if (result.amount != null) {
-                        OcrUtils.log(1, "OcrHandler", "Amount: " + result.amount);
-                        bundle.putString(AMOUNT_RECEIVED, result.amount.toString());
+                    if (result.total != null) {
+                        OcrUtils.log(1, "OcrHandler", "Amount: " + result.total);
+                        bundle.putString(AMOUNT_RECEIVED, result.total.toString());
                         bundle.putString(DURATION_RECEIVED, duration + "");
                     } else {
                         OcrUtils.log(1, "OcrHandler", "No amount found");
                         bundle.putString(AMOUNT_RECEIVED, "Not found.");
                         bundle.putString(DURATION_RECEIVED, duration + "");
                     }
-                    if (result.restoredAmount != null) {
-                        OcrUtils.log(1, "OcrHandler", "Restored Amount: " + result.restoredAmount);
-                        bundle.putString(AMOUNT_RESTORED_RECEIVED, result.restoredAmount.toString());
-                        bundle.putString(DURATION_RECEIVED, duration + "");
-                    } else {
-                        OcrUtils.log(1, "OcrHandler", "No restored amount found");
-                        bundle.putString(AMOUNT_RESTORED_RECEIVED, "Not found.");
-                        bundle.putString(DURATION_RECEIVED, duration + "");
-                    }
+//                    if (result.restoredAmount != null) {
+//                        OcrUtils.log(1, "OcrHandler", "Restored Amount: " + result.restoredAmount);
+//                        bundle.putString(AMOUNT_RESTORED_RECEIVED, result.restoredAmount.toString());
+//                        bundle.putString(DURATION_RECEIVED, duration + "");
+//                    } else {
+//                        OcrUtils.log(1, "OcrHandler", "No restored amount found");
+//                        bundle.putString(AMOUNT_RESTORED_RECEIVED, "Not found.");
+//                        bundle.putString(DURATION_RECEIVED, duration + "");
+//                    }
                     if (result.date != null) {
                         OcrUtils.log(1, "OcrHandler", "Date: " + result.date.toString());
                         DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);

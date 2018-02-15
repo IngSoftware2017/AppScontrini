@@ -12,6 +12,7 @@ import static java.util.Arrays.*;
 import static java.lang.Math.*;
 
 /**
+ * General utilities
  * @author Riccardo Zaglia
  */
 public class CommonUtils {
@@ -61,7 +62,7 @@ public class CommonUtils {
     }
 
     /**
-     * Get an origin aligned rectangle from it's dimensions.
+     * Get an origin aligned rectangle from its dimensions.
      * @param size rectangle dimensions
      * @return rectangle
      */
@@ -99,7 +100,13 @@ public class CommonUtils {
         return (p - srcStart) / (srcEnd - srcStart) * (dstEnd - dstStart) + dstStart;
     }
 
-
+    /**
+     * Scale a length, with some ratio with srcSize, in order to have the same ratio with dstSize.
+     * @param length dimension to scale
+     * @param srcSize source space scale reference
+     * @param dstSize destination space scale reference
+     * @return new scaled length
+     */
     public static float transform(float length, float srcSize, float dstSize) {
         return length * dstSize / srcSize;
     }
@@ -142,15 +149,20 @@ public class CommonUtils {
                 transform(rect.bottom, srcRect.top, srcRect.bottom, dstRect.top, dstRect.bottom));
     }
 
+    public static RectF offset(RectF rect, float x, float y) {
+        return new RectF(rect.left + x, rect.top + y,
+                rect.right + x, rect.bottom + y);
+    }
+
     /**
-     * Overwrite all bits in a pattern with "value"
+     * Overwrite masked bits in a pattern with "value"
      * @param pattern bit pattern
      * @param mask bits to be overwritten
      * @param value value of the new bits
      * @return updated pattern
      */
     public static int overwriteBits(int pattern, int mask, boolean value) {
-        return value ? (pattern | mask) : (pattern & ~mask);
+        return value ? (pattern | mask) : (pattern & ~mask); // turn on: OR; turn off: AND NOT
     }
 
     /**

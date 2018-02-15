@@ -28,20 +28,20 @@ import static java.util.Collections.*;
 public class OcrText implements Comparable<OcrText> {
 
     // List of substitutions used to correct common ocr mistakes in the reading of a price.
-    private static final List<Pair<String, String>> NUM_SANITIZE_LIST = asList(
+    private static final List<Pair<String, String>> NUM_SANITIZE_COMMON_LIST = asList(
             new Pair<>("O", "0"),
-            new Pair<>("o", "0"),
-            new Pair<>("S", "5"),
-            new Pair<>("s", "5"),
-            new Pair<>(",", ".")
+            new Pair<>("I", "1"),
+            new Pair<>(",", "."),
+            new Pair<>("S", "5")
     );
     // These substitutions are less frequent and may produce false positives. Should be used only if you are sure your string is a number.
-    private static final List<Pair<String, String>> NUM_SANITIZE_FORCED = asList(
+    private static final List<Pair<String, String>> NUM_SANITIZE_ADVANCED_LIST = asList(
+            new Pair<>("o", "0"),
             new Pair<>("D", "0"),
-            new Pair<>("I", "1"),
-            new Pair<>("l", "1"), // lowercase L
             new Pair<>("U", "0"),
-			new Pair<>("?", "7"),
+            new Pair<>("l", "1"), // lowercase L
+            new Pair<>("s", "5"),
+            new Pair<>("?", "7"),
             new Pair<>("B", "8")
     );
 
@@ -56,8 +56,8 @@ public class OcrText implements Comparable<OcrText> {
     private Lazy<String> textUppercase; // uppercase text
     private Lazy<String> uppercaseAlphaNum; // uppercase text where all non alphanumeric characters are removed. No spaces between words
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
-    private Lazy<String> textSanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
-    private Lazy<String> textSanitizedForced; // text where it was applied the NUM_SANITIZE_FORCED substitutions
+    private Lazy<String> textSanitizedCommonNum; // text where it was applied NUM_SANITIZE_COMMON_LIST substitutions
+    private Lazy<String> textSanitizedAdvancedNum; // text where it was applied NUM_SANITIZE_COMMON_LIST and NUM_SANITIZE_ADVANCED_LIST substitutions
     private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
     private List<String> tags;
 
@@ -75,23 +75,25 @@ public class OcrText implements Comparable<OcrText> {
         this.text = text.getValue();
         OcrUtils.log(7, "OCRTEXT:", "Text is: " + text.getValue());
         textUppercase = new Lazy<>(() -> text().toUpperCase());
-        textSanitizedNum = new Lazy<>(() -> {
+        textSanitizedCommonNum = new Lazy<>(() -> {
             String res = text();
-            for (Pair<String, String> p : NUM_SANITIZE_LIST)
+            for (Pair<String, String> p : NUM_SANITIZE_COMMON_LIST)
                 res = res.replace(p.first, p.second);
-            return/*textSanitizedNum*/ res;
+            return/*textSanitizedCommonNum*/ res;
         });
-        textSanitizedForced = new Lazy<>(() -> {
-            String res = textSanitizedNum();
-            for (Pair<String, String> p : NUM_SANITIZE_FORCED)
+        textSanitizedAdvancedNum = new Lazy<>(() -> {
+            String res = textSanitizedCommonNum();
+            for (Pair<String, String> p : NUM_SANITIZE_ADVANCED_LIST)
                 res = res.replace(p.first, p.second);
-            return res;
+            return/*textSanitizedAdvancedNum*/ res;
         });
 
         // I used .reduce() to concatenate every result of the lambda expression
         // if these are accessed on a word, they return empty string
         textNoSpaces = new Lazy<>(() -> Stream.of(children())
                 .reduce("", (str, c) -> str + c.textUppercase()));
+        numNoSpaces = new Lazy<>(() -> Stream.of(children())
+                .reduce("", (str, c) -> str + c.textSanitizedCommonNum()));
 
         if (isWord) {
             // length of the longest side of the rotated rectangle, divided by the number of characters of the word
@@ -152,8 +154,8 @@ public class OcrText implements Comparable<OcrText> {
 
         // the text fields remain unchanged
         text = ocrText.text;
-        textSanitizedNum = ocrText.textSanitizedNum;
-        textSanitizedForced = ocrText.textSanitizedForced;
+        textSanitizedCommonNum = ocrText.textSanitizedCommonNum;
+        textSanitizedAdvancedNum = ocrText.textSanitizedAdvancedNum;
         textUppercase = ocrText.textUppercase;
         textNoSpaces = ocrText.textNoSpaces;
         uppercaseAlphaNum = ocrText.uppercaseAlphaNum;
@@ -176,12 +178,12 @@ public class OcrText implements Comparable<OcrText> {
 
     // string properties
     public String text() { return text; }
-	public String textSanitizedForced() { return textSanitizedForced.get(); }
-    public String textUppercase() { return textUppercase.get(); }
+	public String textUppercase() { return textUppercase.get(); }
     public String uppercaseAlphaNum() { return uppercaseAlphaNum.get(); }
     // available only if isWord() == false:
     public String textNoSpaces() { return textNoSpaces.get(); }
-    public String textSanitizedNum() { return textSanitizedNum.get(); }
+    public String textSanitizedCommonNum() { return textSanitizedCommonNum.get(); }
+    public String textSanitizedAdvancedNum() { return textSanitizedCommonNum.get(); }
 
     public List<String> getTags() {
         return tags;

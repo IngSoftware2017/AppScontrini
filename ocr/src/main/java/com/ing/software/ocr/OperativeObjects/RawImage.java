@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OperativeObjects.OcrSchemer.*;
 
 /**
  * Class to store only useful properties of source images and scheme of ticket
@@ -352,5 +353,39 @@ public class RawImage {
             conclusionTexts.add(newText);
             conclusionRect = getMaxRectBorders(conclusionTexts);
         }
+    }
+
+    /**
+     * Add tag to text according to its position (must call textFitter before)
+     * @param text text to tag
+     * @return text with added tag
+     */
+    public static OcrText mapText(OcrText text, RawImage mainImage) {
+        if (mainImage.getIntroRect().contains(text.box()))
+            text.addTag(INTRODUCTION_TAG);
+        else if (mainImage.getProductsRect().contains(text.box()))
+            text.addTag(PRODUCTS_TAG);
+        else if (mainImage.getPricesRect().contains(text.box()))
+            text.addTag(PRICES_TAG);
+        else if (mainImage.getConclusionRect().contains(text.box()))
+            text.addTag(CONCLUSION_TAG);
+        else {
+            float productsTop = Math.min(mainImage.getProductsRect().top, mainImage.getPricesRect().top);
+            float productsBottom = Math.max(mainImage.getProductsRect().bottom, mainImage.getPricesRect().bottom);
+            RectF middleRect = new RectF(mainImage.getProductsRect().left, productsTop, mainImage.getPricesRect().right, productsBottom);
+            //Check its y coordinate
+            float centerY = text.box().centerY();
+            if (centerY < productsTop)
+                text.addTag(INTRODUCTION_TAG);
+            else if (centerY > productsBottom)
+                text.addTag(CONCLUSION_TAG);
+            else {
+                if (text.box().centerX() < middleRect.width()/2)
+                    text.addTag(PRODUCTS_TAG);
+                else
+                    text.addTag(PRICES_TAG);
+            }
+        }
+        return text;
     }
 }

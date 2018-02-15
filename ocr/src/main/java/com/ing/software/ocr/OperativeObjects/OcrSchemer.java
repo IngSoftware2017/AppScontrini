@@ -29,7 +29,14 @@ class OcrSchemer {
     private static final int AREA_DIVIDER = 4; //used to calculate density. (total_area/AREA_DIVIDER) is the area under the current rect to analyze
     private static final int WAVE_TAGGER_HEIGHT_EXTEND = 20; //percentage of the height of source rect to extend to include other rects
     private static final int DENSITY_SNAKE_MISS_RECTS = 15; //for density limit we accept 1/MISS_RECTS wrong rects
-    //ZAGLIA: consider using normalized doubles ( 0 to 1) for percentages
+    private static final String LEFT_TAG = "left"; //tag for text on left of the receipt
+    private static final String CENTER_TAG = "center"; //tag for text on center of the receipt
+    private static final String RIGHT_TAG = "right"; //tag for text on right of the screen
+    static final String INTRODUCTION_TAG = "introduction"; //tag for text on top of the receipt
+    static final String PRODUCTS_TAG = "products"; //tag for text on central-left part of the receipt
+    static final String PRICES_TAG = "prices"; //tag for text on central-right part of the receipt
+    static final String CONCLUSION_TAG = "conclusion"; //tag for text on bottom of the receipt
+
     private RawImage mainImage;
 
     OcrSchemer(RawImage mainImage) {
