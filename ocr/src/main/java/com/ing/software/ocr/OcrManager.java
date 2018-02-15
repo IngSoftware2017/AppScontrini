@@ -164,6 +164,8 @@ public class OcrManager {
                         if (bestTicket != null) {
                             OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
                                     "\nwith scheme: " + bestTicket.obj().toString() + "\nand score: " + bestTicket.getScore());
+                        } else {
+                            OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + newTicket.amount.setScale(2, RoundingMode.HALF_UP));
                         }
                     }
                     Pair<OcrText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //6
