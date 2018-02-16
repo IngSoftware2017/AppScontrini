@@ -124,10 +124,10 @@ public class OcrOptions {
     private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
     private static final TotalSearch DEFAULT_TOTAL_SEARCH = TotalSearch.DEEP;
     private static final DateSearch DEFAULT_DATE_SEARCH = DateSearch.NORMAL;
-    private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.DEEP;
+    private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.NORMAL;
     private static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
     private static final Locale DEFAULT_COUNTRY = Locale.ITALY;
-    private static final PriceEditing DEFAULT_EDIT = PriceEditing.SKIP;
+    private static final PriceEditing DEFAULT_EDIT = PriceEditing.ALLOW_LOOSE;
 
 
     Resolution resolution = Resolution.NORMAL;

@@ -17,7 +17,7 @@ import com.ing.software.ocr.OperativeObjects.RawImage;
 public class OcrUtils {
 
     static final boolean IS_DEBUG_ENABLED = true;
-    private static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
+    private static final int LOG_LEVEL = 4; //A Higher level, means more things are logged
 
     /**
      * @author Michelon
