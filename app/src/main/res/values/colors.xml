@@ -9,5 +9,6 @@
     <color name="colorRef">#FFFFFF</color>
     <color name="colorNotRef">#90A4AE</color>
 
+    <color name="colorNotification">#FFF</color>
     <color name="black_overlay">#66000000</color>
 </resources>

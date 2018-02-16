@@ -8,11 +8,11 @@
     >
 
     <solid
-        android:color="#FFEE00"
+        android:color="@color/colorPrimary"
         />
     <stroke
         android:width="1dip"
-        android:color="#000" />
+        android:color="@color/colorPrimaryDark" />
 
     <padding
         android:top="2dp"
