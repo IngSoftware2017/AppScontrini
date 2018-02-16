@@ -51,7 +51,7 @@
                         android:id="@+id/missionTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="TextView"
+                        android:text="@string/text_init_value"
                         android:textColor="#FFF"
                         android:textSize="26sp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +62,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="TextView"
+                        android:text="@string/text_init_value"
                         android:textColor="#FFF"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/missionTitle" />

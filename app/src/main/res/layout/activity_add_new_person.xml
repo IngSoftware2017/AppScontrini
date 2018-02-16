@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
                 android:textColor="#FFF"
-                android:textSize="22dp" />
+                android:textSize="22sp" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -48,9 +48,9 @@
                 android:id="@+id/input_personLastName"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:hint="Cognome"
+                android:hint="@string/text_cognome"
                 android:textColor="#FFF"
-                android:textSize="22dp" />
+                android:textSize="22sp" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -93,7 +93,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/input_personAcademicTitle"
                         android:singleLine="true"
-                        android:hint="Titolo accademico" />
+                        android:hint="@string/text_titolo" />
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
@@ -125,7 +125,7 @@
                         android:id="@+id/input_personEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Email"
+                        android:hint="@string/text_email"
                         android:singleLine="true" />
                 </android.support.design.widget.TextInputLayout>
 

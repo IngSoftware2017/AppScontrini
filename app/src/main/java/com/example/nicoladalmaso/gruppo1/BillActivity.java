@@ -50,7 +50,7 @@ import database.TicketEntity;
 public class BillActivity extends AppCompatActivity {
     public FloatingActionButton fab, fab1, fab2;
     public Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    public List<TicketEntity> list = new LinkedList<TicketEntity>();
+    public List<TicketEntity> list = new LinkedList<>();
     public Uri photoURI;
     public boolean isFabOpen = false;
     String tempPhotoPath;
@@ -73,22 +73,44 @@ public class BillActivity extends AppCompatActivity {
      * @param savedInstanceState
      *
      * Modify by Marco Olivieri: fixed amount error
+     *
+     * Modified: manage NullPointerException
+     * @author Matteo Mascotto on 16/02/2018
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill);
-        root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+
+        try {
+            root = getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
+        } catch (NullPointerException e) {
+            Toast.makeText(context, R.string.NullPExc_gallery, Toast.LENGTH_LONG).show();
+        }
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
 
         Intent intent = getIntent();
-        missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
+
+        try {
+            missionID = intent.getExtras().getInt(IntentCodes.INTENT_MISSION_ID);
+        } catch (NullPointerException e) {
+            Toast.makeText(context, R.string.NullPExc_Intent, Toast.LENGTH_LONG).show();
+        }
         thisMission = DB.getMission(missionID);
         PersonEntity person = DB.getPerson(thisMission.getPersonID());
         android.support.v7.app.ActionBar ab = getSupportActionBar();
-        ab.setTitle(thisMission.getName()+":");
-        ab.setSubtitle(person.getLastName()+" "+person.getName());
+
+        try {
+            ab.setTitle(thisMission.getName() + ":");
+        } catch (NullPointerException e) {
+            Toast.makeText(context, R.string.NullPExc_MissionName, Toast.LENGTH_LONG).show();
+        }
+        try {
+            ab.setSubtitle(person.getLastName()+" "+person.getName());
+        } catch (NullPointerException e) {
+            Toast.makeText(context, R.string.NullPExc_PersonName, Toast.LENGTH_LONG).show();
+        }
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -109,7 +131,7 @@ public class BillActivity extends AppCompatActivity {
 
     /** Dal Maso
      * Setting toolbar delete button and style from /res/menu
-     * @param menu
+     * @param menu it contain the mission's menu
      * @return success flag
      */
     @Override
@@ -148,33 +170,45 @@ public class BillActivity extends AppCompatActivity {
 
     /** Dal Maso
      *  Manage all animations and catch onclick events about FloatingActionButtons
+     *
+     *  Modified: Improve the click listener using lambda expression
+     *  @author Matteo Mascotto
      */
     public void initializeComponents(){
         printAllTickets();
-        fab = (FloatingActionButton)findViewById(R.id.fab);
-        fab1 = (FloatingActionButton)findViewById(R.id.fab1);
-        fab2 = (FloatingActionButton)findViewById(R.id.fab2);
+        fab = findViewById(R.id.fab);
+        fab1 = findViewById(R.id.fab1);
+        fab2 = findViewById(R.id.fab2);
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_forward);
         rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
+        fab.setOnClickListener(v -> animateFAB());
+        /*
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 animateFAB();
             }
         });
+        */
         //Camera button
+        fab1.setOnClickListener(v -> takePhotoIntent());
+        /*
         fab1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 takePhotoIntent();
             }
         });
+        */
         //Gallery button
+        fab2.setOnClickListener(v -> pickImageFromGallery());
+        /*
         fab2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 pickImageFromGallery();
             }
         });
+        */
         if(thisMission.isClosed()) {
             fab.setVisibility(View.INVISIBLE);
         }
@@ -212,7 +246,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void addToList(TicketEntity t){
         list.add(t);
-        ListView listView = (ListView)findViewById(R.id.list1);
+        ListView listView = findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, screenWIdth);
         adapter.setBitmaps(bitmaps);
         listView.setAdapter(adapter);
@@ -226,7 +260,7 @@ public class BillActivity extends AppCompatActivity {
     public void refreshList(){
         list = DB.getTicketForMissionOrderedByInsertionDate(missionID);
         Log.d("TICKETDEBUG","LIST SIZE: "+list.size());
-        ListView listView = (ListView)findViewById(R.id.list1);
+        ListView listView = findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, screenWIdth);
         //I decided to replace my bitmap caching management with that of Picasso library
         //setBitmaps();
@@ -319,7 +353,7 @@ public class BillActivity extends AppCompatActivity {
     /**Lazzarin
      * It creates a temporary file where to save the photo on.
      * @Framing Directory Pictures
-     * @Return the temporary file
+     * @return  the temporary file
      *
      */
     private File createImageFile() throws IOException {
@@ -340,7 +374,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void deleteTempFiles(){
         File[] files = readAllImages();
-        String filename = "";
+        String filename;
         for (int i = 0; i < files.length; i++)
         {
             filename = files[i].getName();
@@ -371,7 +405,7 @@ public class BillActivity extends AppCompatActivity {
         Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-                /**lazzarin
+                /** lazzarin
                  * Saves definitely the photo without losing quality, deletes the temporary file and shows
                  * the new photo.
                  * @Framing Add the photo on the directory using savePickedFile()
@@ -496,7 +530,7 @@ public class BillActivity extends AppCompatActivity {
      * Method that clears the screen from the images
      */
     public void clearAllImages(){
-        ListView listView = (ListView)findViewById(R.id.list1);
+        ListView listView = findViewById(R.id.list1);
         CustomAdapter adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, screenWIdth);
         adapter.clear();
         adapter.notifyDataSetChanged();
@@ -528,7 +562,7 @@ public class BillActivity extends AppCompatActivity {
         refreshList();
 
         //If there aren't tickets show message
-        TextView noBills = (TextView)findViewById(R.id.noBills);
+        TextView noBills = findViewById(R.id.noBills);
         String noBillsError=getResources().getString(R.string.noBills);
         if(!thisMission.isClosed())
             noBillsError+=getResources().getString(R.string.noBillsOpen);

@@ -79,7 +79,6 @@
     <string name="popup_mission_export">Export</string>
     <string name="popup_mission_close">Chiudi missione</string>
     <string name="popup_mission_delete">Elimina</string>
-
     <string name="popup_export_title">Scegli Formato</string>
     <string name="popup_export_csv">csv</string>
     <string name="popup_export_xml">xml</string>
@@ -88,6 +87,15 @@
     <string name="text_isRefoundable">Scontrino Rimborsabile?</string>
     <string name="text_refoundable_ticket">Scontrini rimborsabili:</string>
     <string name="text_notrefoundable_ticket">Scontrini non rimborsabili:</string>
+    <string name="text_cognome">Cognome</string>
+    <string name="text_titolo">Titolo Accademico</string>
+    <string name="text_email">Email</string>
+    <string name="text_init_value">Text</string>
+    <string name="text_count">C</string>
 
+    <string name="NullPExc_gallery">Controllare che la galleria sia correttamente configurata</string>
+    <string name="NullPExc_Intent">Errore nella lettura della missione, riavviare l\\'app</string>
+    <string name="NullPExc_MissionName">Controllare che la missione abbia un nome valido</string>
+    <string name="NullPExc_PersonName">Controllare che la persona abbia cognome e nome validi</string>
 </resources>
 
