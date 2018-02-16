@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:clickable="true"
+    android:focusableInTouchMode="true"
     android:layout_height="match_parent"
     tools:context="com.ing.software.ticketapp.CheckPhotoActivity">
 
@@ -12,8 +14,9 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/appbar"
         android:elevation="15dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout">
 
         <Button
             android:id="@+id/btnCheck_retry"
@@ -75,11 +78,13 @@
 
             <EditText
                 android:id="@+id/input_checkName"
+                android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:backgroundTint="#FFF"
                 android:hint="@string/name"
+                android:maxLines="1"
                 android:text="Scontrino"
                 android:textColor="#fff"
                 android:textColorHint="#ddd"
@@ -90,7 +95,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="14dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="14dp"
@@ -103,6 +107,7 @@
                 android:layout_marginBottom="14dp"
                 android:layout_marginRight="14dp"
                 android:layout_weight="1"
+                android:hint="@string/total"
                 android:textColorHint="#ddd"
                 android:theme="@style/TextLabelCustom">
 
@@ -113,7 +118,8 @@
                     android:background="@android:color/transparent"
                     android:backgroundTint="#FFF"
                     android:digits="0123456789."
-                    android:hint="@string/total"
+                    android:maxLines="1"
+                    android:maxLength="6"
                     android:inputType="numberDecimal"
                     android:textColor="#fff"
                     android:textColorHint="#ddd"
@@ -137,8 +143,9 @@
                     android:backgroundTint="#FFF"
                     android:digits="0123456789"
                     android:hint="Numero persone"
+                    android:maxLines="1"
                     android:inputType="number"
-                    android:maxLength="1"
+                    android:maxLength="2"
                     android:text="1"
                     android:textColor="#fff"
                     android:textColorHint="#ddd"
@@ -146,6 +153,41 @@
 
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Rimborsare"
+                android:textColor="#FFF"
+                android:textSize="21dp" />
+
+            <CheckBox
+                android:id="@+id/check_Refundable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:checked="true"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:textColor="@color/colorPrimary"
+                android:textColorHighlight="@color/colorPrimary"
+                android:textColorLink="@color/colorPrimaryDark" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

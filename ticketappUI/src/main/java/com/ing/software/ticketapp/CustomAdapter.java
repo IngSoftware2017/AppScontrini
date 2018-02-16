@@ -87,11 +87,13 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         File photo = new File(c.getFileUri().toString().substring(7));
         ticketTitle.setText(c.getTitle());
 
-        if(c.getShop() == null || c.getShop().trim().compareTo("") == 0){
-            ticketShop.setText(context.getString(R.string.string_NoShop));
+        if(c.isRefundable()){
+            ticketShop.setText("Rimborsabile");
+            ticketShop.setTextColor(Color.parseColor("#00C853"));
         }
         else {
-            ticketShop.setText(c.getShop());
+            ticketShop.setText("Non rimborsabile");
+            ticketShop.setTextColor(Color.parseColor("#D50000"));
         }
 
         //Amount text fixes
@@ -101,7 +103,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText(amount);
         }
         else {
-            amount = c.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString();
+            amount = c.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString();
             tot.setText(amount+" €"); //todo HC
         }
 
