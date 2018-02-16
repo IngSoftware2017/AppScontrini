@@ -1,0 +1,88 @@
+<resources>
+
+    <!-- Activity themes -->
+    <style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="MissionTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryMission</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkMission</item>
+        <item name="colorAccent">@color/colorAccentMission</item>
+    </style>
+
+    <style name="MissionTheme.NoActionBar" parent="MissionTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="BillTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryBill</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkBill</item>
+        <item name="colorAccent">@color/colorAccentBill</item>
+    </style>
+
+    <style name="BillTheme.ActionBar.Transparent" parent="BillTheme">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="colorPrimaryDark">#66000000</item>
+    </style>
+
+    <style name="CropTheme" parent="@style/Theme.AppCompat">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="titleTextColor">#FFF</item>
+        <item name="actionMenuTextColor">#FFF</item>
+        <item name="android:textColorPrimary">#FFF</item>
+    </style>
+
+
+    <!-- TextLabel themes -->
+    <style name="TextLabel" parent="TextAppearance.AppCompat">
+        <item name="colorAccent">#FFF</item>
+        <item name="colorControlActivated">#FFF</item>
+    </style>
+
+    <style name="TextLabelMainTheme" parent="TextLabel">
+        <item name="android:colorControlHighlight">@color/colorAccentLight</item>
+        <item name="colorControlNormal">@color/colorAccentLight</item>
+    </style>
+
+    <style name="TextLabelMissionTheme" parent="TextLabel">
+        <item name="colorControlNormal">@color/colorAccentLightMission</item>
+    </style>
+
+    <style name="TextLabelBillTheme" parent="TextLabel">
+        <item name="colorControlNormal">@color/colorAccentLightBill</item>
+    </style>
+
+
+    <style name="MyCardViewStyle" parent="Theme.AppCompat.Light">
+        <item name="cardCornerRadius">2dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="contentPaddingBottom">24dp</item>
+        <item name="contentPaddingTop">24dp</item>
+        <item name="contentPaddingLeft">16dp</item>
+        <item name="contentPaddingRight">16dp</item>
+        <item name="cardBackgroundColor">#fff</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="FullscreenTheme" parent="MainTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+</resources>

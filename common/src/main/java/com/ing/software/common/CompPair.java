@@ -10,6 +10,11 @@ public class CompPair<C extends Comparable<C>, T> implements Comparable<CompPair
     public C comp;
     public T obj;
 
+    /**
+     * New CompPair
+     * @param comp comparable
+     * @param obj object
+     */
     public CompPair(@NonNull C comp, T obj) {
         this.comp = comp;
         this.obj = obj;

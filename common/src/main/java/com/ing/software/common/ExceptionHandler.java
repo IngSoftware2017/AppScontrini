@@ -18,6 +18,10 @@ public class ExceptionHandler {
     private Consumer<Exception> handler;
     private boolean exceptionOccurred;
 
+    /**
+     * New ExceptionHandler
+     * @param handler callback to be executed when an exception is thrown.
+     */
     public ExceptionHandler(Consumer<Exception> handler) { this.handler = handler; }
 
     /**

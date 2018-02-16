@@ -4,7 +4,6 @@ import android.util.Pair;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.DataAnalyzer;
-import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrObjects.TicketSchemes.*;
 
@@ -14,24 +13,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import com.annimon.stream.Stream;
-import com.ing.software.ocr.ScoreFunc;
 
 import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
 
 /**
- * Class to analyze amount and compare it with a predefined ticket.
+ * Class to analyze amount and compare it with predefined tickets.
  */
 
 public class AmountComparator {
 
     private List<TicketScheme> acceptedSchemes = new ArrayList<>();
+    private RawImage mainImage;
 
     /**
      * @author Michelon
      * Constructor, check amount against a defined scheme
      * @param scheme scheme to use to check amount
      */
-    public AmountComparator(TicketScheme scheme) {
+    public AmountComparator(TicketScheme scheme, RawImage mainImage) {
+        this.mainImage = mainImage;
         acceptedSchemes.add(scheme);
     }
 
@@ -40,7 +40,8 @@ public class AmountComparator {
      * Constructor, check amount against a list of schemes
      * @param schemes list of schemes to use to check amount
      */
-    public AmountComparator(List<TicketScheme> schemes) {
+    public AmountComparator(List<TicketScheme> schemes, RawImage mainImage) {
+        this.mainImage = mainImage;
         acceptedSchemes.addAll(schemes);
     }
 
@@ -49,7 +50,8 @@ public class AmountComparator {
      * Constructor, check amount against all schemes
      * @param amount BigDecimal containing decoded amount.
      */
-    public AmountComparator(BigDecimal amount, OcrText amountText) {
+    public AmountComparator(BigDecimal amount, OcrText amountText, RawImage mainImage) {
+        this.mainImage = mainImage;
         acceptedSchemes = getAllSchemes(amount, getAboveTotalPrices(amountText), getBelowTotalPrices(amountText));
     }
 
@@ -74,10 +76,10 @@ public class AmountComparator {
      * @return list of bigDecimal and texts of numbers above total
      */
     private List<Pair<OcrText, BigDecimal>> getAboveTotalPrices(OcrText amountText) {
-        return Stream.of(OcrManager.mainImage.getPricesTexts())
+        return Stream.of(mainImage.getPricesTexts())
                 .filter(price -> price.box().centerY() < amountText.box().centerY())
-                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.numNoSpaces()) < NUMBER_MIN_VALUE)
-                .map(price -> new Pair<>(price, DataAnalyzer.analyzeAmount(price.numNoSpaces())))
+                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.sanitizedNum()) < NUMBER_MIN_VALUE)
+                .map(price -> new Pair<>(price, DataAnalyzer.analyzeAmount(price.sanitizedAdvancedNum())))
                 .filter(price -> price.second != null)
                 .withoutNulls()
                 .toList();
@@ -89,10 +91,10 @@ public class AmountComparator {
      * @return list of bigDecimal of numbers below total
      */
     private List<BigDecimal> getBelowTotalPrices(OcrText amountText) {
-        return Stream.of(OcrManager.mainImage.getPricesTexts())
+        return Stream.of(mainImage.getPricesTexts())
                 .filter(price -> price.box().centerY() > amountText.box().centerY())
-                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.numNoSpaces()) < NUMBER_MIN_VALUE)
-                .map(price -> DataAnalyzer.analyzeAmount(price.numNoSpaces()))
+                .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.sanitizedNum()) < NUMBER_MIN_VALUE)
+                .map(price -> DataAnalyzer.analyzeAmount(price.sanitizedAdvancedNum()))
                 .withoutNulls()
                 .toList();
     }

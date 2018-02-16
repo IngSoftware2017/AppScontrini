@@ -1,104 +1,198 @@
 package com.ing.software.ocr;
 
-import android.support.annotation.IntRange;
+import java.util.Locale;
 
 /**
+ * @author Michelon
+ * @author EDIT: Zaglia
  * Object passed to the manager to avoid performing unnecessary operations
- * and consequently reduce time (time depends primarily on precision)
- * NOTE: As of now (31-1) only precisions 0-3 are implemented
- *
- * For precision:
- * 0 = scan image at 1/3 of its dimension, don't reanalyze specific parts of image to get better results
- * 1 = scan image at 1/2 of its dimension, don't reanalyze specific parts of image to get better results
- * 2 = scan image at original dimension (passed by imageprocessor), don't reanalyze specific parts of image to get better results
- * 3 = scan image at original dimension (passed by imageprocessor), reanalyze total strip to get a better result (only first element)
- * 4 = scan image at original dimension (passed by imageprocessor), reanalyze total (only first element) and prices strips to get a better result
- * 5 = scan image at original dimension (passed by imageprocessor), reanalyze total (first 3 elements) and prices strips to get a better result
- * 6 = scan image at original dimension (passed by imageprocessor), reanalyze total (first 3 elements) and prices strips to get a better result, if
- *      nothing was found scan also upside down
+ * and consequently reduce time (time depends primarily on image scale)
  */
-
-/* ZAGLIA: at precision level 0 and 1 we should still use ocr strip reanalysis because:
-   * it's almost inexpensive time-wise
-   * The benefits of strip are limited at full resolution, because the strip is always created already at full resolution
- */
-
 public class OcrOptions {
 
-    public static final int REDO_OCR_PRECISION = 3;
-    public static final int REDO_OCR_3 = 5; //must be changed with something better
-    private static final int DEFAULT_PRECISION = 3;
-    private static final boolean DEFAULT_TOTAL = true;
-    private static final boolean DEFAULT_DATE = true;
-    private static final boolean DEFAULT_PRODUCTS = true;
+    //NB: the flags inside these enums are ordered in a certain way to make use of ordinal().
+    // Do not reorder.
+    public enum Resolution {
 
-    private boolean findTotal;
-    private boolean findDate;
-    private boolean findProducts;
-    private int precision;
+        /**
+         * Use original image
+         */
+        NORMAL,
 
-    /**
-     * Constructor
-     * @param findTotal true if you want to find total
-     * @param findDate true if you want to find date
-     * @param findProducts true if you want to find a list of products
-     * @param precision Int from 0 to 6.
-     */
-    public OcrOptions(boolean findTotal, boolean findDate, boolean findProducts, @IntRange(from = 0, to = 6) int precision) {
-        this.findTotal = findTotal;
-        this.findDate = findDate;
-        this.findProducts = findProducts;
-        this.precision = precision;
+        /**
+         * Downscale image to 1/2
+         */
+        HALF,
+
+        /**
+         * Downscale image to 1/3
+         */
+        THIRD,
     }
+
+    public enum DateSearch {
+
+        SKIP,
+
+        /**
+         * Use fast detected texts
+         */
+        NORMAL,
+    }
+
+    public enum TotalSearch {
+
+        SKIP,
+
+        /**
+         * Use fast detected texts
+         */
+        NORMAL,
+
+        /**
+         * Redo ocr on target strip
+         */
+        DEEP,
+
+        /**
+         * Redo search if first amount target is not a valid amount (up to 3 searches).
+         */
+        EXTENDED_SEARCH,
+    }
+
+    public enum ProductsSearch {
+
+        SKIP,
+
+        /**
+         * Use fast detected texts
+         */
+        NORMAL,
+
+        /**
+         * Redo ocr on target strip
+         */
+        DEEP,
+    }
+
+    public enum Orientation {
+
+        NORMAL,
+
+        /**
+         * Rescan image upside down if nothing was found
+         */
+        ALLOW_UPSIDE_DOWN,
+
+        FORCE_UPSIDE_DOWN,
+    }
+
+    public enum PriceEditing {
+
+        SKIP,
+
+        ALLOW,
+    }
+
+    private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
+    private static final TotalSearch DEFAULT_TOTAL_SEARCH = TotalSearch.DEEP;
+    private static final DateSearch DEFAULT_DATE_SEARCH = DateSearch.NORMAL;
+    private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.DEEP;
+    private static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
+    private static final Locale DEFAULT_COUNTRY = Locale.ITALY;
+    private static final PriceEditing DEFAULT_EDIT = PriceEditing.SKIP;
+
+    Resolution resolution = Resolution.NORMAL;
+    TotalSearch totalSearch = TotalSearch.SKIP;
+    DateSearch dateSearch = DateSearch.SKIP;
+    ProductsSearch productsSearch = ProductsSearch.SKIP;
+    Orientation orientation = Orientation.NORMAL;
+    PriceEditing priceEditing = DEFAULT_EDIT;
+    Locale suggestedCountry = null;
 
     /**
      * Return default Options
      * @return default options
      */
-    public static OcrOptions getDefaultOptions() {
-        return new OcrOptions(DEFAULT_TOTAL, DEFAULT_DATE, DEFAULT_PRODUCTS, DEFAULT_PRECISION);
+    public static OcrOptions getDefault() {
+        return new OcrOptions()
+                .total(DEFAULT_TOTAL_SEARCH)
+                .resolution(DEFAULT_RESOLUTION)
+                .date(DEFAULT_DATE_SEARCH)
+                .products(DEFAULT_PRODUCTS_SEARCH)
+                .orientation(DEFAULT_ORIENTATION)
+                .suggestedCountry(DEFAULT_COUNTRY);
     }
 
-    public void setPrecision(int precision) {
-        this.precision = precision;
+    /**
+     * Set resolution level
+     * @param level resolution level
+     * @return OcrOptions instance
+     */
+    public OcrOptions resolution(Resolution level) {
+        resolution = level;
+        return this;
     }
 
-    public void setFindTotal(boolean findTotal) {
-        this.findTotal = findTotal;
+    /**
+     * Set total search criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions total(TotalSearch criteria) {
+        totalSearch = criteria;
+        return this;
     }
 
-    public void setFindDate(boolean findDate) {
-        this.findDate = findDate;
+    /**
+     * Set date search criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions date(DateSearch criteria) {
+        dateSearch = criteria;
+        return this;
     }
 
-    public void setFindProducts(boolean findProducts) {
-        this.findProducts = findProducts;
+    /**
+     * Set products search criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions products(ProductsSearch criteria) {
+        productsSearch = criteria;
+        return this;
     }
 
-    public boolean shouldFindTotal() {
-        return findTotal;
+    /**
+     * Set orientation criteria
+     * @param criteria
+     * @return OcrOptions instance
+     */
+    public OcrOptions orientation(Orientation criteria) {
+        orientation = criteria;
+        return this;
     }
 
-    public boolean shouldFindDate() {
-        return findDate;
+    /**
+     * Set suggested country, used to resolve ambiguities.
+     * Can be extracted from current location or location history.
+     * @param country ISO locale country
+     * @return OcrOptions instance
+     */
+    public OcrOptions suggestedCountry(Locale country) {
+        suggestedCountry = country;
+        return this;
     }
 
-    public boolean shouldFindProducts() {
-        return findProducts;
+    public OcrOptions priceEditing(PriceEditing edit) {
+        priceEditing = edit;
+        return this;
     }
 
-    public int getPrecision() {
-        return precision;
-    }
-
-    double getResolutionMultiplier() {
-        switch (precision) {
-            case 0:
-                return 1. / 3.;
-            case 1:
-                return 1. / 2.;
-            default:
-                return 1;
-        }
-    }
+    /**
+     * Translate resolution enum value into a numeric multiplier
+     * @return multiplier
+     */
+    double getResolutionMultiplier() { return 1. / (resolution.ordinal() + 1); }
 }

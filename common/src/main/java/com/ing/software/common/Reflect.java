@@ -18,18 +18,18 @@ public class Reflect {
      * Invoke a static or non static method (with any access level) of a class.
      *
      * @param clazz A class instance or class type. Not null
-     * @param method Method name. Not null
+     * @param method Method name. Not null.
      * @param params List of arguments of the method. They can be null.
-     * @param <T> return type of the method.
-     * @return return value of the method or void.
+     * @param <T> Return type of the method.
+     * @return Return value of the method or void.
      *
      * @throws Exception:
-     *  NoSuchMethodException: The method name, the number or type of parameters is wrong
+     *  NoSuchMethodException: The method name, the number or type of parameters is wrong.
      *  NullPointerException: Calling an instance method with a class type.
      *  ClassCastException: Return type mismatch.
+     *  InvocationTargetException: Exception raised inside method. Check stack trace.
      *  Other exception: Something went wrong. The causes might be:
-     *                    * parameters incompatible with method annotations;
-     *                    * exception raised inside method.
+     *                    * parameters incompatible with method annotations
      */
     @SuppressWarnings("unchecked")
     public static <T> T invoke(@NonNull Object clazz, @NonNull String method, Object... params) throws Exception {
@@ -92,13 +92,14 @@ public class Reflect {
 
     /**
      * Get value of a static or non static field (with any access level).
-     * @param clazz A class instance or class type. Not null
-     * @param fieldName Field name. Not null
+     * @param clazz A class instance or class type. Not null.
+     * @param fieldName Field name. Not null.
      * @param <T> Type of the field.
      * @return Value of the field.
      *
      * @throws Exception:
-     *  NullPointerException: Trying to get an instance field passing a class type.
+     *  NoSuchFieldException: The field name is wrong.
+     *  NullPointerException: Trying to get an instance field with a class type.
      *  ClassCastException: Field type mismatch.
      */
     @SuppressWarnings("unchecked")
@@ -108,12 +109,14 @@ public class Reflect {
 
     /**
      * Set value of a static or non static field (with any access level).
-     * @param clazz A class instance or class type. Not null
-     * @param fieldName Field name. Not null
+     * @param clazz A class instance or class type. Not null.
+     * @param fieldName Field name. Not null.
      * @param newVal New value of the field.
      *
      * @throws Exception:
-     *  NullPointerException: Trying to set an instance field passing a class type.
+     *  NoSuchFieldException: The field name is wrong.
+     *  NullPointerException: Trying to set an instance field with a class type.
+     *  IllegalArgumentException: Field type mismatch.
      */
     public static void setField(@NonNull Object clazz, @NonNull String fieldName, Object newVal) throws Exception {
         getFieldInstance(clazz, fieldName).set(clazz instanceof Class<?> ? null : clazz, newVal);

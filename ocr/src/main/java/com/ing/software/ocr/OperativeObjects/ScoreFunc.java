@@ -1,11 +1,12 @@
-package com.ing.software.ocr;
+package com.ing.software.ocr.OperativeObjects;
 
 import android.graphics.RectF;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
+import com.ing.software.ocr.OcrUtils;
 
-import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OperativeObjects.OcrSchemer.*;
 
 /**
  * Class used to calculate scores for texts
@@ -40,8 +41,8 @@ public class ScoreFunc {
      * @param target text to score
      * @return new score for text + old score
      */
-    public static double getAmountScore(Scored<OcrText> target) {
-        double positionScore = getAmountBlockScore(target.obj());
+    public static double getAmountScore(Scored<OcrText> target, RawImage mainImage) {
+        double positionScore = getAmountBlockScore(target.obj(), mainImage);
         //todo: add score for height etc.
         return positionScore + target.getScore();
     }
@@ -51,11 +52,11 @@ public class ScoreFunc {
      * @param source text containing amount string
      * @return new score + old score
      */
-    public static double getSourceAmountScore(Scored<OcrText> source) {
-        double average = OcrManager.mainImage.getAverageCharHeight();
+    public static double getSourceAmountScore(Scored<OcrText> source, RawImage mainImage) {
+        double average = mainImage.getAverageCharHeight();
         double heightDiff = source.obj().charHeight() - average;
         heightDiff = heightDiff/average*HEIGHT_CHAR_MULTIPLIER;
-        average = OcrManager.mainImage.getAverageCharWidth();
+        average = mainImage.getAverageCharWidth();
         double widthDiff = source.obj().charWidth() - average;
         widthDiff = widthDiff/average*WIDTH_CHAR_MULTIPLIER;
         OcrUtils.log(5, "getSourceAmountScore", "Score for text: " + source.obj().text()
@@ -69,7 +70,7 @@ public class ScoreFunc {
      * @param target target text
      * @return score for chosen texts
      */
-    static double getDistFromSourceScore(OcrText source, OcrText target) {
+    public static double getDistFromSourceScore(OcrText source, OcrText target) {
         OcrUtils.log(7, "getDistFromSource:", "Source rect is (l,t,r,b): (" + source.box().left + "," +
             source.box().top + "," + source.box().right + "," + source.box().bottom + ") \n Target is: ("+
                 target.box().left + "," + target.box().top + "," + target.box().right + "," + target.box().bottom + ")");
@@ -79,7 +80,7 @@ public class ScoreFunc {
         OcrUtils.log(7, "getDistFromSource:", "Partial diff is: " + diffCenter);
         diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
         double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
-        heightDiff = (1-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;  //<- always 0, why?
+        heightDiff = (1.-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;
         OcrUtils.log(5, "getDistFromSourceScore", "Score for text: " + target.text() +
             " with source: " + source.text() + " is: (diffCenter) " + diffCenter + " + (heightDiff) " + heightDiff);
         return diffCenter + heightDiff;
@@ -90,15 +91,15 @@ public class ScoreFunc {
      * @param text source text
      * @return score of the rect in its block.
 	 */
-    private static int getAmountBlockScore(OcrText text) {
+    private static int getAmountBlockScore(OcrText text, RawImage mainImage) {
         if (text.getTags().contains(INTRODUCTION_TAG))
-            return amountBlockIntroduction[getTextBlockPosition(text, OcrManager.mainImage.getIntroRect())];
+            return amountBlockIntroduction[getTextBlockPosition(text, mainImage.getIntroRect())];
         else if (text.getTags().contains(PRODUCTS_TAG))
-            return amountBlockProducts[getTextBlockPosition(text, OcrManager.mainImage.getProductsRect())];
+            return amountBlockProducts[getTextBlockPosition(text, mainImage.getProductsRect())];
         else if (text.getTags().contains(PRICES_TAG))
-            return amountBlockProducts[getTextBlockPosition(text, OcrManager.mainImage.getPricesRect())];
+            return amountBlockProducts[getTextBlockPosition(text, mainImage.getPricesRect())];
         else if (text.getTags().contains(CONCLUSION_TAG))
-            return amountBlockConclusion[getTextBlockPosition(text, OcrManager.mainImage.getConclusionRect())];
+            return amountBlockConclusion[getTextBlockPosition(text, mainImage.getConclusionRect())];
         else
             return -1;
     }
@@ -125,11 +126,12 @@ public class ScoreFunc {
      * If string is longer than NUMBER_MAX_LENGTH default is Integer.MAX_VALUE (allowed numbers up to nn.nnn,nn)
      * return is decreased if one '.' in sanitized is present, increased if more than one are present.
      * @param originalNoSpace string with original text (textnospaces)
-     * @param sanitized string with sanitized text (numnospaces)
+     * @param sanitized string with sanitized text (sanitized text)
      * @return Integer.MAX_VALUE if less than MIN_DIGITS_NUMBER of the string are not numbers;
      * otherwise number of non-digit chars (*0.5 if special)/length
      */
     public static double isPossiblePriceNumber(String originalNoSpace, String sanitized) {
+        sanitized = sanitized.replace(" ", "").replace(",", ".");
         double specialCharsMultiplier = 0.5;
         if (sanitized.length() >= NUMBER_MAX_LENGTH)
             return Integer.MAX_VALUE;

@@ -23,25 +23,30 @@ import static java.util.Collections.*;
  * @author (Edit) Michelon
  * Main object used by this module. It represents a text line or a word, with its absolute position in the image,
  * the result of ocr analysis and a first raw analysis of the string extracted.
+ * Some fileds are declared as Lazy to avoid computation of these fields when its value is never accessed.
  */
-
 public class OcrText implements Comparable<OcrText> {
 
     // List of substitutions used to correct common ocr mistakes in the reading of a price.
     private static final List<Pair<String, String>> NUM_SANITIZE_LIST = asList(
             new Pair<>("O", "0"),
             new Pair<>("o", "0"),
+            new Pair<>("S", "5"),
+            new Pair<>(",", "."),
+            new Pair<>("s", "5")
+    );
+
+    // These substitutions are less frequent and may produce false positives. Should be used only if you are sure your string is a number.
+    private static final List<Pair<String, String>> NUM_SANITIZE_ADVANCED = asList(
             new Pair<>("D", "0"),
             new Pair<>("U", "0"),
             new Pair<>("I", "1"),
             new Pair<>("l", "1"), // lowercase L
-            new Pair<>("S", "5"),
-            new Pair<>("s", "5"),
             new Pair<>("?", "7"),
-            new Pair<>("B", "8"),
-            new Pair<>(",", ".")
+            new Pair<>("B", "8")
     );
 
+    //Immutable fields:
     private boolean isWord;
     private Lazy<List<OcrText>> children; // if this OcrText instance is a text line, its children are words
     private Lazy<List<PointF>> corners; // corners of a rotated rectangle containing the line of text
@@ -53,10 +58,16 @@ public class OcrText implements Comparable<OcrText> {
     private Lazy<String> textUppercase; // uppercase text
     private Lazy<String> uppercaseAlphaNum; // uppercase text where all non alphanumeric characters are removed. No spaces between words
     private Lazy<String> textNoSpaces; // uppercase text with no spaces between words
-    private Lazy<String> textSanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
-    private Lazy<String> numNoSpaces; // concatenate all words where there was applied a sanitize substitution suitable for detecting a price.
+    private Lazy<String> sanitizedNum; // text where it was applied the NUM_SANITIZE_LIST substitutions
+    private Lazy<String> sanitizedAdvanced; // text where it was applied the NUM_SANITIZE_LIST and NUM_SANITIZE_ADVANCED substitutions
+
+    //Mutable fields
     private List<String> tags;
 
+    /**
+     * Create a new OcrText from a Vision API Text object
+     * @param text Text object
+     */
     public OcrText(Text text) {
         isWord = text instanceof Element;
         OcrUtils.log(7, "OCRTEXT: ", "I'm a word: " + isWord);
@@ -71,20 +82,23 @@ public class OcrText implements Comparable<OcrText> {
         this.text = text.getValue();
         OcrUtils.log(7, "OCRTEXT:", "Text is: " + text.getValue());
         textUppercase = new Lazy<>(() -> text().toUpperCase());
-        textSanitizedNum = new Lazy<>(() -> {
+        sanitizedNum = new Lazy<>(() -> {
             String res = text();
             for (Pair<String, String> p : NUM_SANITIZE_LIST)
                 res = res.replace(p.first, p.second);
-            return/*textSanitizedNum*/ res;
+            return/*sanitizedNum*/ res;
+        });
+        sanitizedAdvanced = new Lazy<>(() -> {
+            String res = sanitizedNum();
+            for (Pair<String, String> p : NUM_SANITIZE_ADVANCED)
+                res = res.replace(p.first, p.second);
+            return/*sanitizedAdvanced*/ res;
         });
 
         // I used .reduce() to concatenate every result of the lambda expression
         // if these are accessed on a word, they return empty string
         textNoSpaces = new Lazy<>(() -> Stream.of(children())
                 .reduce("", (str, c) -> str + c.textUppercase()));
-        numNoSpaces = new Lazy<>(() -> Stream.of(children())
-                .reduce("", (str, c) -> str + c.textSanitizedNum()));
-
         if (isWord) {
             // length of the longest side of the rotated rectangle, divided by the number of characters of the word
             charWidth = max(asList(dist(corners().get(0), corners().get(1)),
@@ -112,7 +126,7 @@ public class OcrText implements Comparable<OcrText> {
     }
 
     /**
-     * Create a new OcrText with dimensions converted from one bitmap space to another
+     * Create a new OcrText from another, with its dimensions converted from one bitmap space to another
      * @param ocrText OcrText to convert
      * @param srcImgRect source bitmap space. Eg: optimized amount strip, from (0, 0)
      * @param dstImgRect destination space. Eg: amount strip in original bitmap space.
@@ -144,11 +158,11 @@ public class OcrText implements Comparable<OcrText> {
 
         // the text fields remain unchanged
         text = ocrText.text;
-        textSanitizedNum = ocrText.textSanitizedNum;
         textUppercase = ocrText.textUppercase;
         textNoSpaces = ocrText.textNoSpaces;
-        numNoSpaces = ocrText.numNoSpaces;
         uppercaseAlphaNum = ocrText.uppercaseAlphaNum;
+        sanitizedNum = ocrText.sanitizedNum;
+        sanitizedAdvanced = ocrText.sanitizedAdvanced;
         tags = ocrText.getTags();
     }
 
@@ -172,10 +186,12 @@ public class OcrText implements Comparable<OcrText> {
     public String uppercaseAlphaNum() { return uppercaseAlphaNum.get(); }
     // available only if isWord() == false:
     public String textNoSpaces() { return textNoSpaces.get(); }
-    public String textSanitizedNum() { return textSanitizedNum.get(); }
+    public String sanitizedNum() { return sanitizedNum.get(); }
+    public String sanitizedAdvancedNum() { return sanitizedAdvanced.get(); }
 
-    @Deprecated
-    public String numNoSpaces() { return numNoSpaces.get(); }
+    /**
+     * @author Michelon
+     */
 
     public List<String> getTags() {
         return tags;

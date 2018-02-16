@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="EditMission">
+    tools:context="com.ing.software.ticketapp.EditMission">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryMission"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
@@ -20,13 +20,13 @@
             android:layout_marginTop="15dp"
             android:layout_marginLeft="60dp"
             android:layout_marginRight="10dp"
-            android:theme="@style/TextLabelMissionTheme">
+            android:theme="@style/TextLabel">
 
             <EditText
                 android:id="@+id/input_missionEditName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapSentences"
+                android:inputType="textCapWords"
                 android:hint="@string/name"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
@@ -41,14 +41,14 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="60dp"
             android:layout_marginRight="10dp"
-            android:theme="@style/TextLabelMissionTheme">
+            android:theme="@style/TextLabel">
 
             <EditText
                 android:id="@+id/input_missionEditLocation"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:inputType="textCapSentences"
                 android:hint="@string/location"
+                android:inputType="textCapWords"
                 android:textColor="#FFF"
                 android:textSize="22dp"
                 android:singleLine="true"/>
@@ -121,6 +121,7 @@
                     android:singleLine="true"/>
 
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -131,19 +132,61 @@
                     android:id="@+id/msgIsRepaid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
                     android:layout_weight="1"
                     android:minHeight="40dp"
                     android:minWidth="40dp"
-                    android:layout_marginLeft="20dp"
+                    android:singleLine="true"
                     android:text="@string/text_isRepaid"
-                    android:textSize="16dp"
-                    android:singleLine="true"/>
+                    android:textSize="16dp" />
+
                 <CheckBox
                     android:id="@+id/check_isRepaid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="16dp"/>
+                    android:layout_marginRight="16dp" />
             </LinearLayout>
+            <!--
+            <LinearLayout
+                android:id="@+id/LayoutExport"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="30dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/msgExportMission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="30dp"
+                    android:minWidth="40dp"
+                    android:singleLine="true"
+                    android:text="@string/text_ExportMission"
+                    android:textSize="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Spinner
+                        android:id="@+id/spinner_formats"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                    <Button
+                        android:id="@+id/button_export"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="@string/button_ExportMission" />
+                </LinearLayout>
+            </LinearLayout>
+            -->
         </LinearLayout>
     </RelativeLayout>
 

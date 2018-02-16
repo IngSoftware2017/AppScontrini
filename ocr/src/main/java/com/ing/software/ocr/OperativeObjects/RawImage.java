@@ -5,7 +5,6 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
-import com.ing.software.ocr.OcrManager;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OcrUtils;
 
@@ -14,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OperativeObjects.OcrSchemer.*;
 
 /**
  * Class to store only useful properties of source images and scheme of ticket
@@ -44,7 +44,8 @@ public class RawImage {
     private List<OcrText> conclusionTexts = new ArrayList<>();
 
     /**
-     * Constructor, initializes variables
+     * Constructor, initializes variables.
+     * When you have the texts, call setLines().
      * @param bitmap source photo. Not null.
      */
     public RawImage(@NonNull Bitmap bitmap) {
@@ -61,7 +62,7 @@ public class RawImage {
     }
 
     /**
-     * Must be called only once.
+     * Must be called only once when initialized.
      * @param texts list of rawTexts. Not null.
      */
     public void setLines(@NonNull List<OcrText> texts) {
@@ -70,6 +71,9 @@ public class RawImage {
         averageRectHeight = checkAverageLineHeight();
         averageCharHeight = checkAverageCharHeight();
         averageCharWidth = checkAverageCharWidth();
+        OcrSchemer schemer = new OcrSchemer(this);
+        schemer.prepareScheme(); //Prepare scheme of the ticket
+        textFitter(); //save configuration from prepareScheme in rawimage
     }
 
     /**
@@ -217,7 +221,7 @@ public class RawImage {
      * Keeps a list of all rawTexts divided by tag.
      * Must be used only once and after setLines() has been called and tags have been set (OcrSchemer.prepareScheme).
      */
-    public void textFitter() {
+    private void textFitter() {
         //Remove old lists
         introTexts = new ArrayList<>();
         pricesTexts = new ArrayList<>();
@@ -356,19 +360,19 @@ public class RawImage {
      * @param text text to tag
      * @return text with added tag
      */
-    public static OcrText mapText(OcrText text) {
-        if (OcrManager.mainImage.getIntroRect().contains(text.box()))
+    public static OcrText mapText(OcrText text, RawImage mainImage) {
+        if (mainImage.getIntroRect().contains(text.box()))
             text.addTag(INTRODUCTION_TAG);
-        else if (OcrManager.mainImage.getProductsRect().contains(text.box()))
+        else if (mainImage.getProductsRect().contains(text.box()))
             text.addTag(PRODUCTS_TAG);
-        else if (OcrManager.mainImage.getPricesRect().contains(text.box()))
+        else if (mainImage.getPricesRect().contains(text.box()))
             text.addTag(PRICES_TAG);
-        else if (OcrManager.mainImage.getConclusionRect().contains(text.box()))
+        else if (mainImage.getConclusionRect().contains(text.box()))
             text.addTag(CONCLUSION_TAG);
         else {
-            float productsTop = Math.min(OcrManager.mainImage.getProductsRect().top, OcrManager.mainImage.getPricesRect().top);
-            float productsBottom = Math.max(OcrManager.mainImage.getProductsRect().bottom, OcrManager.mainImage.getPricesRect().bottom);
-            RectF middleRect = new RectF(OcrManager.mainImage.getProductsRect().left, productsTop, OcrManager.mainImage.getPricesRect().right, productsBottom);
+            float productsTop = Math.min(mainImage.getProductsRect().top, mainImage.getPricesRect().top);
+            float productsBottom = Math.max(mainImage.getProductsRect().bottom, mainImage.getPricesRect().bottom);
+            RectF middleRect = new RectF(mainImage.getProductsRect().left, productsTop, mainImage.getPricesRect().right, productsBottom);
             //Check its y coordinate
             float centerY = text.box().centerY();
             if (centerY < productsTop)
