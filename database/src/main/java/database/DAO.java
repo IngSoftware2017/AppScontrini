@@ -267,7 +267,7 @@ public interface DAO {
      * @return List<MissionEntity> not null all active or closed missions of the specific person
      */
     @Query("SELECT * FROM "+Constants.MISSION_TABLE_NAME+" WHERE "+Constants.MISSION_FIELD_CLOSED +" = :closed AND "
-            + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_NAME+" ASC")
+            + Constants.PERSON_CHILD_COLUMNS + " =:personId" + " ORDER BY "+Constants.MISSION_FIELD_END_DATE+" ASC")
     List<MissionEntity> getMissionClosedForPerson(boolean closed, long personId);
 
     /**Created by Federico Taschin
