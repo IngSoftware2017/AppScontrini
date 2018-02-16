@@ -19,8 +19,9 @@ import java.util.*;
 import com.annimon.stream.function.Consumer;
 
 import com.annimon.stream.Stream;
+import com.ing.software.ocr.OperativeObjects.ScoreFunc;
 
-import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OcrUtils.IS_DEBUG_ENABLED;
 import static java.util.Arrays.asList;
 import static com.ing.software.common.CommonUtils.*;
 import static com.ing.software.ocr.DataAnalyzer.*;
@@ -76,6 +77,9 @@ public class OcrManager {
         return r;
     }
 
+    /**
+     * Release internal resources
+     */
     public synchronized void release() {
         operative = false;
         analyzer.release();
@@ -84,23 +88,23 @@ public class OcrManager {
     /**
      * Single run ocr analysis.
      * @param ticket in-out ticket. Not null.
-     * @param imgProc image processor. Not modified. Not null.
+     * @param procCopy image processor. Not modified. Not null.
      * @param options ocr options. Not modified. Not null.
      *
      * @author Luca Michelon
      * @author Riccardo Zaglia
      */
-    private void extractTicket(OcrTicket ticket, ImageProcessor imgProc, OcrOptions options) {
+    private void extractTicket(@NonNull OcrTicket ticket, @NonNull ImageProcessor procCopy, @NonNull OcrOptions options) {
         long startTime;
         long endTime;
         if (IS_DEBUG_ENABLED)
             startTime = System.nanoTime();
-        Bitmap frame = imgProc.undistortForOCR(options.getResolutionMultiplier());
+        Bitmap frame = procCopy.undistortForOCR(options.getResolutionMultiplier());
         if (frame == null) {
             ticket.errors.add(OcrError.INVALID_PROCESSOR);
             return;
         }
-        ticket.rectangle = imgProc.getCorners();
+        ticket.rectangle = procCopy.getCorners();
 
         if (IS_DEBUG_ENABLED) {
             endTime = System.nanoTime();
@@ -117,7 +121,8 @@ public class OcrManager {
         OcrUtils.log(1, "MANAGER: ", "Starting image analysis...");
         List<OcrText> texts = analyzer.analyze(frame); //Get main texts
         mainImage.setLines(texts); //save rect configuration in rawimage and Prepare scheme of the ticket
-        OcrUtils.listEverything(mainImage);
+        if (IS_DEBUG_ENABLED)
+            OcrUtils.listEverything(mainImage);
 
         Locale country = null, language = null;
         double languageScore = 0;
@@ -136,22 +141,24 @@ public class OcrManager {
 
         OcrTicket newTicket = new OcrTicket();
 
-        BigDecimal restoredAmount = null;
-        OcrText amountPriceText = null;
-        OcrText restoredAmountPriceText = null;
-        Scored<TicketScheme> bestTicket = null;
+        BigDecimal restoredAmount = null; //contains modified amount
+        OcrText amountPriceText = null; //text containing price for total
+        Scored<TicketScheme> bestTicketScheme = null; //ticket with highest score for amount (contains list of prices etc.)
+        Scored<TicketScheme> bestRestoredTicketScheme = null;
+        boolean editTotal = options.priceEditing.ordinal() >= PriceEditing.ALLOW_STRICT.ordinal();
         if (options.totalSearch != TotalSearch.SKIP) {
             /*
             Steps:
             1- search string in texts --> Data Analyzer --> Word Matcher
-            2- add score to chosen texts --> Score Func
-            3- if enabled redo ocr on source strip --> OcrAnalyzer
-            4- add score to target texts --> Score Func
-            5- decode amount from target texts --> Data Analyzer --> Word Matcher
-            6- decode restored amount from target texts --> Data Analyzer
-            7 - if enabled redo ocr on prices strip and update mainImage (take old prices rect and overwrite old texts)
-            8- check amount and restored amount against cash and products prices --> Amount Comparator
-            9- set restored amount retrieving best amount from amount comparator
+            2- detect language according to texts --> DataAnalyzer
+            3- add score to chosen texts --> Score Func
+            4- if enabled redo ocr on source strip (take old prices rect and overwrite old texts) --> OcrAnalyzer
+            5- add score to target texts --> ListAmountOrganizer --> Score Func
+            6- decode amount from target texts --> Data Analyzer --> Word Matcher
+            7- decode restored amount from target texts --> Data Analyzer
+            8- if enabled redo ocr on prices strip and update mainImage (take old prices rect and overwrite old texts) --> OcrAnalyzer todo
+            9- check amount and restored amount against cash and products prices --> Amount Comparator
+            10- set amount retrieving best ticket from amount comparator
              */
 
             List<Scored<Pair<OcrText, Locale>>> amountStringsWithLocale = DataAnalyzer.findAmountStringTexts(texts); //1
@@ -163,7 +170,7 @@ public class OcrManager {
 
             Scored<Locale> scoredLanguage = DataAnalyzer.getBestLanguage(asList(amountStringsWithLocale,
                     subtotalStringsWithLocale, cashStringsWithLocale, changeStringsWithLocale,
-                    coverStringsWithLocale, taxStringsWithLocale));
+                    coverStringsWithLocale, taxStringsWithLocale)); //2
             language = scoredLanguage.obj();
             languageScore = scoredLanguage.getScore();
 
@@ -176,67 +183,91 @@ public class OcrManager {
                 List<Scored<OcrText>> coverStrings = DataAnalyzer.filterForLanguage(coverStringsWithLocale, language);
                 List<Scored<OcrText>> taxStrings = DataAnalyzer.filterForLanguage(taxStringsWithLocale, language);
 
-                List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountStrings, mainImage); //2
-                Collections.sort(amountList, Collections.reverseOrder());
+                List<ListAmountOrganizer> amountList = DataAnalyzer.organizeAmountList(amountStrings, mainImage); //3
+                Collections.sort(amountList, Collections.reverseOrder()); //sort from highest to lowest score
                 if (!amountList.isEmpty()) {
-                    List<Scored<OcrText>> amountPrice;
+                    List<Scored<OcrText>> amountPrices;
                     int i = 0;
-                    int maxScan = (options.totalSearch == TotalSearch.EXTENDED_SEARCH ? 3 : 1);
-                    while (i < amountList.size()) {
+                    int maxScan = (options.totalSearch == TotalSearch.EXTENDED_SEARCH ? 3 : 1); //number of scans allowed
+                    while (i < amountList.size()) { //This goes on until I have a valid total (not restored). First restored total is not overwritten in the loop
                         OcrText amountStringText = amountList.get(i).getSourceText().obj();
-                        RectF stripBoundingBox = OcrAnalyzer.getAmountExtendedBox(amountStringText, mainImage.getWidth());
+                        RectF stripBoundingBox = OcrAnalyzer.getAmountExtendedBox(amountStringText, mainImage.getWidth()); //get rect optimized to find amount
                         if (options.totalSearch.ordinal() >= TotalSearch.DEEP.ordinal() && i <= maxScan) {
                             //Redo ocr on i element of list.
-                            amountPrice = analyzer.getTextsInStrip(imgProc, OcrUtils.imageToSize(mainImage), amountStringText, stripBoundingBox);//3
+                            amountPrices = analyzer.getTextsInStrip(procCopy, OcrUtils.imageToSize(mainImage), amountStringText, stripBoundingBox);//4
                         } else {
-                            //Use current texts to search target texts (with price)
-                            amountPrice = analyzer.getOrigTexts(amountStringText, stripBoundingBox);
+                            //Search total price using current texts
+                            amountPrices = analyzer.getOrigTexts(amountStringText, stripBoundingBox);
                         }
-                        //set target texts (lines) to first source text
-                        amountList.get(i).setAmountTargetTexts(amountPrice); //4
+                        //set target texts (prices) to source text (containing total string)
+                        amountList.get(i).setAmountTargetTexts(amountPrices); //5
                         AmountComparator amountComparator;
-                        Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), false); //5
+                        Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), false); //6
+                        //todo: Redo ocr on prices strip if enabled //8
                         if (amountT != null && newTicket.total == null) {
-                            newTicket.total = amountT.second;
-                            amountPriceText = amountT.first;
-                            amountComparator = new AmountComparator(newTicket.total, amountT.first, mainImage); //8
-                            bestTicket = amountComparator.getBestAmount(true);
-                            if (bestTicket != null) {
-                                OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
-                                        "\nwith scheme: " + bestTicket.obj().toString() + "\nand score: " + bestTicket.getScore());
+                            newTicket.total = amountT.second; //BigDecimal containing total price
+                            amountPriceText = amountT.first; //Text containing total price
+                            //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
+                            amountComparator = new AmountComparator(newTicket.total, amountT.first, mainImage); //9
+                            bestTicketScheme = amountComparator.getBestAmount(!editTotal); //editTotal == false => total is not overwritten, only scheme with a complete
+                            if (bestTicketScheme != null) {
+                                OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestTicketScheme.obj().getBestAmount().second.setScale(2, RoundingMode.HALF_UP) +
+                                        "\nwith scheme: " + bestTicketScheme.obj().toString() + "\nand score: " + bestTicketScheme.getScore());
                             } else {
                                 OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + newTicket.total.setScale(2, RoundingMode.HALF_UP));
                             }
                         }
-                        Pair<OcrText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //6
-                        //todo: Redo ocr on prices strip if enabled //7
-
-                        //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
-                        if (restoredAmountT != null && restoredAmount == null) {
-                            restoredAmount = restoredAmountT.second;
-                            restoredAmountPriceText = restoredAmountT.first;
-                            amountComparator = new AmountComparator(restoredAmount, restoredAmountT.first, mainImage);
-                            Scored<TicketScheme> bestRestoredTicket = amountComparator.getBestAmount(false);
-                            if (bestRestoredTicket != null) {
-                                OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredTicket.obj().getBestAmount().setScale(2, RoundingMode.HALF_UP) +
-                                        "\nwith scheme: " + bestRestoredTicket.obj().toString() + "\nand score: " + bestRestoredTicket.getScore());
-                                if (bestTicket == null || bestRestoredTicket.getScore() > bestTicket.getScore()) {
-                                    bestTicket = bestRestoredTicket; //choose total with highest score
+                        if (editTotal) {
+                            //use different method to decode a price, resulting price may be modified
+                            Pair<OcrText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //7
+                            if (restoredAmountT != null && bestRestoredTicketScheme == null) { //Do not find a new restored amount if one is already saved
+                                restoredAmount = restoredAmountT.second; //BigDecimal containing total price
+                                amountComparator = new AmountComparator(restoredAmount, restoredAmountT.first, mainImage); //9
+                                bestRestoredTicketScheme = amountComparator.getBestAmount(false); //editTotal true => can correct the result
+                                if (bestRestoredTicketScheme != null) {
+                                    OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredTicketScheme.obj().getBestAmount().second.setScale(2, RoundingMode.HALF_UP) +
+                                            "\nwith scheme: " + bestRestoredTicketScheme.obj().toString() + "\nand score: " + bestRestoredTicketScheme.getScore());
                                 }
                             }
                         }
-                        if (bestTicket != null)
-                            restoredAmount = bestTicket.obj().getBestAmount(); //9
                         if (newTicket.total != null)
                             break;
                         ++i;
                     }
-                    if (options.priceEditing == PriceEditing.ALLOW) {
-                        newTicket.total = restoredAmount;
-                        amountPriceText = restoredAmountPriceText;
+                } else if (options.priceEditing == PriceEditing.ALLOW_LOOSE) {
+                    //No matching word for total string. Try to find a price
+                    List<Scored<OcrText>> possiblePrices = Stream.of(mainImage.getPricesTexts())
+                            .map(price -> new Scored<>(ScoreFunc.getAmountScore(new Scored<>(0, price), mainImage), price))
+                            .toList();
+                    OcrUtils.log(2, "", "NO STRING FOR TOTAL FOUND");
+                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(possiblePrices, false);
+                    if (amountT != null && newTicket.total == null) {
+                        AmountComparator amountComparator = new AmountComparator(amountT.second, amountT.first, mainImage); //9
+                        Scored<TicketScheme> tempTicketScheme = amountComparator.getBestAmount(false);
+                        if (tempTicketScheme != null) {
+                            OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + tempTicketScheme.obj().getBestAmount().second.setScale(2, RoundingMode.HALF_UP) +
+                                    "\nwith scheme: " + tempTicketScheme.obj().toString() + "\nand score: " + tempTicketScheme.getScore());
+                            if (tempTicketScheme.getScore() > 1) { //This '1' will be changed later
+                                bestTicketScheme = tempTicketScheme; //At least one hit must be found
+                                newTicket.errors.add(OcrError.UNCERTAIN_TOTAL);
+                            }
+                        }
+                    }
+                }
+                if (editTotal) {
+                    if (bestRestoredTicketScheme != null) {
+                        //if (bestRestoredTicketScheme.getScore() > 1 && (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore())) { //This '1' will be changed later. Accept restored only if there is at least 1 hit
+                        if (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore()) {
+                            bestTicketScheme = bestRestoredTicketScheme; //choose scheme with highest score.
+                        }
+                    }
+                    if (bestTicketScheme != null) {
+                        newTicket.total = bestTicketScheme.obj().getBestAmount().second; //10
+                        amountPriceText = bestTicketScheme.obj().getBestAmount().first; //10
                         newTicket.errors.add(OcrError.TOTAL_EDITED);
                     }
                 }
+
                 ticket.containsCover = coverStrings.size() > 0;
                 if (amountPriceText != null) {
                     ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));
@@ -246,13 +277,19 @@ public class OcrManager {
 
         if (options.productsSearch != ProductsSearch.SKIP) {
             List<Pair<String, BigDecimal>> newProducts = null;
-            if (bestTicket != null) {
-                List<Pair<OcrText, BigDecimal>> prices = bestTicket.obj().getPricesList();
+            if (bestTicketScheme != null) {
+                List<Pair<OcrText, BigDecimal>> prices = bestTicketScheme.obj().getPricesList();
                 if (prices != null) {
                     newProducts = Stream.of(prices)
                             .map(price -> new Pair<>(Stream.of(analyzer.getTextsOnleft(price.first)) //get texts for product name and concatenate these texts
                                     .reduce("", (string, text) -> string + text.text() + " "), price.second))
                             .toList();
+                }
+                if (IS_DEBUG_ENABLED && newProducts != null) {
+                    OcrUtils.log(3, "LIST OF PRODUCTS:", "________________________________");
+                    for (Pair<String, BigDecimal> product : newProducts) {
+                        OcrUtils.log(3, "PRODUCT" , product.first + " with price: " + product.second.setScale(2, RoundingMode.HALF_UP));
+                    }
                 }
             }
             newTicket.products = newProducts;

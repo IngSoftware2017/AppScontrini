@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -68,12 +69,19 @@ public class BillActivity extends AppCompatActivity {
     Camera mCamera;
     ListView listView;
     ExportManager manager;
+    TextView title;
 
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int PICK_PHOTO_FOR_AVATAR = 2;
     static final int TICKET_MOD = 4;
     static final int MISSION_MOD = 5;
+
+    int textSize = 23;
+    int paddingLeft = 10;
+    int paddingTop = 40;
+    int paddingRight = 10;
+    int paddingBottom = 40;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +118,7 @@ public class BillActivity extends AppCompatActivity {
         initializeComponents();
     }
 
-    /** Dal Maso, Piccolo
+    /** Dal Maso, Piccolo, Mantovan
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
@@ -124,11 +132,42 @@ public class BillActivity extends AppCompatActivity {
                //Piccolo 
                 manager = new ExportManager(DB, getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getPath());
                 Log.d("export debug","click");
+                listView = new ListView(this);
                 ArrayList<String> formats=manager.exportTags();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item,formats);
-                builder.setTitle(R.string.text_ExportMission)
-                        .setAdapter(adapter,new DialogInterface.OnClickListener(){
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.dialog_export,R.id.txt,formats);
+                listView.setAdapter(adapter);
+                builder.setView(listView);
+
+                //Custom title
+                title = new TextView(this);
+                title.setText(R.string.text_Export);
+                title.setGravity(Gravity.CENTER_HORIZONTAL);
+                title.setTextSize(textSize);
+                title.setBackgroundResource(R.color.colorPrimary);
+                title.setTextColor(getResources().getColor(R.color.white));
+                title.setPadding(paddingLeft, paddingTop,paddingRight,paddingBottom);
+                builder.setCustomTitle(title);
+                //builder.setTitle(R.string.text_Export);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int which, long l) {
+                        try{
+                            Log.d("export debug",formats.get(which));
+                            ExportedFile exported = manager.exportMission(missionID,formats.get(which));
+                            Uri toExport = Uri.fromFile(exported.file);
+                            Intent shareIntent = new Intent();
+                            shareIntent.setAction(Intent.ACTION_SEND);
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, toExport);
+                            shareIntent.setType("file/"+formats.get(which));
+                            startActivity(Intent.createChooser(shareIntent,getResources().getString(R.string.text_ExportMissionTo)));
+                        }
+                        catch (ExportTypeNotSupportedException e){
+                            e.printStackTrace();
+                        }
+                    }});
+                /*builder.setAdapter(adapter,new DialogInterface.OnClickListener(){
                             public void onClick(DialogInterface dialog, int which) {
                                 try{
                                     Log.d("export debug",formats.get(which));
@@ -143,7 +182,7 @@ public class BillActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                 }
                             }
-                        });
+                        });*/
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
                 break;

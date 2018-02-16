@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -36,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import database.DataManager;
+import database.MissionEntity;
 import database.TicketEntity;
 
 /**
@@ -51,6 +53,7 @@ public class CheckPhotoActivity extends Activity {
     EditText checkName;
     EditText checkPrice;
     EditText checkPeople;
+    CheckBox checkRefundable;
     Bitmap finalBitmap;
     ProgressBar waitOCR;
     Button btnOK;
@@ -83,6 +86,7 @@ public class CheckPhotoActivity extends Activity {
         checkPeople = (EditText)findViewById(R.id.input_numPeople);
         checkName = (EditText)findViewById(R.id.input_checkName);
         btnRedo = (Button)findViewById(R.id.btnCheck_retry);
+        checkRefundable = (CheckBox)findViewById(R.id.check_Refundable);
         btnOK = (Button)findViewById(R.id.btnCheck_allow);
         waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
         waitOCR.setVisibility(View.VISIBLE);
@@ -140,7 +144,7 @@ public class CheckPhotoActivity extends Activity {
     private void startOCRProcess(){
         // OCR asynchronous implementation:
         ImageProcessor imgProc = new ImageProcessor(finalBitmap);
-        ocrManager.getTicket(imgProc, OcrOptions.getDefault(), result -> {
+        ocrManager.getTicket(imgProc, OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.ALLOW_LOOSE), result -> {
             //Thread UI control reservation
             runOnUiThread(new Runnable() {
                 @Override
@@ -183,11 +187,21 @@ public class CheckPhotoActivity extends Activity {
 
             TicketEntity thisTicket = new TicketEntity();
 
+            MissionEntity ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
+
             if(OCR_result.date == null)
-                thisTicket.setDate(Calendar.getInstance().getTime());
+                thisTicket.setDate(ticketMission.getStartDate());
             else
                 thisTicket.setDate(OCR_result.date);
+
             thisTicket.setTagPlaces(Short.parseShort(checkPeople.getText().toString()));
+
+            if(checkRefundable.isChecked()){
+                thisTicket.setRefundable(true);
+            }
+            else{
+                thisTicket.setRefundable(false);
+            }
             thisTicket.setFileUri(uri);
             try {
                 thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(checkPrice.getText().toString())));

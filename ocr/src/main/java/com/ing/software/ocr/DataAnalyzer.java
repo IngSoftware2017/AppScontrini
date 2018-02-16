@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 import com.annimon.stream.Stream;
 
-import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OperativeObjects.ScoreFunc.NUMBER_MIN_VALUE;
 import static java.util.Collections.*;
 import static java.util.Arrays.*;
 import static java.util.regex.Pattern.compile;
@@ -208,6 +208,7 @@ public class DataAnalyzer {
      * @param texts list of texts to analyze. Not null.
      * @return list of texts containing cash string with its score and language. Can be empty.
      */
+
     static List<Scored<Pair<OcrText, Locale>>> findCashStringTexts(List<OcrText> texts) {
         return findAllMatchesWithLanguage(texts, CASH_MATCHERS);
     }
@@ -229,6 +230,7 @@ public class DataAnalyzer {
     static List<Scored<Pair<OcrText, Locale>>> findCoverStringTexts(List<OcrText> texts) {
         return findAllMatchesWithLanguage(texts, COVER_MATCHERS);
     }
+
 
     /**
      * Get a list of texts where tax string is present
@@ -286,6 +288,7 @@ public class DataAnalyzer {
      * @author Michelon
      * Insert detected amount texts in a listAmountOrganizer
      * @param texts list of scored source texts
+     * @param mainImage source image
      * @return list of listAmountOrganizer containing source texts
      */
     static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts, RawImage mainImage) {
@@ -368,8 +371,6 @@ public class DataAnalyzer {
         List<Pair<OcrText, BigDecimal>> prices = findAllPricesRegex(Stream.of(texts).map(Scored::obj).toList(), advanced);
         if (prices.size() > 0)
             return prices.get(0);
-        //ZAGLIA: you should not return the first valid BigDecimal, you should evaluate all matches
-        // then choose one with a score function or reject all. Refer to TestFunctions.findAmountPrice
         return null;
     }
 

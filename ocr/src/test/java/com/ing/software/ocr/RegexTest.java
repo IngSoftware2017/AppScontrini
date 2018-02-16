@@ -5,9 +5,6 @@ import org.junit.Test;
 import java.util.regex.*;
 
 import static com.ing.software.ocr.DataAnalyzer.*;
-import static com.ing.software.ocr.OcrVars.POTENTIAL_PRICE;
-import static com.ing.software.ocr.OcrVars.PRICE_UPSIDEDOWN;
-import static com.ing.software.ocr.OcrVars.PRICE_WITH_SPACES;
 import static org.junit.Assert.*;
 
 /**
@@ -24,10 +21,12 @@ public class RegexTest {
         }
     }
 
+    /*
     @Test
     public void dateDmyTest1() {
         assertEquals(null, match(DATE_DMY, "abc"));
     }
+    */
 
     @Test
     public void potentialPriceTest1() {
