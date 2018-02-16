@@ -1,25 +1,24 @@
 package com.ing.software.ocr;
 
-import android.graphics.*;
+import android.graphics.PointF;
+import android.graphics.RectF;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 import android.util.SizeF;
 
+import com.annimon.stream.function.*;
 import com.annimon.stream.Stream;
 import com.ing.software.common.*;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.*;
-import org.opencv.core.Size; // resolve conflict
-import org.opencv.core.Point; // resolve conflict
-import org.opencv.core.Rect; // resolve conflict
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.annimon.stream.function.*;
 
 import static org.opencv.android.Utils.bitmapToMat;
 import static org.opencv.core.Core.*;
@@ -64,8 +63,7 @@ import static com.ing.software.common.CommonUtils.*;
  * @author Riccardo Zaglia
  */
 /*
- * I used only pivate-static and public methods to avoid side effects that increase complexity.
- * I'm sticking to the one-purpose-method rule.
+ * To limit the complexity of the code, I referenced instance fields only in public methods and all private methods are static.
  */
 public class ImageProcessor {
 
@@ -99,7 +97,7 @@ public class ImageProcessor {
     private static Mat ERODE_KER; // assigned in the static block
 
     //Median kernel size
-    private static final int MED_SZ = 7; // must be odd
+    private static final int MED_SZ = 7; // must be odd because it defines the kernel size
 
     //Enclose border thickness
     private static final int MRG_THICK = 2;
@@ -113,37 +111,36 @@ public class ImageProcessor {
     private static final int MAX_SECTOR_DIST = SECTORS / 10; // max distance from best sector
     // that separate inliers from outliers
     private static final double MIN_CONFIDENCE = 0.7; // ratio of inlier lines score
-    private static final int MIN_LINES = 5;
+    private static final int MIN_LINES = 5; // minimum number of lines to accept computed ticket rotation angle.
     // the best angle found is accepted if in the 2 / 10 of all sectors are concentrated half of all lines
 
     //Hough lines
     private static final double DIST_RES = 1; // rho, resolution in hough space
     private static final double ANGLE_RES = PI / SECTORS; // theta, resolution in hough space
     private static final int HOUGH_THRESH = 50; // threshold
-    private static final int HOUGH_MIN_LEN = 40;
-    private static final int HOUGH_MAX_GAP = 5;
+    private static final int HOUGH_MIN_LEN = 40; // line minimum length
+    private static final int HOUGH_MAX_GAP = 5; // maximum gap before connecting two lines into one line
 
     // Maximum number of contours to analyze
     private static final int MAX_CONTOURS = 2;
 
     // factor that determines maximum distance of detected contour from rectangle
-    //private static final double polyMaxErrMul = 0.02;
     private static final int POLY_MAX_ERR = 50;
 
+    //Ticket is crooked if rotation from vertical is more than threshold.
     private static final double CROOCKED_THRESH = 60.;
 
     // margin for OCR analysis
     private static final double OCR_MARGIN_MUL = 0.05;
 
-    // Score values
+    //Score values
     private static final double SCORE_AREA_MUL = 0.001;
     private static final double SCORE_RECT_FOUND = 1;
 
-    //
-    private static final double BG_CONTRAST_THRESHOLD = 0.9;
+    //Background contrast is poor if is less than threshold.
+    private static final double BG_CONTRAST_THRESH = 0.9;
 
 
-    // Anything inside here is run once per app execution and before any other code.
     static {
         if (OpenCVLoader.initDebug()) {
             // assign ERODE_KER kernel from ERODE_KER_DATA.
@@ -165,7 +162,9 @@ public class ImageProcessor {
      * @return List of OpenCV points.
      */
     private static List<Point> androidPtsToCV(List<PointF> points) {
-        return Stream.of(points).map(p -> new Point(p.x, p.y)).toList();
+        return Stream.of(points)
+                .map(p -> new Point(p.x, p.y))
+                .toList();
     }
 
     /**
@@ -174,7 +173,9 @@ public class ImageProcessor {
      * @return List of Android points.
      */
     private static List<PointF> cvPtsToAndroid(List<Point> points) {
-        return Stream.of(points).map(p -> new PointF((float)p.x, (float)p.y)).toList();
+        return Stream.of(points)
+                .map(p -> new PointF((float)p.x, (float)p.y))
+                .toList();
     }
 
     /**
@@ -182,11 +183,15 @@ public class ImageProcessor {
      * @param pts List of points
      * @return MatOfPoints2f
      */
-    @NonNull
     private static MatOfPoint2f ptsToMat(List<Point> pts) {
         return new MatOfPoint2f(pts.toArray(new Point[pts.size()]));
     }
 
+    /**
+     * Decompose a rect into a list of its vertices, ordered counter-clockwise from top-left vertex.
+     * @param rect rectangle. Not null.
+     * @return MatOfPoint2f containing the rectangle vertices
+     */
     private static MatOfPoint2f rectToPtsMat(Rect rect) {
         return new MatOfPoint2f(
                 rect.tl(),
@@ -207,13 +212,14 @@ public class ImageProcessor {
     }
 
     /**
-     *
-     * @param inpSize
-     * @param shortSide
-     * @return
+     * Calculate a new scaled size of an image in order to have the shortest side of length "shortSide"
+     * and the same aspect ratio of the original image.
+     * @param imgSize image size
+     * @param shortSide length of short side
+     * @return new size.
      */
-    private static Size calcScaledSize(Size inpSize, double shortSide) {
-        double aspectRatio = inpSize.width / inpSize.height;
+    private static Size calcScaledSize(Size imgSize, double shortSide) {
+        double aspectRatio = imgSize.width / imgSize.height;
         // find the shortest dimension, set it to "shortSide" and set the other dimension in order to
         // keep the original aspect ratio
         return aspectRatio < 1 ? new Size(shortSide, shortSide / aspectRatio)
@@ -447,8 +453,11 @@ public class ImageProcessor {
 
     private static int getTopLeftCornerIdx(MatOfPoint2f corners) {
         //find index of point closer to top-left corner of image (using taxicab distance).
-        return min(Stream.of(corners.toList())
-                .mapIndexed((i, p) -> new Scored<>(p.x + p.y, i)).toList()).obj();
+        return min(
+                Stream.of(corners.toList())
+                        .mapIndexed((i, p) -> new Scored<>(p.x + p.y, i))
+                        .toList()
+        ).obj();
     }
 
     /**
@@ -512,6 +521,22 @@ public class ImageProcessor {
     }
 
     /**
+     * Get convex hull of a contour.
+     * @param contour MatOfPoint containing the contour. Not null.
+     * @return MatOfPoint2f containing the convex hull.
+     */
+    private static MatOfPoint2f convexHull(MatOfPoint contour) {
+        MatOfInt indices = new MatOfInt();
+        Imgproc.convexHull(contour, indices);
+        Point[] contourPts = contour.toArray();
+        return ptsToMat(
+                Stream.of(indices.toList())
+                        .map(idx -> contourPts[idx])
+                        .toList()
+        );
+    }
+
+    /**
      * Get a score proportional to exposure
      * @param img gray Mat. Not null
      * @param contour contour containing the ticket
@@ -540,9 +565,9 @@ public class ImageProcessor {
 
     /**
      * Get a score proportional to contrast relative to background
-     * @param rect perspective rectangle containing the ticket
-     * @param contour contour containing the ticket
-     * @return contrast value in range [0, 1], higher is better
+     * @param rect perspective rectangle containing the ticket. Not null.
+     * @param contour contour containing the ticket. Not null.
+     * @return contrast value in range [0, 1], higher is better.
      */
     //Problem: Sometimes, if the contrast of the ticket with background is poor, the contour bleeds
     // into the background. Sometimes if the text is too close to the edge of the ticket, a carving
@@ -573,6 +598,13 @@ public class ImageProcessor {
         return contours.size() > 0 ? contours.get(0) : null;
     }
 
+    /**
+     * Compute margin from image size.
+     * @param width width of image
+     * @param height height of image
+     * @param marginMul margin multiplier
+     * @return margin length
+     */
     private static double getMargin(double width, double height, double marginMul) {
         return marginMul * min(width, height);
     }
@@ -632,14 +664,14 @@ public class ImageProcessor {
     }
 
     /**
-     *
-     * @param imgSize
-     * @param marginMul
-     * @return
+     * Get original rectangle of an image which has been added a margin.
+     * @param imgSize size of image with margin
+     * @param marginMul margin multiplier used to add margin to imgSize
+     * @return image rectangle without margin
      */
     private static RectF removeMargin(SizeF imgSize, double marginMul) {
-        return rectFromSize(new SizeF(imgSize.getWidth() / (float) (1. + OCR_MARGIN_MUL),
-                imgSize.getWidth() / (float) (1. + OCR_MARGIN_MUL)));
+        return rectFromSize(new SizeF(imgSize.getWidth() / (float) (1. + marginMul),
+                imgSize.getWidth() / (float) (1. + marginMul)));
     }
 
     /**
@@ -738,6 +770,7 @@ public class ImageProcessor {
     //PUBLIC:
 
     /**
+     * New ImageProcessor.
      * To make this {@link ImageProcessor} instance valid, you still need to call {@link #setImage(Bitmap)}.
      */
     public ImageProcessor() {}
@@ -851,7 +884,7 @@ public class ImageProcessor {
                 errors.add(IPError.UNCERTAIN_DIRECTION);
             if (abs(winner.angle) > CROOCKED_THRESH)
                 errors.add(IPError.CROOKED_TICKET);
-            if (winner.backgroundContrast < BG_CONTRAST_THRESHOLD)
+            if (winner.backgroundContrast < BG_CONTRAST_THRESH)
                 errors.add(IPError.POOR_BG_CONTRAST);
         } else {
             errors.add(IPError.INVALID_CORNERS);
@@ -932,9 +965,7 @@ public class ImageProcessor {
      *                    <ul> Positive: clockwise </ul>
      *                    <ul> Negative: counter clockwise </ul>
      */
-    public void rotate(int angle90step) {
-        corners = shiftMatPoints(corners, angle90step);
-    }
+    public void rotate(int angle90step) { corners = shiftMatPoints(corners, angle90step); }
 
 
     //UTILITY FUNCTIONS:

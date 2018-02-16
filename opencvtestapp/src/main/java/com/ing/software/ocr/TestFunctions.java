@@ -24,6 +24,8 @@ import java.util.Locale;
 
 import static com.ing.software.common.CommonUtils.rectFromSize;
 import static com.ing.software.common.CommonUtils.size;
+import static com.ing.software.ocr.DataAnalyzer.POTENTIAL_PRICE;
+import static com.ing.software.ocr.DataAnalyzer.PRICE_UPSIDEDOWN;
 import static com.ing.software.ocr.OcrVars.*;
 import static java.lang.Math.abs;
 import static java.util.Collections.max;
@@ -101,20 +103,6 @@ public class TestFunctions {
                 bmSize.getWidth(), amountStr.box().centerY() + halfHeight);
     }
 
-    /**
-     * Create a new bitmap optimized for amount price, from the amount rectangle
-     * @param imgProc
-     * @param bmSize
-     * @param amountStr
-     * @param srcRect
-     * @return
-     */
-    private static Bitmap getAmountStrip(
-            ImageProcessor imgProc, SizeF bmSize, OcrText amountStr, RectF srcRect) {
-        return imgProc.undistortedSubregion(bmSize, srcRect,
-                srcRect.width() / srcRect.height() * CHAR_ASPECT_RATIO
-                        / (amountStr.charWidth() / amountStr.charHeight()));
-    }
 
     /**
      * Get all texts that are potentially prices, but could be corrupt
@@ -126,6 +114,7 @@ public class TestFunctions {
         //I do not use sanitized strings because they easily matches at random.
         // So there could be some texts that are matched by certainPrices but not by this
         //todo: discuss decision
+
         return Stream.of(lines).filter(line -> POTENTIAL_PRICE.matcher(line.textNoSpaces()).find()).toList();
     }
 
@@ -200,7 +189,7 @@ public class TestFunctions {
 //            ticket.total = findAmountPrice(amountLinesBmSpace, amountStr, srcAmountStripRect);
 //        }
 //        if (ticket.total == null)
-//            ticket.errors.add(OcrError.AMOUNT_NOT_FOUND);
+//            ticket.errors.add(OcrError.TOTAL_NOT_FOUND);
 //
 //        List<Pair<OcrText, Date>> dates = invoke((lines);
 //        if (dates.size() == 1) {

@@ -8,7 +8,6 @@ import java.util.Locale;
  * Object passed to the manager to avoid performing unnecessary operations
  * and consequently reduce time (time depends primarily on image scale)
  */
-
 public class OcrOptions {
 
     //NB: the flags inside these enums are ordered in a certain way to make use of ordinal().
@@ -86,13 +85,14 @@ public class OcrOptions {
         ALLOW_UPSIDE_DOWN,
 
         FORCE_UPSIDE_DOWN,
+
     }
 
-    public enum Edit {
+    public enum PriceEditing {
 
         SKIP,
 
-        ALLOW_TOTAL_EDIT,
+        ALLOW,
     }
 
     private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
@@ -101,15 +101,16 @@ public class OcrOptions {
     private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.DEEP;
     private static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
     private static final Locale DEFAULT_COUNTRY = Locale.ITALY;
-    private static final Edit DEFAULT_EDIT = Edit.SKIP;
+    private static final PriceEditing DEFAULT_EDIT = PriceEditing.SKIP;
+
 
     Resolution resolution = Resolution.NORMAL;
     TotalSearch totalSearch = TotalSearch.SKIP;
     DateSearch dateSearch = DateSearch.SKIP;
     ProductsSearch productsSearch = ProductsSearch.SKIP;
     Orientation orientation = Orientation.NORMAL;
-    Locale suggestedCountry = DEFAULT_COUNTRY;
-    Edit allowEdit = DEFAULT_EDIT;
+    PriceEditing priceEditing = DEFAULT_EDIT;
+    Locale suggestedCountry = null;
 
     /**
      * Return default Options
@@ -176,21 +177,24 @@ public class OcrOptions {
     }
 
     /**
-     * Set suggested country.
-     * @param locale ISO country
+     * Set suggested country, used to resolve ambiguities.
+     * Can be extracted from current location or location history.
+     * @param country ISO locale country
      * @return OcrOptions instance
      */
-    public OcrOptions suggestedCountry(Locale locale) {
-        suggestedCountry = locale;
+    public OcrOptions suggestedCountry(Locale country) {
+        suggestedCountry = country;
         return this;
     }
 
-    public OcrOptions allowEdit(Edit allowEdit) {
-        this.allowEdit = allowEdit;
+    public OcrOptions priceEditing(PriceEditing edit) {
+        priceEditing = edit;
         return this;
     }
 
-    double getResolutionMultiplier() {
-        return 1. / (resolution.ordinal() + 1);
-    }
+    /**
+     * Translate resolution enum value into a numeric multiplier
+     * @return multiplier
+     */
+    double getResolutionMultiplier() { return 1. / (resolution.ordinal() + 1); }
 }
