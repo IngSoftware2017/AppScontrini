@@ -4,7 +4,7 @@ import java.util.Locale;
 
 /**
  * @author Michelon
- * @author EDIT: Zaglia
+ * @author Zaglia
  * Object passed to the manager to avoid performing unnecessary operations
  * and consequently reduce time (time depends primarily on image scale)
  */
@@ -32,6 +32,9 @@ public class OcrOptions {
 
     public enum DateSearch {
 
+        /**
+         * Skip search
+         */
         SKIP,
 
         /**
@@ -42,6 +45,9 @@ public class OcrOptions {
 
     public enum TotalSearch {
 
+        /**
+         * Skip search
+         */
         SKIP,
 
         /**
@@ -50,18 +56,21 @@ public class OcrOptions {
         NORMAL,
 
         /**
-         * Redo ocr on target strip
+         * Redo ocr on amount strip
          */
         DEEP,
 
         /**
-         * Redo search if first amount target is not a valid amount (up to 3 searches).
+         * Redo search if first scan did not find any valid price (up to 3 searches).
          */
         EXTENDED_SEARCH,
     }
 
     public enum ProductsSearch {
 
+        /**
+         * Skip search
+         */
         SKIP,
 
         /**
@@ -70,13 +79,16 @@ public class OcrOptions {
         NORMAL,
 
         /**
-         * Redo ocr on target strip
+         * Redo ocr on prices strip
          */
         DEEP,
     }
 
     public enum Orientation {
 
+        /**
+         * Scan image as passed
+         */
         NORMAL,
 
         /**
@@ -84,15 +96,29 @@ public class OcrOptions {
          */
         ALLOW_UPSIDE_DOWN,
 
+        /**
+         * Force scan on upside down image
+         */
         FORCE_UPSIDE_DOWN,
 
     }
 
     public enum PriceEditing {
 
+        /**
+         * Do not try to edit first detected price
+         */
         SKIP,
 
-        ALLOW,
+        /**
+         * Allow edit of price, if a more suitable price was decoded from structure
+         */
+        ALLOW_STRICT,
+
+        /**
+         * Allow edit of price and try to find a price if no text matched an amount string
+         */
+        ALLOW_LOOSE,
     }
 
     private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
@@ -138,7 +164,7 @@ public class OcrOptions {
 
     /**
      * Set total search criteria
-     * @param criteria
+     * @param criteria how to search total
      * @return OcrOptions instance
      */
     public OcrOptions total(TotalSearch criteria) {
@@ -148,7 +174,7 @@ public class OcrOptions {
 
     /**
      * Set date search criteria
-     * @param criteria
+     * @param criteria how to search date
      * @return OcrOptions instance
      */
     public OcrOptions date(DateSearch criteria) {
@@ -158,7 +184,7 @@ public class OcrOptions {
 
     /**
      * Set products search criteria
-     * @param criteria
+     * @param criteria how to search products
      * @return OcrOptions instance
      */
     public OcrOptions products(ProductsSearch criteria) {
@@ -168,7 +194,7 @@ public class OcrOptions {
 
     /**
      * Set orientation criteria
-     * @param criteria
+     * @param criteria how to set orientation
      * @return OcrOptions instance
      */
     public OcrOptions orientation(Orientation criteria) {
@@ -187,6 +213,11 @@ public class OcrOptions {
         return this;
     }
 
+    /**
+     * Set permission to edit total
+     * @param edit permission to edit total
+     * @return OcrOptions instance
+     */
     public OcrOptions priceEditing(PriceEditing edit) {
         priceEditing = edit;
         return this;

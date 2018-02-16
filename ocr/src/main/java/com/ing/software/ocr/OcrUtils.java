@@ -21,7 +21,7 @@ public class OcrUtils {
 
     /**
      * @author Michelon
-     * Logs messages only if debug is enabled
+     * Logs messages only if debug variable is enabled
      * @param level int >= 0, only messages with level <= LOG_LEVEL are logged
      * @param tag tag of the message to log, must be less than 24 chars long
      * @param message message to log
@@ -32,7 +32,7 @@ public class OcrUtils {
     }
 
     /**
-     * List in debug log blocks parsed
+     * List blocks parsed in debug log
      * @param rawImage image containing blocks
      */
     static void listEverything(@NonNull RawImage rawImage) {

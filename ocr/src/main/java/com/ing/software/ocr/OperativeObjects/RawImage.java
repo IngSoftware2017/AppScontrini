@@ -18,8 +18,7 @@ import static com.ing.software.ocr.OperativeObjects.OcrSchemer.*;
  * Class to store only useful properties of source images and scheme of ticket
  * How to use:
  * - initialize with constructor
- * - call setLines() passing a list of all Texts
- * - call OcrSchemer.prepareScheme()
+ * - call setLines() passing a list of all Texts detected
  * - now you can use the others methods in this class
  * @author Michelon
  */
@@ -52,17 +51,24 @@ public class RawImage {
         width = bitmap.getWidth();
     }
 
+    /**
+     * @return source image height
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * @return source image width
+     */
     public int getWidth() {
         return width;
     }
 
     /**
-     * Must be called only once when initialized.
-     * @param texts list of rawTexts. Not null.
+     * @author Michelon
+     * Must be called once before anything else.
+     * @param texts list of Texts. Not null.
      */
     public void setLines(@NonNull List<OcrText> texts) {
         allTexts = texts;
@@ -76,6 +82,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call setLines() before.
      * @return rect containing all texts
      */
@@ -84,6 +91,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call setLines() before.
      * @return average rect height of texts
      */
@@ -92,6 +100,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call setLines() before.
      * @return average char height of texts
      */
@@ -100,6 +109,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call setLines() before.
      * @return average char width of texts
      */
@@ -108,6 +118,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call setLines() before.
      * @return list of all texts
      */
@@ -116,6 +127,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
      * @return list of Intro Texts
      */
@@ -125,14 +137,16 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
-     * @return rect containing all Intro texts.
+     * @return rect containing all Intro texts. Fake rect if no text has intro tag.
      */
     public RectF getIntroRect() {
         return introRect != null? introRect : new RectF(0, 0, width, 0);
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
      * @return list of Products Texts
      */
@@ -142,14 +156,16 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
-     * @return rect containing all Products texts.
+     * @return rect containing all Products texts. Fake rect if no text has products tag.
      */
     public RectF getProductsRect() {
         return productsRect != null? productsRect : new RectF(0, getIntroRect().bottom, width/2, getConclusionRect().top);
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
      * @return list of Prices Texts
      */
@@ -159,14 +175,16 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
-     * @return rect containing all Prices texts.
+     * @return rect containing all Prices texts. Fake rect if no text has prices tag.
      */
     public RectF getPricesRect() {
         return pricesRect != null? pricesRect : new RectF(width/2, getIntroRect().bottom, width, getConclusionRect().top);
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
      * @return list of Conclusion Texts
      */
@@ -176,14 +194,16 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Must call textFitter() before.
-     * @return rect containing all Conclusion texts.
+     * @return rect containing all Conclusion texts. Fake rect if no text has conclusion tag.
      */
     public RectF getConclusionRect() {
         return conclusionRect != null? conclusionRect : new RectF(0, height, width, height);
     }
 
     /**
+     * @author Michelon
      * Finds the average height in a list of lines
      * @return average height
      */
@@ -195,6 +215,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Finds the average char height in a list of lines
      * @return average char height
      */
@@ -206,6 +227,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Finds the average char width in a list of lines
      * @return average char width
      */
@@ -217,8 +239,9 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Keeps a list of all rawTexts divided by tag.
-     * Must be used only once and after setLines() has been called and tags have been set (OcrSchemer.prepareScheme).
+     * Must be used only when you set texts for the first time.
      */
     private void textFitter() {
         //Remove old lists
@@ -243,7 +266,9 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Get rect containing all lines detected
+     * @param texts list of texts. Not null.
      * @return Rect containing all texts passed
      */
     private RectF getMaxRectBorders(List<OcrText> texts) {
@@ -267,6 +292,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Override a text with a new one
      * @param oldText old text to remove
      * @param newText new text to insert
@@ -295,6 +321,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Remove a text from all lists
      * @param oldText text to remove
      */
@@ -312,6 +339,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Remove all texts inside passed rect from all lists
      * @param rect rect containing texts to remove
      */
@@ -334,7 +362,8 @@ public class RawImage {
     }
 
     /**
-     * Add text to lists
+     * @author Michelon
+     * Add text to lists. Text must be tagged.
      * @param newText text to add according to its tag
      */
     public void addText(OcrText newText) {
@@ -355,6 +384,7 @@ public class RawImage {
     }
 
     /**
+     * @author Michelon
      * Add tag to text according to its position (must call textFitter before)
      * @param text text to tag
      * @return text with added tag

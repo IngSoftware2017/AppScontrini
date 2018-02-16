@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * @author Michelon
  * Keep ordered list of possible results from string search.
  * Now it's redundant. Will be removed.
  */
@@ -24,6 +25,7 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
     /**
      * Constructor.
      * @param source source text containing string
+     * @param mainImage source image
      */
     public ListAmountOrganizer(Scored<OcrText> source, RawImage mainImage) {
         source.setScore(ScoreFunc.getSourceAmountScore(source, mainImage));
@@ -32,7 +34,7 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
     }
 
     /**
-     * Set target texts for current source.
+     * Set target texts for current source and score them.
      * @param targets list of target texts. Not null.
      */
     public void setAmountTargetTexts(@NonNull List<Scored<OcrText>> targets) {
@@ -44,10 +46,16 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
         Collections.sort(targetTexts, Collections.reverseOrder()); //higher score comes first
     }
 
+    /**
+     * @return current source text (contains source string)
+     */
     public Scored<OcrText> getSourceText() {
         return sourceText;
     }
 
+    /**
+     * @return current ordered target texts
+     */
     public List<Scored<OcrText>> getTargetTexts() {
         return targetTexts;
     }

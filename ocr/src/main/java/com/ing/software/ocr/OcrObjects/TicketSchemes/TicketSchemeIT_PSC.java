@@ -30,7 +30,14 @@ public class TicketSchemeIT_PSC implements TicketScheme{
     private int NO_MATCH = 1;
     private final int FOUR_VALUES = 100;
 
+    /**
+     * Constructor
+     * @param total pair containing total and its text. Element of the pair may be null, not the pair itself.
+     * @param aboveTotal texts above price. Not null. Ordered from top to bottom.
+     * @param belowTotal list of prices below total. Not null. Ordered from top to bottom.
+     */
     public TicketSchemeIT_PSC(Pair<OcrText, BigDecimal> total, @NonNull List<Pair<OcrText, BigDecimal>> aboveTotal, @NonNull List<BigDecimal> belowTotal) {
+        bestAmount = total;
         this.total = total.second;
         this.totalText = total.first;
         if (!aboveTotal.isEmpty())
@@ -71,7 +78,8 @@ public class TicketSchemeIT_PSC implements TicketScheme{
     }
 
     /**
-     * @return scored total if it follows this ticket scheme, null otherwise
+     * This method checks if the ticket follows this scheme. It does not modify the amount.
+     * @return max scored total if it follows this ticket scheme, min scored total otherwise
      */
     private Scored<Pair<OcrText, BigDecimal>> strictBestAmount() {
         if (products != null && total != null && cash != null && subtotal != null) {
@@ -85,12 +93,15 @@ public class TicketSchemeIT_PSC implements TicketScheme{
             if (productsSum.compareTo(total) == 0 && cash.compareTo(total) == 0 && subtotal != null){
                 acceptedList = true;
                 return new Scored<>(FOUR_VALUES, new Pair<>(totalText, total));
+            } else {
+                acceptedList = false;
             }
         }
         return new Scored<>(NO_MATCH, new Pair<>(totalText, total));
     }
 
     /**
+     * This method tries to find the best amount considering all combinations of matches.
      * @return best amount according to arbitrary decisions
      */
     private Scored<Pair<OcrText, BigDecimal>> looseBestAmount() {

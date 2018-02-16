@@ -25,13 +25,12 @@ import static com.ing.software.ocr.OcrUtils.extendRect;
 /**
  * Class used only to perform ocr-library related operations or Text search. No more no less.
  */
-//ZAGLIA: Consider moving this into OperativeObjects
 public class OcrAnalyzer {
 
     // ideal character width / height
     private static final double CHAR_ASPECT_RATIO = 5. / 8.;
     private static final float AMOUNT_RECT_HEIGHT_EXTENDER = 0.7f; //Extend height of source amount text. Used in OcrAnalyzer.getAmountExtendedBox()
-    private static final float PRODUCT_RECT_HEIGHT_EXTENDER = 0.5f; //Extend height of source text of product price.
+    private static final float PRODUCT_RECT_HEIGHT_EXTENDER = 0.5f; //Extend height of source text of product price. Used when trying to find products from prices.
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
@@ -72,7 +71,6 @@ public class OcrAnalyzer {
      *
      * Run the ocr detection on the given bitmap.
      * @param bm input bitmap
-     * //@param ocrEngine TextRecognizer
      * @return list of OcrText
      */
     List<OcrText> analyze(@NonNull Bitmap bm){
@@ -107,9 +105,6 @@ public class OcrAnalyzer {
     private static List<OcrText> getTexts(@NonNull SparseArray<TextBlock> origTextBlocks) {
         List<OcrText> texts = new ArrayList<>();
         for (int i = 0; i < origTextBlocks.size(); ++i) {
-            //for (Text currentText : origTextBlocks.valueAt(i).getComponents()) {
-            //    texts.add(new OcrText(currentText));
-            //}
             TextBlock block = origTextBlocks.valueAt(i);
             for (Text text : block.getComponents()) {
                 OcrUtils.log(7, "GETTEXTS: ", "Text: " + text.getValue());
@@ -164,7 +159,7 @@ public class OcrAnalyzer {
                                     .toList();
         mainImage.removeText(extendedRect);
         for (OcrText text : newTexts)
-            mainImage.addText(text); //can't be added directly to the stream as I'd lose rects configuration
+            mainImage.addText(text); //can't be added directly to the stream as I'd lose rects configuration in rawImage
         OcrUtils.log(3, "replaceTexts", "NEW REPLACED TEXTS");
         if (IS_DEBUG_ENABLED)
             OcrUtils.listEverything(mainImage);
@@ -178,7 +173,7 @@ public class OcrAnalyzer {
      * @param processor processor containing source image
      * @param origBmSize original bitmap size
      * @param amountStringText source text containing amount string
-     * //@param stripRect strip bounding box in original bitmap space
+     * @param stripRect strip bounding box in original bitmap space
      * @return list of scored texts containing decoded values
      */
     List<Scored<OcrText>> getTextsInStrip(ImageProcessor processor, SizeF origBmSize, OcrText amountStringText, RectF stripRect) {
@@ -189,8 +184,10 @@ public class OcrAnalyzer {
                 .map(text -> new Scored<>(ScoreFunc.getDistFromSourceScore(amountStringText, text), text))
                 .sorted(Collections.reverseOrder())
                 .toList();
-        for (Scored<OcrText> tt : texts) {
-            OcrUtils.log(3, "getTextsInStrip: " , "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
+        if (IS_DEBUG_ENABLED) {
+            for (Scored<OcrText> tt : texts) {
+                OcrUtils.log(3, "getTextsInStrip: ", "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
+            }
         }
         replaceTexts(texts, stripRect);
         return texts;
@@ -198,7 +195,6 @@ public class OcrAnalyzer {
 
     /**
      * @author Michelon
-     *
      * Get original texts from extended amount rect
      * @param amountText text containing amount string
      * @param extendedRect rect where to find texts
@@ -220,8 +216,7 @@ public class OcrAnalyzer {
 
     /**
      * @author Michelon
-     *
-     * Get all texts on left of source text
+     * Get all texts on left of source text, extended on height by PRODUCT_RECT_HEIGHT_EXTENDER
      * @param source source product price rect
      * @return list of texts on left of source rect
      */

@@ -4,7 +4,6 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.Pair;
-import android.util.SizeF;
 
 import com.annimon.stream.Stream;
 import com.google.android.gms.vision.text.Element;

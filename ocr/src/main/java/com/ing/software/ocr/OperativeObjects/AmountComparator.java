@@ -23,15 +23,13 @@ import static com.ing.software.ocr.OperativeObjects.ScoreFunc.NUMBER_MIN_VALUE;
 public class AmountComparator {
 
     private List<TicketScheme> acceptedSchemes = new ArrayList<>();
-    private RawImage mainImage;
 
     /**
      * @author Michelon
      * Constructor, check amount against a defined scheme
      * @param scheme scheme to use to check amount
      */
-    public AmountComparator(TicketScheme scheme, RawImage mainImage) {
-        this.mainImage = mainImage;
+    public AmountComparator(TicketScheme scheme) {
         acceptedSchemes.add(scheme);
     }
 
@@ -40,8 +38,7 @@ public class AmountComparator {
      * Constructor, check amount against a list of schemes
      * @param schemes list of schemes to use to check amount
      */
-    public AmountComparator(List<TicketScheme> schemes, RawImage mainImage) {
-        this.mainImage = mainImage;
+    public AmountComparator(List<TicketScheme> schemes) {
         acceptedSchemes.addAll(schemes);
     }
 
@@ -49,17 +46,18 @@ public class AmountComparator {
      * @author Michelon
      * Constructor, check amount against all schemes
      * @param amount BigDecimal containing decoded amount.
+     * @param amountText text containing amount price
+     * @param mainImage source rawImage
      */
     public AmountComparator(BigDecimal amount, OcrText amountText, RawImage mainImage) {
-        this.mainImage = mainImage;
-        acceptedSchemes = getAllSchemes(new Pair<>(amountText, amount), getAboveTotalPrices(amountText), getBelowTotalPrices(amountText));
+        acceptedSchemes = getAllSchemes(new Pair<>(amountText, amount), getAboveTotalPrices(amountText, mainImage), getBelowTotalPrices(amountText, mainImage));
     }
 
     /**
      * @author Michelon
      * Retrieves amount with highest score from ticket schemes
-     * @param strict true if you want only a confirm of the amount, false if you want the amount with highest score
-     * @return amount with highest score, it's score and the ticket used. Null if no valid amount was found.
+     * @param strict true if you want only a confirm of the amount, false if you want the price with highest score
+     * @return ticket containing amount with highest score. Null if no valid amount was found.
      */
     public Scored<TicketScheme> getBestAmount(boolean strict) {
         List<Scored<TicketScheme>> bestAmounts = Stream.of(acceptedSchemes)
@@ -73,9 +71,12 @@ public class AmountComparator {
     /**
      * @author Michelon
      * Analyze the list of products from OcrSchemer and convert accepted values as bigdecimal
+     * @param amountText text containing amount price. Not null.
+     * @param mainImage source rawImage
      * @return list of bigDecimal and texts of numbers above total
      */
-    private List<Pair<OcrText, BigDecimal>> getAboveTotalPrices(OcrText amountText) {
+    private List<Pair<OcrText, BigDecimal>> getAboveTotalPrices(OcrText amountText, RawImage mainImage) {
+        Collections.sort(mainImage.getPricesTexts());
         return Stream.of(mainImage.getPricesTexts())
                 .filter(price -> price.box().centerY() < amountText.box().centerY())
                 .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.sanitizedNum()) < NUMBER_MIN_VALUE)
@@ -88,9 +89,12 @@ public class AmountComparator {
     /**
      * @author Michelon
      * Analyze the list of products from OcrSchemer and convert accepted values as bigdecimal
+     * @param amountText text containing amount price. Not null.
+     * @param mainImage source rawImage
      * @return list of bigDecimal of numbers below total
      */
-    private List<BigDecimal> getBelowTotalPrices(OcrText amountText) {
+    private List<BigDecimal> getBelowTotalPrices(OcrText amountText, RawImage mainImage) {
+        Collections.sort(mainImage.getPricesTexts());
         return Stream.of(mainImage.getPricesTexts())
                 .filter(price -> price.box().centerY() > amountText.box().centerY())
                 .filter(price -> ScoreFunc.isPossiblePriceNumber(price.textNoSpaces(), price.sanitizedNum()) < NUMBER_MIN_VALUE)
@@ -102,8 +106,8 @@ public class AmountComparator {
     /**
      * @author Michelon
      * Initialize a list of all TicketSchemes
-     * @param total bigDecimal with total value
-     * @param aboveTotal list of prices above total
+     * @param total text containing amount price (text + bigDecimal)
+     * @param aboveTotal list of prices (with text) above total
      * @param belowTotal list of prices below total
      * @return list of all ticketSchemes
      */
