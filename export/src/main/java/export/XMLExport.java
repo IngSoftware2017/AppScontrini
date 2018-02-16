@@ -180,9 +180,15 @@ public class XMLExport extends Export {
                 serializer.startTag(null, "Id");
                 serializer.text(String.valueOf(t.getID()));
                 serializer.endTag(null, "Id");
+                serializer.startTag(null, "Refundable");
+                serializer.text(String.valueOf(t.isRefundable()));
+                serializer.endTag(null, "Refundable");
                 serializer.startTag(null, "Amount");
                 serializer.text(String.valueOf(t.getAmount()));
                 serializer.endTag(null, "Amount");
+                serializer.startTag(null, "PlaceSetting");
+                serializer.text(String.valueOf(t.getTagPlaces()));
+                serializer.endTag(null, "PlaceSetting");
                 serializer.startTag(null, "Date");
                 serializer.text(String.valueOf(t.getDate()));
                 serializer.endTag(null, "Date");
@@ -201,9 +207,9 @@ public class XMLExport extends Export {
                 serializer.startTag(null, "Uri");
                 serializer.text(String.valueOf(t.getFileUri()));
                 serializer.endTag(null, "Uri");
-                serializer.startTag(null, "Corners");
-                serializer.text(cornersToString(t.getCorners()));
-                serializer.endTag(null, "Corners");
+                //serializer.startTag(null, "Corners");
+                //serializer.text(cornersToString(t.getCorners()));
+                //serializer.endTag(null, "Corners");
             }
             serializer.endTag(null,"Ticket");
 
@@ -283,6 +289,9 @@ public class XMLExport extends Export {
                 serializer.startTag(null, "PersonId");
                 serializer.text(String.valueOf(m.getPersonID()));
                 serializer.endTag(null, "PersonId");
+                serializer.startTag(null, "TotalAmount");
+                serializer.text(String.valueOf(database.getTotalAmountForMission(m.getID())));
+                serializer.endTag(null, "TotalAmount");
             }
             serializer.endTag(null,"Mission");
 
