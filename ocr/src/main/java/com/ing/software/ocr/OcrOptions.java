@@ -127,7 +127,7 @@ public class OcrOptions {
     private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.NORMAL;
     private static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
     private static final Locale DEFAULT_COUNTRY = Locale.ITALY;
-    private static final PriceEditing DEFAULT_EDIT = PriceEditing.ALLOW_LOOSE;
+    private static final PriceEditing DEFAULT_EDIT = PriceEditing.SKIP;
 
 
     Resolution resolution = Resolution.NORMAL;

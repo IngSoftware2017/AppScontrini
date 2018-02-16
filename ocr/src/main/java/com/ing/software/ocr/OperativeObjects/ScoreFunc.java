@@ -49,8 +49,7 @@ public class ScoreFunc {
      */
     public static double getAmountScore(Scored<OcrText> target, RawImage mainImage) {
         double positionScore = getAmountBlockScore(target.obj(), mainImage);
-        //todo: add score for height etc.
-        //temporary
+        //add score for height etc
         positionScore += getSourceAmountScore(target, mainImage);
         OcrUtils.log(5,"getAmountScore", "Block score is: " + positionScore);
         //return positionScore + target.getScore();
@@ -92,7 +91,7 @@ public class ScoreFunc {
         double diffCenter = Math.abs(source.box().centerY() - target.box().centerY());
         OcrUtils.log(7, "getDistFromSource:", "Partial diff is: " + diffCenter);
         diffCenter = (source.height() - diffCenter)/source.height()* HEIGHT_CENTER_DIFF_MULTIPLIER;
-        double heightDiff = ((double)Math.abs(source.height() - target.height()))/source.height();
+        double heightDiff = ((double)Math.abs(source.charHeight() - target.charHeight()))/source.charHeight();
         heightDiff = (1.-heightDiff)*HEIGHT_SOURCE_DIFF_MULTIPLIER;
         OcrUtils.log(5, "getDistFromSourceScore", "Score for text: " + target.text() +
             " with source: " + source.text() + " is: (diffCenter) " + diffCenter + " + (heightDiff) " + heightDiff);
