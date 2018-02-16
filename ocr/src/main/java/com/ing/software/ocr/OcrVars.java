@@ -1,17 +1,10 @@
 package com.ing.software.ocr;
 
-import android.util.Pair;
-import android.util.Range;
-
-import com.ing.software.ocr.OperativeObjects.WordMatcher;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static java.util.Arrays.*;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -24,7 +17,7 @@ public class OcrVars {
      */
 
     static final boolean IS_DEBUG_ENABLED = true;
-    static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
+    static final int LOG_LEVEL = 7; //A Higher level, means more things are logged
     public static final double NUMBER_MIN_VALUE = 0.4; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber()
     static final float AMOUNT_RECT_HEIGHT_EXTENDER = 0.7f; //Extend height of source amount text. Used in OcrAnalyzer.getAmountExtendedBox()
     static final float PRODUCT_RECT_HEIGHT_EXTENDER = 0.5f; //Extend height of source text of product price.

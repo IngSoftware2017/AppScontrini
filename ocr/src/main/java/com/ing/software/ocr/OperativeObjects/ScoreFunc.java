@@ -44,6 +44,7 @@ public class ScoreFunc {
     public static double getAmountScore(Scored<OcrText> target, RawImage mainImage) {
         double positionScore = getAmountBlockScore(target.obj(), mainImage);
         //todo: add score for height etc.
+        OcrUtils.log(5,"getAmountScore", "Block score is: " + positionScore);
         return positionScore + target.getScore();
     }
 

@@ -4,6 +4,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.Pair;
+import android.util.SizeF;
 
 import com.annimon.stream.Stream;
 import com.google.android.gms.vision.text.Element;
@@ -63,7 +64,7 @@ public class OcrText implements Comparable<OcrText> {
 
     public OcrText(Text text) {
         isWord = text instanceof Element;
-        OcrUtils.log(7, "OCRTEXT: ", "I'm a word: " + isWord);
+        OcrUtils.log(9, "OCRTEXT: ", "I'm a word: " + isWord);
         children = new Lazy<>(() -> Stream.of(text.getComponents()).map(OcrText::new).toList());
         corners = new Lazy<>(() -> pointsToPointFs(asList(text.getCornerPoints())));
 
@@ -73,7 +74,7 @@ public class OcrText implements Comparable<OcrText> {
         box = new Lazy<>(() -> new RectF(text.getBoundingBox()));
 
         this.text = text.getValue();
-        OcrUtils.log(7, "OCRTEXT:", "Text is: " + text.getValue());
+        OcrUtils.log(9, "OCRTEXT:", "Text is: " + text.getValue());
         textUppercase = new Lazy<>(() -> text().toUpperCase());
         sanitizedNum = new Lazy<>(() -> {
             String res = text();

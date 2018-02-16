@@ -41,8 +41,6 @@ public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{
             OcrUtils.log(5, "setAmountTargetTexts: " , "For text: " + text.obj().text() + " Score is: " + ScoreFunc.getAmountScore(text, mainImage));
         }
         Collections.sort(targetTexts, Collections.reverseOrder()); //higher score comes first
-        //todo: remove texts with score too low
-        // ZAGLIA: Use Podium?
     }
 
     public Scored<OcrText> getSourceText() {
