@@ -513,13 +513,6 @@ public class ImageProcessor {
         return newPts;
     }
 
-    private static MatOfPoint2f convexHull(MatOfPoint contour) {
-        MatOfInt indices = new MatOfInt();
-        Imgproc.convexHull(contour, indices);
-        Point[] contourPts = contour.toArray();
-        return ptsToMat(Stream.of(indices.toList()).map(idx -> contourPts[idx]).toList());
-    }
-
     /**
      * Get convex hull of a contour.
      * @param contour MatOfPoint containing the contour. Not null.

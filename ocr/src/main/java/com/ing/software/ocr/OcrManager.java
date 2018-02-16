@@ -241,14 +241,6 @@ public class OcrManager {
                 if (amountPriceText != null) {
                     ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));
                 }
-                if (options.allowEdit == Edit.ALLOW_TOTAL_EDIT) {
-                    newTicket.total = restoredAmount;
-                    amountPriceText = restoredAmountPriceText;
-                }
-            }
-            ticket.containsCover = coverStrings.size() > 0;
-            if (amountPriceText != null) {
-                ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));
             }
         }
 
