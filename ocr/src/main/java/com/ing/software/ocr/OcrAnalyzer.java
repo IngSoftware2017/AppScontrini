@@ -19,8 +19,8 @@ import com.ing.software.ocr.OperativeObjects.ScoreFunc;
 
 import static com.ing.software.common.CommonUtils.rectFromSize;
 import static com.ing.software.common.CommonUtils.size;
+import static com.ing.software.ocr.OcrUtils.IS_DEBUG_ENABLED;
 import static com.ing.software.ocr.OcrUtils.extendRect;
-import static com.ing.software.ocr.OcrVars.*;
 
 /**
  * Class used only to perform ocr-library related operations or Text search. No more no less.
@@ -30,6 +30,8 @@ public class OcrAnalyzer {
 
     // ideal character width / height
     private static final double CHAR_ASPECT_RATIO = 5. / 8.;
+    private static final float AMOUNT_RECT_HEIGHT_EXTENDER = 0.7f; //Extend height of source amount text. Used in OcrAnalyzer.getAmountExtendedBox()
+    private static final float PRODUCT_RECT_HEIGHT_EXTENDER = 0.5f; //Extend height of source text of product price.
 
     private TextRecognizer ocrEngine = null;
     private RawImage mainImage;
@@ -141,7 +143,7 @@ public class OcrAnalyzer {
      * @param origStripRect strip rect in the original bitmap space
      * @return bitmap strip
      */
-    private static Bitmap getAmountStrip(
+    private static Bitmap getStrip(
             ImageProcessor processor, SizeF bmSize, OcrText amountStr, RectF origStripRect) {
         return processor.undistortedSubregion(bmSize, origStripRect,
                 origStripRect.width() / origStripRect.height() * CHAR_ASPECT_RATIO
@@ -162,9 +164,10 @@ public class OcrAnalyzer {
                                     .toList();
         mainImage.removeText(extendedRect);
         for (OcrText text : newTexts)
-            mainImage.addText(text);
+            mainImage.addText(text); //can't be added directly to the stream as I'd lose rects configuration
         OcrUtils.log(3, "replaceTexts", "NEW REPLACED TEXTS");
-        OcrUtils.listEverything(mainImage);
+        if (IS_DEBUG_ENABLED)
+            OcrUtils.listEverything(mainImage);
     }
 
     /**
@@ -179,7 +182,7 @@ public class OcrAnalyzer {
      * @return list of scored texts containing decoded values
      */
     List<Scored<OcrText>> getTextsInStrip(ImageProcessor processor, SizeF origBmSize, OcrText amountStringText, RectF stripRect) {
-        Bitmap strip = getAmountStrip(processor, origBmSize, amountStringText, stripRect);
+        Bitmap strip = getStrip(processor, origBmSize, amountStringText, stripRect);
         RectF undistortedStripRect = rectFromSize(size(strip));
         List<Scored<OcrText>> texts = Stream.of(analyze(strip))
                 .map(text -> new OcrText(text, undistortedStripRect, stripRect))

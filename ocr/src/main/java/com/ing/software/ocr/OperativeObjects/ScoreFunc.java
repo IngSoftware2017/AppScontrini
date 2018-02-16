@@ -20,6 +20,7 @@ public class ScoreFunc {
     private static final int HEIGHT_SOURCE_DIFF_MULTIPLIER = 50; //Multiplier used while analyzing difference in height between source and target rect (e.g. total with it's price)
     private static final int NUMBER_MAX_LENGTH = 8; //Max number of digits allowed for numbers
     private static final double MIN_DIGITS_NUMBER = 2./3.; //Min number of digits in a string to be considered a number
+    public static final double NUMBER_MIN_VALUE = 0.4; //Max allowed value to accept a string as a valid number. See OcrUtils.isPossiblePriceNumber()
 
     private static final int GRID_LENGTH = 10;
     private static final int[] amountBlockIntroduction = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

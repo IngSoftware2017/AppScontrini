@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.ing.software.ocr.OcrVars.*;
 import static com.ing.software.ocr.OperativeObjects.OcrSchemer.*;
 
 /**

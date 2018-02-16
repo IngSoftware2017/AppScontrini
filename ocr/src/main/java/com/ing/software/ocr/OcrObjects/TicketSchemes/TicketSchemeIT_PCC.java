@@ -22,14 +22,17 @@ public class TicketSchemeIT_PCC implements TicketScheme{
     private String tag = "IT_PCC";
     private List<Pair<OcrText, BigDecimal>> products = new ArrayList<>();
     private BigDecimal total;
+    private OcrText totalText;
     private BigDecimal cash;
     private BigDecimal change;
-    private BigDecimal bestAmount;
+    private Pair<OcrText, BigDecimal> bestAmount;
     private boolean acceptedList = false;
+    private int NO_MATCH = 1;
     private final int THREE_VALUES = 80;
 
-    public TicketSchemeIT_PCC(BigDecimal total, @NonNull List<Pair<OcrText, BigDecimal>> aboveTotal, @NonNull List<BigDecimal> belowTotal) {
-        this.total = total;
+    public TicketSchemeIT_PCC(Pair<OcrText, BigDecimal> total, @NonNull List<Pair<OcrText, BigDecimal>> aboveTotal, @NonNull List<BigDecimal> belowTotal) {
+        this.total = total.second;
+        this.totalText = total.first;
         products = new ArrayList<>(aboveTotal);
         if (aboveTotal.isEmpty())
             products = null;
@@ -41,13 +44,13 @@ public class TicketSchemeIT_PCC implements TicketScheme{
     }
 
     @Override
-    public BigDecimal getBestAmount() {
+    public Pair<OcrText, BigDecimal> getBestAmount() {
         return bestAmount;
     }
 
     @Override
     public double getAmountScore(boolean strict) {
-        Scored<BigDecimal> tempAmount = strict ? strictBestAmount() : looseBestAmount();
+        Scored<Pair<OcrText, BigDecimal>> tempAmount = strict ? strictBestAmount() : looseBestAmount();
         if (tempAmount != null) {
             bestAmount = tempAmount.obj();
             return tempAmount.getScore();
@@ -68,7 +71,7 @@ public class TicketSchemeIT_PCC implements TicketScheme{
     /**
      * @return scored total if it follows this ticket scheme, null otherwise
      */
-    private Scored<BigDecimal> strictBestAmount() {
+    private Scored<Pair<OcrText, BigDecimal>> strictBestAmount() {
         if (products != null && total != null && cash != null && change != null) {
             BigDecimal normCash = cash.subtract(change);
             BigDecimal productsSum = Stream.of(products)
@@ -79,19 +82,18 @@ public class TicketSchemeIT_PCC implements TicketScheme{
             OcrUtils.log(3, "TicketScheme_" + tag, "cash is: " + normCash);
             if (productsSum.compareTo(total) == 0 && normCash.compareTo(total) == 0){
                 acceptedList = true;
-                return new Scored<>(THREE_VALUES, total);
+                return new Scored<>(THREE_VALUES, new Pair<>(totalText, total));
             }
         }
-        return null;
+        return new Scored<>(NO_MATCH, new Pair<>(totalText, total));
     }
 
     /**
      * @return best amount according to arbitrary decisions
      */
-    private Scored<BigDecimal> looseBestAmount() {
+    private Scored<Pair<OcrText, BigDecimal>> looseBestAmount() {
         int TWO_VALUES_AMOUNT = 50;
         int TWO_VALUES = 30;
-        int NO_MATCH = 1;
         if (total != null) {
             if (products != null && cash != null && change != null) {
                 BigDecimal productsSum = Stream.of(products)
@@ -104,14 +106,14 @@ public class TicketSchemeIT_PCC implements TicketScheme{
                 if (cashPrices || pricesAmount) {
                     acceptedList = true;
                     if (cashAmount) {
-                        return new Scored<>(THREE_VALUES, total);
+                        return new Scored<>(THREE_VALUES, new Pair<>(totalText, total));
                     } else if (pricesAmount) {
-                        return new Scored<>(TWO_VALUES_AMOUNT, total);
+                        return new Scored<>(TWO_VALUES_AMOUNT, new Pair<>(totalText, total));
                     } else {
-                        return new Scored<>(TWO_VALUES, normCash);
+                        return new Scored<>(TWO_VALUES, new Pair<>(null, normCash));
                     }
                 } else {
-                    return new Scored<>(NO_MATCH, total);
+                    return new Scored<>(NO_MATCH, new Pair<>(totalText, total));
                 }
             } else if (products != null) {
                 BigDecimal productsSum = Stream.of(products)
@@ -119,19 +121,19 @@ public class TicketSchemeIT_PCC implements TicketScheme{
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 if (productsSum.compareTo(total) == 0) {
                     acceptedList = true;
-                    return new Scored<>(TWO_VALUES_AMOUNT, total);
+                    return new Scored<>(TWO_VALUES_AMOUNT, new Pair<>(totalText, total));
                 } else {
-                    return new Scored<>(NO_MATCH, total);
+                    return new Scored<>(NO_MATCH, new Pair<>(totalText, total));
                 }
             } else if (cash != null && change != null) {
                 BigDecimal normCash = cash.subtract(change);
                 if (normCash.compareTo(total) == 0) {
-                    return new Scored<>(TWO_VALUES_AMOUNT, total);
+                    return new Scored<>(TWO_VALUES_AMOUNT, new Pair<>(totalText, total));
                 } else {
-                    return new Scored<>(NO_MATCH, total);
+                    return new Scored<>(NO_MATCH, new Pair<>(totalText, total));
                 }
             } else {
-                return new Scored<>(NO_MATCH, total);
+                return new Scored<>(NO_MATCH, new Pair<>(totalText, total));
             }
         } else {
             //no total
@@ -142,7 +144,7 @@ public class TicketSchemeIT_PCC implements TicketScheme{
                 BigDecimal normCash = cash.subtract(change);
                 if (normCash.compareTo(productsSum) == 0) {
                     acceptedList = true;
-                    return new Scored<>(TWO_VALUES, normCash);
+                    return new Scored<>(TWO_VALUES, new Pair<>(totalText, normCash));
                 }
             }
             return null;

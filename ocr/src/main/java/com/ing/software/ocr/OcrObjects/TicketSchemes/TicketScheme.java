@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface TicketScheme {
 
-    BigDecimal getBestAmount();
+    Pair<OcrText, BigDecimal> getBestAmount();
 
     double getAmountScore(boolean strict);
 

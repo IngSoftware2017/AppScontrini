@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import com.annimon.stream.Stream;
 
-import static com.ing.software.ocr.OcrVars.NUMBER_MIN_VALUE;
+import static com.ing.software.ocr.OperativeObjects.ScoreFunc.NUMBER_MIN_VALUE;
 
 /**
  * Class to analyze amount and compare it with predefined tickets.
@@ -52,7 +52,7 @@ public class AmountComparator {
      */
     public AmountComparator(BigDecimal amount, OcrText amountText, RawImage mainImage) {
         this.mainImage = mainImage;
-        acceptedSchemes = getAllSchemes(amount, getAboveTotalPrices(amountText), getBelowTotalPrices(amountText));
+        acceptedSchemes = getAllSchemes(new Pair<>(amountText, amount), getAboveTotalPrices(amountText), getBelowTotalPrices(amountText));
     }
 
     /**
@@ -107,7 +107,7 @@ public class AmountComparator {
      * @param belowTotal list of prices below total
      * @return list of all ticketSchemes
      */
-    private static List<TicketScheme> getAllSchemes(BigDecimal total, List<Pair<OcrText, BigDecimal>> aboveTotal, List<BigDecimal> belowTotal) {
+    private static List<TicketScheme> getAllSchemes(Pair<OcrText, BigDecimal> total, List<Pair<OcrText, BigDecimal>> aboveTotal, List<BigDecimal> belowTotal) {
         TicketScheme[] schemes = {
                 new TicketSchemeIT_PC(total, aboveTotal, belowTotal),
                 new TicketSchemeIT_PCC(total, aboveTotal, belowTotal),

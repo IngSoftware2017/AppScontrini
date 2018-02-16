@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Keep ordered list of possible results from string search.
+ * Now it's redundant. Will be removed.
  */
 
 public class ListAmountOrganizer implements Comparable<ListAmountOrganizer>{

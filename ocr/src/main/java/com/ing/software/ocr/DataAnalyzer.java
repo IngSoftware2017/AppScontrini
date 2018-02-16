@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 import com.annimon.stream.Stream;
 
-import static com.ing.software.ocr.OcrVars.*;
+import static com.ing.software.ocr.OperativeObjects.ScoreFunc.NUMBER_MIN_VALUE;
 import static java.util.Collections.*;
 import static java.util.Arrays.*;
 import static java.util.regex.Pattern.compile;

@@ -10,22 +10,24 @@ import android.util.SizeF;
 import com.ing.software.ocr.OcrObjects.OcrText;
 import com.ing.software.ocr.OperativeObjects.RawImage;
 
-import static com.ing.software.ocr.OcrVars.*;
 
 /**
- * Utility class
+ * Utility class. These methods can't be moved to common utils as they use module-specific classes.
  */
 public class OcrUtils {
+
+    static final boolean IS_DEBUG_ENABLED = true;
+    private static final int LOG_LEVEL = 3; //A Higher level, means more things are logged
 
     /**
      * @author Michelon
      * Logs messages only if debug is enabled
-     * @param level int >= 0, only messages with level <= OcrVars.LOG_LEVEL are logged
+     * @param level int >= 0, only messages with level <= LOG_LEVEL are logged
      * @param tag tag of the message to log, must be less than 24 chars long
      * @param message message to log
      */
     public static void log(@IntRange(from = 0) int level, @Size(max = 23) String tag, String message) {
-        if (OcrVars.IS_DEBUG_ENABLED && level <= LOG_LEVEL)
+        if (IS_DEBUG_ENABLED && level <= LOG_LEVEL)
             Log.d(tag, message);
     }
 
@@ -58,7 +60,7 @@ public class OcrUtils {
      * @param image source rawimage. Not null.
      * @return size of source rawimage
      */
-    public static SizeF imageToSize(RawImage image) {
+    static SizeF imageToSize(RawImage image) {
         return new SizeF(image.getWidth(), image.getHeight());
     }
 
@@ -68,8 +70,8 @@ public class OcrUtils {
      * Or extending of chosen pixels on both sides (if param is negative)
      * Note: Min value for top and left is 0
      * @param rect source rect. Not null
-     * @param percentHeight chosen percentage for height. \pixels if negative
-     * @param percentWidth chosen percentage for width. \pixels if negative
+     * @param percentHeight chosen percentage for height. or pixels if negative int
+     * @param percentWidth chosen percentage for width. or pixels if negative int
      * @return new extended rectangle
      */
     public static RectF extendRect(@NonNull RectF rect, int percentHeight, int percentWidth) {
