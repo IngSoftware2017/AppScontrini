@@ -33,8 +33,8 @@ import database.TicketEntity;
 public class ExcelExport extends Export {
 
     //Header CSV file
-    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
-    private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;CLOSED;PERSONID";
+    private final String TICKET_FILE_HEADER = "ID;REFUNDABLE;AMOUNT;PLACE-SETTING;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
+    private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;CLOSED;PERSONID;TOT-AMOUNT";
     private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
     //TablesEntity of db
@@ -174,28 +174,34 @@ public class ExcelExport extends Export {
             cell0.setCellValue(new HSSFRichTextString(String.valueOf(t.getID())));
 
             HSSFCell cell1 = irow.createCell(1);
-            cell1.setCellValue(new HSSFRichTextString(String.valueOf(t.getAmount())));
+            cell1.setCellValue(new HSSFRichTextString(String.valueOf(t.isRefundable())));
 
-            HSSFCell cell2 = irow.createCell(2);
-            cell2.setCellValue(new HSSFRichTextString(String.valueOf(t.getDate())));
+            HSSFCell cell2 = irow.createCell(1);
+            cell2.setCellValue(new HSSFRichTextString(String.valueOf(t.getAmount())));
 
-            HSSFCell cell3 = irow.createCell(3);
-            cell3.setCellValue(new HSSFRichTextString(t.getShop()));
+            HSSFCell cell3 = irow.createCell(1);
+            cell3.setCellValue(new HSSFRichTextString(String.valueOf(t.getTagPlaces())));
 
-            HSSFCell cell4 = irow.createCell(4);
-            cell4.setCellValue(new HSSFRichTextString(t.getTitle()));
+            HSSFCell cell4 = irow.createCell(2);
+            cell4.setCellValue(new HSSFRichTextString(String.valueOf(t.getDate())));
 
-            HSSFCell cell5 = irow.createCell(5);
-            cell5.setCellValue(new HSSFRichTextString(categoryToString(t.getCategory())));
+            HSSFCell cell5 = irow.createCell(3);
+            cell5.setCellValue(new HSSFRichTextString(t.getShop()));
 
-            HSSFCell cell6 = irow.createCell(6);
-            cell6.setCellValue(new HSSFRichTextString(String.valueOf(t.getMissionID())));
+            HSSFCell cell6 = irow.createCell(4);
+            cell6.setCellValue(new HSSFRichTextString(t.getTitle()));
 
-            HSSFCell cell7 = irow.createCell(7);
-            cell7.setCellValue(new HSSFRichTextString(String.valueOf(t.getFileUri())));
+            HSSFCell cell7 = irow.createCell(5);
+            cell7.setCellValue(new HSSFRichTextString(categoryToString(t.getCategory())));
 
-            HSSFCell cell8 = irow.createCell(8);
-            cell8.setCellValue(new HSSFRichTextString(cornersToString(t.getCorners())));
+            HSSFCell cell8 = irow.createCell(6);
+            cell8.setCellValue(new HSSFRichTextString(String.valueOf(t.getMissionID())));
+
+            HSSFCell cell9 = irow.createCell(7);
+            cell9.setCellValue(new HSSFRichTextString(String.valueOf(t.getFileUri())));
+
+            //HSSFCell cell10 = irow.createCell(8);
+            //cell10.setCellValue(new HSSFRichTextString(cornersToString(t.getCorners())));
         }
     }
 
@@ -280,6 +286,9 @@ public class ExcelExport extends Export {
 
             HSSFCell cell6 = irow.createCell(6);
             cell6.setCellValue(new HSSFRichTextString(String.valueOf(m.getPersonID())));
+
+            HSSFCell cell7 = irow.createCell(6);
+            cell7.setCellValue(new HSSFRichTextString(String.valueOf(database.getTotalAmountForMission(m.getID()))));
 
         }
     }
