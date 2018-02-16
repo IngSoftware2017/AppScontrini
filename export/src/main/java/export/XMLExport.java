@@ -277,9 +277,9 @@ public class XMLExport extends Export {
                 serializer.startTag(null, "Location");
                 serializer.text(m.getLocation());
                 serializer.endTag(null, "Location");
-                serializer.startTag(null, "Repaid");
+                serializer.startTag(null, "Closed");
                 serializer.text(String.valueOf(m.isClosed()));
-                serializer.endTag(null, "Repaid");
+                serializer.endTag(null, "Closed");
                 serializer.startTag(null, "PersonId");
                 serializer.text(String.valueOf(m.getPersonID()));
                 serializer.endTag(null, "PersonId");

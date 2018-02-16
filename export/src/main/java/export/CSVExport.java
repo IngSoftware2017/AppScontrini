@@ -26,8 +26,8 @@ public class CSVExport extends Export {
     private final String NEW_LINE_SEPARATOR = "\n";
 
     //Header CSV file
-    private final String TICKET_FILE_HEADER = "ID;AMOUNT;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI;CORNERS";
-    private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;REPAID;PERSONID";
+    private final String TICKET_FILE_HEADER = "ID;REFUNDABLE;AMOUNT;PLACE-SETTING;DATE;SHOP;TITLE;CATEGORY;MISSIONID;URI";
+    private final String MISSION_FILE_HEADER = "ID;NAME;STARTDATE;ENDDATE;LOCATION;CLOSED;PERSONID;TOT-AMOUNT";
     private final String PERSON_FILE_HEADER = "ID;NAME;LASTNAME;ACADEMICTITLE;EMAIL;FOTO";
 
     //TablesEntity of db
@@ -60,6 +60,7 @@ public class CSVExport extends Export {
         tickets = database.getAllTickets();
         missions = database.getAllMission();
         persons = database.getAllPerson();
+
     }
 
 
@@ -164,7 +165,11 @@ public class CSVExport extends Export {
             for (TicketEntity t : tickets) {
                 fileTickets.append(String.valueOf(t.getID()));
                 fileTickets.append(SEMICOLON_DELIMITER);
+                fileTickets.append(String.valueOf(t.isRefundable()));
+                fileTickets.append(SEMICOLON_DELIMITER);
                 fileTickets.append(String.valueOf(t.getAmount()));
+                fileTickets.append(SEMICOLON_DELIMITER);
+                fileTickets.append(String.valueOf(t.getTagPlaces()));
                 fileTickets.append(SEMICOLON_DELIMITER);
                 fileTickets.append(String.valueOf(t.getDate()));
                 fileTickets.append(SEMICOLON_DELIMITER);
@@ -178,8 +183,8 @@ public class CSVExport extends Export {
                 fileTickets.append(SEMICOLON_DELIMITER);
                 fileTickets.append(String.valueOf(t.getFileUri()));
                 fileTickets.append(SEMICOLON_DELIMITER);
-                fileTickets.append(cornersToString(t.getCorners()));
-                fileTickets.append(NEW_LINE_SEPARATOR);
+                //fileTickets.append(cornersToString(t.getCorners()));
+                //fileTickets.append(NEW_LINE_SEPARATOR);
             }
         }
         catch (IOException e){
@@ -253,6 +258,8 @@ public class CSVExport extends Export {
                 fileMissions.append(String.valueOf(m.isClosed()));
                 fileMissions.append(SEMICOLON_DELIMITER);
                 fileMissions.append(String.valueOf(m.getPersonID()));
+                fileMissions.append(NEW_LINE_SEPARATOR);
+                fileMissions.append(String.valueOf(database.getTotalAmountForMission(m.getID())));
                 fileMissions.append(NEW_LINE_SEPARATOR);
             }
         }
