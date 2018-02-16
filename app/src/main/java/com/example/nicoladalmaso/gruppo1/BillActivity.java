@@ -88,7 +88,7 @@ public class BillActivity extends AppCompatActivity {
         PersonEntity person = DB.getPerson(thisMission.getPersonID());
         android.support.v7.app.ActionBar ab = getSupportActionBar();
         ab.setTitle(thisMission.getName()+":");
-        ab.setSubtitle(person.getName()+" "+person.getLastName());
+        ab.setSubtitle(person.getLastName()+" "+person.getName());
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);

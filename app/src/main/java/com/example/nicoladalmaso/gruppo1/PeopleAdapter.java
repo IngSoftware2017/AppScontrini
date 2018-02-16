@@ -52,7 +52,7 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
         TextView name = (TextView)convertView.findViewById(R.id.personName);
         //TextView title=(TextView)convertView.findViewById(R.id.personAcademicTitle);
         PersonEntity person = getItem(position);
-        name.setText(person.getName()+" "+person.getLastName());
+        name.setText(person.getLastName()+" "+person.getName());
         String academicTitle = person.getAcademicTitle();
         TextView countText = (TextView)convertView.findViewById(R.id.activeCountText);
         DataManager db = new DataManager(context);
