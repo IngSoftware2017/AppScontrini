@@ -143,7 +143,6 @@ public class OcrManager {
 
         BigDecimal restoredAmount = null; //contains modified amount
         OcrText amountPriceText = null; //text containing price for total
-        // May be different from amountPriceText as it uses a different method to accept prices.
         Scored<TicketScheme> bestTicketScheme = null; //ticket with highest score for amount (contains list of prices etc.)
         Scored<TicketScheme> bestRestoredTicketScheme = null;
         boolean editTotal = options.priceEditing.ordinal() >= PriceEditing.ALLOW_STRICT.ordinal();
