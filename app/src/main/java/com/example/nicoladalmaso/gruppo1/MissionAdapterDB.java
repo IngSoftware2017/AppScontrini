@@ -32,15 +32,15 @@ import database.MissionEntity;
 public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
     DataManager DB;
-    Activity activity;
+    MissionsTabbed activity;
     String path = "";
     int missionID = 0;
     List<MissionEntity> missions;
 
-    public MissionAdapterDB(Fragment activity, int textViewResourceId,
+    public MissionAdapterDB(MissionsTabbed activity, int textViewResourceId,
                             List<MissionEntity> objects) {
-        super(activity.getActivity(), textViewResourceId, objects);
-        this.activity = activity.getActivity();
+        super(activity, textViewResourceId, objects);
+        this.activity = activity;
         missions = objects;
         DB = new DataManager(getContext());
     }
@@ -92,7 +92,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 missionID = Integer.parseInt(v.getTag().toString());
                 Intent startTicketsView = new Intent(activity.getApplicationContext(), BillActivity.class);
                 startTicketsView.putExtra(IntentCodes.INTENT_MISSION_ID, missionID);
-                ((MissionsTabbed) activity).startActivityForResult(startTicketsView, 1);
+                (activity).startActivityForResult(startTicketsView, 1);
             }
         });
 
@@ -137,5 +137,21 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         }
 
         popup.show();
+    }
+
+    public void closeMission(MissionEntity missionEntity){
+        missions.remove(missionEntity);
+        notifyDataSetChanged();
+        activity.reload();
+
+    }
+
+    public void setMissionRepaid(long missionID){
+        for(MissionEntity missionEntity : missions){
+            if(missionEntity.getID()==missionID) {
+                missionEntity.setClosed(true);
+                notifyDataSetChanged();
+            }
+        }
     }
 }

@@ -160,9 +160,11 @@ public class MissionsTabbed extends AppCompatActivity {
             switch(position){
                 case 0:
                     missionsOpen.setArguments(bundle);
+                    missionsOpen.setParentActivity(MissionsTabbed.this);
                     return missionsOpen;
                 case 1:
                     missionsClosed.setArguments(bundle);
+                    missionsClosed.setParentActivity(MissionsTabbed.this);
                     return missionsClosed;
                 default:
                     return null;
@@ -214,7 +216,7 @@ public class MissionsTabbed extends AppCompatActivity {
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
 
-    private void reload() {
+    public void reload() {
         Intent intent = getIntent();
         finish();
         startActivity(intent);

@@ -98,7 +98,7 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
             case R.id.close_mission:
                 mission.setClosed(true);
                 DB.updateMission(mission);
-                adapterDB.notifyDataSetChanged();
+                adapterDB.closeMission(mission);
                 break;
 
             // Delete the mission
@@ -148,4 +148,6 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
         Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }
+
+
 }
