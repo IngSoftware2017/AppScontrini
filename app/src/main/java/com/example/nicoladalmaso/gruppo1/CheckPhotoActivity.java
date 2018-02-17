@@ -38,9 +38,12 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Set;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.SettingsEntity;
 import database.TicketEntity;
 
 /**
@@ -93,8 +96,12 @@ public class CheckPhotoActivity extends Activity {
         btnOK = (Button)findViewById(R.id.btnCheck_allow);
         waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
         waitOCR.setVisibility(View.VISIBLE);
+
         //OCR initialize
         ocrManager = new OcrManager();
+
+        addOCRSettings();
+
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
                 //On first run vision library will be downloaded
@@ -229,6 +236,53 @@ public class CheckPhotoActivity extends Activity {
             outOriginal.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /** Dal Maso
+     * Set all OCR settings from db
+     */
+    private void addOCRSettings(){
+        if(DB.getAllSettings().size() != 0){
+            SettingsEntity settings = DB.getAllSettings().get(0);
+
+            switch (settings.getAccuracyOCR()){
+                case (0):
+                    OcrOptions.getDefault().resolution(OcrOptions.Resolution.THIRD);
+                    break;
+                case (1):
+                    OcrOptions.getDefault().resolution(OcrOptions.Resolution.HALF);
+                    break;
+                case (2):
+                    OcrOptions.getDefault().resolution(OcrOptions.Resolution.NORMAL);
+                    break;
+            }
+
+            switch (settings.getCurrencyDefault()){
+                case ("EUR"):
+                    OcrOptions.getDefault().suggestedCountry(Locale.ITALY);
+                    break;
+                case ("USD"):
+                    OcrOptions.getDefault().suggestedCountry(Locale.US);
+                    break;
+                case ("GBP"):
+                    OcrOptions.getDefault().suggestedCountry(Locale.UK);
+                    break;
+            }
+
+            if(settings.isAutomaticCorrectionAmountOCR()){
+                OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.ALLOW_STRICT);
+            }
+            else {
+                OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.SKIP);
+            }
+
+            if(settings.isSearchUpDownOCR()){
+                OcrOptions.getDefault().orientation(OcrOptions.Orientation.ALLOW_UPSIDE_DOWN);
+            }
+            else{
+                OcrOptions.getDefault().orientation(OcrOptions.Orientation.NORMAL);
+            }
         }
     }
 }
