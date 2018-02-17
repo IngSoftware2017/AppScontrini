@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.titlePeople));
         setContentView(R.layout.activity_main);
+        //Intent sett = new Intent(getApplicationContext(), com.example.nicoladalmaso.gruppo1.ApplicationSettings.class);
+        //startActivity(sett);
         initialize();
         printAllPeople();
     }
