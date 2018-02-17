@@ -90,7 +90,10 @@
             android:name=".CheckPhotoActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
-        <activity android:name=".ApplicationSettings"></activity>
+        <activity
+            android:name=".ApplicationSettings"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

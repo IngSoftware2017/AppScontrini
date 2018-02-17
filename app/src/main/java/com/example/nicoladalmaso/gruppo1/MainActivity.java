@@ -17,6 +17,9 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.net.Uri;
 import android.os.Environment;
@@ -70,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.titlePeople));
         setContentView(R.layout.activity_main);
-        //Intent sett = new Intent(getApplicationContext(), com.example.nicoladalmaso.gruppo1.ApplicationSettings.class);
-        //startActivity(sett);
         initialize();
         printAllPeople();
     }
@@ -80,6 +81,18 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         myView.setVisibility(View.INVISIBLE);
+    }
+
+    /** Dal Maso
+     * Setting toolbar buttons and style from /res/menu
+     * @param menu
+     * @return success flag
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_menu, menu);
+        return true;
     }
 
     /** Dal Maso
@@ -108,6 +121,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Dal Maso
+     * Catch events on toolbar
+     * @param item object on the toolbar
+     * @return flag of success
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        Intent intent = new Intent();
+        switch (item.getItemId()) {
+            //Open settings panel
+            case R.id.action_OCRsettings:
+                int cx = myView.getWidth();
+                AppUtilities.circularReveal(myView, cx, 0);
+                Intent settings = new Intent(getApplicationContext(), com.example.nicoladalmaso.gruppo1.ApplicationSettings.class);
+                startActivity(settings);
+                break;
+        }
+        return true;
+    }
+
+    /** Dal Maso
      * Se non sono presenti persone mostra come aggiungerne una
      */
     private void startFabGuide(){
@@ -126,7 +160,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onTargetClick(TapTargetView v) {
                     super.onTargetClick(v);      // This call is optional
-                    AppUtilities.circularReveal(myView);
+                    int cx = myView.getWidth();
+                    int cy = myView.getHeight();
+                    AppUtilities.circularReveal(myView, cx, cy);
                     Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
                     startActivityForResult(addPerson, person_added);
                 }
@@ -145,7 +181,9 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AppUtilities.circularReveal(myView);
+                int cx = myView.getWidth();
+                int cy = myView.getHeight();
+                AppUtilities.circularReveal(myView, cx, cy);
                 Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
                 startActivityForResult(addPerson, person_added);
             }

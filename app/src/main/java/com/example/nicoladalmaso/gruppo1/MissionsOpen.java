@@ -56,7 +56,9 @@ public class MissionsOpen extends Fragment {
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AppUtilities.circularReveal(myView);
+                int cx = myView.getWidth();
+                int cy = myView.getHeight();
+                AppUtilities.circularReveal(myView, cx, cy);
                 Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
                 addMission.putExtra("person", personID);
                 Log.d("PersonID", ""+personID);
@@ -132,7 +134,9 @@ public class MissionsOpen extends Fragment {
                 @Override
                 public void onTargetClick(TapTargetView v) {
                     super.onTargetClick(v);      // This call is optional
-                    AppUtilities.circularReveal(myView);
+                    int cx = myView.getWidth();
+                    int cy = myView.getHeight();
+                    AppUtilities.circularReveal(myView, cx, cy);
                     Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
                     addMission.putExtra("person", personID);
                     Log.d("PersonID", ""+personID);

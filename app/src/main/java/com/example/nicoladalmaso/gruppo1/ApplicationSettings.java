@@ -8,6 +8,8 @@ public class ApplicationSettings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setElevation(0);
+        setTitle("Impostazioni");
         setContentView(R.layout.activity_application_settings);
     }
 }

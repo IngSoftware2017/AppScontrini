@@ -155,14 +155,12 @@ public class AppUtilities {
     /** Dal Maso
      * Circular new activity reveal animation
      * @param v view to expand
+     * @param cx start x axis coord
+     * @param cy start y axis coord
      */
-    public static void circularReveal(View v){
-        // get the center for the clipping circle
-        int cx = v.getWidth();
-        int cy = v.getHeight();
-
+    public static void circularReveal(View v, int cx, int cy){
         // get the final radius for the clipping circle
-        float finalRadius = (float) Math.hypot(cx, cy);
+        float finalRadius = (float) Math.hypot(v.getWidth(), v.getHeight());
 
         // create the animator for this view (the start radius is zero)
         Animator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);

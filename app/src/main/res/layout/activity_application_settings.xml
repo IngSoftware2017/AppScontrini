@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="com.example.nicoladalmaso.gruppo1.ApplicationSettings">
 
     <LinearLayout
@@ -19,6 +20,7 @@
             android:layout_height="wrap_content"
             android:text="Qualità OCR"
             android:textSize="20dp"
+            android:textColor="@color/white"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="3dp"
             android:layout_marginBottom="5dp"/>
@@ -28,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:elevation="3dp"
+            android:elevation="2dp"
             app:rrbg_animateDrawables_enter="overshoot"
             app:rrbg_animateTexts_enter="overshoot"
             app:rrbg_dividerColor="@color/black"
@@ -83,6 +85,7 @@
             android:layout_height="wrap_content"
             android:text="Correzione del totale"
             android:textSize="20dp"
+            android:textColor="@color/white"
             android:layout_marginLeft="3dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="5dp"/>
@@ -96,7 +99,7 @@
             app:rrbg_dividerSize="1dp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:elevation="3dp"
+            android:elevation="2dp"
             app:rrbg_radius="10dp"
             app:rrbg_selectorColor="@color/colorPrimary"
             app:rrbg_selectorSize="4dp">
@@ -136,6 +139,7 @@
             android:layout_height="wrap_content"
             android:text="Ricerca foto capovolta"
             android:textSize="20dp"
+            android:textColor="@color/white"
             android:layout_marginLeft="3dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="5dp"/>
@@ -149,7 +153,7 @@
             app:rrbg_dividerSize="1dp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:elevation="3dp"
+            android:elevation="2dp"
             app:rrbg_radius="10dp"
             app:rrbg_selectorColor="@color/colorPrimary"
             app:rrbg_selectorSize="4dp">
@@ -189,6 +193,7 @@
             android:layout_height="wrap_content"
             android:text="Moneta"
             android:textSize="20dp"
+            android:textColor="@color/white"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="3dp"
             android:layout_marginBottom="5dp"/>
@@ -198,7 +203,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:elevation="3dp"
+            android:elevation="2dp"
             app:rrbg_animateDrawables_enter="overshoot"
             app:rrbg_animateTexts_enter="overshoot"
             app:rrbg_dividerColor="@color/black"
@@ -253,15 +258,16 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_addPerson"
+        android:id="@+id/fab"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
-        android:background="@color/colorPrimary"
+        android:background="@android:color/background_light"
         android:clickable="true"
-        app:srcCompat="@mipmap/ic_add_white_24dp" />
+        app:backgroundTint="@color/cardview_light_background"
+        app:srcCompat="@drawable/ic_done_primary" />
 
 </RelativeLayout>
