@@ -38,9 +38,13 @@ public final class Constants {
     public static final String MISSION_FIELD_LOCATION = "location";
     public static final String MISSION_FIELD_CLOSED = "isClosed";
     public static final String MISSION_FIELD_NAME = "name";
+
     //Person's constants
     public static final String PERSON_PRIMARY_KEY = "ID";
     public static final String PERSON_FIELD_NAME = "name";
     public static final String PERSON_FIELD_LAST_NAME = "lastName";
+
+    //Settings' contants
+    public static final String SETTINGS_PRIMARY_KEY = "ID";
 
 }

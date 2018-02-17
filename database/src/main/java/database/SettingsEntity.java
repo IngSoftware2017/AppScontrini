@@ -1,14 +1,19 @@
 package database;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
 
 
 /**
+ * @author Marco Olivieri (Team 3)
  * Represents the app settings
  * It saves the ocr options to scan the tickets
- * @author Marco Olivieri (Team 3)
+ *
+ * There may be multiple instances of settings
  */
 
 @Entity(tableName = Constants.SETTINGS_TABLE_NAME)
@@ -17,10 +22,27 @@ import android.arch.persistence.room.TypeConverters;
 
 public class SettingsEntity {
 
+    @ColumnInfo(name = Constants.SETTINGS_PRIMARY_KEY)
+    @PrimaryKey(autoGenerate = true)
+    private long ID;
     private int accuracyOCR;
     private boolean automaticCorrectionAmountOCR;
     private boolean searchUpDownOCR;
 
+    @Ignore
+    /**
+     * Non parametric constructor to use when you don't want set all fields
+     */
+    public SettingsEntity() {
+    }
+
+    /** @author Marco Olivieri
+     * Parametric constructor
+     *
+     * @param accuracyOCR accuracy of the analysis of the OCR
+     * @param automaticCorrectionAmountOCR enable automatic correction of the amount
+     * @param searchUpDownOCR enable the search upside down
+     */
     public SettingsEntity(int accuracyOCR, boolean automaticCorrectionAmountOCR, boolean searchUpDownOCR) {
         this.accuracyOCR = accuracyOCR;
         this.automaticCorrectionAmountOCR = automaticCorrectionAmountOCR;
@@ -37,7 +59,7 @@ public class SettingsEntity {
 
     /** @author Marco Olivieri
      * Sets the accuracy of OCR
-     * @param accuracyOCR not negative
+     * @param accuracyOCR - not negative
      */
     public void setAccuracyOCR(int accuracyOCR) {
         this.accuracyOCR = accuracyOCR;
