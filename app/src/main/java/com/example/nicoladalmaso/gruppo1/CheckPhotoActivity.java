@@ -24,9 +24,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.ing.software.common.Ticket;
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
+import com.ing.software.ocr.OcrOptions;
+import com.ing.software.ocr.OcrTicket;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,7 +50,7 @@ public class CheckPhotoActivity extends Activity {
     OcrManager ocrManager;
     String root;
     DataManager DB;
-    Ticket OCR_result;
+    OcrTicket OCR_result;
     EditText checkName;
     EditText checkPrice;
     EditText checkPeople;
@@ -144,13 +145,13 @@ public class CheckPhotoActivity extends Activity {
     private void startOCRProcess(){
         // OCR asynchronous implementation:
         ImageProcessor imgProc = new ImageProcessor(finalBitmap);
-        ocrManager.getTicket(imgProc, result -> {
+        ocrManager.getTicket(imgProc, OcrOptions.getDefault(), result -> {
             //Thread UI control reservation
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(result.amount != null) {
-                        checkPrice.setText(result.amount.toString());
+                    if(result.total != null) {
+                        checkPrice.setText(result.total.toString());
                     }
                     waitOCR.setVisibility(View.INVISIBLE);
                 }
