@@ -1,7 +1,7 @@
 package com.ing.software.ocr;
 
 /**
- * General purpose error enum. Used by ImagePreprocessor, Ticket
+ * Error enum used by OcrManager to communicate some information abount the returned OcrTicket
  * @author Riccardo Zaglia
  */
 public enum OcrError {

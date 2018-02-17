@@ -10,6 +10,7 @@ import java.util.*;
 
 /**
  * Structure containing information about a single ticket.
+ * When a field is null, it means the ocr wasn't able to extract the relative information
  */
 public class OcrTicket implements Cloneable {
 

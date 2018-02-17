@@ -552,7 +552,18 @@ public class ImageProcessor {
     // if there are too few edges, the image is out of focus.
     // return (number of edge pixels)^2 / contour area
     // use ^2 because edges are one dimensional, but we want to compare to an area (2 dimensional)
+
+    //https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
     private static double getFocus(Mat img, MatOfPoint contour, double area) {
+        Mat lap = new Mat();
+        Laplacian(img, lap, CV_64F);
+
+        Mat mask = new Mat();
+
+
+        MatOfDouble mean, stddev;
+
+        //meanStdDev(lap, mean, stddev)
         return 1; // stub
     }
 
@@ -663,8 +674,12 @@ public class ImageProcessor {
      * @return image rectangle without margin
      */
     private static RectF removeMargin(SizeF imgSize, double marginMul) {
-        return rectFromSize(new SizeF(imgSize.getWidth() / (float) (1. + marginMul),
-                imgSize.getWidth() / (float) (1. + marginMul)));
+        float aspectRatio = imgSize.getWidth() / imgSize.getHeight();
+        // margin : shortSide = marginMul : (1 + 2 * marginMul)
+        float margin = (aspectRatio < 1. ? imgSize.getWidth() : imgSize.getHeight())
+                * (float)(marginMul / (1. + 2 * marginMul));
+        return rectFromSize(new SizeF(imgSize.getWidth() - 2 * margin,
+                imgSize.getHeight() - 2 * margin));
     }
 
     /**

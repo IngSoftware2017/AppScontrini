@@ -42,12 +42,18 @@ import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
 import static org.opencv.imgproc.Imgproc.*;
 import static java.util.Collections.*;
 
-
+/**
+ * This app is used to test and diagnose the class ImageProcessor and some functions relative to the ocr.
+ * The tests are executed against the dataset and photos shot with the app itself.
+ * @author Riccardo Zaglia
+ */
 public class MainActivity extends AppCompatActivity {
 
     // aliases
     private static final Class<?> IP = ImageProcessor.class;
     private static final Class<?> TF = TestFunctions.class;
+    private static final Class<?> OA = OcrAnalyzer.class;
+    private static final Class<?> DA = DataAnalyzer.class;
 
     private static final DecimalFormat NUM_FMT = new DecimalFormat("#.##");
 
@@ -88,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     private int cameraThreads = 0;
     private int imgsTot;
     private int imgIdx = 0;
-    private TextRecognizer ocrEngine = null;
+    private OcrAnalyzer analyzer = null;
     private File tempPhoto = null;
 
     /**
@@ -117,18 +123,24 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
+    /**
+     * Object used as a replacement for the try-catch-finally construct to reuse the same catch logic.
+     */
     ExceptionHandler errHdlr = new ExceptionHandler(e ->
             hdl.obtainMessage(MSG_EXCEPTION, e.toString() + "\n" + e.getMessage()).sendToTarget()
     );
 
     /**
      * Change appbar text
-     * @param str title text
+     * @param str title string
      */
-    private void asyncSetTitle(String str) {
-        hdl.obtainMessage(MSG_TITLE, str).sendToTarget();
-    }
+    private void asyncSetTitle(String str) { hdl.obtainMessage(MSG_TITLE, str).sendToTarget(); }
 
+    /**
+     * Convert a Bitmap to an OpenCV Mat.
+     * @param bm bitmap
+     * @return mat
+     */
     private static Mat bitmapToMat(Bitmap bm) {
         Mat mat = new Mat();
         Utils.bitmapToMat(bm, mat);
@@ -171,6 +183,13 @@ public class MainActivity extends AppCompatActivity {
         return copy;
     }
 
+    /**
+     * Draw a polygon on a mat image
+     * @param img
+     * @param pts
+     * @param color
+     * @param thick
+     */
     static void drawPoly(Mat img, MatOfPoint2f pts, Scalar color, int thick) {
         polylines(img, singletonList(new MatOfPoint(pts.toArray())), true, color, thick);
     }
@@ -279,7 +298,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ocrEngine = new TextRecognizer.Builder(this).build();
+        analyzer = new OcrAnalyzer();
+        errHdlr.tryRun(() ->
+            invoke(analyzer, "initialize", this)
+        );
         imgsTot = getImgsTot();
         tempPhoto = new File(getExternalStorageDirectory().toString() + "/temp.jpg");
 
@@ -419,15 +441,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (check(showFlags, SHOW_OCR)) {
-            Bitmap textLinesBm = invoke(imgProc, "undistortForOCR", 1. / 3.);
-            List<OcrText> lines = invoke(TF, "runOCR", textLinesBm, ocrEngine);
+            Bitmap ocrBm = invoke(imgProc, "undistortForOCR", 1. / 3.);
+            List<OcrText> texts = invoke(analyzer, "analyze", ocrBm);
 
             //find amount strings
             List<Scored<OcrText>> amountStrs = invoke(TF, "findAllScoredAmountStrings",
-                    lines, size(textLinesBm));
+                    texts, size(ocrBm));
 
             // find dates
-            List<Pair<OcrText, Date>> dates = invoke(TF, "findAllDates", lines);
+            List<Pair<OcrText, Date>> dates = invoke(DA, "findAllDatesRegex", texts);
 
             // draw
             StringBuilder titleStr = new StringBuilder();
@@ -439,23 +461,22 @@ public class MainActivity extends AppCompatActivity {
                 titleStr.append(" - date not found or multiple");
             }
             asyncSetTitle(titleStr.toString());
-            showMat.accept(classifyAndDrawTexts(textLinesBm, lines, FONT_SIZE_DEF));
+            showMat.accept(classifyAndDrawTexts(ocrBm, texts, FONT_SIZE_DEF));
 
             // find amount price
             if (amountStrs.size() != 0) {
                 OcrText amountStr = max(amountStrs).obj();
                 RectF srcAmountStripRect = invoke(TF, "getAmountStripRect",
-                        amountStr, size(textLinesBm));
+                        amountStr, size(ocrBm));
                 Bitmap amountStrip = invoke(TF, "getAmountStrip",
-                        imgProc, size(textLinesBm), amountStr, srcAmountStripRect);
+                        imgProc, size(ocrBm), amountStr, srcAmountStripRect);
                 RectF dstAmountStripRect = rectFromSize(size(amountStrip));
-                List<OcrText> amountLinesStripSpace = invoke(TF, "runOCR",
-                        amountStrip, ocrEngine);
-                List<OcrText> amountLinesBmSpace = Stream.of(amountLinesStripSpace)
+                List<OcrText> stripTextsStripSpace = invoke(analyzer, "analyze", amountStrip);
+                List<OcrText> stripTextsBmSpace = Stream.of(stripTextsStripSpace)
                         .map(line -> new OcrText(line, dstAmountStripRect, srcAmountStripRect))
                         .toList();
                 BigDecimal price = invoke(TF, "findAmountPrice",
-                        amountLinesBmSpace, amountStr, srcAmountStripRect);
+                        stripTextsBmSpace, amountStr, srcAmountStripRect);
 
                 // draw strip
                 titleStr = new StringBuilder();
@@ -463,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
                 if (price != null)
                     titleStr.append(" -  ").append(price);
                 asyncSetTitle(titleStr.toString());
-                showMat.accept(classifyAndDrawTexts(amountStrip, amountLinesStripSpace, FONT_SIZE_AMOUNT));
+                showMat.accept(classifyAndDrawTexts(amountStrip, stripTextsBmSpace, FONT_SIZE_AMOUNT));
             }
         }
     }

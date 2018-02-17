@@ -1,19 +1,24 @@
 package com.ing.software.ocr;
 
+import com.ing.software.common.ExceptionHandler;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.regex.*;
 
 import static com.ing.software.ocr.DataAnalyzer.*;
-import static com.ing.software.ocr.OcrVars.POTENTIAL_PRICE;
-import static com.ing.software.ocr.OcrVars.PRICE_UPSIDEDOWN;
-import static com.ing.software.ocr.OcrVars.PRICE_WITH_SPACES;
+import static com.ing.software.common.Reflect.*;
 import static org.junit.Assert.*;
 
 /**
  * @author Riccardo Zaglia
  */
 public class RegexTest {
+
+    Pattern DATE_DMY;
+    ExceptionHandler excHdlr;
+
 
     private String match(Pattern regex, String target) {
         Matcher matcher = regex.matcher(target);
@@ -24,9 +29,11 @@ public class RegexTest {
         }
     }
 
-    @Test
-    public void dateDmyTest1() {
-        assertEquals(null, match(DATE_DMY, "abc"));
+    @Before
+    public void init() {
+        excHdlr = new ExceptionHandler(e -> System.out.println(e.getMessage()));
+        excHdlr.tryRun(() -> {
+        });
     }
 
     @Test

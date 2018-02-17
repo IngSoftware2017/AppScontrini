@@ -3,10 +3,10 @@ package com.ing.software.ocr;
 import java.util.Locale;
 
 /**
- * @author Michelon
- * @author EDIT: Zaglia
  * Object passed to the manager to avoid performing unnecessary operations
  * and consequently reduce time (time depends primarily on image scale)
+ * @author Michelon
+ * @author EDIT: Zaglia
  */
 public class OcrOptions {
 
@@ -185,8 +185,13 @@ public class OcrOptions {
         return this;
     }
 
-    public OcrOptions priceEditing(PriceEditing edit) {
-        priceEditing = edit;
+    /**
+     * Set price editing criteria
+     * @param criteria
+     * @return
+     */
+    public OcrOptions priceEditing(PriceEditing criteria) {
+        priceEditing = criteria;
         return this;
     }
 
