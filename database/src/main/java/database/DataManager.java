@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Created by Federico Taschin on 07/11/2017.
- * Modified by Marco Olivieri
+ * Modified by Marco Olivieri: added methods and query
  * Modify by Matteo Mascotto: improve methods and complete documentation
  */
 

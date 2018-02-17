@@ -16,7 +16,7 @@ import android.content.Context;
  * the Room library takes care of creating the DAO object and returning it when ticketDao() is called.
  */
 
-@android.arch.persistence.room.Database(entities = {TicketEntity.class, MissionEntity.class, PersonEntity.class}, version = 1)
+@android.arch.persistence.room.Database(entities = {TicketEntity.class, MissionEntity.class, PersonEntity.class, SettingsEntity.class}, version = 1)
 public abstract class Database extends RoomDatabase {
 
     private static Database INSTANCE; //Unique instance of the Database object
