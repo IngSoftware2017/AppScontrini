@@ -189,6 +189,10 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_NAME + " ASC")
     List<PersonEntity> getAllPersonNameOrder();
 
+
+    @Query("SELECT * FROM "+Constants.SETTINGS_TABLE_NAME)
+    List<SettingsEntity> getAllSettings();
+
     //SELECT FROM ID
 
     /**

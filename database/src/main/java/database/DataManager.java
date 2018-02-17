@@ -201,6 +201,13 @@ public class DataManager {
         return database.ticketDao().getAllPersonNameOrder();
     }
 
+    /**@author Federico Taschin
+     * @return list of saved settings
+     */
+    public List<SettingsEntity> getAllSettings(){
+        return database.ticketDao().getAllSettings();
+    }
+
     /**
      * Return a list of the tickets associate to a specific Mission
      *
