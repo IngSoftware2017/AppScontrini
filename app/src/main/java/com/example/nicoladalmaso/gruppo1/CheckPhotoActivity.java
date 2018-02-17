@@ -156,7 +156,6 @@ public class CheckPhotoActivity extends Activity {
                 }
             });
             OCR_result = result;
-            Log.d("SHAPE", result.rectangle.toString());
             //enable save button
             btnOK.setClickable(true);
         });
@@ -213,7 +212,6 @@ public class CheckPhotoActivity extends Activity {
 
             thisTicket.setMissionID(Singleton.getInstance().getMissionID());
             long id = DB.addTicket(thisTicket);
-            Log.d("Aggiunto ticket", ""+id);
 
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();

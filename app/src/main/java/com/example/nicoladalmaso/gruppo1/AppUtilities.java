@@ -68,13 +68,13 @@ public class AppUtilities {
         }
         return false;
     }
-    /**
-          * Lazzarin
-          * Method written to fix a bug of Android's DatePicker that save the date with month before the selected month.(When this bug will be eliminated, simply we'll
-          * don't use this method)
-          * @param date on format dd/MM/yyyy
-          * @return date with +1 about Month, on format dd/MM/yyyy
-          */
+
+    /** Lazzarin
+      * Method written to fix a bug of Android's DatePicker that save the date with month before the selected month.(When this bug will be eliminated, simply we'll
+      * don't use this method)
+      * @param date on format dd/MM/yyyy
+      * @return date with +1 about Month, on format dd/MM/yyyy
+     */
     public static String addMonth(String date)
     {        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
                 SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
@@ -98,12 +98,13 @@ public class AppUtilities {
         }
         return newDate;
     }
-        /**Lazzarin
-        * check if insert date is between interval of mission
-         *@param current date of start mission
-         *@param finish date of end mission
-         *@param  current date of ticket insert by user
-        */
+
+    /**Lazzarin
+     *check if insert date is between interval of mission
+     *@param current date of start mission
+     *@param finish date of end mission
+     *@param  current date of ticket insert by user
+    */
     public static  boolean checkIntervalDate(String start, String finish, String current)
     {
         if(checkDate(start,current) && checkDate(current,finish))

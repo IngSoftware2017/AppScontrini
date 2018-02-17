@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (resultCode == Activity.RESULT_CANCELED) {
-            Log.d("CANCELLED", "OK");
             printAllPeople();
         }
     }
@@ -112,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
     private void startFabGuide(){
         TapTargetView.showFor(this,
                 TapTarget.forView(findViewById(R.id.fab_addPerson),
-                        "Benvenuto in TicketManager!",
-                        "1) Clicca qui per aggiungere una nuova persona\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla")
+                        getResources().getString(R.string.personAddTitle),
+                        getResources().getString(R.string.personAddDesc))
             .targetCircleColor(R.color.white)
             .titleTextSize(21)
             .titleTextColor(R.color.white)
@@ -179,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < people.size(); i++)
         {
             listPeople.add(people.get(i));
-            Log.d("Persone", ""+people.get(i).getName());
         }
         addToList();
     }

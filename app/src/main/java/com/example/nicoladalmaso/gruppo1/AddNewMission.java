@@ -59,7 +59,6 @@ public class AddNewMission extends AppCompatActivity{
 
         Intent intent = getIntent();
         personID = intent.getExtras().getInt("person");
-        Log.d("PersonIDAddMission", ""+personID);
 
         initializeComponents();
     }
@@ -71,7 +70,8 @@ public class AddNewMission extends AppCompatActivity{
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
-    //edit by Lazzarin
+
+    //DalMaso, edit by Lazzarin
     private void initializeComponents(){
         missionStart = (TextView)findViewById(R.id.input_missionStart);
         missionFinish = (TextView)findViewById(R.id.input_missionFinish);
@@ -114,7 +114,6 @@ public class AddNewMission extends AppCompatActivity{
      * Catch events on toolbar
      * @param item object on the toolbar
      * @return flag of success
-     *
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -140,7 +139,6 @@ public class AddNewMission extends AppCompatActivity{
         String location = editLocation.getText().toString();
         String startDate = missionStart.getText().toString();
         String finishDate = missionFinish.getText().toString();
-        Log.d("marsadenadata",startDate);
 
         if ((name == null) || name.replaceAll(" ","").equals("")) {
             Toast.makeText(context, getResources().getString(R.string.toast_missionNoName), Toast.LENGTH_SHORT).show();
@@ -170,7 +168,6 @@ public class AddNewMission extends AppCompatActivity{
             String start = AppUtilities.addMonth(startDate);
             String finish = AppUtilities.addMonth(finishDate);
             if(!AppUtilities.checkDate(start,finish)) {
-                Log.d("formato data inserita", "errato");
                 Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
                 return false;
             }

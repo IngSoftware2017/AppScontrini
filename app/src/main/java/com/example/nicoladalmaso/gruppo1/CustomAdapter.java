@@ -61,7 +61,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         this.missionID = missionID;
         this.DB = new DataManager(context);
         this.t = objects;
-        Log.d("MISSION", ""+missionID);
     }
 
     /** Dal Maso

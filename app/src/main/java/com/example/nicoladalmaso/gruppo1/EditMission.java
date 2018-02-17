@@ -82,9 +82,7 @@ public class EditMission extends AppCompatActivity {
             public void onClick(View v) {
                 // edit by Lazzarin: use flag to tell Datepicker what date we're setting
                 hideSoftKeyboard(EditMission.this);
-                Log.d("stato del flag prima",Singleton.getInstance().getStartFlag()+"");
                 Singleton.getInstance().setStartFlag(0);
-                Log.d("flag appena prima",Singleton.getInstance().getStartFlag()+"");
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart);
                 newFragment.show(getFragmentManager(), "startDatePicker");
              }
@@ -94,12 +92,9 @@ public class EditMission extends AppCompatActivity {
             // edit by Lazzarin
             public void onClick(View v) {
                 Singleton.getInstance().setStartFlag(1);
-                Log.d("stato del flag prima",Singleton.getInstance().getStartFlag()+"");
                 hideSoftKeyboard(EditMission.this);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
-                Log.d("stato del flag durante",Singleton.getInstance().getStartFlag()+"");
-                Log.d("stato del flag dopo",Singleton.getInstance().getStartFlag()+"");
             }
         });
 
@@ -137,13 +132,11 @@ public class EditMission extends AppCompatActivity {
                 try {
                     String start = txtMissionStart.getText().toString();
                     String finish =  txtMissionEnd.getText().toString();
+
                     if(!AppUtilities.checkDate(start, finish)) {
-                        Log.d("formato data inserita", "errato");
                         Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    else
-                        Log.d("formato data inserita","corretto");
 
                     thisMission.setStartDate(format.parse(start));
                     thisMission.setEndDate(format.parse(finish));

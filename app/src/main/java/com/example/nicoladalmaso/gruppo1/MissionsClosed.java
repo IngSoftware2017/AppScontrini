@@ -41,7 +41,6 @@ public class MissionsClosed extends Fragment {
         listView = (ListView)rootView.findViewById(R.id.listMission);
         noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
         personID = getArguments().getInt("personID", 0);
-        Log.d("TAB1", ""+personID);
 
         printAllMissions();
         return rootView;

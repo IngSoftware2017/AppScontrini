@@ -60,7 +60,6 @@ public class  DatePickerFragment extends DialogFragment
         //variable check is used to communicate with OnDataSet method about the DatePicker chosen.
         check = false;
         int flag=Singleton.getInstance().getStartFlag();
-        Log.d("flag read by datePicker",flag+"");
         switch(flag) {
             //DatePicker of end Date..set min date
             case 1:
@@ -105,7 +104,6 @@ public class  DatePickerFragment extends DialogFragment
      * @param day selected dd
      */
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        Log.d("TextInputEditTextID", "ID: "+id+", R.id: "+R.id.input_missionStart);
         String dayS = "" + day, monthS = "" + (month + 1);
         TextView textView = (TextView) getActivity().findViewById(id);
         if(dayS.length() == 1){

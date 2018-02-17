@@ -119,8 +119,8 @@ public class MissionsOpen extends Fragment {
     private void startGuide(){
         TapTargetView.showFor(getActivity(),
                 TapTarget.forView(rootView.findViewById(R.id.fab_addMission),
-                        "Ci sei quasi!",
-                        "1) Clicca qui per creare una nuova missione\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla")
+                        getResources().getString(R.string.missionAddTitle),
+                        getResources().getString(R.string.missionAddDesc))
             .targetCircleColor(R.color.white)
             .titleTextSize(21)
             .titleTextColor(R.color.white)

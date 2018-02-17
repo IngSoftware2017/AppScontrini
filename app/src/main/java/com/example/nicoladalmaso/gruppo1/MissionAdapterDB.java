@@ -95,11 +95,8 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
             title.setTextColor(textColor);
         }
 
-        Log.d("Position", ""+position);
-
         toTickets.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                Log.d("Position", ""+mission.getID());
                 Intent startTicketsView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                 Singleton.getInstance().setMissionID((int)mission.getID());
                 ((MissionsTabbed)context).startActivityForResult(startTicketsView, 1);

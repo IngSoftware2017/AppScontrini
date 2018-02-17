@@ -112,7 +112,6 @@ public class MissionsTabbed extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 default:
@@ -121,7 +120,6 @@ public class MissionsTabbed extends AppCompatActivity {
             }
         }
         if (resultCode == Activity.RESULT_CANCELED) {
-            Log.d("CANCELLED", "OK");
             refresh();
         }
     }
