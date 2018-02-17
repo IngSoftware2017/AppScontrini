@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SizeF;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
@@ -136,6 +138,7 @@ public class CheckPhotoActivity extends Activity {
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
         Bitmap btm = AppUtilities.fromByteArrayToBitmap(Singleton.getInstance().getTakenPicture());
+
         finalBitmap = Bitmap.createBitmap(btm, 0, 0, btm.getWidth(), btm.getHeight(), matrix, true);
     }
 
@@ -150,6 +153,9 @@ public class CheckPhotoActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if(!result.errors.isEmpty()) {
+                        Toast.makeText(getApplicationContext(), result.errors.toString(), Toast.LENGTH_SHORT).show();
+                    }
                     if(result.total != null) {
                         checkPrice.setText(result.total.toString());
                     }
