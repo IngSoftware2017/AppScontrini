@@ -15,6 +15,7 @@ public final class Constants {
     public static final String TICKET_TABLE_NAME = "tickets";
     public static final String MISSION_TABLE_NAME = "missions";
     public static final String PERSON_TABLE_NAME = "persons";
+    public static final String SETTINGS_TABLE_NAME = "settings";
 
     //Foreign Keys
     public static final String TICKET_CHILD_COLUMNS = "ticket_ID";
