@@ -1,66 +1,26 @@
 package com.ing.software.ocr;
 
-import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.util.SizeF;
-import android.util.SparseArray;
 
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Consumer;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static com.ing.software.common.CommonUtils.rectFromSize;
-import static com.ing.software.common.CommonUtils.size;
 import static com.ing.software.ocr.DataAnalyzer.POTENTIAL_PRICE;
 import static com.ing.software.ocr.DataAnalyzer.PRICE_UPSIDEDOWN;
-<<<<<<< HEAD
-import static com.ing.software.ocr.OcrVars.*;
-=======
->>>>>>> kraktun/gruppo2-modular-complete
 import static java.lang.Math.abs;
-import static java.util.Collections.max;
 
 //todo use new functions instead
 public class TestFunctions {
 
-    // level of detail of image to be passed to OCR engine
-    private static final double OCR_NORMAL_SCALE = 1.;
-    private static final double OCR_ADVANCED_SCALE = 1. / 3.;
-
     // Extended rectangle vertical multiplier
     private static final float EXT_RECT_V_MUL = 3;
-
-    private TextRecognizer ocrEngine = null;
-
-    /**
-     * Run the ocr detection on the given bitmap.
-     * @param bm input bitmap
-     * @param ocrEngine TextRecognizer
-     * @return list of OcrText
-     *
-     * @author Riccardo Zaglia
-     */
-    private static List<OcrText> runOCR(Bitmap bm, TextRecognizer ocrEngine) {
-        SparseArray<TextBlock> blocks = ocrEngine.detect(new Frame.Builder().setBitmap(bm).build());
-        List<OcrText> lines = new ArrayList<>();
-        for (int i = 0; i < blocks.size(); i++)
-            for (Text txt : blocks.valueAt(i).getComponents())
-                lines.add(new OcrText(txt));
-        return lines;
-    }
 
     /**
      * Choose the OcrText that most probably contains the amount string.
@@ -156,61 +116,4 @@ public class TestFunctions {
         }
         return price;
     }
-
-//    /**
-//     * Extract a Ticket from an ImageProcessor loaded with a bitmap.
-//     * @param imgProc ImagePreprocessor with at least an image assigned (corners can be set manually).
-//     * @return Ticket containing any information found, and/or a list of errors occurred.
-//     *
-//     * @author Riccardo Zaglia
-//     */
-//    // todo: integrate schemer and other heuristics
-//    public synchronized OcrTicket analyzeTicket(@NonNull ImageProcessor imgProc, boolean advanced) {
-//        OcrTicket ticket = new OcrTicket();
-//        ticket.errors = new ArrayList<>();
-//
-//        Bitmap bm = imgProc.undistortForOCR(advanced ? OCR_ADVANCED_SCALE : OCR_NORMAL_SCALE);
-//        if (bm == null) {
-//            ticket.errors.add(OcrError.INVALID_PROCESSOR);
-//            return ticket;
-//        }
-//        ticket.rectangle = imgProc.getCorners();
-//        List<OcrText> lines = runOCR(bm, ocrEngine);
-//
-//        //find amount
-//        List<Scored<OcrText>> amountStrs = findAllScoredAmountStrings(lines, size(bm));
-//        if (amountStrs.size() > 0) {
-//            OcrText amountStr = max(amountStrs).obj();
-//            RectF srcAmountStripRect = getAmountStripRect(amountStr, size(bm));
-//            Bitmap amountStrip = getAmountStrip(imgProc, size(bm), amountStr, srcAmountStripRect);
-//            RectF dstAmountStripRect = rectFromSize(size(amountStrip));
-//            List<OcrText> amountLinesStripSpace = runOCR(amountStrip, ocrEngine);
-//
-//            // transform texts from destination to source space (I swap source and destination rect).
-//            List<OcrText> amountLinesBmSpace = Stream.of(amountLinesStripSpace)
-//                    .map(line -> new OcrText(line, dstAmountStripRect, srcAmountStripRect)).toList();
-//            ticket.total = findAmountPrice(amountLinesBmSpace, amountStr, srcAmountStripRect);
-//        }
-//        if (ticket.total == null)
-//            ticket.errors.add(OcrError.TOTAL_NOT_FOUND);
-//
-//        List<Pair<OcrText, Date>> dates = invoke((lines);
-//        if (dates.size() == 1) {
-//            ticket.date = dates.get(0).second;
-//        } else {
-//            ticket.errors.add(OcrError.DATE_NOT_FOUND);
-//        }
-//
-//        return ticket;
-//    }
-//
-//    /**
-//     * Asynchronous version of analyzeTicket(imgProc). The ticket is passed by the callback parameter.
-//     * @param imgProc ImagePreprocessor
-//     * @param ticketCb Callback
-//     */
-//    public void analyzeTicket(
-//            @NonNull ImageProcessor imgProc, boolean advanced, @NonNull Consumer<OcrTicket> ticketCb) {
-//        new Thread(() -> ticketCb.accept(analyzeTicket(imgProc, advanced))).start();
-//    }
 }

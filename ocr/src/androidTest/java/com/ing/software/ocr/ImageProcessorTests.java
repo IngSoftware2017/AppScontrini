@@ -34,7 +34,7 @@ public class ImageProcessorTests {
     @Test
     public void expandCoordinatesTestNoMargin() {
         RectF rect = expandRectCoordinates(new RectF(0.25f,0.25f,0.75f,0.75f),
-                new SizeF(10, 20), 0.5);
+                new SizeF(10, 20), 0);
         assertEquals(new RectF(2.5f, 5f, 7.5f, 15f), rect);
     }
 
