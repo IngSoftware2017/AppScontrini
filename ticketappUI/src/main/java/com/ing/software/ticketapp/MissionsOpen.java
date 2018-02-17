@@ -56,7 +56,9 @@ public class MissionsOpen extends Fragment {
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AppUtilities.circularReveal(myView);
+                int cx = myView.getWidth();
+                int cy = myView.getHeight();
+                AppUtilities.circularReveal(myView, cx, cy);
                 Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                 addMission.putExtra("person", personID);
                 Log.d("PersonID", ""+personID);
@@ -119,8 +121,8 @@ public class MissionsOpen extends Fragment {
     private void startGuide(){
         TapTargetView.showFor(getActivity(),
                 TapTarget.forView(rootView.findViewById(R.id.fab_addMission),
-                        "Ci sei quasi!",
-                        "1) Clicca qui per creare una nuova missione\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla")
+                        getResources().getString(R.string.missionAddTitle),
+                        getResources().getString(R.string.missionAddDesc))
             .targetCircleColor(R.color.white)
             .titleTextSize(21)
             .titleTextColor(R.color.white)
@@ -132,7 +134,9 @@ public class MissionsOpen extends Fragment {
                 @Override
                 public void onTargetClick(TapTargetView v) {
                     super.onTargetClick(v);      // This call is optional
-                    AppUtilities.circularReveal(myView);
+                    int cx = myView.getWidth();
+                    int cy = myView.getHeight();
+                    AppUtilities.circularReveal(myView, cx, cy);
                     Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                     addMission.putExtra("person", personID);
                     Log.d("PersonID", ""+personID);

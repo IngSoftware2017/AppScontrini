@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -71,11 +73,7 @@ public class BillActivity extends AppCompatActivity {
     ExportManager manager;
     TextView title;
 
-
     static final int REQUEST_TAKE_PHOTO = 1;
-    static final int PICK_PHOTO_FOR_AVATAR = 2;
-    static final int TICKET_MOD = 4;
-    static final int MISSION_MOD = 5;
 
     int textSize = 23;
     int paddingLeft = 10;
@@ -129,17 +127,17 @@ public class BillActivity extends AppCompatActivity {
         Intent intent = new Intent();
         switch (item.getItemId()) {
             case R.id.action_export:
-               //Piccolo 
+
+                //Piccolo
                 manager = new ExportManager(DB, getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getPath());
-                Log.d("export debug","click");
                 listView = new ListView(this);
-                ArrayList<String> formats=manager.exportTags();
+                ArrayList<String> formats = manager.exportTags();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.dialog_export,R.id.txt,formats);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.dialog_export, R.id.txt, formats);
                 listView.setAdapter(adapter);
                 builder.setView(listView);
 
-                //Custom title
+                //Mantovan, Custom title
                 title = new TextView(this);
                 title.setText(R.string.text_Export);
                 title.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -148,13 +146,12 @@ public class BillActivity extends AppCompatActivity {
                 title.setTextColor(getResources().getColor(R.color.white));
                 title.setPadding(paddingLeft, paddingTop,paddingRight,paddingBottom);
                 builder.setCustomTitle(title);
-                //builder.setTitle(R.string.text_Export);
+
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int which, long l) {
                         try{
-                            Log.d("export debug",formats.get(which));
                             ExportedFile exported = manager.exportMission(missionID,formats.get(which));
                             Uri toExport = Uri.fromFile(exported.file);
                             Intent shareIntent = new Intent();
@@ -166,23 +163,8 @@ public class BillActivity extends AppCompatActivity {
                         catch (ExportTypeNotSupportedException e){
                             e.printStackTrace();
                         }
-                    }});
-                /*builder.setAdapter(adapter,new DialogInterface.OnClickListener(){
-                            public void onClick(DialogInterface dialog, int which) {
-                                try{
-                                    Log.d("export debug",formats.get(which));
-                                    ExportedFile exported = manager.exportMission(missionID,formats.get(which));
-                                    Uri toExport = Uri.fromFile(exported.file);
-                                    Intent shareIntent = new Intent();
-                                    shareIntent.setAction(Intent.ACTION_SEND);
-                                    shareIntent.putExtra(Intent.EXTRA_STREAM, toExport);
-                                    shareIntent.setType("file/"+formats.get(which));
-                                    startActivity(Intent.createChooser(shareIntent,getResources().getString(R.string.text_ExportMissionTo)));
-                                } catch (ExportTypeNotSupportedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });*/
+                }});
+
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
                 break;
@@ -211,7 +193,7 @@ public class BillActivity extends AppCompatActivity {
      * Se non sono presenti ticket mostra come aggiungerli
      */
     public void showGuide(){
-        TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab), "Iniziamo!", "Aggiungi un nuovo scontrino, inizia subito scattando una foto")
+        TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab), getResources().getString(R.string.ticketAddTitle), getResources().getString(R.string.ticketAddDesc))
             .targetCircleColor(R.color.white)
             .titleTextSize(20)
             .titleTextColor(R.color.white)
@@ -282,6 +264,7 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
+    //Dal Maso
     /** Check if this device has a camera */
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
@@ -293,6 +276,7 @@ public class BillActivity extends AppCompatActivity {
         }
     }
 
+    //Dal Maso
     /** A safe way to get an instance of the Camera object. */
     public static Camera getCameraInstance(){
         Camera c = null;
@@ -315,7 +299,6 @@ public class BillActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
 
@@ -330,7 +313,6 @@ public class BillActivity extends AppCompatActivity {
             }
         }
         if (resultCode == Activity.RESULT_CANCELED) {
-            Log.d("CANCELLED", "OK");
             printAllTickets();
         }
     }
@@ -341,12 +323,10 @@ public class BillActivity extends AppCompatActivity {
     public void printAllTickets(){
         list.clear();
         List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
-        Log.d("Tickets", ticketList.toString());
         TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
             list.add(ticketList.get(i));
-            Log.d("Ticket_ID", ""+ticketList.get(i).getID());
             count++;
         }
         addToList();

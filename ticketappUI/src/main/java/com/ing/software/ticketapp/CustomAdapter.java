@@ -61,7 +61,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         this.missionID = missionID;
         this.DB = new DataManager(context);
         this.t = objects;
-        Log.d("MISSION", ""+missionID);
     }
 
     /** Dal Maso
@@ -104,7 +103,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         }
         else {
             amount = c.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString();
-            tot.setText(amount+" €"); //todo HC
+            tot.setText(amount+" €");
         }
 
         //Ticket image bitmap set
@@ -124,7 +123,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                 for(int i = 0; i < t.size(); i++){
                     if(t.get(i).getID() == ticketID){
                         TicketEntity thisTicket = t.get(i);
-                        Intent startImageView = new Intent(context, BillViewer.class);
+                        Intent startImageView = new Intent(context,BillViewer.class);
                         File photo = new File(thisTicket.getFileUri().toString().substring(7));
 
                         //Put data to next activity

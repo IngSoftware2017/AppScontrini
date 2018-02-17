@@ -17,6 +17,9 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.net.Uri;
 import android.os.Environment;
@@ -81,6 +84,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Dal Maso
+     * Setting toolbar buttons and style from /res/menu
+     * @param menu
+     * @return success flag
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_menu, menu);
+        return true;
+    }
+
+    /** Dal Maso
      * Catch intent results
      * @param requestCode action number
      * @param resultCode intent result code
@@ -101,9 +116,29 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (resultCode == Activity.RESULT_CANCELED) {
-            Log.d("CANCELLED", "OK");
             printAllPeople();
         }
+    }
+
+    /** Dal Maso
+     * Catch events on toolbar
+     * @param item object on the toolbar
+     * @return flag of success
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        Intent intent = new Intent();
+        switch (item.getItemId()) {
+            //Open settings panel
+            case R.id.action_OCRsettings:
+                int cx = myView.getWidth();
+                AppUtilities.circularReveal(myView, cx, 0);
+                Intent settings = new Intent(getApplicationContext(), ApplicationSettings.class);
+                startActivity(settings);
+                break;
+        }
+        return true;
     }
 
     /** Dal Maso
@@ -112,8 +147,8 @@ public class MainActivity extends AppCompatActivity {
     private void startFabGuide(){
         TapTargetView.showFor(this,
                 TapTarget.forView(findViewById(R.id.fab_addPerson),
-                        "Benvenuto in TicketManager!",
-                        "1) Clicca qui per aggiungere una nuova persona\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla")
+                        getResources().getString(R.string.personAddTitle),
+                        getResources().getString(R.string.personAddDesc))
             .targetCircleColor(R.color.white)
             .titleTextSize(21)
             .titleTextColor(R.color.white)
@@ -125,7 +160,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onTargetClick(TapTargetView v) {
                     super.onTargetClick(v);      // This call is optional
-                    AppUtilities.circularReveal(myView);
+                    int cx = myView.getWidth();
+                    int cy = myView.getHeight();
+                    AppUtilities.circularReveal(myView, cx, cy);
                     Intent addPerson = new Intent(v.getContext(), AddNewPerson.class);
                     startActivityForResult(addPerson, person_added);
                 }
@@ -144,7 +181,9 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AppUtilities.circularReveal(myView);
+                int cx = myView.getWidth();
+                int cy = myView.getHeight();
+                AppUtilities.circularReveal(myView, cx, cy);
                 Intent addPerson = new Intent(v.getContext(), AddNewPerson.class);
                 startActivityForResult(addPerson, person_added);
             }
@@ -179,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < people.size(); i++)
         {
             listPeople.add(people.get(i));
-            Log.d("Persone", ""+people.get(i).getName());
         }
         addToList();
     }

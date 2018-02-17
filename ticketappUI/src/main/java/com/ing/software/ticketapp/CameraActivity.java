@@ -65,35 +65,45 @@ public class CameraActivity extends Activity {
         initializeComponents();
     }
 
+    /** Dal Maso
+     * Initialize all the components
+     */
     public void initializeComponents(){
         mCamera = getCameraInstance();
         mCamera.setDisplayOrientation(90);
+
+        //Camera parameters
         Camera.Parameters p = mCamera.getParameters();
         p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         p.setJpegQuality(100);
+
         mCamera.setParameters(p);
 
         final ImageButton flashButton = (ImageButton)findViewById(R.id.flashBtn);
         flashButton.setTag(0);
         flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_off));
 
+        //Flash button managment
         flashButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick (View v) {
                 final int status =(Integer) v.getTag();
                 switch (status){
+                    //Flash on
                     case 0:
                         v.setTag(1);
                         flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_on));
                         p.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
                         mCamera.setParameters(p);
                         break;
+                    //Flash auto
                     case 1:
                         v.setTag(2);
                         flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_auto));
                         p.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
                         mCamera.setParameters(p);
                         break;
+                    //Flash off
                     case 2:
                         v.setTag(0);
                         flashButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_off));
@@ -110,7 +120,7 @@ public class CameraActivity extends Activity {
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 
 
-
+        //Camera focus on touch
         mPreview.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -121,8 +131,10 @@ public class CameraActivity extends Activity {
             }
         });
 
+        //Start camera real-time preview
         preview.addView(mPreview);
 
+        //Image capture button
         ImageButton captureButton = (ImageButton) findViewById(R.id.takePhoto_button);
         captureButton.setOnClickListener(new View.OnClickListener() {
              @Override
@@ -132,6 +144,7 @@ public class CameraActivity extends Activity {
              }
         });
 
+        //Finish taking photo
         Button finishButton = (Button)findViewById(R.id.btnCheck_goBack);
         finishButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -142,6 +155,7 @@ public class CameraActivity extends Activity {
 
     }
 
+    //Focus manage method
     private void focusOnTouch(MotionEvent event) {
         if (mCamera != null ) {
 
@@ -163,6 +177,7 @@ public class CameraActivity extends Activity {
         }
     }
 
+    //It calculates the focus area
     private Rect calculateFocusArea(float x, float y) {
         int left = clamp(Float.valueOf((x / mPreview.getWidth()) * 2000 - 1000).intValue(), FOCUS_AREA_SIZE);
         int top = clamp(Float.valueOf((y / mPreview.getHeight()) * 2000 - 1000).intValue(), FOCUS_AREA_SIZE);
@@ -239,23 +254,4 @@ public class CameraActivity extends Activity {
             startActivity(intent);
         }
     };
-
-    public static String tempFileImage(Context context, Bitmap bitmap, String name) {
-
-        File outputDir = context.getCacheDir();
-        File imageFile = new File(outputDir, name + ".jpg");
-
-        OutputStream os;
-        try {
-            os = new FileOutputStream(imageFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
-            os.flush();
-            os.close();
-        } catch (Exception e) {
-            Log.e(context.getClass().getSimpleName(), "Error writing file", e);
-        }
-
-        return imageFile.getAbsolutePath();
-    }
-
 }
