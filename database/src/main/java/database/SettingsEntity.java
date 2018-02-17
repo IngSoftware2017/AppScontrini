@@ -28,6 +28,7 @@ public class SettingsEntity {
     private int accuracyOCR;
     private boolean automaticCorrectionAmountOCR;
     private boolean searchUpDownOCR;
+    private String currencyDefault;
 
     @Ignore
     /**
@@ -42,11 +43,13 @@ public class SettingsEntity {
      * @param accuracyOCR accuracy of the analysis of the OCR
      * @param automaticCorrectionAmountOCR enable automatic correction of the amount
      * @param searchUpDownOCR enable the search upside down
+     * @param currencyDefault the currency used by default
      */
-    public SettingsEntity(int accuracyOCR, boolean automaticCorrectionAmountOCR, boolean searchUpDownOCR) {
+    public SettingsEntity(int accuracyOCR, boolean automaticCorrectionAmountOCR, boolean searchUpDownOCR, String currencyDefault) {
         this.accuracyOCR = accuracyOCR;
         this.automaticCorrectionAmountOCR = automaticCorrectionAmountOCR;
         this.searchUpDownOCR = searchUpDownOCR;
+        this.currencyDefault = currencyDefault;
     }
 
     /**
@@ -112,6 +115,22 @@ public class SettingsEntity {
      */
     public void setSearchUpDownOCR(boolean searchUpDownOCR) {
         this.searchUpDownOCR = searchUpDownOCR;
+    }
+
+    /** @author Marco Olivieri
+     * Returns the currency used by default
+     * @return string - currency
+     */
+    public String getCurrencyDefault() {
+        return currencyDefault;
+    }
+
+    /** @author Marco Olivieri
+     * Sets the currency used by default
+     * @param currencyDefault
+     */
+    public void setCurrencyDefault(String currencyDefault) {
+        this.currencyDefault = currencyDefault;
     }
 }
 
