@@ -72,18 +72,18 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="10dp"
             android:textColorHint="#ddd"
             android:theme="@style/TextLabelCustom">
 
             <EditText
                 android:id="@+id/input_checkName"
-                android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:backgroundTint="#FFF"
                 android:hint="@string/name"
+                android:inputType="text"
                 android:maxLines="1"
                 android:text="Scontrino"
                 android:textColor="#fff"
@@ -97,14 +97,13 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_layout_checkTotal"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="14dp"
                 android:layout_marginRight="14dp"
                 android:layout_weight="1"
                 android:hint="@string/total"
@@ -118,9 +117,9 @@
                     android:background="@android:color/transparent"
                     android:backgroundTint="#FFF"
                     android:digits="0123456789."
-                    android:maxLines="1"
-                    android:maxLength="6"
                     android:inputType="numberDecimal"
+                    android:maxLength="6"
+                    android:maxLines="1"
                     android:textColor="#fff"
                     android:textColorHint="#ddd"
                     android:textSize="22dp" />
@@ -143,9 +142,9 @@
                     android:backgroundTint="#FFF"
                     android:digits="0123456789"
                     android:hint="Numero persone"
-                    android:maxLines="1"
                     android:inputType="number"
                     android:maxLength="2"
+                    android:maxLines="1"
                     android:text="1"
                     android:textColor="#fff"
                     android:textColorHint="#ddd"
@@ -160,7 +159,7 @@
             android:layout_marginBottom="14dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:orientation="horizontal">
 
