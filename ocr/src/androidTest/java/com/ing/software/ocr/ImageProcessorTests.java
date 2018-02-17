@@ -51,7 +51,7 @@ public class ImageProcessorTests {
         float origWidth = 10, origHeight = 20;
         float margin = origWidth * OCR_MARGIN_MUL;
         SizeF imgSize = new SizeF(origWidth + 2 * margin, origHeight + 2 * margin);
-        //NB: intentional use of img width for both right and bottom parameters, as width is the shortest of the two dimensions.
+        //NB: intentional use of width for both right and bottom parameters, as width is the shortest of the two dimensions.
         RectF rect = normalizeCoordinates(new RectF(0,0, margin, margin), imgSize);
         assertEquals(new RectF(-OCR_MARGIN_MUL, -OCR_MARGIN_MUL / 2, 0, 0), rect);
     }

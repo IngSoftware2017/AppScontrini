@@ -5,6 +5,7 @@ import com.ing.software.common.ExceptionHandler;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.regex.*;
 
 import static com.ing.software.ocr.DataAnalyzer.*;
@@ -16,7 +17,7 @@ import static org.junit.Assert.*;
  */
 public class RegexTest {
 
-    Pattern DATE_DMY;
+    Pattern DATE;
     ExceptionHandler excHdlr;
 
 
@@ -32,8 +33,16 @@ public class RegexTest {
     @Before
     public void init() {
         excHdlr = new ExceptionHandler(e -> System.out.println(e.getMessage()));
+
         excHdlr.tryRun(() -> {
+            DATE = getField(DataAnalyzer.class, "DATE");
         });
+    }
+
+
+    @Test
+    public void dateTest1() {
+        assertNotEquals(null, match(DATE, "1/2/34"));
     }
 
     @Test

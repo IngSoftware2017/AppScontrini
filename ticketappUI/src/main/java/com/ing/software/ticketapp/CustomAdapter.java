@@ -61,7 +61,6 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         this.missionID = missionID;
         this.DB = new DataManager(context);
         this.t = objects;
-        Log.d("MISSION", ""+missionID);
     }
 
     /** Dal Maso
@@ -87,11 +86,13 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         File photo = new File(c.getFileUri().toString().substring(7));
         ticketTitle.setText(c.getTitle());
 
-        if(c.getShop() == null || c.getShop().trim().compareTo("") == 0){
-            ticketShop.setText(context.getString(R.string.string_NoShop));
+        if(c.isRefundable()){
+            ticketShop.setText("Rimborsabile");
+            ticketShop.setTextColor(Color.parseColor("#00C853"));
         }
         else {
-            ticketShop.setText(c.getShop());
+            ticketShop.setText("Non rimborsabile");
+            ticketShop.setTextColor(Color.parseColor("#D50000"));
         }
 
         //Amount text fixes
@@ -101,8 +102,8 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
             tot.setText(amount);
         }
         else {
-            amount = c.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString();
-            tot.setText(amount+" €"); //todo HC
+            amount = c.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString();
+            tot.setText(amount+" €");
         }
 
         //Ticket image bitmap set
@@ -122,7 +123,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                 for(int i = 0; i < t.size(); i++){
                     if(t.get(i).getID() == ticketID){
                         TicketEntity thisTicket = t.get(i);
-                        Intent startImageView = new Intent(context, BillViewer.class);
+                        Intent startImageView = new Intent(context,BillViewer.class);
                         File photo = new File(thisTicket.getFileUri().toString().substring(7));
 
                         //Put data to next activity

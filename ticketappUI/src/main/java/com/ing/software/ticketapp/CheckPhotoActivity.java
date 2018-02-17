@@ -5,16 +5,20 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SizeF;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -36,6 +40,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import database.DataManager;
+import database.MissionEntity;
 import database.TicketEntity;
 
 /**
@@ -51,6 +56,7 @@ public class CheckPhotoActivity extends Activity {
     EditText checkName;
     EditText checkPrice;
     EditText checkPeople;
+    CheckBox checkRefundable;
     Bitmap finalBitmap;
     ProgressBar waitOCR;
     Button btnOK;
@@ -83,6 +89,7 @@ public class CheckPhotoActivity extends Activity {
         checkPeople = (EditText)findViewById(R.id.input_numPeople);
         checkName = (EditText)findViewById(R.id.input_checkName);
         btnRedo = (Button)findViewById(R.id.btnCheck_retry);
+        checkRefundable = (CheckBox)findViewById(R.id.check_Refundable);
         btnOK = (Button)findViewById(R.id.btnCheck_allow);
         waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
         waitOCR.setVisibility(View.VISIBLE);
@@ -131,6 +138,7 @@ public class CheckPhotoActivity extends Activity {
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
         Bitmap btm = AppUtilities.fromByteArrayToBitmap(Singleton.getInstance().getTakenPicture());
+
         finalBitmap = Bitmap.createBitmap(btm, 0, 0, btm.getWidth(), btm.getHeight(), matrix, true);
     }
 
@@ -140,11 +148,14 @@ public class CheckPhotoActivity extends Activity {
     private void startOCRProcess(){
         // OCR asynchronous implementation:
         ImageProcessor imgProc = new ImageProcessor(finalBitmap);
-        ocrManager.getTicket(imgProc, OcrOptions.getDefault(), result -> {
+        ocrManager.getTicket(imgProc, OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.ALLOW_LOOSE), result -> {
             //Thread UI control reservation
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if(!result.errors.isEmpty()) {
+                        Toast.makeText(getApplicationContext(), result.errors.toString(), Toast.LENGTH_SHORT).show();
+                    }
                     if(result.total != null) {
                         checkPrice.setText(result.total.toString());
                     }
@@ -152,7 +163,6 @@ public class CheckPhotoActivity extends Activity {
                 }
             });
             OCR_result = result;
-            Log.d("SHAPE", result.rectangle.toString());
             //enable save button
             btnOK.setClickable(true);
         });
@@ -182,12 +192,22 @@ public class CheckPhotoActivity extends Activity {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
             TicketEntity thisTicket = new TicketEntity();
+            MissionEntity ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
 
             if(OCR_result.date == null)
-                thisTicket.setDate(Calendar.getInstance().getTime());
+                thisTicket.setDate(ticketMission.getStartDate());
             else
                 thisTicket.setDate(OCR_result.date);
+
             thisTicket.setTagPlaces(Short.parseShort(checkPeople.getText().toString()));
+
+            if(checkRefundable.isChecked()){
+                thisTicket.setRefundable(true);
+            }
+            else{
+                thisTicket.setRefundable(false);
+            }
+
             thisTicket.setFileUri(uri);
             try {
                 thisTicket.setAmount(BigDecimal.valueOf(Double.parseDouble(checkPrice.getText().toString())));
@@ -199,7 +219,6 @@ public class CheckPhotoActivity extends Activity {
 
             thisTicket.setMissionID(Singleton.getInstance().getMissionID());
             long id = DB.addTicket(thisTicket);
-            Log.d("Aggiunto ticket", ""+id);
 
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();

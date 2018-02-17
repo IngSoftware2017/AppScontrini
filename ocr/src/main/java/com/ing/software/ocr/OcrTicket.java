@@ -3,7 +3,6 @@ package com.ing.software.ocr;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.Pair;
-import android.util.SizeF;
 
 import java.math.BigDecimal;
 import java.util.*;

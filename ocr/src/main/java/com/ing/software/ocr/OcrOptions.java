@@ -1,5 +1,7 @@
 package com.ing.software.ocr;
 
+import android.support.annotation.NonNull;
+
 import java.util.Locale;
 
 /**
@@ -32,6 +34,9 @@ public class OcrOptions {
 
     public enum DateSearch {
 
+        /**
+         * Skip search
+         */
         SKIP,
 
         /**
@@ -42,6 +47,9 @@ public class OcrOptions {
 
     public enum TotalSearch {
 
+        /**
+         * Skip search
+         */
         SKIP,
 
         /**
@@ -50,18 +58,21 @@ public class OcrOptions {
         NORMAL,
 
         /**
-         * Redo ocr on target strip
+         * Redo ocr on amount strip
          */
         DEEP,
 
         /**
-         * Redo search if first amount target is not a valid amount (up to 3 searches).
+         * Redo search if first scan did not find any valid price (up to 3 searches).
          */
         EXTENDED_SEARCH,
     }
 
     public enum ProductsSearch {
 
+        /**
+         * Skip search
+         */
         SKIP,
 
         /**
@@ -70,13 +81,16 @@ public class OcrOptions {
         NORMAL,
 
         /**
-         * Redo ocr on target strip
+         * Redo ocr on prices strip
          */
         DEEP,
     }
 
     public enum Orientation {
 
+        /**
+         * Scan image as passed
+         */
         NORMAL,
 
         /**
@@ -84,23 +98,39 @@ public class OcrOptions {
          */
         ALLOW_UPSIDE_DOWN,
 
+        /**
+         * Force scan on upside down image
+         */
         FORCE_UPSIDE_DOWN,
+
     }
 
     public enum PriceEditing {
 
+        /**
+         * Do not try to edit first detected price
+         */
         SKIP,
 
-        ALLOW,
+        /**
+         * Allow edit of price, if a more suitable price was decoded from structure
+         */
+        ALLOW_STRICT,
+
+        /**
+         * Allow edit of price and try to find a price if no text matched an amount string
+         */
+        ALLOW_LOOSE,
     }
 
     private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;
     private static final TotalSearch DEFAULT_TOTAL_SEARCH = TotalSearch.DEEP;
     private static final DateSearch DEFAULT_DATE_SEARCH = DateSearch.NORMAL;
-    private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.DEEP;
+    private static final ProductsSearch DEFAULT_PRODUCTS_SEARCH = ProductsSearch.NORMAL;
     private static final Orientation DEFAULT_ORIENTATION = Orientation.NORMAL;
     private static final Locale DEFAULT_COUNTRY = Locale.ITALY;
     private static final PriceEditing DEFAULT_EDIT = PriceEditing.SKIP;
+
 
     Resolution resolution = Resolution.NORMAL;
     TotalSearch totalSearch = TotalSearch.SKIP;
@@ -121,55 +151,56 @@ public class OcrOptions {
                 .date(DEFAULT_DATE_SEARCH)
                 .products(DEFAULT_PRODUCTS_SEARCH)
                 .orientation(DEFAULT_ORIENTATION)
-                .suggestedCountry(DEFAULT_COUNTRY);
+                .suggestedCountry(DEFAULT_COUNTRY)
+                .priceEditing(DEFAULT_EDIT);
     }
 
     /**
      * Set resolution level
-     * @param level resolution level
+     * @param level resolution level. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions resolution(Resolution level) {
+    public OcrOptions resolution(@NonNull Resolution level) {
         resolution = level;
         return this;
     }
 
     /**
      * Set total search criteria
-     * @param criteria
+     * @param criteria how to search total. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions total(TotalSearch criteria) {
+    public OcrOptions total(@NonNull TotalSearch criteria) {
         totalSearch = criteria;
         return this;
     }
 
     /**
      * Set date search criteria
-     * @param criteria
+     * @param criteria how to search date. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions date(DateSearch criteria) {
+    public OcrOptions date(@NonNull DateSearch criteria) {
         dateSearch = criteria;
         return this;
     }
 
     /**
      * Set products search criteria
-     * @param criteria
+     * @param criteria how to search products. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions products(ProductsSearch criteria) {
+    public OcrOptions products(@NonNull ProductsSearch criteria) {
         productsSearch = criteria;
         return this;
     }
 
     /**
      * Set orientation criteria
-     * @param criteria
+     * @param criteria how to set orientation. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions orientation(Orientation criteria) {
+    public OcrOptions orientation(@NonNull Orientation criteria) {
         orientation = criteria;
         return this;
     }
@@ -177,7 +208,7 @@ public class OcrOptions {
     /**
      * Set suggested country, used to resolve ambiguities.
      * Can be extracted from current location or location history.
-     * @param country ISO locale country
+     * @param country ISO locale country. Can be null.
      * @return OcrOptions instance
      */
     public OcrOptions suggestedCountry(Locale country) {
@@ -187,10 +218,10 @@ public class OcrOptions {
 
     /**
      * Set price editing criteria
-     * @param criteria
-     * @return
+     * @param criteria permission to edit total. Not null.
+     * @return OcrOptions instance
      */
-    public OcrOptions priceEditing(PriceEditing criteria) {
+    public OcrOptions priceEditing(@NonNull PriceEditing criteria) {
         priceEditing = criteria;
         return this;
     }

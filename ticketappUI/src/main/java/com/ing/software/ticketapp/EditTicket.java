@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,12 +39,14 @@ public class EditTicket extends AppCompatActivity {
     Context context;
     TicketEntity thisTicket;
     MissionEntity thisMission;
-    String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = "", ticketDateString = "";
+    String ticketTitle = "", ticketAmount = "", ticketShop = "", ticketPath = "", ticketDateString = "", ticketPeople = "";
     Date ticketDate;
     TextView txtTitle;
     TextView txtAmount;
     TextView txtShop;
     TextView txtDate;
+    CheckBox checkRefund;
+    TextView txtPeople;
     Intent intent;
 
     @Override
@@ -126,6 +129,10 @@ public class EditTicket extends AppCompatActivity {
                     thisTicket.setShop(txtShop.getText().toString());
                 }
 
+                thisTicket.setTagPlaces(Short.parseShort(txtPeople.getText().toString()));
+
+                thisTicket.setRefundable(checkRefund.isChecked());
+
                 /**
                  * Mantovan Federico
                  * Check entry amount
@@ -182,6 +189,7 @@ public class EditTicket extends AppCompatActivity {
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate();
+        ticketPeople = ""+thisTicket.getTagPlaces();
         if(thisTicket.getAmount() == null){
             ticketAmount = "";
         }
@@ -207,10 +215,16 @@ public class EditTicket extends AppCompatActivity {
         txtAmount = (TextView)findViewById(R.id.input_ticketAmountMod);
         txtShop = (TextView)findViewById(R.id.input_ticketShopMod);
         txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
+        checkRefund = (CheckBox)findViewById(R.id.check_isRepaidTicket);
+        txtPeople = (TextView)findViewById(R.id.input_ticketPersonNumber);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         txtDate.setText(formatter.format(ticketDate));
         txtTitle.setText(ticketTitle);
         txtShop.setText(ticketShop);
         txtAmount.setText(ticketAmount);
+        txtPeople.setText(ticketPeople);
+        if(thisTicket.isRefundable()){
+            checkRefund.isChecked();
+        }
     }
 }

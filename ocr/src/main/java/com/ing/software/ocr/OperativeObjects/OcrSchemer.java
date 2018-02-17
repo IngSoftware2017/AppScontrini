@@ -13,16 +13,14 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static com.ing.software.ocr.OcrVars.*;
-
 /**
  * @author Michelon
  * Manages a receipt trying to find its elements (introduction, products, prices, conclusion).
- * Only methods that don't change mainImage (rects included) are static, as it should be.
  */
 
 class OcrSchemer {
 
+    //Magic Numbers.
     private static final int X_DIVIDER = 13; //divider for rect to choose left-center-right tag
     private static final int X_DIVIDER_LEFT = 4; //where to end left tags, must be <= X_DIVIDER_RIGTH
     private static final int X_DIVIDER_RIGHT = 9; //where to end center tag, must be <= X_DIVIDER
@@ -37,14 +35,21 @@ class OcrSchemer {
     static final String PRICES_TAG = "prices"; //tag for text on central-right part of the receipt
     static final String CONCLUSION_TAG = "conclusion"; //tag for text on bottom of the receipt
 
-    private RawImage mainImage;
+    private RawImage mainImage; //this is a reference to current rawImage, so every change here is available
+    // wherever the same (=/= clone) object is used
 
+    /**
+     * Constructor
+     * @param mainImage source image. Will be modified.
+     */
     OcrSchemer(RawImage mainImage) {
         this.mainImage = mainImage;
     }
 
     /**
+     * @author Michelon
      * Organize a list of Texts adding tags according to their position.
+     * Modifies mainImage dividing texts in different regions.
      */
     void prepareScheme() {
         List<OcrText> textList = mainImage.getAllTexts();
@@ -83,6 +88,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Find column where center of rawText is, dividing the maximized rect in a defined number of parts parts
      * @param text target text. Not null.
      * @return 0,1,2 according to position (left, center, right)
@@ -102,9 +108,10 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * @param text source text. Not null.
      * @param targetHeight target height
-     * @return True if text is above target height
+     * @return True if text is above (top is 0) target height
      */
     private static boolean isHalfUp(@NonNull OcrText text, float targetHeight) {
         //int height = text.getRawImage().getHeight();
@@ -113,9 +120,11 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Tries to find the area of the ticket where there is the highest number of left/right
      * texts, to decide the "central" point of the ticket
      * @param texts list of all texts
+     * @param mainImage source image
      * @return y coordinate of central point
      */
     private static float getBestCentralArea(List<OcrText> texts, RawImage mainImage) {
@@ -152,6 +161,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Organize texts, if they are on the same level of a introduction\conclusion text, tag them accordingly
      * else consider them products or prices.
      * @param texts ordered list of Texts. Not null.
@@ -175,7 +185,8 @@ class OcrSchemer {
     }
 
     /**
-     * Tags central texts according to position
+     * @author Michelon
+     * Tags central (x coordinate) texts according to position
      * @param texts ordered list of Texts. Not null.
      * @param targetHeight center (y coordinate) of the ticket
      */
@@ -195,6 +206,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Tag rawTexts without a introduction\conclusion tag, as products\prices
      * @param texts list of Texts. Not null.
      */
@@ -213,6 +225,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Get index of rect at which you want to stop tag 'block'
      * Method comments are an example of introduction tag
      * @param textList list of Texts. Not null.
@@ -268,6 +281,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Get area of a rect
      * @param rect A rect. Not null.
      * @return Area of the rect.
@@ -277,6 +291,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Tag all texts in a interval with the same tag. Starting and ending indexes are included.
      * @param textList list of Texts. Not null.
      * @param tag new tag for Texts. Not null.
@@ -298,6 +313,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Tag all texts in a interval with the same tag. Starting and ending indexes are included.
      * @param textList list of Texts. Not null.
      * @param tagLeft new tag for Texts on left. Not null.
@@ -336,6 +352,7 @@ class OcrSchemer {
     }
 
     /**
+     * @author Michelon
      * Remove all tags (excluded left-center-right) from a Text
      * @param text source text. Not Null.
      */

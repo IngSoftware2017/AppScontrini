@@ -26,7 +26,10 @@ import static com.ing.software.common.CommonUtils.rectFromSize;
 import static com.ing.software.common.CommonUtils.size;
 import static com.ing.software.ocr.DataAnalyzer.POTENTIAL_PRICE;
 import static com.ing.software.ocr.DataAnalyzer.PRICE_UPSIDEDOWN;
+<<<<<<< HEAD
 import static com.ing.software.ocr.OcrVars.*;
+=======
+>>>>>>> kraktun/gruppo2-modular-complete
 import static java.lang.Math.abs;
 import static java.util.Collections.max;
 

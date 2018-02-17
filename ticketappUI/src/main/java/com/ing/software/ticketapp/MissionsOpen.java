@@ -56,7 +56,9 @@ public class MissionsOpen extends Fragment {
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab_addMission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AppUtilities.circularReveal(myView);
+                int cx = myView.getWidth();
+                int cy = myView.getHeight();
+                AppUtilities.circularReveal(myView, cx, cy);
                 Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                 addMission.putExtra("person", personID);
                 Log.d("PersonID", ""+personID);
@@ -117,11 +119,14 @@ public class MissionsOpen extends Fragment {
      * Se non sono presenti missioni mostra come aggiungerne una
      */
     private void startGuide(){
-        TapTargetView.showFor(getActivity(), TapTarget.forView(rootView.findViewById(R.id.fab_addMission), "Ci sei quasi!", "Clicca qui per creare una nuova missione")
+        TapTargetView.showFor(getActivity(),
+                TapTarget.forView(rootView.findViewById(R.id.fab_addMission),
+                        getResources().getString(R.string.missionAddTitle),
+                        getResources().getString(R.string.missionAddDesc))
             .targetCircleColor(R.color.white)
-            .titleTextSize(20)
+            .titleTextSize(21)
             .titleTextColor(R.color.white)
-            .descriptionTextSize(10)
+            .descriptionTextSize(13)
             .descriptionTextColor(R.color.white)
             .textColor(R.color.white)
             .icon(getResources().getDrawable(R.mipmap.ic_add_white_24dp)),
@@ -129,7 +134,9 @@ public class MissionsOpen extends Fragment {
                 @Override
                 public void onTargetClick(TapTargetView v) {
                     super.onTargetClick(v);      // This call is optional
-                    AppUtilities.circularReveal(myView);
+                    int cx = myView.getWidth();
+                    int cy = myView.getHeight();
+                    AppUtilities.circularReveal(myView, cx, cy);
                     Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                     addMission.putExtra("person", personID);
                     Log.d("PersonID", ""+personID);
