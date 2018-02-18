@@ -63,8 +63,10 @@ public class CheckPhotoActivity extends Activity {
     Bitmap finalBitmap;
     ProgressBar waitOCR;
     Button btnOK;
+    Date dateTicket;
     Button btnRedo;
     ImageView checkPhotoView;
+    MissionEntity ticketMission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +98,7 @@ public class CheckPhotoActivity extends Activity {
         btnOK = (Button)findViewById(R.id.btnCheck_allow);
         waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
         waitOCR.setVisibility(View.VISIBLE);
+        ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
 
         //OCR initialize
         ocrManager = new OcrManager();
@@ -166,6 +169,20 @@ public class CheckPhotoActivity extends Activity {
                     if(result.total != null) {
                         checkPrice.setText(result.total.toString());
                     }
+                    if(OCR_result.date != null) {
+                        dateTicket = OCR_result.date;
+                        //Ticket date < Mission date start, it advises the user
+                        if(OCR_result.date.before(ticketMission.getStartDate())){
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMin), Toast.LENGTH_SHORT).show();
+                        }
+                        //Ticket date > Mission date finish, it advises the user
+                        if(OCR_result.date.after(ticketMission.getEndDate())){
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMax), Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        dateTicket = ticketMission.getStartDate();
+                    }
                     waitOCR.setVisibility(View.INVISIBLE);
                 }
             });
@@ -199,12 +216,8 @@ public class CheckPhotoActivity extends Activity {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
             TicketEntity thisTicket = new TicketEntity();
-            MissionEntity ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
 
-            if(OCR_result.date == null)
-                thisTicket.setDate(ticketMission.getStartDate());
-            else
-                thisTicket.setDate(OCR_result.date);
+            thisTicket.setDate(dateTicket);
 
             thisTicket.setTagPlaces(Short.parseShort(checkPeople.getText().toString()));
 
