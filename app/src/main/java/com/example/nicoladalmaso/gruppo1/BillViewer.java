@@ -106,8 +106,8 @@ public class BillViewer extends AppCompatActivity {
             ticketAmountUn = getString(R.string.string_NoAmountFull);
         }
         else {
-            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
-            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() +  Singleton.getInstance().getCurrency();
+            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " " + Singleton.getInstance().getCurrency();
         }
 
         //Title

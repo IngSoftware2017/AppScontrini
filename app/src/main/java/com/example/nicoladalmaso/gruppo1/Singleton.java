@@ -2,6 +2,7 @@ package com.example.nicoladalmaso.gruppo1;
 
 import android.util.Log;
 
+import java.util.Currency;
 import java.util.Date;
 
 import database.DataManager;
@@ -19,6 +20,7 @@ public class Singleton {
     private byte[] pictureTaken; //it saves the system from another picture save (-2 sec in photo taking process)
     private Date startDate;
     private Date endDate;
+    private String currency;
     private int flag;
     private boolean flagStart;
     private Singleton(){
@@ -28,6 +30,7 @@ public class Singleton {
         pictureTaken = null;
         startDate = null;
         flag = 0;
+        currency = "";
     }
 
     public static synchronized Singleton getInstance(){
@@ -85,5 +88,24 @@ public class Singleton {
     public Date getEndDate(){return endDate;}
 
     public void setEndDate(Date end){endDate = end;}
+
+    public void setCurrency(String curr){
+        switch (curr){
+            case ("EUR"):
+                currency = "€";
+                break;
+            case ("USD"):
+                currency = "$";
+                break;
+            case ("GBP"):
+                currency = "£";
+                break;
+            default:
+                currency = "€";
+                break;
+        }
+    }
+
+    public String getCurrency() {return currency;}
 
 }

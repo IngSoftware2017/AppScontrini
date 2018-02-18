@@ -62,7 +62,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_Ticket">Scontrino</string>
     <string name="string_NoShop">Negozio non impostato</string>
-    <string name="string_NoAmount">NaN</string>
+    <string name="string_NoAmount">Null</string>
     <string name="string_NoAmountFull">Numero non rilevato</string>
     <string name="string_Total">Totale: </string>
     <string name="string_Euros">€</string>

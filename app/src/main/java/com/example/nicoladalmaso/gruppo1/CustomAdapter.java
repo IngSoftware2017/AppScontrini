@@ -103,7 +103,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         }
         else {
             amount = c.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString();
-            tot.setText(amount+" €");
+            tot.setText(amount + " " + Singleton.getInstance().getCurrency());
         }
 
         //Ticket image bitmap set
