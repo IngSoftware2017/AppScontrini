@@ -194,6 +194,8 @@ public class CheckPhotoActivity extends Activity {
             TicketEntity thisTicket = new TicketEntity();
             MissionEntity ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
 
+            MissionEntity ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
+
             if(OCR_result.date == null)
                 thisTicket.setDate(ticketMission.getStartDate());
             else

@@ -44,6 +44,7 @@ public class RegexTest {
     public void dateTest1() {
         assertNotEquals(null, match(DATE, "1/2/34"));
     }
+    */
 
     @Test
     public void potentialPriceTest1() {
