@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:focusableInTouchMode="true"
     tools:context="com.example.nicoladalmaso.gruppo1.EditTicket">
 
     <LinearLayout
@@ -28,7 +29,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:windowSoftInputMode="stateHidden"
                 android:hint="@string/name"
                 android:inputType="textCapSentences"
                 android:singleLine="true"
@@ -75,7 +75,6 @@
                         android:id="@+id/input_ticketShopMod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:windowSoftInputMode="stateHidden"
                         android:hint="@string/shop"
                         android:inputType="textCapSentences"
                         android:textColor="#666"
@@ -111,7 +110,6 @@
                         android:id="@+id/input_ticketAmountMod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:windowSoftInputMode="stateHidden"
                         android:digits="0123456789."
                         android:hint="@string/total"
                         android:inputType="numberDecimal"
@@ -150,7 +148,6 @@
                         android:layout_height="wrap_content"
                         android:digits="123456789"
                         android:hint="Numero persone"
-                        android:windowSoftInputMode="stateHidden"
                         android:inputType="number"
                         android:textColor="#666"
                         android:textSize="20dp" />
@@ -187,7 +184,6 @@
                         android:id="@+id/input_ticketDateMod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:windowSoftInputMode="stateHidden"
                         android:layout_marginLeft="3dp"
                         android:hint="@string/date"
                         android:paddingTop="7dp"
