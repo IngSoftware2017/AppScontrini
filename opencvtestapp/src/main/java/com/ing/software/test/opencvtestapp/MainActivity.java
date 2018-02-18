@@ -18,12 +18,12 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.*;
 import android.widget.*;
 
 import com.annimon.stream.function.ThrowableConsumer;
-import com.google.android.gms.vision.text.*;
 
 import com.ing.software.common.*;
 import com.ing.software.ocr.*;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int LINE_THICKNESS = 6;
     private static final int FONT_THICKNESS = 2;
     private static final double FONT_SIZE_DEF = 0.6;
-    private static final double FONT_SIZE_AMOUNT = 2.;
+    private static final double FONT_SIZE_STRIP = 2.;
 
     private static final Scalar WHITE = new Scalar(255,255,255, 255);
     private static final Scalar RED = new Scalar(255,0,0, 255);
@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case MSG_EXCEPTION:
                     Toast.makeText(this, "Exception: " + msg.obj, Toast.LENGTH_LONG).show();
+                    Log.e("Exception:", (String)msg.obj);
                     break;
                 default:
                     return false;
@@ -185,28 +186,42 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Draw a polygon on a mat image
-     * @param img
-     * @param pts
-     * @param color
-     * @param thick
+     * @param img in-out RGBA Mat. Not null.
+     * @param pts MatOfPoint2f containing the vertices of a polygon
+     * @param color line color
+     * @param thick line thickness
      */
     static void drawPoly(Mat img, MatOfPoint2f pts, Scalar color, int thick) {
         polylines(img, singletonList(new MatOfPoint(pts.toArray())), true, color, thick);
     }
 
+    /**
+     * Convert a list of points to a list containing one MatOfPoint
+     * @param pts list of PointF. Not null.
+     * @return List of MatOfPoint
+     * @throws Exception
+     */
     static List<MatOfPoint> pts2matArr(List<PointF> pts) throws Exception {
         List<Point> cvPts = invoke(IP, "androidPtsToCV", pts);
         return singletonList(new MatOfPoint(cvPts.toArray(new Point[4])));
     }
 
-    static void drawTextLines(Mat img, List<OcrText> lines, Scalar backColor, double fontSize) throws Exception {
-        for (OcrText line : lines) {
+    /**
+     * Draw the text of OcrTexts on an image, filling the area containing words and outlining the rows of texts.
+     * @param img in-out RGBA Mat. Not null.
+     * @param texts list of OcrText. Can be empty. Not null.
+     * @param backColor word background color. Not null.
+     * @param fontSize font size
+     * @throws Exception
+     */
+    static void drawTextLines(Mat img, List<OcrText> texts, Scalar backColor, double fontSize) throws Exception {
+        for (OcrText line : texts) {
             polylines(img, pts2matArr(line.corners()), true, RED, LINE_THICKNESS);
             for (OcrText w : line.children()) {
                 fillPoly(img, pts2matArr(w.corners()), backColor);
             }
         }
-        for (OcrText line : lines) {
+        for (OcrText line : texts) {
             for (OcrText w : line.children()) {
                 PointF blPt = w.corners().get(3); // bottom-right point (clockwise from top-left)
                 putText(img, w.textUppercase(), new Point(blPt.x + 3, blPt.y - 3), // add some padding (3, -3)
@@ -217,9 +232,9 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Draw lines contained in a MatOfInt4
-     * @param rgba in-out RGBA Mat
-     * @param lines MatOfInt4 containing the lines
-     * @param color Scalar with 4 channels
+     * @param rgba in-out RGBA Mat. Not null.
+     * @param lines MatOfInt4 containing the lines. Not null.
+     * @param color Scalar with 4 channels. Not null.
      */
     static void drawLines(Mat rgba, MatOfInt4 lines, Scalar color) {
         if (lines.rows() > 0) {
@@ -231,15 +246,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Mat classifyAndDrawTexts(Bitmap bm, List<OcrText> lines, double fontSize) throws Exception {
+    /**
+     * Classify a and draw a list of OcrTexts. Class is shown with background color:
+     * BLUE: unclassified
+     * PURPLE: dates
+     * DARK GREEN: total string
+     * DARK RED: prices
+     * ORANGE: potential or corrupted prices
+     * RED: upside down prices
+     *
+     * @param bm Bitmap. Not null.
+     * @param texts list of OcrText. Can be empty. Not null.
+     * @param fontSize font size
+     * @return OpenCV Mat filled with the bitmap image and the drawn texts
+     * @throws Exception
+     */
+    private Mat classifyAndDrawTexts(Bitmap bm, List<OcrText> texts, double fontSize) throws Exception {
         Mat img = bitmapToMat(bm);
 
         // first of all, find best amount string and draw strip rect
-        List<Scored<OcrText>> amountStrs = invoke(TF, "findAllScoredAmountStrings",
-                lines, size(bm));
+        List<Scored<Pair<OcrText, Locale>>> amountStrs = invoke(TF, "findAllScoredAmountStrings",
+                texts, size(bm));
         if (amountStrs.size() != 0) { //Note: size != 0 is more readable than !...isEmpty()
-            OcrText amountStr = max(amountStrs).obj();
-            RectF amountSripRect = invoke(TF, "getAmountStripRect", amountStr, size(bm));
+            OcrText amountStr = max(amountStrs).obj().first;
+            RectF amountSripRect = invoke(OA, "getAmountExtendedBox", amountStr, (float)bm.getWidth());
             List<Point> cvPts = invoke(IP, "androidPtsToCV", rectToPts(amountSripRect));
             MatOfPoint2f ptsMat = invoke(IP, "ptsToMat", cvPts);
             drawPoly(img, ptsMat, GREEN, DEF_THICKNESS);
@@ -248,25 +278,25 @@ public class MainActivity extends AppCompatActivity {
         //draw elements in ascending order of importance
 
         // draw all texts
-        drawTextLines(img, lines, BLUE, fontSize);
+        drawTextLines(img, texts, BLUE, fontSize);
 
         // draw potential prices
-        List<OcrText> potPrices = invoke(TF, "findAllPotentialPrices", lines);
+        List<OcrText> potPrices = invoke(TF, "findAllPotentialPrices", texts);
         drawTextLines(img, potPrices, ORANGE, fontSize);
 
         // draw all dates
-        List<Pair<OcrText, Date>> dates = invoke(TF, "findAllDates", lines);
+        List<Triple<OcrText, Date, Locale>> dates = invoke(DA, "findAllDatesRegex", texts, null);
         drawTextLines(img, Stream.of(dates).map(p -> p.first).toList(), PURPLE, fontSize);
 
         // draw all amount strings
-        drawTextLines(img, Stream.of(amountStrs).map(Scored::obj).toList(), DARK_GREEN, fontSize);
+        drawTextLines(img, Stream.of(amountStrs).map(s -> s.obj().first).toList(), DARK_GREEN, fontSize);
 
         // draw certain prices
-        List<Pair<OcrText, BigDecimal>> prices = invoke(DataAnalyzer.class, "findAllPricesRegex", lines);
+        List<Pair<OcrText, BigDecimal>> prices = invoke(DA, "findAllPricesRegex", texts, true);
         drawTextLines(img, Stream.of(prices).map(p -> p.first).toList(), DARK_RED, fontSize);
 
         // draw upside down prices
-        List<OcrText> udPrices = invoke(TF, "findAllUpsideDownPrices", lines);
+        List<OcrText> udPrices = invoke(TF, "findAllUpsideDownPrices", texts);
         drawTextLines(img, udPrices, RED, fontSize);
 
         return img;
@@ -352,6 +382,9 @@ public class MainActivity extends AppCompatActivity {
             startDatasetLoop();
     }
 
+    /**
+     * Execute processImage() for the images in the dataset.
+     */
     private void startDatasetLoop() {
         new Thread(() -> errHdlr.tryRun(() -> {
             while(true) {
@@ -418,17 +451,28 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            double bgThresh = getField(IP, "BG_CONTRAST_THRESHOLD");
+            double bgThresh = getField(IP, "BG_CONTRAST_THRESH");
+            double focusThresh = getField(IP, "FOCUS_THRESH");
             double bgContrast = invoke(IP, "getBackgroundContrast", rect, contour);
+            double focus = invoke(IP, "getFocus", grayResized, contour);
 
             StringBuilder titleStr = new StringBuilder();
-            titleStr.append(imgIdx).append("  BGC=").append(NUM_FMT.format(bgContrast));
+            titleStr.append(imgIdx).append(" BGC:").append(NUM_FMT.format(bgContrast));
             if (bgContrast < bgThresh) {
+                titleStr.append(" BAD");
+            }
+            titleStr.append(" F:").append((int)focus);
+            if (focus < focusThresh) {
                 titleStr.append(" BAD");
             }
             asyncSetTitle(titleStr.toString());
 
             // show both contours and hough lines
+            // polygon: GREEN if accepted, RED if rejected
+            // contours: YELLOW accepted, ORANGE rejected
+            // optimized contour: BLUE
+            // hough lines: PURPLE
+            // final image rectangle: BLACK
             Mat rgbaResized = new Mat();
             cvtColor(grayResized, rgbaResized, COLOR_GRAY2RGBA);
             drawPoly(rgbaResized, rect, BLACK, DEF_THICKNESS);
@@ -445,18 +489,18 @@ public class MainActivity extends AppCompatActivity {
             List<OcrText> texts = invoke(analyzer, "analyze", ocrBm);
 
             //find amount strings
-            List<Scored<OcrText>> amountStrs = invoke(TF, "findAllScoredAmountStrings",
-                    texts, size(ocrBm));
+            List<Scored<Pair<OcrText, Locale>>> amountStrs =
+                    invoke(TF, "findAllScoredAmountStrings", texts, size(ocrBm));
 
             // find dates
-            List<Pair<OcrText, Date>> dates = invoke(DA, "findAllDatesRegex", texts);
+            Pair<OcrText, Date> date = invoke(DA, "findDate", texts, null, null);
 
             // draw
             StringBuilder titleStr = new StringBuilder();
             titleStr.append(imgIdx);
-            if (dates.size() == 1) {
-                titleStr.append(" - ").append(new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY)
-                        .format(dates.get(0).second));
+            if (date != null) {
+                titleStr.append(" - ")
+                        .append(new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(date.second));
             } else {
                 titleStr.append(" - date not found or multiple");
             }
@@ -465,18 +509,18 @@ public class MainActivity extends AppCompatActivity {
 
             // find amount price
             if (amountStrs.size() != 0) {
-                OcrText amountStr = max(amountStrs).obj();
-                RectF srcAmountStripRect = invoke(TF, "getAmountStripRect",
-                        amountStr, size(ocrBm));
-                Bitmap amountStrip = invoke(TF, "getAmountStrip",
-                        imgProc, size(ocrBm), amountStr, srcAmountStripRect);
-                RectF dstAmountStripRect = rectFromSize(size(amountStrip));
+                OcrText amountStr = max(amountStrs).obj().first;
+                RectF srcStripRect =
+                        invoke(OA, "getAmountExtendedBox", amountStr, (float)ocrBm.getWidth());
+                Bitmap amountStrip =
+                        invoke(OA, "getStrip", imgProc, size(ocrBm), amountStr, srcStripRect);
+                RectF dstStripRect = rectFromSize(size(amountStrip));
                 List<OcrText> stripTextsStripSpace = invoke(analyzer, "analyze", amountStrip);
                 List<OcrText> stripTextsBmSpace = Stream.of(stripTextsStripSpace)
-                        .map(line -> new OcrText(line, dstAmountStripRect, srcAmountStripRect))
+                        .map(line -> new OcrText(line, dstStripRect, srcStripRect))
                         .toList();
-                BigDecimal price = invoke(TF, "findAmountPrice",
-                        stripTextsBmSpace, amountStr, srcAmountStripRect);
+                BigDecimal price =
+                        invoke(TF, "findAmountPrice", stripTextsBmSpace, amountStr, srcStripRect);
 
                 // draw strip
                 titleStr = new StringBuilder();
@@ -484,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
                 if (price != null)
                     titleStr.append(" -  ").append(price);
                 asyncSetTitle(titleStr.toString());
-                showMat.accept(classifyAndDrawTexts(amountStrip, stripTextsBmSpace, FONT_SIZE_AMOUNT));
+                showMat.accept(classifyAndDrawTexts(amountStrip, stripTextsStripSpace, FONT_SIZE_STRIP));
             }
         }
     }
@@ -516,6 +560,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Request a photo captured with native camera.
+     */
     public void takePicture() {
         errHdlr.tryRun(() -> {
             invoke(StrictMode.class, "disableDeathOnFileUriExposure"); // hack to avoid using FileProvider

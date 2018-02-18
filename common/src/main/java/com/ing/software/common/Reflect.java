@@ -16,6 +16,7 @@ public class Reflect {
 
     /**
      * Invoke a static or non static method (with any access level) of a class.
+     * NB: the parameters must be of the same type of which of the method to invoke. Any cast must be made explicit.
      *
      * @param clazz A class instance or class type. Not null
      * @param method Method name. Not null.
