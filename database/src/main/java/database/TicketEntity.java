@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-
 /**
  * Represents the ticket and its associated information
  * @author Marco Olivieri (Team 3)
@@ -40,7 +39,6 @@ public class TicketEntity {
     private boolean isRefundable; //a ticket can be refundable or not
     private int[] ipErrorArray;
     private int[] ocrErrorArray;
-
 
     @ColumnInfo(name = Constants.MISSION_CHILD_COLUMNS)
     private long missionID;
@@ -184,7 +182,6 @@ public class TicketEntity {
         this.missionID = missionID;
     }
 
-
     /** Created by Marco Olivieri
      * Returns the corners of the ticket
      * 8 float point of the rectangle coordinate
@@ -284,7 +281,6 @@ public class TicketEntity {
         this.ipErrorArray = ipErrorArray;
     }
 
-
     /** Created by Marco Olivieri
      * Returns an integer array that contains OCRmanager's error
      * @return OcrErrorArray
@@ -300,7 +296,6 @@ public class TicketEntity {
     public void setOcrErrorArray(int[] ocrErrorArray) {
         this.ocrErrorArray = ocrErrorArray;
     }
-
 
     /**
      * Returns a String with TicketEntity data formatted as follows:

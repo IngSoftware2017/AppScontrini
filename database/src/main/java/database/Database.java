@@ -16,7 +16,7 @@ import android.content.Context;
  * the Room library takes care of creating the DAO object and returning it when ticketDao() is called.
  */
 
-@android.arch.persistence.room.Database(entities = {TicketEntity.class, MissionEntity.class, PersonEntity.class}, version = 1)
+@android.arch.persistence.room.Database(entities = {TicketEntity.class, MissionEntity.class, PersonEntity.class, SettingsEntity.class}, version = 1)
 public abstract class Database extends RoomDatabase {
 
     private static Database INSTANCE; //Unique instance of the Database object
@@ -29,12 +29,13 @@ public abstract class Database extends RoomDatabase {
     public static Database getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), Database.class, Constants.DATABASE_NAME)
-                    .allowMainThreadQueries().build();
+                            .allowMainThreadQueries().build();
         }
         return INSTANCE;
     }
 
-    /**Destroys the Database instance (by setting it to null). getAppDatabase(context) must be called before using the saved instance of Database again
+    /**
+     * Destroys the Database instance (by setting it to null). getAppDatabase(context) must be called before using the saved instance of Database again
      **/
     public static void destroyInstance() {
         INSTANCE = null;
@@ -50,6 +51,4 @@ public abstract class Database extends RoomDatabase {
     protected InvalidationTracker createInvalidationTracker() {
         return null;
     }
-
-
 }

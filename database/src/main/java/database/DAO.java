@@ -15,7 +15,7 @@ import java.util.concurrent.CompletionService;
 
 /**
  * Created by Federico Taschin on 08/11/2017.
- * Modified by Marco Olivieri
+ * Modified by Marco Olivieri: added query
  * Modify by Matteo Mascotto: improve getPerson from id and complete methods documentation
  */
 
@@ -54,6 +54,14 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.FAIL)
     long addMission(MissionEntity missionEntity);
 
+    /** @author Marco Olivieri
+     * Executes the insert query.
+     * @param settingsEntity not null, the entity to be inserted
+     * @return the id of inserted entity.
+     */
+    @Insert(onConflict = OnConflictStrategy.FAIL)
+    long addSettings(SettingsEntity settingsEntity);
+
     /**
      * Executes the insert query.
      * @param personEntity PersonEntity not null, the entity to be inserted
@@ -90,9 +98,17 @@ public interface DAO {
     @Query("DELETE FROM "+ Constants.TICKET_TABLE_NAME+" WHERE "+ Constants.TICKET_PRIMARY_KEY+" = :id")
     int deleteTicket(long id);
 
-    //UPDATE
+    /** @author Marco Olivieri
+     * Deletes a SettingsEntity from the database
+     * @param id long the ID of the SettingsEntity to be deleted
+     * @return the number of deleted entities.
+     */
+    @Query("DELETE FROM "+ Constants.SETTINGS_TABLE_NAME+" WHERE "+ Constants.SETTINGS_PRIMARY_KEY+" = :id")
+    int deleteSetting(long id);
 
-    /**Updates the given TicketEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+    //UPDATE
+    /**
+     * Updates the given TicketEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
      * @param ticketEntity TicketEntity not null, the entity to be updated.
      *               ticketEntity.fileUri not null
      *               ticketEntity.amount not null
@@ -122,8 +138,15 @@ public interface DAO {
     @Update
     int updatePerson(PersonEntity personEntity);
 
-    //SELECT ALL
+    /** @author Marco Olivieri
+     * Updates the given SettingsEntity matching its ID. All fields (except ID) with values other than those in the database will be updated
+     * @param settingsEntity not null, the entity to be inserted
+     * @return the number of updated entities
+     */
+    @Update
+    int updateSetting(SettingsEntity settingsEntity);
 
+    //SELECT ALL
     /**
      * @author Federico Taschin
      * Executes a SELECT of all the TicketEntity in the database
@@ -164,8 +187,11 @@ public interface DAO {
     @Query("SELECT * FROM "+ Constants.PERSON_TABLE_NAME + " ORDER BY " + Constants.PERSON_FIELD_NAME + " ASC")
     List<PersonEntity> getAllPersonNameOrder();
 
-    //SELECT FROM ID
 
+    @Query("SELECT * FROM "+Constants.SETTINGS_TABLE_NAME)
+    List<SettingsEntity> getAllSettings();
+
+    //SELECT FROM ID
     /**
      *Gets all the TicketEnt of a MissionEntity
      *@param id long, the id of the MissionEntity
@@ -303,7 +329,6 @@ public interface DAO {
             Constants.PERSON_CHILD_COLUMNS+"= :personID AND "+Constants.MISSION_FIELD_CLOSED+"=0")
     int getActiveMissionsNumberForPerson(long personID);
 
-
     /**
      * Gets the number of the refoundable Tickets in the DB
      * @return the number of refoundable tickets
@@ -323,4 +348,5 @@ public interface DAO {
     @Query("SELECT COUNT(*) FROM " + Constants.TICKET_TABLE_NAME + " WHERE NOT " +
             Constants.TICKET_IS_REFUNDABLE)
     int countNotRefundableTickets();
+
 }

@@ -23,12 +23,7 @@ public class PersonEntity {
     private String name;
     private String lastName;
     private String academicTitle;
-
-
-
     private Uri foto;
-
-
     private String email;
 
     @Ignore

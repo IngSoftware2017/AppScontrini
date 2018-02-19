@@ -15,6 +15,7 @@ public final class Constants {
     public static final String TICKET_TABLE_NAME = "tickets";
     public static final String MISSION_TABLE_NAME = "missions";
     public static final String PERSON_TABLE_NAME = "persons";
+    public static final String SETTINGS_TABLE_NAME = "settings";
 
     //Foreign Keys
     public static final String TICKET_CHILD_COLUMNS = "ticket_ID";
@@ -37,10 +38,13 @@ public final class Constants {
     public static final String MISSION_FIELD_LOCATION = "location";
     public static final String MISSION_FIELD_CLOSED = "isClosed";
     public static final String MISSION_FIELD_NAME = "name";
+
     //Person's constants
     public static final String PERSON_PRIMARY_KEY = "ID";
     public static final String PERSON_FIELD_NAME = "name";
     public static final String PERSON_FIELD_LAST_NAME = "lastName";
 
+    //Settings' contants
+    public static final String SETTINGS_PRIMARY_KEY = "ID";
 
 }

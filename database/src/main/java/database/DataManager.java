@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Created by Federico Taschin on 07/11/2017.
- * Modified by Marco Olivieri
+ * Modified by Marco Olivieri: added methods and query
  * Modify by Matteo Mascotto: improve methods and complete documentation
  */
 
@@ -66,6 +66,17 @@ public class DataManager {
     }
 
     /**
+     * @author Marco Olivieri
+     * Executes the insert query.
+     * @param settingsEntity not null, the entity to be inserted
+     * @return the id of the inserted settingsEntity
+     */
+    public long addSettings(SettingsEntity settingsEntity){
+        settingsEntity.setID(database.ticketDao().addSettings(settingsEntity));
+        return settingsEntity.getID();
+    }
+
+    /**
      * Deletes a ticket from the database
      * @param id the id of the ticket to be deleted
      * @return true if the ticket is deleted, false otherwise
@@ -92,6 +103,16 @@ public class DataManager {
      */
     public boolean deletePerson(long id){
         return database.ticketDao().deletePerson(id)>0;
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Deletes a record setting from the db
+     * @param id the id of the person to be deleted
+     * @return true if the record setting is deleted, false otherwise
+     */
+    public boolean deleteSettings(long id){
+        return database.ticketDao().deleteSetting(id)>0;
     }
 
     /**Updates values of the ticketEntity with the same id in the database. All fields (except ID) are updated
@@ -123,6 +144,16 @@ public class DataManager {
      */
     public boolean updatePerson(PersonEntity personEntity){
         return database.ticketDao().updatePerson(personEntity)>0;
+    }
+
+    /**
+     * @author Marco Olivieri
+     * Updates values of the PersonEntity with the same id in the database. All fields (except ID) are updated
+     * @param settingsEntity not null
+     * @return true if the update is executed, false otherwise (i.e. invalid ID)
+     */
+    public boolean updateSettings(SettingsEntity settingsEntity){
+        return database.ticketDao().updateSetting(settingsEntity)>0;
     }
 
     /**
@@ -168,6 +199,13 @@ public class DataManager {
      */
     public List<PersonEntity> getAllPersonNameOrder(){
         return database.ticketDao().getAllPersonNameOrder();
+    }
+
+    /**@author Federico Taschin
+     * @return list of saved settings
+     */
+    public List<SettingsEntity> getAllSettings(){
+        return database.ticketDao().getAllSettings();
     }
 
     /**
@@ -371,6 +409,7 @@ public class DataManager {
     public int getNumberOfNotRefundableTickets() {
         return database.ticketDao().countNotRefundableTickets();
     }
+
 //    /**
 //     Turns a List of TicketEntity into a List of TicketEntity
 //     * @param ticketEntities not null
