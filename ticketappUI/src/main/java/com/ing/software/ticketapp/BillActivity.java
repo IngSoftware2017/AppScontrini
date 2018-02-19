@@ -81,12 +81,6 @@ public class BillActivity extends AppCompatActivity {
     int paddingRight = 10;
     int paddingBottom = 40;
 
-    int textSize = 23;
-    int paddingLeft = 10;
-    int paddingTop = 40;
-    int paddingRight = 10;
-    int paddingBottom = 40;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

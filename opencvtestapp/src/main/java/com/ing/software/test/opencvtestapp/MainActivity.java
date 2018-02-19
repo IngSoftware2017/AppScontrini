@@ -39,6 +39,7 @@ import static android.os.Environment.getExternalStorageDirectory;
 import static com.ing.software.common.CommonUtils.*;
 import static com.ing.software.common.Reflect.*;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
+import static org.opencv.core.CvType.CV_8UC1;
 import static org.opencv.imgproc.Imgproc.*;
 import static java.util.Collections.*;
 
@@ -450,11 +451,15 @@ public class MainActivity extends AppCompatActivity {
                 rect = invoke(IP, "rotatedBoundingBox", contour, angle, grayResized.size());
             }
 
-
-            double bgThresh = getField(IP, "BG_CONTRAST_THRESH");
+            Mat mask = new Mat(grayResized.rows(), grayResized.cols(), CV_8UC1);
+            invoke(IP, "maskFromContour", mask, contour);
+            double exposureUpThresh = getField(IP, "EXPOSURE_UPPER_THRESH");
+            double exposureLowThresh = getField(IP, "EXPOSURE_LOWER_THRESH");
+            double exposure = invoke(IP, "getExposure", grayResized, mask);
             double focusThresh = getField(IP, "FOCUS_THRESH");
+            double focus = invoke(IP, "getFocus", grayResized, mask);
+            double bgThresh = getField(IP, "BG_CONTRAST_THRESH");
             double bgContrast = invoke(IP, "getBackgroundContrast", rect, contour);
-            double focus = invoke(IP, "getFocus", grayResized, contour);
 
             StringBuilder titleStr = new StringBuilder();
             titleStr.append(imgIdx).append(" BGC:").append(NUM_FMT.format(bgContrast));
@@ -464,6 +469,12 @@ public class MainActivity extends AppCompatActivity {
             titleStr.append(" F:").append((int)focus);
             if (focus < focusThresh) {
                 titleStr.append(" BAD");
+            }
+            titleStr.append(" E:").append((int)exposure);
+            if (exposure < exposureLowThresh) {
+                titleStr.append(" UNDER");
+            } else if (exposure > exposureUpThresh) {
+                titleStr.append(" OVER");
             }
             asyncSetTitle(titleStr.toString());
 

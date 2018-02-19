@@ -208,7 +208,6 @@ public class DataAnalyzer {
      * @param texts list of texts to analyze. Not null.
      * @return list of texts containing cash string with its score and language. Can be empty.
      */
-
     static List<Scored<Pair<OcrText, Locale>>> findCashStringTexts(List<OcrText> texts) {
         return findAllMatchesWithLanguage(texts, CASH_MATCHERS);
     }
@@ -230,7 +229,6 @@ public class DataAnalyzer {
     static List<Scored<Pair<OcrText, Locale>>> findCoverStringTexts(List<OcrText> texts) {
         return findAllMatchesWithLanguage(texts, COVER_MATCHERS);
     }
-
 
     /**
      * Get a list of texts where tax string is present

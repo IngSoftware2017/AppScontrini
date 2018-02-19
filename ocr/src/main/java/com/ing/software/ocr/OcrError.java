@@ -27,7 +27,6 @@ public enum OcrError {
      * The total amount has not been found.
      * The amount field is null.
      */
-
     TOTAL_NOT_FOUND, // on the user end, the check of the presence of this flag can be replaced with a null check
                       // but checking against this flag makes the code more readable
 

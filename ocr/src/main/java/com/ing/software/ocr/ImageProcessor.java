@@ -136,6 +136,10 @@ public class ImageProcessor {
 //    private static final double SCORE_AREA_MUL = 0.001;
 //    private static final double SCORE_RECT_FOUND = 1;
 
+    //Exposure extremities
+    private static final double EXPOSURE_UPPER_THRESH = 240;
+    private static final double EXPOSURE_LOWER_THRESH = 118;
+
     //Background contrast is poor if is less than threshold.
     private static final double BG_CONTRAST_THRESH = 0.9;
 
@@ -532,37 +536,34 @@ public class ImageProcessor {
     }
 
     /**
-     * Get a score proportional to exposure
+     * Get a score proportional to exposure.
+     * Implemented as a simple color mean.
      * @param img gray Mat. Not null
-     * @param contour contour containing the ticket
-     * @return
+     * @param contourMask mask
+     * @return value in range [0, 255]. A good value is between the the two range extremities.
      */
-    //Check if average of area inside contour is above e.g. 200, if not: UNDEREXPOSED
-    // then check if the the darker shades (text) are well spread
-    // (can use ratio between area of convex hull of contour and area of convex hull of text), if not: OVEREXPOSED
-    private static double getExposure(Mat img, MatOfPoint contour) {
-        return 0; // stub
+    //todo: use a histogram or some gradient function instead
+    private static double getExposure(Mat img, Mat contourMask) {
+        return mean(img, contourMask).val[0];
     }
 
     /**
      * Get a score proportional to the focus inside contour.
      * Implemented as variance of laplacian.
      * @param img gray Mat. Not modified. Not null
-     * @param contour contour containing the ticket
+     * @param contourMask mask
      * @return focus positive value, higher is better.
      */
     //https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
-    private static double getFocus(Mat img, MatOfPoint contour) {
-        Mat mask = new Mat(img.rows(), img.cols(), CV_8UC1);
-        maskFromContour(mask, contour);
+    private static double getFocus(Mat img, Mat contourMask) {
 
         Mat lap = new Mat();
         MatOfDouble meanMat = new MatOfDouble(), stdDevMat = new MatOfDouble();
         Laplacian(img, lap, CV_64F);
-        meanStdDev(lap, meanMat, stdDevMat, mask);
+        meanStdDev(lap, meanMat, stdDevMat, contourMask);
         double stdDev = stdDevMat.get(0, 0)[0];
 
-        return stdDev * stdDev; // stub
+        return stdDev * stdDev;
     }
 
     /**
@@ -870,11 +871,15 @@ public class ImageProcessor {
                 if (size.width > size.height)
                     rect = shiftMatPoints(rect, angle > 0 ? 1 : 3); // 1 -> rotate clockwise
             }                                                       // 3 -> rotate counter clockwise
+
+            Mat mask = new Mat(grayResized.rows(), grayResized.cols(), CV_8UC1);
+            maskFromContour(mask, contour.obj());
             result.polyContour = rect;
             result.angle = angle;
             result.angleConfidence = angleConfidence.val;
+            result.exposure = getExposure(grayResized, mask);
+            result.focus = getFocus(grayResized, mask);
             result.backgroundContrast = getBackgroundContrast(rect, contour.obj());
-            result.focus = getFocus(grayResized, contour.obj());
             candidates.add(new Scored<>(0., result));
         }
         List<IPError> errors = new ArrayList<>();
@@ -896,6 +901,10 @@ public class ImageProcessor {
                 errors.add(IPError.UNCERTAIN_DIRECTION);
             if (abs(winner.angle) > CROOCKED_THRESH)
                 errors.add(IPError.CROOKED_TICKET);
+            if (winner.exposure < EXPOSURE_LOWER_THRESH)
+                errors.add(IPError.UNDEREXPOSED);
+            else if (winner.exposure > EXPOSURE_UPPER_THRESH)
+                errors.add(IPError.OVEREXPOSED);
             if (winner.focus < FOCUS_THRESH)
                 errors.add(IPError.OUT_OF_FOCUS);
             if (winner.backgroundContrast < BG_CONTRAST_THRESH)
