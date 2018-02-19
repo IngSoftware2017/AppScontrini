@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
@@ -16,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
@@ -76,7 +78,13 @@ public class CameraActivity extends Activity {
         Camera.Parameters p = mCamera.getParameters();
         p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         p.setJpegQuality(100);
-
+        List<Camera.Size> sizes = p.getSupportedPictureSizes();
+        Camera.Size size = sizes.get(0);
+        for (int i = 0; i < sizes.size(); i++) {
+            if (sizes.get(i).width > size.width)
+                size = sizes.get(i);
+        }
+        p.setPictureSize(size.width, size.height);
         mCamera.setParameters(p);
 
         final ImageButton flashButton = (ImageButton)findViewById(R.id.flashBtn);

@@ -164,7 +164,7 @@ public class CheckPhotoActivity extends Activity {
                 @Override
                 public void run() {
                     if(!result.errors.isEmpty()) {
-                        Toast.makeText(getApplicationContext(), result.errors.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), result.errors.toString().replace("_", " ").replace("[", "").replace("]", ""), Toast.LENGTH_SHORT).show();
                     }
                     if(result.total != null) {
                         checkPrice.setText(result.total.toString());
