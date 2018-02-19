@@ -30,6 +30,7 @@ import database.DataManager;
 import database.MissionEntity;
 import database.TicketEntity;
 
+import static com.ing.software.ticketapp.EditMission.hideSoftKeyboard;
 
 public class EditTicket extends AppCompatActivity {
 
@@ -125,12 +126,8 @@ public class EditTicket extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                if(txtShop.getText().toString().replace(" ","").compareTo("") != 0) {
-                    thisTicket.setShop(txtShop.getText().toString());
-                }
-
+                thisTicket.setShop(txtShop.getText().toString());
                 thisTicket.setTagPlaces(Short.parseShort(txtPeople.getText().toString()));
-
                 thisTicket.setRefundable(checkRefund.isChecked());
 
                 /**
@@ -224,7 +221,7 @@ public class EditTicket extends AppCompatActivity {
         txtAmount.setText(ticketAmount);
         txtPeople.setText(ticketPeople);
         if(thisTicket.isRefundable()){
-            checkRefund.isChecked();
+            checkRefund.setChecked(true);
         }
     }
 }

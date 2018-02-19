@@ -113,14 +113,14 @@ public class OcrOptions {
         SKIP,
 
         /**
-         * Allow edit of price, if a more suitable price was decoded from structure
+         * Allow edit of price, if a more suitable price was decoded analyzing the structure of the ticket
          */
         ALLOW_STRICT,
 
         /**
          * Allow edit of price and try to find a price if no text matched an amount string
          */
-        ALLOW_LOOSE,
+        ALLOW_VOID,
     }
 
     private static final Resolution DEFAULT_RESOLUTION = Resolution.HALF;

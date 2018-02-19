@@ -79,7 +79,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         title.setText(mission.getName());
         location.setText(mission.getLocation());
-        total.setText(DB.getTotalAmountForMission(mission.getID()).setScale(2, RoundingMode.HALF_EVEN).toString()+" €");
+        total.setText(DB.getTotalAmountForMission(mission.getID()).setScale(2, RoundingMode.HALF_EVEN).toString() + " " + Singleton.getInstance().getCurrency());
         convertView.setTag(mission.getID());
         Date start = mission.getStartDate();
         SimpleDateFormat tr = new SimpleDateFormat("dd/MM/yyyy");

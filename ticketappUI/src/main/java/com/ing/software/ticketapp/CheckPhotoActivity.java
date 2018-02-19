@@ -38,9 +38,12 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Set;
 
 import database.DataManager;
 import database.MissionEntity;
+import database.SettingsEntity;
 import database.TicketEntity;
 
 /**
@@ -60,8 +63,10 @@ public class CheckPhotoActivity extends Activity {
     Bitmap finalBitmap;
     ProgressBar waitOCR;
     Button btnOK;
+    Date dateTicket;
     Button btnRedo;
     ImageView checkPhotoView;
+    MissionEntity ticketMission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,12 +98,17 @@ public class CheckPhotoActivity extends Activity {
         btnOK = (Button)findViewById(R.id.btnCheck_allow);
         waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
         waitOCR.setVisibility(View.VISIBLE);
+        ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
+
         //OCR initialize
         ocrManager = new OcrManager();
+
+        addOCRSettings();
+
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
                 //On first run vision library will be downloaded
-                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.downLibrary), Toast.LENGTH_LONG).show();
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -148,7 +158,7 @@ public class CheckPhotoActivity extends Activity {
     private void startOCRProcess(){
         // OCR asynchronous implementation:
         ImageProcessor imgProc = new ImageProcessor(finalBitmap);
-        ocrManager.getTicket(imgProc, OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.ALLOW_LOOSE), result -> {
+        ocrManager.getTicket(imgProc, OcrOptions.getDefault(), result -> {
             //Thread UI control reservation
             runOnUiThread(new Runnable() {
                 @Override
@@ -158,6 +168,20 @@ public class CheckPhotoActivity extends Activity {
                     }
                     if(result.total != null) {
                         checkPrice.setText(result.total.toString());
+                    }
+                    if(OCR_result.date != null) {
+                        dateTicket = OCR_result.date;
+                        //Ticket date < Mission date start, it advises the user
+                        if(OCR_result.date.before(ticketMission.getStartDate())){
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMin), Toast.LENGTH_SHORT).show();
+                        }
+                        //Ticket date > Mission date finish, it advises the user
+                        if(OCR_result.date.after(ticketMission.getEndDate())){
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMax), Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        dateTicket = ticketMission.getStartDate();
                     }
                     waitOCR.setVisibility(View.INVISIBLE);
                 }
@@ -192,12 +216,8 @@ public class CheckPhotoActivity extends Activity {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
             TicketEntity thisTicket = new TicketEntity();
-            MissionEntity ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
 
-            if(OCR_result.date == null)
-                thisTicket.setDate(ticketMission.getStartDate());
-            else
-                thisTicket.setDate(OCR_result.date);
+            thisTicket.setDate(dateTicket);
 
             thisTicket.setTagPlaces(Short.parseShort(checkPeople.getText().toString()));
 
@@ -229,6 +249,53 @@ public class CheckPhotoActivity extends Activity {
             outOriginal.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /** Dal Maso
+     * Set all OCR settings from db
+     */
+    private void addOCRSettings(){
+        if(DB.getAllSettings().size() != 0){
+            SettingsEntity settings = DB.getAllSettings().get(0);
+
+            switch (settings.getAccuracyOCR()){
+                case (0):
+                    OcrOptions.getDefault().resolution(OcrOptions.Resolution.THIRD);
+                    break;
+                case (1):
+                    OcrOptions.getDefault().resolution(OcrOptions.Resolution.HALF);
+                    break;
+                case (2):
+                    OcrOptions.getDefault().resolution(OcrOptions.Resolution.NORMAL);
+                    break;
+            }
+
+            switch (settings.getCurrencyDefault()){
+                case ("EUR"):
+                    OcrOptions.getDefault().suggestedCountry(Locale.ITALY);
+                    break;
+                case ("USD"):
+                    OcrOptions.getDefault().suggestedCountry(Locale.US);
+                    break;
+                case ("GBP"):
+                    OcrOptions.getDefault().suggestedCountry(Locale.UK);
+                    break;
+            }
+
+            if(settings.isAutomaticCorrectionAmountOCR()){
+                OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.ALLOW_STRICT);
+            }
+            else {
+                OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.SKIP);
+            }
+
+            if(settings.isSearchUpDownOCR()){
+                OcrOptions.getDefault().orientation(OcrOptions.Orientation.ALLOW_UPSIDE_DOWN);
+            }
+            else{
+                OcrOptions.getDefault().orientation(OcrOptions.Orientation.NORMAL);
+            }
         }
     }
 }

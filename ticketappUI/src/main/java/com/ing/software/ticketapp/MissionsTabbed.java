@@ -65,16 +65,22 @@ public class MissionsTabbed extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        initialize();
+        initializeComponents();
     }
 
     /** Dal Maso
      * Initialize the activity
      */
-    private void initialize(){
+    private void initializeComponents(){
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        //Set the currency
+        if(DB.getAllSettings().size() > 0)
+            Singleton.getInstance().setCurrency(DB.getAllSettings().get(0).getCurrencyDefault());
+        else
+            Singleton.getInstance().setCurrency("EUR");
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);

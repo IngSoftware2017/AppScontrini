@@ -61,7 +61,6 @@ public class MissionsOpen extends Fragment {
                 AppUtilities.circularReveal(myView, cx, cy);
                 Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                 addMission.putExtra("person", personID);
-                Log.d("PersonID", ""+personID);
                 startActivityForResult(addMission, 1);
             }
         });
@@ -72,7 +71,6 @@ public class MissionsOpen extends Fragment {
 
         listView = (ListView)rootView.findViewById(R.id.listMission);
         personID = getArguments().getInt("personID", 0);
-        Log.d("TAB1", ""+personID);
 
         printAllMissions();
         return rootView;
@@ -139,7 +137,6 @@ public class MissionsOpen extends Fragment {
                     AppUtilities.circularReveal(myView, cx, cy);
                     Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                     addMission.putExtra("person", personID);
-                    Log.d("PersonID", ""+personID);
                     startActivityForResult(addMission, 1);
                 }
             }

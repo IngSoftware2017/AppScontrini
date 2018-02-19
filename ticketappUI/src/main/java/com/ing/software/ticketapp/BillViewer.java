@@ -93,21 +93,23 @@ public class BillViewer extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketPeople = ""+thisTicket.getTagPlaces();
-        ticketTitle = thisTicket.getTitle();
+        if(thisTicket.getTitle().replace(" ", "").length() == 0){
+            ticketTitle = getResources().getString(R.string.title_Ticket);
+        } else {
+            ticketTitle = thisTicket.getTitle();
+        }
         ticketDate = thisTicket.getDate();
         if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
             ticketShop = getString(R.string.string_NoShop);
-        }
-        else {
+        } else {
             ticketShop = thisTicket.getShop();
         }
         if(thisTicket.getAmount() == null || thisTicket.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
             ticketAmount = getString(R.string.string_NoAmountFull);
             ticketAmountUn = getString(R.string.string_NoAmountFull);
-        }
-        else {
-            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
-            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
+        } else {
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() +  Singleton.getInstance().getCurrency();
+            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " " + Singleton.getInstance().getCurrency();
         }
 
         //Title
@@ -208,7 +210,6 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case(TICKET_MOD):
@@ -240,7 +241,6 @@ public class BillViewer extends AppCompatActivity {
                 toDelete = thisTicket.getFileUri().toString().substring(7);
                 final File ticketDelete = new File(toDelete);
                 final File ticketDeleteOriginal = new File (toDelete+"orig");
-                Log.d("TicketID", ""+ticketId);
                 if(DB.deleteTicket(ticketId) && ticketDelete.delete() && ticketDeleteOriginal.delete()){
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);

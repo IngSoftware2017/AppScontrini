@@ -234,7 +234,7 @@ public class OcrManager {
                             break;
                         ++i;
                     }
-                } else if (options.priceEditing == PriceEditing.ALLOW_LOOSE) {
+                } else if (options.priceEditing == PriceEditing.ALLOW_VOID) {
                     //No matching word for total string. Try to find a price
                     List<Scored<OcrText>> possiblePrices = Stream.of(mainImage.getPricesTexts())
                             .map(price -> new Scored<>(ScoreFunc.getAmountScore(new Scored<>(0, price), mainImage), price))

@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     //String rectString = (err.isEmpty() ? "found" : "not found");
                     //OcrUtils.log(1, "OcrHandler", "Rectangle: " + rectString);
                     //bundle.putString(RECTANGLE_RECEIVED, rectString);
-                    OcrTicket result = ocrAnalyzer.getTicket(preproc, OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.ALLOW_LOOSE));
+                    OcrTicket result = ocrAnalyzer.getTicket(preproc, OcrOptions.getDefault().priceEditing(OcrOptions.PriceEditing.ALLOW_VOID));
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     long endTime = System.nanoTime();
                     double duration = ((double) (endTime - startTime)) / 1000000000;
