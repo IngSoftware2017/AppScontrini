@@ -1,6 +1,7 @@
 package com.ing.software.ticketapp;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.view.inputmethod.InputMethodManager;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
@@ -66,13 +68,13 @@ public class AppUtilities {
         }
         return false;
     }
-    /**
-          * Lazzarin
-          * Method written to fix a bug of Android's DatePicker that save the date with month before the selected month.(When this bug will be eliminated, simply we'll
-          * don't use this method)
-          * @param date on format dd/MM/yyyy
-          * @return date with +1 about Month, on format dd/MM/yyyy
-          */
+
+    /** Lazzarin
+      * Method written to fix a bug of Android's DatePicker that save the date with month before the selected month.(When this bug will be eliminated, simply we'll
+      * don't use this method)
+      * @param date on format dd/MM/yyyy
+      * @return date with +1 about Month, on format dd/MM/yyyy
+     */
     public static String addMonth(String date)
     {        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
                 SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
@@ -96,12 +98,13 @@ public class AppUtilities {
         }
         return newDate;
     }
-        /**Lazzarin
-        * check if insert date is between interval of mission
-         *@param current date of start mission
-         *@param finish date of end mission
-         *@param  current date of ticket insert by user
-        */
+
+    /**Lazzarin
+     *check if insert date is between interval of mission
+     *@param current date of start mission
+     *@param finish date of end mission
+     *@param  current date of ticket insert by user
+    */
     public static  boolean checkIntervalDate(String start, String finish, String current)
     {
         if(checkDate(start,current) && checkDate(current,finish))
@@ -152,14 +155,12 @@ public class AppUtilities {
     /** Dal Maso
      * Circular new activity reveal animation
      * @param v view to expand
+     * @param cx start x axis coord
+     * @param cy start y axis coord
      */
-    public static void circularReveal(View v){
-        // get the center for the clipping circle
-        int cx = v.getWidth();
-        int cy = v.getHeight();
-
+    public static void circularReveal(View v, int cx, int cy){
         // get the final radius for the clipping circle
-        float finalRadius = (float) Math.hypot(cx, cy);
+        float finalRadius = (float) Math.hypot(v.getWidth(), v.getHeight());
 
         // create the animator for this view (the start radius is zero)
         Animator anim = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, finalRadius);

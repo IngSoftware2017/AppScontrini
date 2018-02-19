@@ -163,19 +163,19 @@ public class DataAnalyzer {
     // or match any with 1 to 6 digits before dot and 0 to 2 digits after,
     // optional minus in front, optional character before end of string (could be another digit).
     static final Pattern POTENTIAL_PRICE = compile(
-            "(?<![\\d.,-])-?(?:\\d{2,4}|\\d{0,6}[.,]\\d{1,2}|\\d{1,6}[.,]\\d{0,2})[^.,]?$");
+            "(?<![\\d.,-])-?(?:\\d{2,4}|\\d{0,6}[.,]\\d{1,2}|\\d{1,6}[.,]\\d{0,2}) ?[^.,]?$");
     //match any number with a symbol for two decimals (a dot/comma or a space or a dot/comma + space),
     // optional thousands symbols, optional minus in front, optional character before end of string
     static final Pattern PRICE_WITH_SPACES = compile(
-            "(?<![\\d.,'-])-?(?:0|[1-9]\\d{0,3}|[1-9]\\d{0,2}(?:(?:[.,'] |[.,' ])\\d{3})*)(?:[.,] |[., ])\\d{2}(?=[^\\d.,]?$)");
+            "(?<![\\d.,'-])-?(?:0|[1-9]\\d{0,3}|[1-9]\\d{0,2}(?:(?:[.,'] |[.,' ])\\d{3})*)(?:[.,] |[., ])\\d{2}(?= ?[^\\d.,]?$)");
     static final Pattern PRICE_STRICT = compile(
-            "(?<![\\d.,'-])-?(?:0|[1-9]\\d{0,3}|[1-9]\\d{0,2}(?:[.,']\\d{3})*)[.,]\\d{2}(?=[^\\d.,]?$)");
+            "(?<![\\d.,'-])-?(?:0|[1-9]\\d{0,3}|[1-9]\\d{0,2}(?:[.,']\\d{3})*)[.,]\\d{2}(?= ?[^\\d.,]?$)");
     //match any number with no points, optional minus in front, optional character before end of string
     static final Pattern PRICE_NO_DECIMALS = compile(
-            "(?<![\\d.-])-?(?:0|[1-9]\\d*)(?=[^\\d.]?$)");
+            "(?<![\\d.-])-?(?:0|[1-9]\\d*)(?= ?[^\\d.,]?$)");
     //match upside down prices. it's designed to reject corrupted upside down prices to avoid false positives.
     static final Pattern PRICE_UPSIDEDOWN = compile(
-            "^[^'.,-]?[0OD1Il2ZEh5S9L8B6]{2} ?'[0OD1Il2ZEh5S9L8B6]+[^'.,]?$");
+            "^[0OD1Il2ZEh5S9L8B6]{2} ?'[0OD1Il2ZEh5S9L8B6]+[^'.,]?$");
     //java does not support regex subroutines: I have to duplicate the character matching part
 
     //Used to sanitize price matched with PRICE_WITH_SPACES before cast to BigDecimal
@@ -208,7 +208,6 @@ public class DataAnalyzer {
      * @param texts list of texts to analyze. Not null.
      * @return list of texts containing cash string with its score and language. Can be empty.
      */
-
     static List<Scored<Pair<OcrText, Locale>>> findCashStringTexts(List<OcrText> texts) {
         return findAllMatchesWithLanguage(texts, CASH_MATCHERS);
     }
@@ -230,7 +229,6 @@ public class DataAnalyzer {
     static List<Scored<Pair<OcrText, Locale>>> findCoverStringTexts(List<OcrText> texts) {
         return findAllMatchesWithLanguage(texts, COVER_MATCHERS);
     }
-
 
     /**
      * Get a list of texts where tax string is present

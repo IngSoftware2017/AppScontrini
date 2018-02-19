@@ -1,16 +1,25 @@
 package com.ing.software.ocr;
 
+import com.ing.software.common.ExceptionHandler;
+
+import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.regex.*;
 
 import static com.ing.software.ocr.DataAnalyzer.*;
+import static com.ing.software.common.Reflect.*;
 import static org.junit.Assert.*;
 
 /**
  * @author Riccardo Zaglia
  */
 public class RegexTest {
+
+    Pattern DATE;
+    ExceptionHandler excHdlr;
+
 
     private String match(Pattern regex, String target) {
         Matcher matcher = regex.matcher(target);
@@ -21,12 +30,20 @@ public class RegexTest {
         }
     }
 
-    /*
-    @Test
-    public void dateDmyTest1() {
-        assertEquals(null, match(DATE_DMY, "abc"));
+    @Before
+    public void init() {
+        excHdlr = new ExceptionHandler(e -> System.out.println(e.getMessage()));
+
+        excHdlr.tryRun(() -> {
+            DATE = getField(DataAnalyzer.class, "DATE");
+        });
     }
-    */
+
+
+    @Test
+    public void dateTest1() {
+        assertNotEquals(null, match(DATE, "1/2/34"));
+    }
 
     @Test
     public void potentialPriceTest1() {

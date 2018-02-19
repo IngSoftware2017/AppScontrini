@@ -30,7 +30,7 @@ public enum IPError {
     OVEREXPOSED,
 
     /**
-     * The ticket is underexposed
+     * The ticket is underexposed. Could be caused by shadows
      */
     UNDEREXPOSED,
 

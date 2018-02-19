@@ -27,6 +27,12 @@
     <string name="dateFinish">Data fine</string>
     <string name="Open">Aperte</string>
     <string name="Closed">Chiuse</string>
+    <string name="personAddTitle">Benvenuto in TicketManager!</string>
+    <string name="personAddDesc">1) Clicca qui per aggiungere una nuova persona\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla</string>
+    <string name="ticketAddTitle">Iniziamo!</string>
+    <string name="ticketAddDesc">Aggiungi un nuovo scontrino, inizia subito scattando una foto</string>
+    <string name="missionAddTitle">Ci sei quasi!</string>
+    <string name="missionAddDesc">1) Clicca qui per creare una nuova missione\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla</string>
     <!--lazzarin-->
     <string name="newMission">Nuova missione</string>
     <string name="newPerson">Nuova persona</string>
