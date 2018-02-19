@@ -37,7 +37,7 @@
             app:rrbg_dividerColor="@color/black"
             app:rrbg_dividerSize="1dp"
             app:rrbg_radius="10dp"
-            app:rrbg_selectorColor="@color/colorPrimary"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
             app:rrbg_selectorSize="4dp">
 
             <co.ceryle.radiorealbutton.RadioRealButton
@@ -106,7 +106,7 @@
             app:rrbg_dividerColor="@color/black"
             app:rrbg_dividerSize="1dp"
             app:rrbg_radius="10dp"
-            app:rrbg_selectorColor="@color/colorPrimary"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
             app:rrbg_selectorSize="4dp">
 
             <co.ceryle.radiorealbutton.RadioRealButton
@@ -163,7 +163,7 @@
             app:rrbg_dividerColor="@color/black"
             app:rrbg_dividerSize="1dp"
             app:rrbg_radius="10dp"
-            app:rrbg_selectorColor="@color/colorPrimary"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
             app:rrbg_selectorSize="4dp">
 
             <co.ceryle.radiorealbutton.RadioRealButton
@@ -220,7 +220,7 @@
             app:rrbg_dividerColor="@color/black"
             app:rrbg_dividerSize="1dp"
             app:rrbg_radius="10dp"
-            app:rrbg_selectorColor="@color/colorPrimary"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
             app:rrbg_selectorSize="4dp">
 
             <co.ceryle.radiorealbutton.RadioRealButton

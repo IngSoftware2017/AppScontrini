@@ -225,7 +225,7 @@ public class EditTicket extends AppCompatActivity {
         txtAmount.setText(ticketAmount);
         txtPeople.setText(ticketPeople);
         if(thisTicket.isRefundable()){
-            checkRefund.isChecked();
+            checkRefund.setChecked(true);
         }
     }
 }
