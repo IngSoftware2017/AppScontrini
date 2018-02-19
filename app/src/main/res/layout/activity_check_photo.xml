@@ -86,6 +86,7 @@
                 android:inputType="text"
                 android:maxLines="1"
                 android:text="Scontrino"
+                android:maxLength="30"
                 android:textColor="#fff"
                 android:textColorHint="#ddd"
                 android:textSize="22dp" />
@@ -118,7 +119,7 @@
                     android:backgroundTint="#FFF"
                     android:digits="0123456789."
                     android:inputType="numberDecimal"
-                    android:maxLength="6"
+                    android:maxLength="7"
                     android:maxLines="1"
                     android:textColor="#fff"
                     android:textColorHint="#ddd"

@@ -108,7 +108,7 @@ public class CheckPhotoActivity extends Activity {
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
                 //On first run vision library will be downloaded
-                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.downLibrary), Toast.LENGTH_LONG).show();
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();

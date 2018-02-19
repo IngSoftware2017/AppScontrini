@@ -126,12 +126,8 @@ public class EditTicket extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                if(txtShop.getText().toString().replace(" ","").compareTo("") != 0) {
-                    thisTicket.setShop(txtShop.getText().toString());
-                }
-
+                thisTicket.setShop(txtShop.getText().toString());
                 thisTicket.setTagPlaces(Short.parseShort(txtPeople.getText().toString()));
-
                 thisTicket.setRefundable(checkRefund.isChecked());
 
                 /**

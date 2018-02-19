@@ -84,14 +84,18 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
-        ticketTitle.setText(c.getTitle());
+
+        if(c.getTitle().replace(" ", "").length() == 0){
+            ticketTitle.setText(context.getResources().getString(R.string.title_Ticket));
+        } else {
+            ticketTitle.setText(c.getTitle());
+        }
 
         if(c.isRefundable()){
-            ticketShop.setText("Rimborsabile");
+            ticketShop.setText(context.getResources().getString(R.string.refundable));
             ticketShop.setTextColor(Color.parseColor("#00C853"));
-        }
-        else {
-            ticketShop.setText("Non rimborsabile");
+        } else {
+            ticketShop.setText(context.getResources().getString(R.string.nonRefundable));
             ticketShop.setTextColor(Color.parseColor("#D50000"));
         }
 
@@ -100,8 +104,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         if(c.getAmount() == null || c.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
             amount = context.getString(R.string.string_NoAmount);
             tot.setText(amount);
-        }
-        else {
+        } else {
             amount = c.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString();
             tot.setText(amount + " " + Singleton.getInstance().getCurrency());
         }

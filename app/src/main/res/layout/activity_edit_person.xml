@@ -34,6 +34,8 @@
                 android:inputType="textCapWords"
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
+                android:maxLength="30"
+                android:maxLines="1"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
 
@@ -55,6 +57,8 @@
                 android:layout_height="60dp"
                 android:inputType="textCapWords"
                 android:hint="@string/hint_LastName"
+                android:maxLength="30"
+                android:maxLines="1"
                 android:textColor="#FFF"
                 android:textSize="22dp" />
 
@@ -98,6 +102,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textCapSentences"
+                        android:maxLength="30"
+                        android:maxLines="1"
                         android:id="@+id/input_personEditAcademicTitle"
                         android:hint="@string/hint_AcademicTitle"
                         android:singleLine="true"/>

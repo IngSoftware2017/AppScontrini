@@ -32,7 +32,7 @@ public class ApplicationSettings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
-        setTitle("Impostazioni");
+        setTitle(getResources().getString(R.string.settings));
         setContentView(R.layout.activity_application_settings);
         initializeComponents();
         setSettingsParameters();
@@ -52,7 +52,6 @@ public class ApplicationSettings extends AppCompatActivity {
 
         if(DB.getAllSettings().size() != 0) {
             thisSettings = DB.getAllSettings().get(0);
-            Log.d("Settings", ""+DB.getAllSettings().size());
         }
         else{
             long settID = DB.addSettings(thisSettings);

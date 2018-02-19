@@ -36,7 +36,6 @@ public class Singleton {
     public static synchronized Singleton getInstance(){
         if (mInstance == null) {
             mInstance = new Singleton();
-            Log.d("Nuovo singleton", "OK");
         }
         return mInstance;
     }
