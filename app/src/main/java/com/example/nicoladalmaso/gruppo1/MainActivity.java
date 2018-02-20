@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public void addToList(PersonEntity person){
         listPeople.add(person);
         ListView listView = (ListView)findViewById(R.id.listPeople);
-        PeopleAdapter adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
+        PeopleAdapter adapter = new PeopleAdapter(this, R.layout.person_card, listPeople,this);
         listView.setAdapter(adapter);
     }
 
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     public void clearAllPeople()
     {
         ListView listView = (ListView)findViewById(R.id.listPeople);
-        PeopleAdapter emptyAdapter = new PeopleAdapter(this, R.layout.mission_card, listPeople);
+        PeopleAdapter emptyAdapter = new PeopleAdapter(this, R.layout.person_card, listPeople,this);
         emptyAdapter.clear();
         emptyAdapter.notifyDataSetChanged();
         listView.setAdapter(emptyAdapter);
@@ -241,4 +241,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void reload() {
+        clearAllPeople();
+        printAllPeople();
+    }
 }
