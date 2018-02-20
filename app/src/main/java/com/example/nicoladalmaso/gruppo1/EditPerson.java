@@ -23,7 +23,7 @@ import database.PersonEntity;
 
 public class EditPerson extends AppCompatActivity{
     public DataManager DB;
-    int personID;
+    long personID;
     Context context;
     PersonEntity thisPerson;
     String personName = "", personLastName = "", personAcademicTitle = "", email = "";
@@ -94,7 +94,7 @@ public class EditPerson extends AppCompatActivity{
      */
     private void setPersonValues(){
         Intent intent = getIntent();
-        personID = intent.getExtras().getInt("personID");
+        personID = intent.getExtras().getLong("personID");
         Log.d("personID", "Edit person "+personID);
         thisPerson = DB.getPerson(personID);
         //TODO: fix the crash
