@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context="com.example.nicoladalmaso.gruppo1.ApplicationSettings">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Qualità OCR"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginBottom="5dp"/>
+
+        <co.ceryle.radiorealbutton.RadioRealButtonGroup
+            android:id="@+id/quality_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:elevation="2dp"
+            app:rrbg_animateDrawables_enter="overshoot"
+            app:rrbg_animateTexts_enter="overshoot"
+            app:rrbg_dividerColor="@color/black"
+            app:rrbg_dividerSize="1dp"
+            app:rrbg_radius="10dp"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
+            app:rrbg_selectorSize="4dp">
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/quality_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_brightness_low_white_24px"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableWidth="24dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" Bassa"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/quality_mid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_brightness_medium_white_24px"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableWidth="24dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" Media"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/quality_hi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_brightness_high_white_24px"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableWidth="24dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" Alta"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+        </co.ceryle.radiorealbutton.RadioRealButtonGroup>
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Correzione del totale"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"/>
+
+        <co.ceryle.radiorealbutton.RadioRealButtonGroup
+            android:id="@+id/total_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:elevation="2dp"
+            app:rrbg_animateDrawables_enter="overshoot"
+            app:rrbg_animateTexts_enter="overshoot"
+            app:rrbg_dividerColor="@color/black"
+            app:rrbg_dividerSize="1dp"
+            app:rrbg_radius="10dp"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
+            app:rrbg_selectorSize="4dp">
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/total_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_thumb_up_white_24px"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableTint="#999"
+                app:rrb_drawableWidth="24dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" Attivata"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/total_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_thumb_down_white_24px"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableTint="#999"
+                app:rrb_drawableWidth="24dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" Disattivata"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+        </co.ceryle.radiorealbutton.RadioRealButtonGroup>
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ricerca foto capovolta"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"/>
+
+        <co.ceryle.radiorealbutton.RadioRealButtonGroup
+            android:id="@+id/reverse_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:elevation="2dp"
+            app:rrbg_animateDrawables_enter="overshoot"
+            app:rrbg_animateTexts_enter="overshoot"
+            app:rrbg_dividerColor="@color/black"
+            app:rrbg_dividerSize="1dp"
+            app:rrbg_radius="10dp"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
+            app:rrbg_selectorSize="4dp">
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/reverse_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_thumb_up_white_24px"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableTint="#999"
+                app:rrb_drawableWidth="24dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" Attivata"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/reverse_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_thumb_down_white_24px"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableTint="#999"
+                app:rrb_drawableWidth="24dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" Disattivata"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+        </co.ceryle.radiorealbutton.RadioRealButtonGroup>
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Moneta"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginBottom="5dp"/>
+
+        <co.ceryle.radiorealbutton.RadioRealButtonGroup
+            android:id="@+id/currency_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:elevation="2dp"
+            app:rrbg_animateDrawables_enter="overshoot"
+            app:rrbg_animateTexts_enter="overshoot"
+            app:rrbg_dividerColor="@color/black"
+            app:rrbg_dividerSize="1dp"
+            app:rrbg_radius="10dp"
+            app:rrbg_selectorColor="@color/colorPrimaryDark"
+            app:rrbg_selectorSize="4dp">
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/currency_eur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_euro_currency_symbol"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableTint="#999"
+                app:rrb_drawableWidth="22dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" EUR"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/currency_usd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_dollar_symbol"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableTint="#999"
+                app:rrb_drawableWidth="22dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" USD"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+
+            <co.ceryle.radiorealbutton.RadioRealButton
+                android:id="@+id/currency_gbp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rrb_drawable="@drawable/ic_great_britain_pound"
+                app:rrb_drawableHeight="36dp"
+                app:rrb_drawablePadding="8dp"
+                app:rrb_drawableTint="#999"
+                app:rrb_drawableWidth="22dp"
+                app:rrb_ripple="true"
+                app:rrb_rippleColor="#666"
+                app:rrb_text=" GBP"
+                app:rrb_textColor="#444"
+                app:rrb_textSize="14dp" />
+        </co.ceryle.radiorealbutton.RadioRealButtonGroup>
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@android:color/background_light"
+        android:clickable="true"
+        app:backgroundTint="@color/cardview_light_background"
+        app:srcCompat="@drawable/ic_done_primary" />
+
+</RelativeLayout>

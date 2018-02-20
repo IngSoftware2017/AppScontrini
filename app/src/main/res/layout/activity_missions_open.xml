@@ -30,6 +30,7 @@
         <ListView
             android:id="@+id/listMission"
             android:layout_width="match_parent"
+            android:layout_marginTop="3dp"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
@@ -41,12 +42,22 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginBottom="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@color/colorPrimary"
             android:clickable="true"
+            android:focusable="true"
             app:srcCompat="@mipmap/ic_add_white_24dp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/circularAnimation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:visibility="invisible">
 
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

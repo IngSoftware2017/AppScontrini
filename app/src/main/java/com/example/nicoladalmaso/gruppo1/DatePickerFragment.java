@@ -11,17 +11,20 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.util.Calendar;
 
-/**
- * Created by Nicola on 22/12/2017.
+/** This class is fully developed by Nicola Dal Maso
+ * Datepicker management
  */
 
 public class  DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
     int id;
+    boolean check;
 
     public static DatePickerFragment newInstance(TextView textView) {
         DatePickerFragment f = new DatePickerFragment();
@@ -30,10 +33,12 @@ public class  DatePickerFragment extends DialogFragment
         f.setArguments(args);
         return f;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         id = getArguments().getInt("textView");
+        check=false;
     }
 
     @Override
@@ -45,12 +50,80 @@ public class  DatePickerFragment extends DialogFragment
         int day = c.get(Calendar.DAY_OF_MONTH);
 
         // Create a new instance of DatePickerDialog and return it
-        return new DatePickerDialog(getActivity(), this, year, month, day);
+        DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
+
+        /**
+         * edit by Lazzarin
+         * check if we are set Start or End date, and set min/max date
+         */
+
+        //variable check is used to communicate with OnDataSet method about the DatePicker chosen.
+        check = false;
+        int flag=Singleton.getInstance().getStartFlag();
+        switch(flag) {
+            //DatePicker of end Date..set min date
+            case 1:
+            {
+                dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                if (Singleton.getInstance().getStartDate() != null)
+                {
+                    long start = Singleton.getInstance().getStartDate().getTime();
+                    dialog.getDatePicker().setMinDate(start);
+                }
+                else
+                    Log.d("error on StartDate", "date is null");
+                break;
+            }
+            //DatePicker of startDate
+            case 0:
+            {
+                dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                Singleton.getInstance().setStartFlag(1);
+                check = true;   // tell onDateSet to write on startDate
+                break;
+            }
+            //DatePicker of editTicket(2)
+            case 2:
+            {
+                long start = Singleton.getInstance().getStartDate().getTime();
+                dialog.getDatePicker().setMinDate(start);
+                long end = Singleton.getInstance().getEndDate().getTime();
+                dialog.getDatePicker().setMaxDate(end);
+                break;
+            }
+            default: Log.d("error","value of flag unknown");
+        }
+        return dialog;
     }
 
+    /** Dal Maso
+     * When the date is set print this in the edittext
+     * @param view view who called the method
+     * @param year selected yyyy
+     * @param month selected mm
+     * @param day selected dd
+     */
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        Log.d("TextInputEditTextID", "ID: "+id+", R.id: "+R.id.input_missionStart);
+        String dayS = "" + day, monthS = "" + (month + 1);
         TextView textView = (TextView) getActivity().findViewById(id);
-        textView.setText(day + "/" + (month+1) + "/" + year);
+        if(dayS.length() == 1){
+            dayS = "0" + day;
+        }
+        if(monthS.length() == 1){
+            monthS = "0" + (month + 1);
+        }
+        textView.setText(dayS + "/" + monthS + "/" + year);
+        //lazzarin
+        SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
+        if(check)
+            {
+            try{
+            Singleton.getInstance().setStartDate(dateformat.parse(day + "/" + (month+1) + "/" + year));
+                 }
+            catch (ParseException e) {
+                e.printStackTrace();
+            }
+            check=false;
+        }
     }
 }

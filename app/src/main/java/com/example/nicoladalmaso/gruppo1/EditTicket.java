@@ -14,10 +14,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +29,8 @@ import java.util.Locale;
 import database.DataManager;
 import database.MissionEntity;
 import database.TicketEntity;
+
+import static com.example.nicoladalmaso.gruppo1.EditMission.hideSoftKeyboard;
 
 /**
  * Class for Edit the Ticket's data
@@ -36,7 +41,8 @@ import database.TicketEntity;
 public class EditTicket extends AppCompatActivity {
 
     public DataManager DB;
-    int ticketId;
+    int ticketID;
+    int missionID;
     Context context;
     TicketEntity thisTicket;
     String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
@@ -45,19 +51,36 @@ public class EditTicket extends AppCompatActivity {
     TextView txtShop;
     TextView txtDate;
     CheckBox chkIsRefoundable;
+    MissionEntity thisMission;
+    TextView txtPeople;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
-        setTitle("Modifica ticket");
-        setContentView(R.layout.activity_edit_ticket);
-        DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
+        setTitle(context.getString(R.string.title_EditTicket));
+        setContentView(R.layout.activity_edit_ticket);
+
+        DB = new DataManager(this.getApplicationContext());
+        ticketID = Singleton.getInstance().getTicketID();
+        missionID = Singleton.getInstance().getMissionID();
+        thisTicket = DB.getTicket(ticketID);
+        thisMission = DB.getMission(missionID);
+        TextView editDate=(TextView)findViewById(R.id.input_ticketDateMod);
+        LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.buttonEditTicketDate);
+        bntMissionStart.setOnClickListener(new View.OnClickListener() {
+            //lazzarin
+            public void onClick(View v) {
+                Singleton.getInstance().setStartFlag(2);
+                DialogFragment newFragment = new DatePickerFragment().newInstance(editDate);
+                newFragment.show(getFragmentManager(), "startDatePicker");
+            }
+        });
 
         //Get data from parent view
         setTicketValues();
-
     }
 
     /** Dal Maso
@@ -88,15 +111,27 @@ public class EditTicket extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_confirm:
                 //Salva i file nel DB
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 thisTicket.setTitle(txtTitle.getText().toString());
+                SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
                 try {
-                    thisTicket.setDate(format.parse(txtDate.getText().toString()));
+                    MissionEntity current = DB.getMission(missionID);
+                    String  start = DateFormat.format(current.getStartDate());
+
+                    String finish = DateFormat.format(current.getEndDate());
+
+                    if( AppUtilities.checkIntervalDate(start,finish,txtDate.getText().toString()))
+                        thisTicket.setDate(DateFormat.parse(txtDate.getText().toString()));
+                    else {
+                        Toast.makeText(context, getResources().getString(R.string.toast_errorIntervalDate), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
                 thisTicket.setShop(txtShop.getText().toString());
-                //thisTicket.setAmount(BigDecimal.valueOf(Integer.parseInt(txtAmount.getText().toString())));
+                thisTicket.setTagPlaces(Short.parseShort(txtPeople.getText().toString()));
 
                 try {
                     String newAmount = txtAmount.getText().toString();
@@ -108,6 +143,7 @@ public class EditTicket extends AppCompatActivity {
                 }
 
                 thisTicket.setRefundable(chkIsRefoundable.isChecked());
+
                 DB.updateTicket(thisTicket);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -121,27 +157,30 @@ public class EditTicket extends AppCompatActivity {
         return true;
     }
 
+    /** Dal Maso
+     * set the current values on the variables
+     */
     private void setTicketValues(){
-        Intent intent = getIntent();
-        ticketId = (int) intent.getExtras().getLong("ticketID");
-        Log.d("TicketID", "Edit ticket "+ticketId);
-        thisTicket = DB.getTicket(ticketId);
+
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate()==null?"":thisTicket.getDate().toString();
-        if(thisTicket.getAmount() !=null) {
-            Double amount = thisTicket.getAmount().doubleValue();
-            ticketAmount = amount.toString();
-        }
+
+        if(thisTicket.getAmount() !=null)
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString();
         else
-            ticketAmount="";
-        ticketShop = thisTicket.getShop();
+            ticketAmount = "";
+
+        if (thisTicket.getShop() != null)
+            ticketShop = thisTicket.getShop();
+        else
+            ticketShop = "";
 
         //set those values to the edittext
         setTicketValuesOnScreen();
     }
 
-    /**
+    /** Dal Maso
      * It set the value on Activity
      *
      * Modified: Improved Refoundable Ticket
@@ -153,7 +192,9 @@ public class EditTicket extends AppCompatActivity {
         txtShop = (TextView)findViewById(R.id.input_ticketShopMod);
         txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
         chkIsRefoundable = (CheckBox)findViewById(R.id.check_isRefoundable);
-        LinearLayout btnModifyDate = (LinearLayout) findViewById(R.id.btn_modify_date);
+        txtPeople = (TextView)findViewById(R.id.input_ticketPersonNumber);
+        LinearLayout btnModifyDate = (LinearLayout) findViewById(R.id.buttonEditTicketDate);
+
         btnModifyDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

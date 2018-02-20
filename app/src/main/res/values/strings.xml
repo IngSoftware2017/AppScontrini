@@ -19,14 +19,24 @@
     <string name="location">Luogo</string>
     <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + per iniziare</string>
     <string name="noMissionsClosed">Nessuna missione chiusa</string>
-    <string name="noBills">Nessun scontrino disponibile</string>
-    <string name="noBillsOpen">\nClicca sul pulsante + per iniziare</string>
+    <string name="noBills">Nessuno scontrino disponibile</string>
+    <string name="noBillsOpen">\nClicca sul pulsante foto per iniziare</string>
     <string name="noAcademicTitle">Nessun titolo accademico</string>
     <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + per iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
     <string name="Open">Aperte</string>
     <string name="Closed">Chiuse</string>
+    <string name="personAddTitle">Benvenuto in TicketManager!</string>
+    <string name="personAddDesc">1) Clicca qui per aggiungere una nuova persona\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla</string>
+    <string name="ticketAddTitle">Iniziamo!</string>
+    <string name="ticketAddDesc">Aggiungi un nuovo scontrino, inizia subito scattando una foto</string>
+    <string name="missionAddTitle">Ci sei quasi!</string>
+    <string name="missionAddDesc">1) Clicca qui per creare una nuova missione\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla</string>
+    <string name="dateTicketMin">Data minore dell\u0027inizio missione</string>
+    <string name="dateTicketMax">Data maggiore del termine missione</string>
+
+
     <!--lazzarin-->
     <string name="newMission">Nuova missione</string>
     <string name="newPerson">Nuova persona</string>
@@ -45,17 +55,41 @@
     <string name="toast_errorDate">Inizio > Fine</string>
     <string name="toast_noDataStart">Data di inizio mancante</string>
     <string name="toast_noDataFinish">Data di fine mancante</string>
+    <string name="toast_errorIntervalDate">data non presente nella missione</string>
+
+
     <!--Piccolo-->
-    <string name="text_isRepaid">Missione chiusa?</string>
+    <string name="text_isRepaid">La missione è stata archiviata?</string>
     <string name="title_activity_missions_tabbed">MissionsTabbed</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="tab_text_3">Tab 3</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_Ticket">Scontrino</string>
+    <string name="string_NoShop">Negozio non impostato</string>
+    <string name="string_NoAmount">Null</string>
+    <string name="string_NoAmountFull">Numero non rilevato</string>
+    <string name="string_Total">Totale: </string>
+    <string name="string_Euros">€</string>
+    <string name="title_EditPerson">Modifica persona</string>
+    <string name="title_EditTicket">Modifica scontrino</string>
+    <string name="title_EditMission">Modifica missione</string>
+    <string name="hint_LastName">Cognome</string>
+    <string name="hint_AcademicTitle">Titolo accademico</string>
+    <string name="text_ExportMission">Esporta la missione</string>
+    <string name="button_ExportMission">Esporta</string>
+
     <!--Mantovan-->
-    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
+    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe sue missioni e gli scontrini verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
+    <string name="toast_multiPoint">Totale non valido</string>
+    <string name="toast_tooHightTotal">Importo troppo grande</string>
+    <string name="toast_multiPoint_noNumber">Totale non valido</string>
+    <string name="text_ExportMissionTo">Dove vuoi esportare la missione?</string>
+    <string name="text_Export">Formato esportazione</string>
+
+
     <!--Olivieri-->
     <string name="text_numPerson">Persone presenti:</string>
     <string name="text_activeMission">Missioni aperte:</string>
@@ -73,6 +107,7 @@
     <string name="export_share_text">Vuoi condividere i file esportati?</string>
     <string name="export_mission_button">Esporta missione</string>
     <string name="selection_format">Seleziona formato esportazione:</string>
+
 
     <!--Mascotto-->
     <string name="popup_mission_modify">Modifica</string>

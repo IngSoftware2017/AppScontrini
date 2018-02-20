@@ -1,11 +1,15 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -20,9 +24,12 @@ public class MissionsClosed extends Fragment {
 
     public DataManager DB;
     int personID;
-    public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
+    PersonEntity thisPerson;
+    public List<MissionEntity> listMission = new LinkedList<>();
     View rootView;
-    MissionsTabbed tabInstance;
+    MissionAdapterDB adapter;
+    ListView listView;
+    TextView noMissions;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -30,8 +37,10 @@ public class MissionsClosed extends Fragment {
         rootView = inflater.inflate(R.layout.activity_missions_closed, container, false);
 
         DB = new DataManager(getContext());
+
+        listView = (ListView)rootView.findViewById(R.id.listMission);
+        noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
         personID = getArguments().getInt("personID", 0);
-        Log.d("TAB1", ""+personID);
 
         printAllMissions();
         return rootView;
@@ -39,25 +48,10 @@ public class MissionsClosed extends Fragment {
 
     /** PICCOLO
      * Adds in the database the new mission
-     * @param mission the mission to be added
      */
-    public void addToListDB(MissionEntity mission){
-        listMission.add(mission);
-        ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB adapter = new MissionAdapterDB(tabInstance, R.layout.mission_card, listMission);
+    public void addToListDB(){
+        adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
-    }
-
-    /**Lazzarin
-     * clear the view after I've eliminated a mission(before to call printAllMissions)
-     */
-    public void clearAllMissions()
-    {
-        ListView listView = (ListView)rootView.findViewById(R.id.listMission);
-        MissionAdapterDB emptyAdapter = new MissionAdapterDB(tabInstance, R.layout.mission_card, listMission);
-        emptyAdapter.clear();
-        emptyAdapter.notifyDataSetChanged();
-        listView.setAdapter(emptyAdapter);
     }
 
     /** Dal Maso
@@ -66,28 +60,43 @@ public class MissionsClosed extends Fragment {
      * Modify by Marco Olivieri: get repaid mission in alphabetical order by sql query
      */
     public void printAllMissions(){
-        //List<MissionEntity> missions = DB.getMissionsForPerson(personID);
-        //int count = 0;
+        listMission.clear();
         List<MissionEntity> missions = DB.getMissionClosedForPerson(true, personID);
         TextView noMissions = (TextView)rootView.findViewById(R.id.noMissionsClosed);
         for (int i = 0; i < missions.size(); i++)
         {
             //if(missions.get(i).isRepay()) {
                 //count++;
-                addToListDB(missions.get(i));
+                listMission.add(missions.get(i));
             //}
         }
-        //if(count == 0){
-        if(missions.size() == 0){
+        addToListDB();
+
+        if(missions.size() == 0)
             noMissions.setVisibility(View.VISIBLE);
-        }
-        else{
+        else
             noMissions.setVisibility(View.INVISIBLE);
-        }
 
     }
 
-    public void setParentActivity(MissionsTabbed missionsTabbed){
-        tabInstance = missionsTabbed;
+    /** Dal Maso
+     * Delete one listview cell
+     * @param v view to animate after deleting
+     * @param index item position
+     */
+    public void deleteCell(final View v, final int index) {
+        Animation.AnimationListener al = new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                listMission.remove(index);
+                adapter.notifyDataSetChanged();
+                if(listMission.size() == 0){
+                    noMissions.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override public void onAnimationRepeat(Animation animation) {}
+            @Override public void onAnimationStart(Animation animation) {}
+        };
+        AppUtilities.collapse(v, al);
     }
 }

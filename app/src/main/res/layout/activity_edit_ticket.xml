@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:focusableInTouchMode="true"
     tools:context="com.example.nicoladalmaso.gruppo1.EditTicket">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/input_layout_ticketTitleMod"
@@ -31,6 +31,7 @@
                 android:textColor="#FFF"
                 android:textSize="23sp"
                 android:layout_marginBottom="15dp"
+                android:inputType="textCapSentences"
                 android:singleLine="true"/>
 
         </android.support.design.widget.TextInputLayout>
@@ -47,84 +48,19 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_marginTop="30dp"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:orientation="horizontal"
-                android:layout_marginEnd="10dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="11dp"
-                    android:layout_marginRight="11dp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="3dp"
-                    android:minHeight="48dp"
-                    android:minWidth="48dp"
-                    app:srcCompat="@drawable/ic_euro_symbol_black_48px" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="6">
-
-                    <android.support.design.widget.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/input_ticketAmountMod"
-                        android:hint="@string/total" />
-                </android.support.design.widget.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_marginTop="35dp"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:orientation="horizontal"
                 android:layout_marginEnd="10dp"
-                android:id="@+id/btn_modify_date">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:minWidth="48dp"
-                    android:minHeight="48dp"
-                    android:layout_marginTop="3dp"
-                    app:srcCompat="@drawable/ic_date_range_black_48px"
-                    android:layout_marginLeft="11dp"
-                    android:layout_marginRight="11dp"/>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="6">
-
-                    <android.support.design.widget.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/input_ticketDateMod"
-                        android:hint="@string/date" />
-                </android.support.design.widget.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_marginTop="30dp"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:orientation="horizontal"
-                android:layout_marginEnd="10dp">
+                android:layout_marginTop="25dp"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="11dp"
                     android:layout_marginRight="11dp"
-                    android:layout_weight="1"
                     android:layout_marginTop="3dp"
+                    android:layout_weight="1"
                     android:minHeight="48dp"
                     android:minWidth="48dp"
                     app:srcCompat="@drawable/ic_store_black_48px" />
@@ -135,10 +71,122 @@
                     android:layout_weight="6">
 
                     <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_ticketShopMod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/input_ticketShopMod"
-                        android:hint="@string/shop" />
+                        android:hint="@string/shop"
+                        android:inputType="textCapSentences"
+                        android:textColor="#666"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:minHeight="48dp"
+                    android:minWidth="48dp"
+                    app:srcCompat="@drawable/ic_euro_symbol_black_48px" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_ticketAmountMod"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="0123456789."
+                        android:hint="@string/total"
+                        android:inputType="numberDecimal"
+                        android:textColor="#666"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginTop="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:orientation="horizontal"
+                android:layout_marginEnd="10dp">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:minHeight="48dp"
+                    android:minWidth="48dp"
+                    app:srcCompat="@drawable/ic_store_black_48px" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_ticketPersonNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="123456789"
+                        android:hint="Numero persone"
+                        android:inputType="number"
+                        android:textColor="#666"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonEditTicketDate"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="30dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:minHeight="48dp"
+                    android:minWidth="48dp"
+                    app:srcCompat="@drawable/ic_date_range_black_24px" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:paddingTop="6dp">
+
+                    <TextView
+                        android:id="@+id/input_ticketDateMod"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:hint="@string/date"
+                        android:paddingTop="7dp"
+                        android:textSize="20sp" />
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
@@ -170,5 +218,4 @@
 
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

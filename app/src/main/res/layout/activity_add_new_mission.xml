@@ -27,7 +27,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
-                android:textColor="#FFF"
+                android:inputType="textCapWords"
+                android:textColor="#fff"
                 android:textSize="22sp"
                 android:singleLine="true"/>
 
@@ -48,7 +49,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/location"
-                android:textColor="#FFF"
+                android:inputType="textCapWords"
+                android:textColor="#fff"
                 android:singleLine="true"
                 android:textSize="22sp" />
 
@@ -67,7 +69,7 @@
 
             <LinearLayout
                 android:id="@+id/button_missionStart"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="45dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -78,7 +80,7 @@
                     android:layout_weight="1"
                     android:minWidth="40dp"
                     android:minHeight="40dp"
-                    app:srcCompat="@drawable/ic_date_range_black_48px" />
+                    app:srcCompat="@drawable/ic_date_range_white_48px" />
 
                 <TextView
                     android:id="@+id/input_missionStart"
@@ -88,13 +90,14 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="8"
                     android:text="@string/dateStart"
-                    android:textSize="21sp"/>
+                    android:textColor="#fff"
+                    android:textSize="26sp"/>
 
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/button_missionFinish"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="45dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -105,16 +108,18 @@
                     android:layout_weight="1"
                     android:minWidth="40dp"
                     android:minHeight="40dp"
-                    app:srcCompat="@drawable/ic_date_range_black_48px" />
+                    app:srcCompat="@drawable/ic_date_range_white_48px" />
 
                 <TextView
                     android:id="@+id/input_missionFinish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
                     android:orientation="vertical"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="8"
                     android:text="@string/dateFinish"
+                    android:textColor="#fff"
                     android:textSize="20sp" />
 
             </LinearLayout>

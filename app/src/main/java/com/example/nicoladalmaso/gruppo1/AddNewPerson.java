@@ -3,6 +3,7 @@ package com.example.nicoladalmaso.gruppo1;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,17 +39,19 @@ public class AddNewPerson extends AppCompatActivity {
         context = this.getApplicationContext();
         setTitle(context.getString(R.string.newPerson));
         setContentView(R.layout.activity_add_new_person);
-    }
-    /** Dal Maso
-     * Setting toolbar buttons and style from /res/menu
-     * @param menu
-     * @return success flag
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.confirm_menu, menu);
-        return true;
+        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(addPerson()){
+                    Intent intent = new Intent();
+                    Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
+                    startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(startMissionView);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            }
+        });
     }
 
     /** Dal Maso
@@ -59,56 +62,44 @@ public class AddNewPerson extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent();
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_confirm:
-                //read input text
-                EditText editName =(EditText)findViewById(R.id.input_personName);
-                EditText editLastName = (EditText)findViewById(R.id.input_personLastName);
-                EditText editAcademicTitle = (EditText)findViewById(R.id.input_personAcademicTitle);
-                EditText editEmail = (EditText)findViewById(R.id.input_personEmail);
-                String name = editName.getText().toString();
-                String lastName = editLastName.getText().toString();
-                String academicTitle = editAcademicTitle.getText().toString();
-                String email = editEmail.getText().toString();
-
-                if ((name == null) || name.replaceAll(" ","").equals("")) {
-                    Toast.makeText(context, getResources().getString(R.string.toast_personNoName), Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-                if((lastName==null) || lastName.replaceAll(" ","").equals("")) {
-                    Toast.makeText(context, getResources().getString(R.string.toast_personNoLastName), Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-
-                PersonEntity person = new PersonEntity();
-                person.setName(name);
-                person.setLastName(lastName);
-                person.setAcademicTitle(academicTitle);
-                person.setEmail(email);
-
-
-                long personID = DB.addPerson(person);
-                Log.d("New mission id", ""+personID);
-                //create new directory with input text
-                //Start billActivity
-                Bundle bundle = new Bundle();
-
-                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
-                startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startMissionView.putExtra("personID", (int) personID);
-                startMissionView.putExtra("personName", name);
-                context.startActivity(startMissionView);
-                setResult(RESULT_OK, intent);
-                finish();
-                break;
-
             default:
+                Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
         }
+        return true;
+    }
+
+    private boolean addPerson(){
+        EditText editName =(EditText)findViewById(R.id.input_personName);
+        EditText editLastName = (EditText)findViewById(R.id.input_personLastName);
+        EditText editAcademicTitle = (EditText)findViewById(R.id.input_personAcademicTitle);
+        // EditText editEmail = (EditText)findViewById(R.id.input_personEmail);
+        String name = editName.getText().toString();
+        String lastName = editLastName.getText().toString();
+        String academicTitle = editAcademicTitle.getText().toString();
+        // String email = editEmail.getText().toString();
+
+        if ((name == null) || name.replaceAll(" ","").equals("")) {
+            Toast.makeText(context, getResources().getString(R.string.toast_personNoName), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if((lastName==null) || lastName.replaceAll(" ","").equals("")) {
+            Toast.makeText(context, getResources().getString(R.string.toast_personNoLastName), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        PersonEntity person = new PersonEntity();
+        person.setName(name);
+        person.setLastName(lastName);
+        person.setAcademicTitle(academicTitle);
+        // person.setEmail(email);
+
+        long personID = DB.addPerson(person);
+        Singleton.getInstance().setPersonID((int) personID);
         return true;
     }
 }
