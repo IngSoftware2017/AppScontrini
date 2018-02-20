@@ -16,7 +16,7 @@ import com.ing.software.ocr.OperativeObjects.RawImage;
  */
 public class OcrUtils {
 
-    static final boolean IS_DEBUG_ENABLED = true;
+    public static final boolean IS_DEBUG_ENABLED = true;
     private static final int LOG_LEVEL = 4; //A Higher level, means more things are logged
 
     /**
@@ -35,7 +35,7 @@ public class OcrUtils {
      * List blocks parsed in debug log
      * @param rawImage image containing blocks
      */
-    static void listEverything(@NonNull RawImage rawImage) {
+    public static void listEverything(@NonNull RawImage rawImage) {
             OcrUtils.log(2, "LIST EVERYTHING", "###########################\nINTRODUCTION");
             for (OcrText text : rawImage.getIntroTexts()) {
                 OcrUtils.log(2, "introduction", text.text());

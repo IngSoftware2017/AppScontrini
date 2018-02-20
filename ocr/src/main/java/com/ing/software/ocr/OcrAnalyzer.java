@@ -146,24 +146,20 @@ public class OcrAnalyzer {
     }
 
     /**
-     * @author Michelon
-     *
-     * Replace texts in rawImage inside passed rect with new texts passed
-     * @param texts new texts to add
-     * @param rect rect containing texts to remove
+     * Edited version of above method (getStrip)
+     * Create a new bitmap not optimized, from the chosen strip rect.
+     * @param processor processor containing source image and valid corners
+     * @param bmSize original bitmap size
+     * @param origStripRect strip rect in the original bitmap space
+     * @return bitmap strip
      */
-    private void replaceTexts(List<Scored<OcrText>> texts, RectF rect) {
-        RectF extendedRect = extendRect(rect, 5, 5);
-        List<OcrText> newTexts = Stream.of(texts)
-                                    .map(text -> RawImage.mapText(text.obj(), mainImage))
-                                    .toList();
-        mainImage.removeText(extendedRect);
-        for (OcrText text : newTexts)
-            mainImage.addText(text); //can't be added directly to the stream as I'd lose rects configuration in rawImage
-        OcrUtils.log(3, "replaceTexts", "NEW REPLACED TEXTS");
-        if (IS_DEBUG_ENABLED)
-            OcrUtils.listEverything(mainImage);
+    private static Bitmap getStrip(
+            ImageProcessor processor, SizeF bmSize, RectF origStripRect) {
+        return processor.undistortedSubregion(bmSize, origStripRect,
+                origStripRect.width() / origStripRect.height());
     }
+
+
 
     /**
      * @author Michelon
@@ -189,7 +185,29 @@ public class OcrAnalyzer {
                 OcrUtils.log(3, "getTextsInStrip: ", "For tt: " + tt.obj().text() + " Score is: " + tt.getScore());
             }
         }
-        replaceTexts(texts, stripRect);
+        return texts;
+    }
+
+    /**
+     * Edited version of above method (getTextsInStrip)
+     * Get Texts in extended box
+     * @param processor processor containing source image
+     * @param origBmSize original bitmap size
+     * @param stripRect strip bounding box in original bitmap space
+     * @return list of (not) scored texts containing decoded values
+     */
+    List<Scored<OcrText>> getTextsInStrip(ImageProcessor processor, SizeF origBmSize, RectF stripRect) {
+        Bitmap strip = getStrip(processor, origBmSize, stripRect);
+        RectF undistortedStripRect = rectFromSize(size(strip));
+        List<Scored<OcrText>> texts = Stream.of(analyze(strip))
+                .map(text -> new OcrText(text, undistortedStripRect, stripRect))
+                .map(text -> new Scored<>(0, text))
+                .toList();
+        if (IS_DEBUG_ENABLED) {
+            for (Scored<OcrText> tt : texts) {
+                OcrUtils.log(3, "getTextsInStrip: ", "New Product is: " + tt.obj().text());
+            }
+        }
         return texts;
     }
 
