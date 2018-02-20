@@ -5,6 +5,7 @@ import com.annimon.stream.function.Supplier;
 /**
  * Create and recycle two objects to avoid creating new instances.
  * @param <T> object type.
+ * @author Riccardo Zaglia
  */
 public class Swap<T> {
     public T first, second;

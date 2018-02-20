@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.ing.software.ocr.ImageProcessor;
 import com.ing.software.ocr.OcrManager;
+import com.ing.software.ocr.OcrOptions;
 import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -511,9 +512,9 @@ public class BillActivity extends AppCompatActivity {
      */
     private void startOcrAnalysis(Bitmap bitmap, TicketEntity ticketEntity){
         ImageProcessor processor = new ImageProcessor(bitmap);
-        ocrManager.getTicket(processor, result -> {
+        ocrManager.getTicket(processor, OcrOptions.getDefault(), result -> {
             Log.d("DEBUGOCR","RESULT IS READY");
-            ticketEntity.setAmount(result.amount);
+            ticketEntity.setAmount(result.total);
             ticketEntity.setDate(result.date);
             DB.updateTicket(ticketEntity);
             runOnUiThread(new Runnable() {

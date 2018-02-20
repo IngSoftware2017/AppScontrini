@@ -146,6 +146,12 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
     }
 
+    public void deleteMission(MissionEntity missionEntity){
+        missions.remove(missionEntity);
+        notifyDataSetChanged();
+        activity.reload();
+    }
+
     public void setMissionRepaid(long missionID){
         for(MissionEntity missionEntity : missions){
             if(missionEntity.getID()==missionID) {

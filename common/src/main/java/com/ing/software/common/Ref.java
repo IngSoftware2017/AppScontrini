@@ -5,13 +5,16 @@ package com.ing.software.common;
  * @author Riccardo Zaglia
  */
 public class Ref<T> {
-    public T value;
+    public T val;
 
-    public Ref() {
-        value = null;
-    }
+    /**
+     * New Ref with null value
+     */
+    public Ref() { val = null; }
 
-    public Ref(T obj) {
-        value = obj;
-    }
+    /**
+     * New Ref with specified value
+     * @param value new value
+     */
+    public Ref(T value) { val = value; }
 }

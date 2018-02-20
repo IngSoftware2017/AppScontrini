@@ -1,78 +1,536 @@
 package com.ing.software.ocr;
 
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Size;
+import android.util.Pair;
+import android.util.Range;
+import android.util.SparseIntArray;
+
+import com.ing.software.common.Scored;
+import com.ing.software.common.Triple;
+import com.ing.software.ocr.OcrObjects.OcrText;
+import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
+import com.ing.software.ocr.OperativeObjects.RawImage;
+import com.ing.software.ocr.OperativeObjects.ScoreFunc;
+import com.ing.software.ocr.OperativeObjects.WordMatcher;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.ing.software.ocr.OcrObjects.RawGridResult;
-import com.ing.software.ocr.OcrObjects.RawStringResult;
-import com.ing.software.ocr.OcrObjects.RawText;
+import com.annimon.stream.Stream;
 
-import android.support.annotation.IntRange;
-import android.support.annotation.Size;
-
-import static com.ing.software.ocr.OcrUtils.levDistance;
-
-import java.text.ParseException;
-
-
+import static com.ing.software.ocr.OperativeObjects.ScoreFunc.NUMBER_MIN_VALUE;
+import static java.util.Collections.*;
+import static java.util.Arrays.*;
+import static java.util.regex.Pattern.compile;
 
 /**
- * Class used to extract informations from raw data
- * todo: fallback, if no amount is present try to decode a possible pricelist
- * todo: remove rectangle-probability and use block-specific-probability
+ * Class used to extract information from raw data
  */
 public class DataAnalyzer {
 
-    /**
-     * @author Michelon
-     * Search through results from the research of amount string and retrieves the text with highest
-     * probability to contain the amount calculated with (probability from grid - distanceFromTarget*distanceMultiplier).
-     * If no amount was found in first result iterate through all results following previous order.
-     * @param amountResults list of RawStringResult from amount search. Not null.
-     * @return BigDecimal containing the amount found. Null if nothing found
+    /*
+        @author Zaglia (date, price, word matchers)
+        CONSTANTS:
      */
-    static List<RawGridResult> getPossibleAmounts(@NonNull List<RawStringResult> amountResults) {
-        int distanceMultiplier = 15;
-        List<RawGridResult> possibleResults = new ArrayList<>();
-        Collections.sort(amountResults);
-        for (RawStringResult stringResult : amountResults) {
-            //Ignore text with invalid distance (-1) according to findSubstring() documentation
-            if (stringResult.getDistanceFromTarget() > -1) {
-                RawText sourceText = stringResult.getSourceText();
-                int singleCatch = sourceText.getAmountProbability() - stringResult.getDistanceFromTarget() * distanceMultiplier;
-                if (stringResult.getDetectedTexts() != null) {
-                    //Here we order texts according to their distance (position) from source rect
-                    List<RawText> orderedDetectedTexts = OcrUtils.orderRawTextFromRect(stringResult.getDetectedTexts(), stringResult.getSourceText().getRect());
-                    for (RawText rawText : orderedDetectedTexts) {
-                        if (!rawText.equals(sourceText)) {
-                            possibleResults.add(new RawGridResult(rawText, singleCatch));
-                            OcrUtils.log(3, "getPossibleAmount", "Analyzing source text: " + sourceText.getDetection() +
-                                    " where target is: " + rawText.getDetection() + " with probability: " + sourceText.getAmountProbability() +
-                                    " and distance: " + stringResult.getDistanceFromTarget());
-                        }
-                    }
+
+
+    private enum DateType {
+        DMY,
+        MDY;
+
+        private static Map<Locale, DateType> DATE_TYPES =  new HashMap<>();
+        static {
+            DATE_TYPES.put(Locale.ITALY, DateType.DMY);
+            DATE_TYPES.put(Locale.UK, DateType.DMY);
+            DATE_TYPES.put(Locale.US, DateType.MDY);
+        }
+
+        static DateType fromCountry(Locale locale) { return DATE_TYPES.get(locale); }
+
+        static List<DateType> all() { return asList(DMY, MDY); }
+    }
+
+    // go to https://regex101.com/ to check the behaviour of these regular expressions.
+    //back reference/forward reference not supported in lookbehind but is supported in lookahead
+//    static final Pattern DATE_DMY = compile(
+//            "(?<!\\d)(0?[1-9]|[12]\\d|3[01])([-\\/.])(0?[1-9]|1[012])\\2((?:19)?[6-9]\\d|(?:20)?[0-5]\\d)(?!\\2|\\d)");
+
+    private static final Pattern DATE = compile(
+            "(?<!\\d)(\\d{1,4})([-\\/.])(\\d{1,2})\\2(\\d{1,4})(?!\\2|\\d)");
+    // group 0 is the whole match, 2 is the delimiter
+    private static final List<Integer> DATE_GROUPS = asList(1, 3, 4);
+    private static final Range<Integer> YEAR_RANGE = new Range<>(1900, 2099);
+    private static final int YEAR_CUT = 60; // YY < 60 -> 20YY;  YY >= 60 -> 19YY
+
+    //In principle, multiple words should be matched with a space between them,
+    //but since sometimes some words are split into multiple words, I remove all spaces all together
+    //and match the words without spaces, even if there were in origin effectively distinct words.
+    //The accepted errors (ex: O -> U,D) are based on common errors of the ocr scanning the dataset.
+    //todo: consider importing this data from an external file
+    private static final List<Pair<Locale, List<WordMatcher>>> TOTAL_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("T[OUD]TALE", 1),
+                    new WordMatcher("T[OUD]TALEE[UI]R[OD]", 3),
+                    new WordMatcher("IMP[OU]RT[OD]", 1),
+                    new WordMatcher("TOT", 0),
+                    new WordMatcher("TOTE[UI]R[OD]", 1),
+                    new WordMatcher("IMP[OU]RT[OD]E[UI]R[OD]", 3)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("T[OUD]TAL", 1),
+                    new WordMatcher("AMOUNT", 1),
+                    new WordMatcher("GRANDTOTAL", 2)
+            ))
+    );
+
+    private static final  List<Pair<Locale, List<WordMatcher>>> SUBTOTAL_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("SUBT[OD]TALE", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("SUBTOTAL", 1)
+            ))
+    );
+
+    private static final  List<Pair<Locale, List<WordMatcher>>> CASH_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("CONTANT[EI]", 1),
+                    new WordMatcher("CARTADICREDITO", 3),
+                    new WordMatcher("PAGAMENTOCONTANTE", 4),
+                    new WordMatcher("CCRED", 0),
+                    new WordMatcher("ASSEGNI", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("CASH", 0)
+            ))
+    );
+
+    private static final  List<Pair<Locale, List<WordMatcher>>> CHANGE_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("RESTO", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("CHANGE", 1)
+            ))
+    );
+
+
+    private static final  List<Pair<Locale, List<WordMatcher>>> COVER_MATCHERS = asList(
+            new Pair<>(Locale.ITALIAN, asList(
+                    new WordMatcher("COPERT[OI]", 1),
+                    new WordMatcher("TAVOL[OI]", 1)
+            )),
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("COVER", 0),
+                    new WordMatcher("TABLE", 0)
+            ))
+    );
+
+    //searching tax with ITALIAN locale will return 0 matches
+    private static final  List<Pair<Locale, List<WordMatcher>>> TAX_MATCHERS = asList(
+            new Pair<>(Locale.ENGLISH, asList(
+                    new WordMatcher("TAX", 0),
+                    new WordMatcher("SALESTAX", 1)
+            ))
+    );
+
+    //NB: these matchers use country locale instead of language locale
+    private static final  List<Pair<Locale, List<WordMatcher>>> CURRENCY_MATCHERS = asList(
+            new Pair<>(Locale.ITALY, asList(
+                    new WordMatcher("EUR[OD]", 0),
+                    new WordMatcher("EUR", 0)
+            )),
+            new Pair<>(Locale.UK, asList(
+                    new WordMatcher("GBP", 0)
+            )),
+            new Pair<>(Locale.US, asList(
+                    new WordMatcher("USD", 0)
+            ))
+    );
+
+    //match a number between 2 and 4 digits,
+    // or match any with 0 to 6 digits before dot and 1 to 2 digits after,
+    // or match any with 1 to 6 digits before dot and 0 to 2 digits after,
+    // optional minus in front, optional character before end of string (could be another digit).
+    static final Pattern POTENTIAL_PRICE = compile(
+            "(?<![\\d.,-])-?(?:\\d{2,4}|\\d{0,6}[.,]\\d{1,2}|\\d{1,6}[.,]\\d{0,2})[^.,]?$");
+    //match any number with a symbol for two decimals (a dot/comma or a space or a dot/comma + space),
+    // optional thousands symbols, optional minus in front, optional character before end of string
+    static final Pattern PRICE_WITH_SPACES = compile(
+            "(?<![\\d.,'-])-?(?:0|[1-9]\\d{0,3}|[1-9]\\d{0,2}(?:(?:[.,'] |[.,' ])\\d{3})*)(?:[.,] |[., ])\\d{2}(?=[^\\d.,]?$)");
+    static final Pattern PRICE_STRICT = compile(
+            "(?<![\\d.,'-])-?(?:0|[1-9]\\d{0,3}|[1-9]\\d{0,2}(?:[.,']\\d{3})*)[.,]\\d{2}(?=[^\\d.,]?$)");
+    //match any number with no points, optional minus in front, optional character before end of string
+    static final Pattern PRICE_NO_DECIMALS = compile(
+            "(?<![\\d.-])-?(?:0|[1-9]\\d*)(?=[^\\d.]?$)");
+    //match upside down prices. it's designed to reject corrupted upside down prices to avoid false positives.
+    static final Pattern PRICE_UPSIDEDOWN = compile(
+            "^[^'.,-]?[0OD1Il2ZEh5S9L8B6]{2} ?'[0OD1Il2ZEh5S9L8B6]+[^'.,]?$");
+    //java does not support regex subroutines: I have to duplicate the character matching part
+
+    //Used to sanitize price matched with PRICE_WITH_SPACES before cast to BigDecimal
+    //the lookahead with anchor makes sure to match only (or exclude) last occurrence
+    static final String DECIMAL_SEPARATOR = "(?:[.,] |[., ])(?=\\d{2}$)";
+    static final String THOUSAND_SEPARATOR = "(?:[.,'] |[.,' ])(?!\\d{2}$)";
+
+
+
+    /**
+     * Get a list of texts where amount string is present
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing amount string with its score and language. Can be empty.
+     */
+    static List<Scored<Pair<OcrText, Locale>>> findAmountStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, TOTAL_MATCHERS);
+    }
+
+    /**
+     * Get a list of texts where subtotal string is present
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing subtotal string with its score and language. Can be empty.
+     */
+    static List<Scored<Pair<OcrText, Locale>>> findSubtotalStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, SUBTOTAL_MATCHERS);
+    }
+
+    /**
+     * Get a list of texts where cash string is present
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing cash string with its score and language. Can be empty.
+     */
+
+    static List<Scored<Pair<OcrText, Locale>>> findCashStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, CASH_MATCHERS);
+    }
+
+    /**
+     * Get a list of texts where change string is present
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing change string with its score and language. Can be empty.
+     */
+    static List<Scored<Pair<OcrText, Locale>>> findChangeStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, CHANGE_MATCHERS);
+    }
+
+    /**
+     * Get a list of texts where cover string is present
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing cover string with its score and language. Can be empty.
+     */
+    static List<Scored<Pair<OcrText, Locale>>> findCoverStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, COVER_MATCHERS);
+    }
+
+
+    /**
+     * Get a list of texts where tax string is present
+     * @param texts list of texts to analyze. Not null.
+     * @return list of texts containing tax string with its score and language. Can be empty.
+     */
+    static List<Scored<Pair<OcrText, Locale>>> findTaxStringTexts(List<OcrText> texts) {
+        return findAllMatchesWithLanguage(texts, TAX_MATCHERS);
+    }
+
+    /**
+     * @author Zaglia
+     * Find the most probable ticket language from al list of matches with associated language
+     * @param matches list of matches with associated language. Can be emty. Not null.
+     * @return best language locale. Can be empty if matches is empty.
+     */
+    // not using varargs because of possible heap pollution??
+    static Scored<Locale> getBestLanguage(List<List<Scored<Pair<OcrText, Locale>>>> matches) {
+        Locale bestLanguage = null;
+        double bestScore = 0;
+        Map<Locale, Double> accumulator = new HashMap<>();
+        for (int i = 0; i < matches.size(); i++) {
+            for (int j = 0; j < matches.get(i).size(); j++) {
+                Locale matchLang = matches.get(i).get(j).obj().second;
+                double matchScore = matches.get(i).get(j).getScore();
+
+                Double maybeScore = accumulator.get(matchLang);
+                double newScore = maybeScore != null ? maybeScore + matchScore : matchScore;
+                accumulator.put(matchLang, newScore);
+                if (newScore > bestScore) {
+                    bestScore = newScore;
+                    bestLanguage = matchLang;
                 }
-            } else {
-                OcrUtils.log(3, "getPossibleAmount", "Ignoring text: " + stringResult.getSourceText().getDetection());
             }
         }
-        if (possibleResults.size() > 0) {
-            /* Here we order considering their final probability to contain the amount:
-            If the probability is the same, the fallback is their previous order, so based on when
-            they are inserted (=their distance (position) from source rect).
-            */
-            Collections.sort(possibleResults);
-        }
-        return possibleResults;
+        return new Scored<>(bestScore, bestLanguage);
     }
+
+    /**
+     * @author Zaglia
+     * Remove all matches in a list of matches (with associated language locale) that
+     * do not belong to specified language
+     * @param matches list of matches with associated language locale. Not null.
+     * @param language language of matches to keep. Non null.
+     * @return filtered matches. Can be empty if no match remains.
+     */
+    static List<Scored<OcrText>> filterForLanguage(List<Scored<Pair<OcrText, Locale>>> matches, Locale language) {
+        return Stream.of(matches)
+                .filter(match -> match.obj().second == language)
+                .map(scored -> new Scored<>(scored.getScore(), scored.obj().first))
+                .toList();
+    }
+
+    /**
+     * @author Michelon
+     * Insert detected amount texts in a listAmountOrganizer
+     * @param texts list of scored source texts
+     * @param mainImage source image
+     * @return list of listAmountOrganizer containing source texts
+     */
+    static List<ListAmountOrganizer> organizeAmountList(@NonNull List<Scored<OcrText>> texts, RawImage mainImage) {
+        return Stream.of(texts)
+                    .map(source -> new ListAmountOrganizer(source, mainImage))
+                    .toList();
+    }
+
+    /**
+     * @author Riccardo Zaglia
+     * Find all OcrText which text is matched by any of the list of matchers.
+     * @param lines list of OcrTexts. Can be empty. Not null.
+     * @return OcrTexts matched. Can be empty if no match is found.
+     */
+    @Deprecated
+    static List<Scored<OcrText>> findAllMatchingTexts(List<OcrText> lines, List<WordMatcher> matchers) {
+        return Stream.of(lines)
+                .map(line -> new Scored<>(max(Stream.of(matchers).map(m -> m.match(line)).toList()), line))
+                .filter(s -> s.getScore() > 0)
+                .toList();
+    }
+
+    /**
+     * @author Zaglia
+     * Find all matches in a list of texts and assign a language and a fit score to each one.
+     * The same text can appear in multiple matches if it can be interpreted in multiple languages
+     * @param texts list of OcrTexts. Not modified. Can be empty. Not null.
+     * @param languageMatchers list ontaining lists of WordMatchers categorized by a Locale (language).
+     *                         Can be empty. Not null.
+     * @return list of scored matches with associated language. Can be empty.
+     */
+    private static List<Scored<Pair<OcrText, Locale>>> findAllMatchesWithLanguage(
+            List<OcrText> texts, List<Pair<Locale, List<WordMatcher>>> languageMatchers) {
+        List<Scored<Pair<OcrText, Locale>>> matches = new ArrayList<>();
+        for (OcrText text : texts) {
+            List<Scored<Locale>> scoredLocales = Stream.of(languageMatchers)
+                    .map(pair -> new Scored<>(
+                            max(Stream.of(pair.second).map(m -> m.match(text)).toList()),
+                            pair.first))
+                    .filter(s -> s.getScore() > 0)
+                    .toList();
+            if (scoredLocales.size() > 0) {
+                matches.add(new Scored<>(scoredLocales.get(0).getScore(),
+                        new Pair<>(text, scoredLocales.get(0).obj())));
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * @author Zaglia
+     * Choose a currency country based on the number of matches of the currency abbreviations.
+     * @param texts list of OcrTexts. Not modified. Can be empty. Not null.
+     * @return chosen country. Can be null if no match is found.
+     */
+    static Locale getCurrencyCountry(List<OcrText> texts) {
+        List<Scored<Pair<OcrText, Locale>>> matches = findAllMatchesWithLanguage(texts, CURRENCY_MATCHERS);
+        Locale bestCountry = null;
+        int bestScore = 0;
+        Map<Locale, Integer> accumulator = new HashMap<>();
+        for (int i = 0; i < matches.size(); i++) {
+            Locale match = matches.get(i).obj().second;
+            Integer counter = accumulator.get(match);
+            int score = counter != null ? counter + 1 : 1;
+            accumulator.put(match, score);
+            if (score > bestScore) {
+                bestScore = score;
+                bestCountry = match;
+            }
+        }
+        return bestCountry;
+    }
+
+    /**
+     * Get possible amount from word matcher and regex
+     * @param texts list of scored target texts (prices). Not null.
+     * @return text containing amount price and its decoded value
+     */
+    static Pair<OcrText, BigDecimal>  getMatchingAmount(@NonNull List<Scored<OcrText>> texts, boolean advanced) {
+        List<Pair<OcrText, BigDecimal>> prices = findAllPricesRegex(Stream.of(texts).map(Scored::obj).toList(), advanced);
+        if (prices.size() > 0)
+            return prices.get(0);
+        return null;
+    }
+
+    /**
+     * @author Zaglia
+     * Convert a price regex match into a BigDecimal
+     * @param match regex match
+     * @return BigDecimal or null if error.
+     */
+    private static BigDecimal getRegexPriceValue(String match) {
+        String sanitized = match.replaceAll(DECIMAL_SEPARATOR, ".");
+        sanitized = sanitized.replaceAll(THOUSAND_SEPARATOR, "");
+        //since price regex accept dots, commas and spaces for both decimal and thousands symbol,
+        //the sanitized string could still be an invalid number.
+        try {
+            return new BigDecimal(sanitized);
+        }
+        catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Find all OcrTexts that matches a price with regex
+     * @param lines List of OcrTexts
+     * @return list of pairs of OcrText and associated price string
+     *
+     * @author Zaglia
+     */
+    static List<Pair<OcrText, BigDecimal>> findAllPricesRegex(List<OcrText> lines, boolean advanced) {
+        List<Pair<OcrText, BigDecimal>> prices = new ArrayList<>();
+        for (OcrText line : lines) {
+            Matcher matcher = PRICE_WITH_SPACES.matcher(advanced ? line.sanitizedAdvancedNum()
+                    : line.sanitizedNum());
+            if (matcher.find()) {
+                BigDecimal price = getRegexPriceValue(matcher.group());
+                if (price != null) {
+                    prices.add(new Pair<>(line, price));
+                }
+            }
+        }
+        return prices;
+    }
+
+    /**
+     * @author Michelon
+     * Get restored amount without regex
+     * @param texts list of scored target texts (prices). Not null.
+     * @return text containing amount price and it's decoded value
+     */
+    static Pair<OcrText, BigDecimal> getRestoredAmount(@NonNull List<Scored<OcrText>> texts) {
+        for (Scored<OcrText> singleText : texts) {
+            if (ScoreFunc.isPossiblePriceNumber(singleText.obj().textNoSpaces(), singleText.obj().sanitizedNum()) < NUMBER_MIN_VALUE) {
+                BigDecimal amount = analyzeAmount(singleText.obj().sanitizedAdvancedNum());
+                if (amount != null)
+                    return new Pair<>(singleText.obj(), amount);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @author Zaglia
+     * Find all dates, eventually restristed to a specific country date format.
+     * @param texts list of OcrTexts
+     * @param forcedCountry forced country locale. If null then all date formats are tried to match.
+     * @return list of triple containing the date, country and OcrText. The same OcrText could be included
+     * in multiple triples if the date match could be interpreted in multiple formats.
+     */
+    private static List<Triple<OcrText, Date, DateType>> findAllDatesRegex(List<OcrText> texts, Locale forcedCountry) {
+        List<DateType> formats = forcedCountry != null
+                ? singletonList(DateType.fromCountry(forcedCountry))
+                : DateType.all();
+        //using map makes sure that if the same date is repeated inside the ticket,
+        // it will no be rejected due to multiple matches.
+        Map<Date, Pair<OcrText, DateType>> dates = new HashMap<>();
+        for (OcrText text : texts) {
+            Matcher matcher = DATE.matcher(text.sanitizedNum());
+            if (matcher.find()) {
+                SparseIntArray groups = new SparseIntArray(3);
+                for (Integer idx : DATE_GROUPS) {
+                    groups.append(idx, Integer.valueOf(matcher.group(idx)));
+                }
+                for (DateType fmt : formats) {
+                    int year = 0, month = 0, day = 0;
+                    if (fmt == DateType.DMY) {
+                        day = groups.get(DATE_GROUPS.get(0));
+                        month = groups.get(DATE_GROUPS.get(1));
+                        year = groups.get(DATE_GROUPS.get(2));
+                    } else if (fmt == DateType.MDY) {
+                        month = groups.get(DATE_GROUPS.get(0));
+                        day = groups.get(DATE_GROUPS.get(1));
+                        year = groups.get(DATE_GROUPS.get(2));
+                    }
+
+                    // here I define some constants inline because they are not meant to be changed ever.
+                    //Eg: any 2 digit year is always < 100; the months are always 12, etc.
+                    boolean validYear = year < 100 || YEAR_RANGE.contains(year);
+                    boolean validMonth = month >= 1 && month <= 12;
+                    boolean validDay = day >= 1 && (asList(4, 6, 9, 11).contains(month)
+                            ? day < 30 : (month == 2 ? day < 29 : day < 31));
+                    //for convenience I do not check for leap years and other date exceptions, in the rare
+                    // occurrence of a matched date with a non leap year, february month and 29th day,
+                    // the gregorian calendar overflows to march 1st without throwing exceptions.
+                    if (validYear && validMonth && validDay) {
+                        if (year < 100)
+                            year += year > YEAR_CUT ? 1900 : 2000;
+                        // correct for 0 based month
+                        Date date = new GregorianCalendar(year, month - 1, day).getTime();
+                        dates.put(date, new Pair<>(text, fmt));
+                    }
+                }
+            }
+            // It's better to avoid word concatenation because it could match a wrong date.
+            // Ex: 1/1/20 14:30 -> 1/1/2014:30
+        }
+        return Stream.of(dates)
+                .map(entry -> new Triple<>(entry.getValue().first, entry.getKey(), entry.getValue().second))
+                .toList();
+    }
+
+    /**
+     * Find date. Date is rejected if there are multiple and disambiguation has failed.
+     * @param texts List of OcrTexts.
+     * @param suggestedCountry country locale used for disambiguation. Can be null.
+     * @param forcedCountry forced country locale. Can be null.
+     * @return triple containing OcrText, date and locale. Can be null if no date found or multiple.
+     */
+    static Pair<OcrText, Date> findDate(
+            List<OcrText> texts, Locale suggestedCountry, Locale forcedCountry) {
+        List<Triple<OcrText, Date, DateType>> matches = findAllDatesRegex(texts, forcedCountry);
+        if (matches.size() >= 1) {
+            Triple<OcrText, Date, DateType> firstMatch = matches.get(0);
+            if (forcedCountry != null || suggestedCountry == null) {
+                return matches.size() == 1 ? new Pair<>(firstMatch.first, firstMatch.second) : null;
+            }
+            DateType suggestedType = DateType.fromCountry(suggestedCountry);
+            //map containing pairs of (first: match counter, second: last match index).
+            Map<DateType, Pair<Integer, Integer>> accumulator = new HashMap<>();
+            for (int i = 0; i < matches.size(); i++) {
+                DateType type = matches.get(i).third;
+                Pair<Integer, Integer> pair = accumulator.get(type);
+                accumulator.put(type, new Pair<>(pair.first != null ? pair.first + 1 : 1, i));
+            }
+            Pair<Integer, Integer> pair = accumulator.get(suggestedType);
+            if (pair != null) {
+                Triple<OcrText, Date, DateType> match = matches.get(pair.second);
+                // discard match if counter is > 1 -> date is ambiguous
+                return pair.first == 1 ? new Pair<>(match.first, match.second) : null;
+            } else {
+                return matches.size() == 1 ? new Pair<>(firstMatch.first, firstMatch.second) : null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /*
+    Old analysis. Used alongside regex.
+     */
 
     /**
      * @author Michelon
@@ -80,73 +538,20 @@ public class DataAnalyzer {
      * @param amountString string containing possible amount. Length > 0.
      * @return BigDecimal containing the amount, null if no number was found
      */
-    static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
+    public static BigDecimal analyzeAmount(@Size(min = 1) String amountString) {
         BigDecimal amount = null;
-        if (OcrUtils.isPossibleNumber(amountString)) {
-            try {
-                amount = new BigDecimal(amountString);
-            } catch (NumberFormatException e) {
-                try {
-                    String decoded = deepAnalyzeAmountChars(amountString);
-                    if (!decoded.equals(""))
-                        amount = new BigDecimal(decoded);
-                } catch (Exception e1) {
-                    amount = null;
-                }
-            } catch (Exception e2) {
-                amount = null;
-            }
-            if (amount != null)
-                amount = amount.setScale(2, RoundingMode.HALF_UP);
+        try {
+            String decoded = deepAnalyzeAmountChars(amountString);
+            if (!decoded.equals(""))
+                amount = new BigDecimal(decoded);
+        } catch (Exception e1) {
+            amount = null;
         }
         return amount;
     }
 
     /**
      * @author Michelon
-     * Tries to find a number in string that may contain also letters (ex. '€' recognized as 'e')
-     * @param targetAmount string containing possible amount. Length > 0.
-     * @return string containing the amount, null if no number was found
-     */
-    @Deprecated
-    private static String deepAnalyzeAmount(@Size(min = 1) String targetAmount){
-        targetAmount = targetAmount.replaceAll(",", ".").replaceAll("S", "5");
-        StringBuilder manipulatedAmount = new StringBuilder();
-        OcrUtils.log(2,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
-        boolean numberPresent = false; //used because length can be > 0 if '.' was found but no number
-        for (int i = 0; i < targetAmount.length(); ++i) {
-            char singleChar = targetAmount.charAt(i);
-            if (Character.isDigit(singleChar)) {
-                manipulatedAmount.append(singleChar);
-                numberPresent = true;
-            } else if (singleChar=='.') {
-                //Should be replaced with a better analysis
-                if (targetAmount.length()-1 != i) { //bad way to check if it's last '.'
-                    String temp = manipulatedAmount.toString().replaceAll("\\.", ""); //Replace previous '.' so only last '.' is saved
-                    manipulatedAmount = new StringBuilder(temp);
-                }
-                manipulatedAmount.append(singleChar);
-                //} else if (isExp(targetAmount, i)) { //Removes previous exponents
-                //    String temp = manipulatedAmount.toString().replaceAll("E", "");
-                //    temp = temp.replaceAll("\\+", "");
-                //    temp = temp.replaceAll("-", "");
-                //    manipulatedAmount = new StringBuilder(temp);
-                //    manipulatedAmount.append(getExp(targetAmount, i));
-            } else if (singleChar == '-' && manipulatedAmount.length() == 0) { //If negative number
-                manipulatedAmount.append(singleChar);
-            }
-        }
-        if (manipulatedAmount.toString().length() == 0 || !numberPresent)
-            return null;
-        //If last char is '.' remove it
-        if (manipulatedAmount.toString().charAt(manipulatedAmount.length()-1) == '.')
-            manipulatedAmount.setLength(manipulatedAmount.length()-1);
-        return manipulatedAmount.toString();
-    }
-
-    /**
-     * @author Michelon
-     * @date 8-12-17
      * Analyze a string (reversed by this method) looking for a number (with two decimals).
      * Uses arbitrary decisions.
      * @param targetAmount string containing possible amount. Length > 0.
@@ -154,17 +559,16 @@ public class DataAnalyzer {
      */
     private static String deepAnalyzeAmountChars(@Size(min = 1) String targetAmount){
         StringBuilder manipulatedAmount;
-        StringBuilder reversedAmount = new StringBuilder(targetAmount.replaceAll(",", ".")
-                .replaceAll(" ", "").replaceAll("S", "5")).reverse();
-        OcrUtils.log(3,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
-        OcrUtils.log(3,"deepAnalyzeAmount", "Reversed amount is: " + reversedAmount.toString());
+        StringBuilder reversedAmount = new StringBuilder(targetAmount).reverse();
+        OcrUtils.log(4,"deepAnalyzeAmount", "Deep amount analysis for: " + targetAmount);
+        OcrUtils.log(5,"deepAnalyzeAmount", "Reversed amount is: " + reversedAmount.toString());
         manipulatedAmount = analyzeCharsLong(reversedAmount.toString());
+        OcrUtils.log(4,"deepAnalyzeAmount", "Analyzed amount is: " + manipulatedAmount.toString());
         return manipulatedAmount.reverse().toString();
     }
 
     /**
      * @author Michelon
-     * @date 9-12-17
      * Analyze a string looking for a number (with two decimals)
      * @param source string containing possible amount. Length > 0.
      * @return stringBuilder containing the amount, empty stringBuilder if nothing found
@@ -206,7 +610,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Keep only digits and points in a string
      * @param string source string. Length > 0.
      * @return string with only digits and '.'
@@ -221,7 +624,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Removes '.' from a string
      * @param string source string. Length > 0
      * @return string with no '.'
@@ -236,7 +638,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze a string looking for a number with two decimals
      * @param source source string @Size(min = 1, max = 3)
      * @return StringBuilder with decoded number (empty if nothing found)
@@ -252,7 +653,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze three chars, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
@@ -281,7 +681,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze two chars, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @param char1 second char. Not null.
@@ -304,7 +703,6 @@ public class DataAnalyzer {
 
     /**
      * @author Michelon
-     * @date 8-12-17
      * Analyze single char, uses arbitrary decisions to extract a number with two decimals.
      * @param char0 first char. Not null.
      * @return StringBuilder with decoded number (empty if nothing found)
@@ -315,249 +713,5 @@ public class DataAnalyzer {
             return result.append("00.").append(char0);
         else
             return result;
-    }
-
-    /**
-     * @author Michelon
-     * Check if at chosen index the string contains an exponential form.
-     * Exp are recognized if they are in the form:
-     * E'num'
-     * E+'num'
-     * E-'num'
-     * where 'num' is a number
-     * @param text source string. Length > 0.
-     * @param startingPoint position of 'E' (from 0 to text.length-1). Int >= 0.
-     * @return true if it's a valid exponential form
-     */
-    static boolean isExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
-        if (text.length() <= startingPoint + 2) //There must be at least E'num'
-            return false;
-        if (text.charAt(startingPoint)!='E')
-            return false;
-        else
-        if (Character.isDigit(text.charAt(startingPoint + 1)))
-            return true;
-        else if (text.charAt(startingPoint + 1) == '+' || text.charAt(startingPoint + 1) == '-')
-            return Character.isDigit(text.charAt(startingPoint + 2));
-        return false;
-    }
-
-    /**
-     * @author Michelon
-     * Get exponential form from chosen string.
-     * Note: isExp() must return true for these same text and startingPoint
-     * @param text source text. Length > 0.
-     * @param startingPoint position of 'E'. Int >= 0.
-     * @return String containing the exponential form (only 'E' and, if present, '+' or '-')
-     */
-    static String getExp(@Size(min = 1) String text, @IntRange(from = 0) int startingPoint) {
-        if (Character.isDigit(text.charAt(startingPoint + 1)))
-            return String.valueOf(text.charAt(startingPoint));
-        else if (text.charAt(startingPoint + 1) == '+' || text.charAt(startingPoint + 1) == '-')
-            if (Character.isDigit(text.charAt(startingPoint + 2)))
-                return text.substring(startingPoint, startingPoint + 2);
-        return "";
-    }
-
-    /**
-     * @author Salvagno
-     * Accept a text and check if there is a combination of date format.
-     * Controllo per tutte le combinazioni simili a
-     * xx/xx/xxxx o xx/xx/xxxx o xxxx/xx/xx
-     * xx-xx-xxxx o xx-xx-xxxx o xxxx-xx-xx
-     * xx.xx.xxxx o xx.xx.xxxx xxxx.xx.xx
-     *
-     * @param text The text to find the date format
-     * @return the absolute value of the minimum distance found between all combinations,
-     * if the distance is >= 10 or the inserted text is empty returns -1
-     */
-    static int findDate(String text) {
-        if (text.length() == 0)
-            return -1;
-
-        //Splits the string into tokens
-        String[] pack = text.split("\\s");
-
-        String[] formatDate = {"xx/xx/xxxx", "xx/xx/xxxx", "xxxx/xx/xx","xx-xx-xxxx", "xx-xx-xxxx", "xxxx-xx-xx", "xx.xx.xxxx", "xx.xx.xxxx", "xxxx.xx.xx"};
-
-        //Maximum number of characters in the date format
-        int minDistance = 10;
-        //Th eminimum of number combinations of date format without symbols like '/' or '.' or '-'
-        int minCharaterDate = 8;
-
-        for (String p : pack) {
-            for (String d : formatDate) {
-                //Convert string to uppercase
-                int distanceNow = levDistance(p.toUpperCase(), d.toUpperCase());
-                if (distanceNow < minDistance)
-                    minDistance = distanceNow;
-            }
-        }
-
-        if(minDistance==10)
-            return -1;
-        else
-            //Returns the absolute value of the distance by subtracting the minimum character
-            return Math.abs(minCharaterDate-minDistance);
-
-    }
-
-
-    /**
-     * @author Salvagno
-     * It takes a text and returns the date if a similarity is found with a date format
-     *
-     * @param text The text to find the date
-     * @return date or null if the date is not there
-     */
-    static Date getDate(String text) {
-        if (text.length() == 0)
-            return null;
-
-        Date date = null;
-
-        //Possible date formats
-        String[] formatDate = {"xx/xxxx/xx", "xxxx/xx/xx","xx/xx/xxxx", "xx-xxxx-xx", "xxxx-xx-xx","xx-xx-xxxx","xx.xxxx.xx","xxxx.xx.xx" ,"xx.xx.xxxx"};
-
-
-        //Analyze the text by removing the spaces
-        String text_w_o_space =  text.replace(" ", "");
-
-        //Set the maximum length of the string as the minimum distance
-        int minDistance = text_w_o_space.length();
-        String dataSearch = null;
-
-        //Search a piece of string as long as the length of the searched string in the text
-        int start;
-        for (String d : formatDate) {
-            int subLength = d.length();
-            start = 0;
-            int tokenLength = 6; //Set at 6 the minimum number of characters that a date can have (x-x-xx)
-            for (int finish = subLength; finish <= (text_w_o_space.length()); finish++) {
-                String token = text_w_o_space.substring(start, finish);
-                token = token.toUpperCase();
-                String tokenNUmber = "";
-                //Check if there are letters or 'S', in this case the change in 5
-                char[] string = token.toCharArray();
-                for (char c : string){
-                    boolean isLetter = Character.isDigit(c);
-                    if(isLetter)
-                        tokenNUmber = tokenNUmber+c;
-                    else
-                    {
-                        if(c == 'S')
-                            tokenNUmber = tokenNUmber+'5';
-                        else if (c == '-' || c == '.' || c == '/')
-                            tokenNUmber = tokenNUmber+c;
-                    }
-
-                }
-                //Check if the length of characters is greater than the last one found
-                if(tokenNUmber.length()>=tokenLength) {
-                    int distanceNow = levDistance(tokenNUmber, d.toUpperCase());
-                    if (distanceNow <= minDistance) {
-                        minDistance = distanceNow;
-                        dataSearch = tokenNUmber;
-                        tokenLength = tokenNUmber.length();
-                    }
-                }
-                start++;
-            }
-        }
-
-        //If the distance is greater than 10 which is the maximum number of characters that a date can take, return null
-        if(minDistance<10)
-        {
-            date = parseDate(dataSearch);
-        }
-        return date;
-
-
-    }
-
-    /**
-     * @author Salvagno
-     *
-     * @param dateString An input date string.
-     * @return A Date (java.util.Date) reference. The reference will be null if
-     *         we could not match any of the known formats.
-     */
-    public static Date parseDate(String dateString)
-    {
-        Date date = null;
-        Locale locale = new Locale("US");
-
-        //prendo i tre pezzi della stringa data
-        char[] string = dateString.toCharArray();
-        String token1 = "";
-        String token2 = "";
-        String token3 = "";
-        Integer numberOfSymbols = 0;
-        String finalDate = "";
-        String[] formats;
-
-
-
-        for (char c : string) {
-            if (c == '-' || c == '.' || c == '/')
-            {
-                numberOfSymbols ++;
-                finalDate=finalDate+'-';
-            }
-            else
-            {
-                finalDate=finalDate+c;
-
-                if(numberOfSymbols == 0)
-                    token1 = token1+c;
-                else if(numberOfSymbols == 1)
-                    token2 = token2+c;
-                else if(numberOfSymbols == 2)
-                    token3 = token3+c;
-                else
-                    return null;
-            }
-
-        }
-
-        //convert string to integer and get last two digit
-        int token1Number = ((Integer.parseInt(token1))%100);    //probably is day
-        int token2Number = ((Integer.parseInt(token2))%100);    //probably is month
-        int token3Number; //probably is year
-        if(token3.length()==4) //if this token have 4 character
-        {
-            token3Number = Integer.parseInt(token3);
-            formats = new String[] {"dd-MM-yyyy","MM-dd-yyyy"};
-        }
-        else {
-            token3Number = ((Integer.parseInt(token3)) % 100);
-            formats = new String[] {"dd-MM-yy", "MM-dd-yy"};
-        }
-
-        if((token1Number >= 1 && token1Number <= 12) && (token2Number >= 1 && token2Number <= 12))
-            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
-        else if(token2Number > 12)
-            dateString = String.valueOf(token2Number)+'-'+String.valueOf(token1Number)+'-'+String.valueOf(token3Number);
-        else
-            dateString = String.valueOf(token1Number)+'-'+String.valueOf(token2Number)+'-'+String.valueOf(token3Number);
-
-        for (int i = 0; i < formats.length; i++)
-        {
-            String format = formats[i];
-            SimpleDateFormat dateFormat = new SimpleDateFormat(format,locale);
-            try
-            {
-                // parse() will throw an exception if the given dateString doesn't match
-                // the current format
-                date = dateFormat.parse(dateString);
-                break;
-            }
-            catch(ParseException e)
-            {
-                // don't do anything. just let the loop continue.
-            }
-        }
-
-        return date;
     }
 }

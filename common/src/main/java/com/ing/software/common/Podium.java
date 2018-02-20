@@ -32,8 +32,9 @@ public class Podium<T extends Comparable<T>> {
      * @return true if obj is added to podium, false otherwise
      */
     public boolean tryAdd(@NonNull T obj) {
+        // add the object to podium and remove the last object if podium size > k
         pq.offer(obj);
-        return pq.size() <= tgtSize || pq.poll() != obj; // if lowest is obj -> add failed
+        return pq.size() <= tgtSize || pq.poll() != obj; // if last is obj -> add failed
     }
 
     /**
