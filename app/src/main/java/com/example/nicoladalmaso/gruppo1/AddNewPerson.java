@@ -39,17 +39,15 @@ public class AddNewPerson extends AppCompatActivity {
         context = this.getApplicationContext();
         setTitle(context.getString(R.string.newPerson));
         setContentView(R.layout.activity_add_new_person);
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(addPerson()){
-                    Intent intent = new Intent();
-                    Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
-                    startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(startMissionView);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v -> {
+            if(addPerson()){
+                Intent intent = new Intent();
+                Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
+                startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(startMissionView);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }
@@ -74,14 +72,15 @@ public class AddNewPerson extends AppCompatActivity {
     }
 
     private boolean addPerson(){
-        EditText editName =(EditText)findViewById(R.id.input_personName);
-        EditText editLastName = (EditText)findViewById(R.id.input_personLastName);
-        EditText editAcademicTitle = (EditText)findViewById(R.id.input_personAcademicTitle);
-        // EditText editEmail = (EditText)findViewById(R.id.input_personEmail);
+        EditText editName =findViewById(R.id.input_personName);
+        EditText editLastName = findViewById(R.id.input_personLastName);
+        EditText editAcademicTitle = findViewById(R.id.input_personAcademicTitle);
+        EditText editEmail = findViewById(R.id.input_personEmail);
+
         String name = editName.getText().toString();
         String lastName = editLastName.getText().toString();
         String academicTitle = editAcademicTitle.getText().toString();
-        // String email = editEmail.getText().toString();
+        String email = editEmail.getText().toString();
 
         if ((name == null) || name.replaceAll(" ","").equals("")) {
             Toast.makeText(context, getResources().getString(R.string.toast_personNoName), Toast.LENGTH_SHORT).show();
@@ -96,7 +95,7 @@ public class AddNewPerson extends AppCompatActivity {
         person.setName(name);
         person.setLastName(lastName);
         person.setAcademicTitle(academicTitle);
-        // person.setEmail(email);
+        person.setEmail(email);
 
         long personID = DB.addPerson(person);
         Singleton.getInstance().setPersonID((int) personID);

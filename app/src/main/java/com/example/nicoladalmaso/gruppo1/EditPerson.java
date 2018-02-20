@@ -19,8 +19,8 @@ import database.PersonEntity;
 
 /**
  * Created by Francesco on 02/01/2018.
+ *
  */
-
 public class EditPerson extends AppCompatActivity{
     public DataManager DB;
     int personID;
@@ -35,15 +35,16 @@ public class EditPerson extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setElevation(0);
-        setTitle(context.getString(R.string.action_editPerson));
-        setContentView(R.layout.activity_edit_person);
-        setContentView(R.layout.activity_edit_person);
 
         context = this.getApplicationContext();
         DB = new DataManager(context);
         personID = Singleton.getInstance().getPersonID();
         thisPerson = DB.getPerson(personID);
+
+        getSupportActionBar().setElevation(0);
+        setTitle(context.getString(R.string.action_editPerson));
+        setContentView(R.layout.activity_edit_person);
+        setContentView(R.layout.activity_edit_person);
 
         //Get data from parent view
         setPersonValues();
@@ -106,10 +107,10 @@ public class EditPerson extends AppCompatActivity{
      * show on screen the values of the person
      */
     private void setPersonValuesOnScreen(){
-        txtName = (TextView)findViewById(R.id.input_personEditName);
-        txtLastName = (TextView)findViewById(R.id.input_personEditLastName);
-        txtAcademicTitle = (TextView)findViewById(R.id.input_personEditAcademicTitle);
-        txtEmail = (TextView)findViewById(R.id.input_personEmail);
+        txtName = findViewById(R.id.input_personEditName);
+        txtLastName = findViewById(R.id.input_personEditLastName);
+        txtAcademicTitle = findViewById(R.id.input_personEditAcademicTitle);
+        txtEmail = findViewById(R.id.input_personEmail);
         txtName.setText(personName);
         txtLastName.setText(personLastName);
         txtAcademicTitle.setText(personAcademicTitle);
