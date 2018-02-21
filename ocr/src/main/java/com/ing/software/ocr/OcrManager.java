@@ -210,7 +210,7 @@ public class OcrManager {
                         //set target texts (prices) to source text (containing total string)
                         amountList.get(i).setAmountTargetTexts(amountPrices); //5
                         AmountComparator amountComparator;
-                        Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), false); //6
+                        Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), editTotal); //6
                         if (amountT != null && newTicket.total == null) {
                             newTicket.total = amountT.second; //BigDecimal containing total price
                             amountPriceText = amountT.first; //Text containing total price
@@ -238,7 +238,7 @@ public class OcrManager {
                                 OcrUtils.log(2, "", "Using default amount comparator");
                                 amountComparator = new AmountComparator(newTicket.total, amountT.first, mainImage); //9
                             }
-                            bestTicketScheme = amountComparator.getBestAmount(!editTotal); //editTotal == false => total is not overwritten, only scheme with a complete
+                            bestTicketScheme = amountComparator.getBestAmount(!editTotal); //editTotal == false => total is not overwritten, only scheme with a complete match has score > 1
                             if (bestTicketScheme != null) {
                                 OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestTicketScheme.obj().getBestAmount().second.setScale(2, RoundingMode.HALF_UP) +
                                         "\nwith scheme: " + bestTicketScheme.obj().toString() + "\nand score: " + bestTicketScheme.getScore());
@@ -306,7 +306,7 @@ public class OcrManager {
                     }
                 }
                 if (editTotal) {
-                    if (bestRestoredTicketScheme != null) {
+                    if (bestRestoredTicketScheme != null && bestRestoredTicketScheme.getScore() > 1) {
                         //if (bestRestoredTicketScheme.getScore() > 1 && (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore())) { //This '1' will be changed later. Accept restored only if there is at least 1 hit
                         if (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore()) {
                             bestTicketScheme = bestRestoredTicketScheme; //choose scheme with highest score.

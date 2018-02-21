@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                 break;
             case STATUS_FINISHED:
                 BigDecimal price = null;
-                String result = "FAILURE";
+                String result = "FAILURE #################";
                 if (images.contains(resultData.getString(IMAGE_RECEIVED))) {
                     int index = images.indexOf(resultData.getString(IMAGE_RECEIVED));
                     price = prices.get(index).setScale(2, RoundingMode.HALF_UP);
@@ -264,8 +264,8 @@ public class MainActivity extends AppCompatActivity implements OcrResultReceiver
                     OcrOptions options = OcrOptions.getDefault()
                             .priceEditing(OcrOptions.PriceEditing.ALLOW_VOID)
                             .products(OcrOptions.ProductsSearch.DEEP)
-                            .resolution(OcrOptions.Resolution.NORMAL)
-                            .total(OcrOptions.TotalSearch.EXTENDED_SEARCH);
+                            .resolution(OcrOptions.Resolution.THIRD)
+                            .total(OcrOptions.TotalSearch.DEEP);
                     OcrTicket result = ocrAnalyzer.getTicket(preproc, options);
                     OcrUtils.log(1, "OcrHandler", "Detection complete");
                     long endTime = System.nanoTime();
