@@ -69,9 +69,9 @@ public class EditTicket extends AppCompatActivity {
         TextView editDate = findViewById(R.id.input_ticketDateMod);
         LinearLayout bntMissionStart = findViewById(R.id.buttonEditTicketDate);
         bntMissionStart.setOnClickListener(v -> {
-                Singleton.getInstance().setStartFlag(2);
-                DialogFragment newFragment = new DatePickerFragment().newInstance(editDate,thisTicket.getDate(),null);
-                newFragment.show(getFragmentManager(), "startDatePicker");
+            Singleton.getInstance().setStartFlag(2);
+            DialogFragment newFragment = new DatePickerFragment().newInstance(editDate, null,null);
+            newFragment.show(getFragmentManager(), "startDatePicker");
         });
 
         //Get data from parent view
@@ -118,7 +118,7 @@ public class EditTicket extends AppCompatActivity {
                     if( AppUtilities.checkIntervalDate(start,finish,txtDate.getText().toString()))
                         thisTicket.setDate(DateFormat.parse(txtDate.getText().toString()));
                     else {
-                        Toast.makeText(context, getResources().getString(R.string.toast_errorIntervalDate), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getResources().getString(R.string.toast_errorTicketDate), Toast.LENGTH_SHORT).show();
                         break;
                     }
                 } catch (ParseException e) {
@@ -182,6 +182,7 @@ public class EditTicket extends AppCompatActivity {
      *
      * Modified: Improved Refoundable Ticket
      * @author Matteo Mascotto on 15-02-2018
+     * Modified: Remove bug interval date for DatePicker
      */
     private void setTicketValuesOnScreen(){
         txtTitle = findViewById(R.id.input_ticketTitleMod);
@@ -193,8 +194,8 @@ public class EditTicket extends AppCompatActivity {
         LinearLayout btnModifyDate = findViewById(R.id.buttonEditTicketDate);
 
         btnModifyDate.setOnClickListener(v -> {
-                DialogFragment newFragment = new DatePickerFragment().newInstance(txtDate, thisTicket.getDate(),null);
-                newFragment.show(getFragmentManager(), "startDatePicker");
+            DialogFragment newFragment = new DatePickerFragment().newInstance(txtDate, null,null);
+            newFragment.show(getFragmentManager(), "startDatePicker");
         });
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");

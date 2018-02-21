@@ -145,7 +145,7 @@
     <string name="NullPExc_Intent">Errore nella lettura della missione, riavviare l\\'app</string>
     <string name="NullPExc_MissionName">Controllare che la missione abbia un nome valido</string>
     <string name="NullPExc_PersonName">Controllare che la persona abbia cognome e nome validi</string>
-
+    <string name="toast_errorTicketDate">La data dello scontrino non rientra nel periodo dell missione</string>
 
     <string name="popup_person_modify">Modifica</string>
     <string name="popup_person_delete">Elimina</string>
