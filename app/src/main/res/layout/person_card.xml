@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#DFDFDF">
@@ -26,9 +25,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="16dp"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginRight="0dp"
+                android:layout_marginEnd="16dp"
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -49,9 +48,9 @@
 
                     <TextView
                         android:id="@+id/personName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="1dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="fill_vertical"
                         android:gravity="center_vertical"
                         android:text="@string/text_init_value"
                         android:textColor="#333"
@@ -67,12 +66,10 @@
                         android:textColor="@color/cardview_dark_background"
                         android:textSize="12dp" />-->
                 </LinearLayout>
+
                 <LinearLayout
-                    android:layout_margin="5dp"
-                    android:layout_width="match_parent"
+                    android:layout_width="50dp"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical|end"
-                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -90,15 +87,16 @@
                         android:textAlignment="center"
                         android:textColor="@color/colorNotification"
                         android:textSize="15sp" />
+
                     <ImageButton
                         android:id="@+id/personMenu"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_gravity="end"
-                        android:src="@mipmap/ic_more_vert_black_24dp"
                         android:background="@null"
                         android:paddingLeft="8dp"
-                        android:paddingRight="8dp" />
+                        android:paddingRight="8dp"
+                        android:src="@mipmap/ic_more_vert_black_24dp" />
                 </LinearLayout>
 
             </LinearLayout>
