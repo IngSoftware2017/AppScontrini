@@ -80,6 +80,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         //Dal Maso
         //Sets a default background color for the mission's card
+        // Olivieri changed colors
         switch (position%4){
             case 0:
                 card.setBackgroundColor(Color.parseColor("#FF4589A6"));
