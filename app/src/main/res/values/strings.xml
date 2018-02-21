@@ -128,6 +128,11 @@
     <string name="text_init_value">Text</string>
     <string name="text_count">C</string>
 
+    <string name="set_OCRQuality">Qualità OCR</string>
+    <string name="set_Correction">Correzione del totale</string>
+    <string name="set_PhRotation">Ricerca foto capovolta</string>
+    <string name="set_Currency">Moneta</string>
+
     <string name="NullPExc_gallery">Controllare che la galleria sia correttamente configurata</string>
     <string name="NullPExc_Intent">Errore nella lettura della missione, riavviare l\\'app</string>
     <string name="NullPExc_MissionName">Controllare che la missione abbia un nome valido</string>

@@ -60,7 +60,7 @@ import database.PersonEntity;
 
 public class MainActivity extends AppCompatActivity {
     public DataManager DB;
-    public List<PersonEntity> listPeople = new LinkedList<PersonEntity>();
+    public List<PersonEntity> listPeople = new LinkedList<>();
     static final int person_added = 1;
     ListView listView;
     PeopleAdapter adapter;
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Dal Maso adapted by Elardo
      * Setting toolbar buttons and style from /res/menu
-     * @param menu
+     * @param menu menu for the main activity
      * @return success flag
      */
     @Override
@@ -141,6 +141,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent settings = new Intent(getApplicationContext(), com.example.nicoladalmaso.gruppo1.ApplicationSettings.class);
                 startActivity(settings);
                 break;
+
+            case R.id.action_infoDB:
+                Intent report = new Intent(getApplicationContext(), com.example.nicoladalmaso.gruppo1.ReportDB.class);
+                startActivity(report);
+                break;
+
         }
         return true;
     }
@@ -179,18 +185,16 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initialize(){
         myView = findViewById(R.id.circularAnimation);
-        noPeople = (TextView)findViewById(R.id.noPeople);
-        listView = (ListView)findViewById(R.id.listPeople);
+        noPeople = findViewById(R.id.noPeople);
+        listView = findViewById(R.id.listPeople);
         DB = new DataManager(this.getApplicationContext());
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab_addPerson);
-        fab.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        FloatingActionButton fab = findViewById(R.id.fab_addPerson);
+        fab.setOnClickListener(v -> {
                 int cx = myView.getWidth();
                 int cy = myView.getHeight();
                 AppUtilities.circularReveal(myView, cx, cy);
                 Intent addPerson = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewPerson.class);
                 startActivityForResult(addPerson, person_added);
-            }
         });
         if(DB.getAllPerson().size() == 0){
             startFabGuide();
@@ -204,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void addToList(PersonEntity person){
         listPeople.add(person);
-        ListView listView = (ListView)findViewById(R.id.listPeople);
+        ListView listView = findViewById(R.id.listPeople);
         adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
         listView.setAdapter(adapter);
     }
@@ -215,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
     public void printAllPeople(){
         listPeople.clear();
         List<PersonEntity> people = getAllPersonOrderedByNumMission();
-        TextView noPeople = (TextView)findViewById(R.id.noPeople);
+        TextView noPeople = findViewById(R.id.noPeople);
 
         if(people.size() == 0)
             noPeople.setVisibility(View.VISIBLE);
@@ -279,9 +283,9 @@ public class MainActivity extends AppCompatActivity {
     private void insert(PersonNumMissions[] array, int lastIndex, int from, PersonNumMissions newValue){
         //last index is the first free position of the array
         //from is the element from which to traslate the values
-        for(int i = lastIndex; i>from; i--){
+        for (int i = lastIndex; i>from; i--)
             array[i] = array[i-1];
-        }
+
         array[from] = newValue;
     }
 
