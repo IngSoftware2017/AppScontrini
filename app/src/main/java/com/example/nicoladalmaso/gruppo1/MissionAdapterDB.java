@@ -54,12 +54,14 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         CardView card = (CardView)convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
+        TextView total = (TextView)convertView.findViewById(R.id.missionTotal);
         ImageButton menuCard = (ImageButton) convertView.findViewById(R.id.missionMenu);
         RelativeLayout cardLayout = convertView.findViewById(R.id.missionClick);
 
         MissionEntity c = getItem(position);
         title.setText(c.getName());
         location.setText(c.getLocation());
+        total.setText(String.valueOf(DB.getTotalAmountForMission(c.getID())));
         cardLayout.setTag(c.getID());
         Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data
