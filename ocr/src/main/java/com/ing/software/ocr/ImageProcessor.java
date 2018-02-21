@@ -38,20 +38,19 @@ import static com.ing.software.common.CommonUtils.*;
  * <p> USAGE CASES: </p>
  *
  * <p> Real time visual feedback when framing a ticket: </p>
- * <ol> Create new ImageProcessor passing a the bitmap of the preview frame.</ol>
+ * <ol> Create new {@link ImageProcessor} passing a the bitmap of the preview frame.</ol>
  * <ol> Call findTicket(true) </ol>
- * <ol> If findTicket callback has an empty error list, call getCorners() to get the rectangle corners
+ * <ol> If findTicket returns an empty error list, call {@link #getCorners()} to get the rectangle corners
  *       to overlay on top of the preview. </ol>
- * <ol> If the callback list contains CROOKED_TICKET, alert user that the ticket is framed sideways </ol>
  *
  * <p> User shoots a photo: </p>
- * <ol> Use ImageProcessor instance of last frame when rectangle was found. </ol>
+ * <ol> Use {@link ImageProcessor} instance of last frame when rectangle was found. </ol>
  * <ol> Call findTicket(false); </ol>
  * <ol> If findTicket callback has an empty error list, proceed to step 5) </ol>
  * <ol> If the callback list contains RECT_NOT_FOUND, let user drag the rectangle corners into position,
  *     then proceed to call setCorners(). </ol>
- * <ol> Call OcrManager.getTicket passing this ImageProcessor instance.
- *       Call undistort() to get the photo of the ticket unwarped. </ol>
+ * <ol> Call {@link OcrManager#getTicket(ImageProcessor, OcrOptions)} passing this ImageProcessor instance.
+ *       Call {@link #undistort(double, int)} to get the unwarped photo of the ticket. </ol>
  *
  * <p> New photo imported from storage: </p>
  * <ol> Same as when user shot a photo, but ImageProcessor must be created with imported photo. </ol>
@@ -133,12 +132,19 @@ public class ImageProcessor {
     // margin for OCR analysis
     private static final double OCR_MARGIN_MUL = 0.05;
 
-    //Score values
-    private static final double SCORE_AREA_MUL = 0.001;
-    private static final double SCORE_RECT_FOUND = 1;
+//    //Score values
+//    private static final double SCORE_AREA_MUL = 0.001;
+//    private static final double SCORE_RECT_FOUND = 1;
+
+    //Exposure extremities
+    private static final double EXPOSURE_UPPER_THRESH = 240;
+    private static final double EXPOSURE_LOWER_THRESH = 118;
 
     //Background contrast is poor if is less than threshold.
     private static final double BG_CONTRAST_THRESH = 0.9;
+
+    //Focus is poor if is less than threshold
+    private static final double FOCUS_THRESH = 85.;
 
 
     static {
@@ -285,16 +291,16 @@ public class ImageProcessor {
     /**
      * Find k biggest outer contours in a RGBA image, sorted by area (descending).
      * @param imgSwap Swap of gray Mat. This parameter is modified by the function. Not null.
-     * @param k number of contours to return.
+     * @param contourCount number of contours to return.
      * @return Contour-area pairs with biggest area. Never null.
      */
-    private static List<Scored<MatOfPoint>> findBiggestContours(Swap<Mat> imgSwap, int k) {
+    private static List<Scored<MatOfPoint>> findBiggestContours(Swap<Mat> imgSwap, int contourCount) {
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         //NB: findContours mangles the image!
         findContours(imgSwap.first, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
-        Podium<Scored<MatOfPoint>> podium = new Podium<>(k);
+        Podium<Scored<MatOfPoint>> podium = new Podium<>(contourCount);
         for (int i = 0; i < hierarchy.cols(); i++) {
             // select outer contours, i.e. contours that have no parent (hierarchy-1)
             // to know more, go to the link below, look for "RETR_CCOMP":
@@ -321,12 +327,12 @@ public class ImageProcessor {
 
     /**
      * Get a mask from a contour
-     * @param imgSwap out swap of B&W Mat. Not null.
+     * @param img out B&W Mat. Not null.
      * @param contour MatOfPoint containing a contour. Not null.
      */
-    private static void maskFromContour(Swap<Mat> imgSwap, MatOfPoint contour) {
-        imgSwap.first.setTo(new Scalar(BLACK));
-        fillPoly(imgSwap.first, singletonList(contour), new Scalar(WHITE));
+    private static void maskFromContour(Mat img, MatOfPoint contour) {
+        img.setTo(new Scalar(BLACK));
+        fillPoly(img, singletonList(contour), new Scalar(WHITE));
     }
 
     /**
@@ -336,7 +342,7 @@ public class ImageProcessor {
      */
     private static void removeBackground(Swap<Mat> imgSwap, MatOfPoint contour) {
         Mat binary = imgSwap.first.clone();
-        maskFromContour(imgSwap, contour);
+        maskFromContour(imgSwap.first, contour);
         erode(imgSwap, ERODE_KER_DATA[0].length + 1);
         bitwise_and(binary, imgSwap.first, imgSwap.swap());
     }
@@ -530,37 +536,41 @@ public class ImageProcessor {
     }
 
     /**
-     * Get a score proportional to exposure
+     * Get a score proportional to exposure.
+     * Implemented as a simple color mean.
      * @param img gray Mat. Not null
-     * @param contour contour containing the ticket
-     * @return
+     * @param contourMask mask
+     * @return value in range [0, 255]. A good value is between the the two range extremities.
      */
-    //Check if average of area inside contour is above e.g. 200, if not: UNDEREXPOSED
-    // then check if the the darker shades (text) are well spread
-    // (can use ratio between area of convex hull of contour and area of convex hull of text), if not: OVEREXPOSED
-    private static double getExposure(Mat img, MatOfPoint contour) {
-        return 0; // stub
+    //todo: use a histogram or some gradient function instead
+    private static double getExposure(Mat img, Mat contourMask) {
+        return mean(img, contourMask).val[0];
     }
 
     /**
-     * Get a score proportional to focus
-     * @param img gray Mat. Not null
-     * @param contour contour containing the ticket
-     * @return
+     * Get a score proportional to the focus inside contour.
+     * Implemented as variance of laplacian.
+     * @param img gray Mat. Not modified. Not null
+     * @param contourMask mask
+     * @return focus positive value, higher is better.
      */
-    // Use a simple edge detector (try Canny) tuned to detect sharp edges.
-    // if there are too few edges, the image is out of focus.
-    // return (number of edge pixels)^2 / contour area
-    // use ^2 because edges are one dimensional, but we want to compare to an area (2 dimensional)
-    private static double getFocus(Mat img, MatOfPoint contour, double area) {
-        return 1; // stub
+    //https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
+    private static double getFocus(Mat img, Mat contourMask) {
+
+        Mat lap = new Mat();
+        MatOfDouble meanMat = new MatOfDouble(), stdDevMat = new MatOfDouble();
+        Laplacian(img, lap, CV_64F);
+        meanStdDev(lap, meanMat, stdDevMat, contourMask);
+        double stdDev = stdDevMat.get(0, 0)[0];
+
+        return stdDev * stdDev;
     }
 
     /**
      * Get a score proportional to contrast relative to background
      * @param rect perspective rectangle containing the ticket. Not null.
      * @param contour contour containing the ticket. Not null.
-     * @return contrast value in range [0, 1], higher is better.
+     * @return contrast value normally in range [0, 1], higher is better. Can be > 1 if contour is bigger than rect.
      */
     //Problem: Sometimes, if the contrast of the ticket with background is poor, the contour bleeds
     // into the background. Sometimes if the text is too close to the edge of the ticket, a carving
@@ -575,14 +585,14 @@ public class ImageProcessor {
      * Not to be confused with closing a curve into a contour.
      * @param contour input contour. Not null.
      * @param imgSwap in swap of B&W Mat. Modified by this function. Not null.
-     * @return new contour or null if no contour found.
+     * @return new contour or null if no contour found. The score is the area of the contour
      */
     private static Scored<MatOfPoint> contourClosing(MatOfPoint contour, Swap<Mat> imgSwap, int iters) {
-        maskFromContour(imgSwap, contour);
+        maskFromContour(imgSwap.first, contour);
         //closing
         dilate(imgSwap, iters);
-        // I have to force erode to consider the outside of the image all black.
         medianBlur(imgSwap.first, imgSwap.swap(), MED_SZ);
+        // I have to force erode to consider the outside of the image all black.
         Imgproc.erode(imgSwap.first, imgSwap.swap(), new Mat(), new Point(-1, -1), iters,
                 BORDER_CONSTANT, new Scalar(BLACK));
 //        erode(imgSwap, iters);
@@ -618,15 +628,16 @@ public class ImageProcessor {
 
     /**
      * Apply a perspective straightening to a Mat. The returned Mat has the same level of detail of the input Mat.
+     * NB: only one of sizeMul and shortSide can be > 0.
      * @param srcImg Mat of any color
      * @param corners MatOfPoint2f containing 4 normalized points ordered counter-clockwise
      * @param marginMul border multiplier
-     * @param sizeMulOrShortSide shortest side length or multiplier for default bitmap size
-     * @param isSizeMul true if scaleOrShortSide is size scale, short side length otherwise.
+     * @param sizeMul multiplier for default bitmap size. Unused if <= 0
+     * @param shortSide shortest side length. Unused if <= 0
      * @return undistorted Mat
      */
     private static Mat undistort(
-            Mat srcImg, MatOfPoint2f corners, double marginMul, double sizeMulOrShortSide, boolean isSizeMul) {
+            Mat srcImg, MatOfPoint2f corners, double marginMul, double sizeMul, double shortSide) {
         Mat dstImg = new Mat();
         if (corners.rows() == 4) { // at this point "corners" should have always 4 points.
             MatOfPoint2f srcRect = scale(corners, NORMALIZED_SIZE, srcImg.size());
@@ -640,12 +651,13 @@ public class ImageProcessor {
             Size dstSizeWithMargin = new Size(dstSize.width + 2 * mrg,
                     dstSize.height + 2 * mrg);
             Size resizedDstSize;
-            if (isSizeMul) {
-                resizedDstSize = new Size(dstSizeWithMargin.width * sizeMulOrShortSide,
-                        dstSizeWithMargin.height * sizeMulOrShortSide);
+            if (sizeMul > 0) {
+                resizedDstSize = new Size(dstSizeWithMargin.width * sizeMul,
+                        dstSizeWithMargin.height * sizeMul);
+            } else if(shortSide > 0){
+                resizedDstSize = calcScaledSize(dstSizeWithMargin, shortSide);
             } else {
-                resizedDstSize = sizeMulOrShortSide > 0
-                        ? calcScaledSize(dstSizeWithMargin, sizeMulOrShortSide) : dstSizeWithMargin;
+                resizedDstSize = dstSizeWithMargin;
             }
             MatOfPoint2f resizedDstRect = scale(dstRect, dstSizeWithMargin, resizedDstSize);
 
@@ -663,15 +675,20 @@ public class ImageProcessor {
      * @return image rectangle without margin
      */
     private static RectF removeMargin(SizeF imgSize, double marginMul) {
-        return rectFromSize(new SizeF(imgSize.getWidth() / (float) (1. + marginMul),
-                imgSize.getWidth() / (float) (1. + marginMul)));
+        float aspectRatio = imgSize.getWidth() / imgSize.getHeight();
+        // margin : shortSide = marginMul : (1 + 2 * marginMul)
+        float margin = (aspectRatio < 1. ? imgSize.getWidth() : imgSize.getHeight())
+                * (float)(marginMul / (1. + 2 * marginMul));
+        return rectFromSize(new SizeF(imgSize.getWidth() - 2 * margin,
+                imgSize.getHeight() - 2 * margin));
     }
 
     /**
      * Convenience class to group some contour related properties
      */
     private class ContourResult {
-        MatOfPoint2f rect;
+        MatOfPoint2f polyContour;
+        boolean rectFound;
         double angle, angleConfidence;
         double exposure, focus, backgroundContrast;
     }
@@ -699,7 +716,7 @@ public class ImageProcessor {
             if (findTicket(false).contains(IPError.IMAGE_NOT_SET))
                 return null;
         }
-        return matToBitmap(undistort(srcImg, corners, OCR_MARGIN_MUL, sizeMul, true));
+        return matToBitmap(undistort(srcImg, corners, OCR_MARGIN_MUL, sizeMul, 0));
     }
 
     /**
@@ -840,7 +857,10 @@ public class ImageProcessor {
             Ref<Double> angleConfidence = new Ref<>();
             double angle = predominantAngle(houghLines(graySwap), angleConfidence);
 
-            if (rect.rows() == 4) {// fix orientation of already found rectangle
+            ContourResult result = new ContourResult();
+            result.rectFound = rect.rows() == 4; // todo check angle between sides to reject skewed rectangles
+
+            if (result.rectFound) {// fix orientation of already found rectangle
                 rect = orderRectCorners(rect, angle, grayResized.size());
             } else { // find rotated bounding box of contour
                 rect = rotatedBoundingBox(contour.obj(), angle, grayResized.size());
@@ -851,10 +871,14 @@ public class ImageProcessor {
                 if (size.width > size.height)
                     rect = shiftMatPoints(rect, angle > 0 ? 1 : 3); // 1 -> rotate clockwise
             }                                                       // 3 -> rotate counter clockwise
-            ContourResult result = new ContourResult();
-            result.rect = rect;
+
+            Mat mask = new Mat(grayResized.rows(), grayResized.cols(), CV_8UC1);
+            maskFromContour(mask, contour.obj());
+            result.polyContour = rect;
             result.angle = angle;
             result.angleConfidence = angleConfidence.val;
+            result.exposure = getExposure(grayResized, mask);
+            result.focus = getFocus(grayResized, mask);
             result.backgroundContrast = getBackgroundContrast(rect, contour.obj());
             candidates.add(new Scored<>(0., result));
         }
@@ -867,7 +891,7 @@ public class ImageProcessor {
             ContourResult winner = candidates.get(0).obj();
 
             //normalize the corners in the space [0, 1]^2
-            corners = scale(winner.rect, grayResized.size(), NORMALIZED_SIZE);
+            corners = scale(winner.polyContour, grayResized.size(), NORMALIZED_SIZE);
 
             // find and return errors
             if (corners.rows() != 4)
@@ -877,6 +901,12 @@ public class ImageProcessor {
                 errors.add(IPError.UNCERTAIN_DIRECTION);
             if (abs(winner.angle) > CROOCKED_THRESH)
                 errors.add(IPError.CROOKED_TICKET);
+            if (winner.exposure < EXPOSURE_LOWER_THRESH)
+                errors.add(IPError.UNDEREXPOSED);
+            else if (winner.exposure > EXPOSURE_UPPER_THRESH)
+                errors.add(IPError.OVEREXPOSED);
+            if (winner.focus < FOCUS_THRESH)
+                errors.add(IPError.OUT_OF_FOCUS);
             if (winner.backgroundContrast < BG_CONTRAST_THRESH)
                 errors.add(IPError.POOR_BG_CONTRAST);
         } else {
@@ -934,7 +964,7 @@ public class ImageProcessor {
             if (findTicket(false).contains(IPError.IMAGE_NOT_SET))
                 return null;
         }
-        return matToBitmap(undistort(srcImg, corners, marginMul, shortSide, false));
+        return matToBitmap(undistort(srcImg, corners, marginMul, 0, shortSide));
     }
 
     /**

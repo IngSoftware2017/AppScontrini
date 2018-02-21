@@ -1,12 +1,14 @@
 package com.ing.software.ocr;
 
+import android.support.annotation.NonNull;
+
 import java.util.Locale;
 
 /**
- * @author Michelon
- * @author Zaglia
  * Object passed to the manager to avoid performing unnecessary operations
  * and consequently reduce time (time depends primarily on image scale)
+ * @author Michelon
+ * @author EDIT: Zaglia
  */
 public class OcrOptions {
 
@@ -149,55 +151,56 @@ public class OcrOptions {
                 .date(DEFAULT_DATE_SEARCH)
                 .products(DEFAULT_PRODUCTS_SEARCH)
                 .orientation(DEFAULT_ORIENTATION)
-                .suggestedCountry(DEFAULT_COUNTRY);
+                .suggestedCountry(DEFAULT_COUNTRY)
+                .priceEditing(DEFAULT_EDIT);
     }
 
     /**
      * Set resolution level
-     * @param level resolution level
+     * @param level resolution level. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions resolution(Resolution level) {
+    public OcrOptions resolution(@NonNull Resolution level) {
         resolution = level;
         return this;
     }
 
     /**
      * Set total search criteria
-     * @param criteria how to search total
+     * @param criteria how to search total. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions total(TotalSearch criteria) {
+    public OcrOptions total(@NonNull TotalSearch criteria) {
         totalSearch = criteria;
         return this;
     }
 
     /**
      * Set date search criteria
-     * @param criteria how to search date
+     * @param criteria how to search date. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions date(DateSearch criteria) {
+    public OcrOptions date(@NonNull DateSearch criteria) {
         dateSearch = criteria;
         return this;
     }
 
     /**
      * Set products search criteria
-     * @param criteria how to search products
+     * @param criteria how to search products. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions products(ProductsSearch criteria) {
+    public OcrOptions products(@NonNull ProductsSearch criteria) {
         productsSearch = criteria;
         return this;
     }
 
     /**
      * Set orientation criteria
-     * @param criteria how to set orientation
+     * @param criteria how to set orientation. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions orientation(Orientation criteria) {
+    public OcrOptions orientation(@NonNull Orientation criteria) {
         orientation = criteria;
         return this;
     }
@@ -205,7 +208,7 @@ public class OcrOptions {
     /**
      * Set suggested country, used to resolve ambiguities.
      * Can be extracted from current location or location history.
-     * @param country ISO locale country
+     * @param country ISO locale country. Can be null.
      * @return OcrOptions instance
      */
     public OcrOptions suggestedCountry(Locale country) {
@@ -214,12 +217,12 @@ public class OcrOptions {
     }
 
     /**
-     * Set permission to edit total
-     * @param edit permission to edit total
+     * Set price editing criteria
+     * @param criteria permission to edit total. Not null.
      * @return OcrOptions instance
      */
-    public OcrOptions priceEditing(PriceEditing edit) {
-        priceEditing = edit;
+    public OcrOptions priceEditing(@NonNull PriceEditing criteria) {
+        priceEditing = criteria;
         return this;
     }
 
