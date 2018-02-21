@@ -127,6 +127,8 @@
     <string name="text_email">Email</string>
     <string name="text_init_value">Text</string>
     <string name="text_count">C</string>
+    <string name="text_mission">Missione</string>
+    <string name="text_initTotal">0.00</string>
 
     <string name="set_OCRQuality">Qualità OCR</string>
     <string name="set_Correction">Correzione del totale</string>
