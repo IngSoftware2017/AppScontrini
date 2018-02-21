@@ -46,6 +46,7 @@ public class AddNewMission extends AppCompatActivity{
     TextView missionStart;
     TextView missionFinish;
     int personID = 1;
+    int missionID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +98,7 @@ public class AddNewMission extends AppCompatActivity{
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_new_mission);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(addMission()){

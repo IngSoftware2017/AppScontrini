@@ -37,7 +37,6 @@ public class MissionsOpen extends Fragment {
 
     public DataManager DB;
     int personID;
-    PersonEntity thisPerson;
     public List<MissionEntity> listMission = new LinkedList<MissionEntity>();
     View rootView;
     MissionsTabbed tabInstance;
@@ -55,6 +54,12 @@ public class MissionsOpen extends Fragment {
         myView = rootView.findViewById(R.id.circularAnimation);
         noMissions = (TextView)rootView.findViewById(R.id.noMissions);
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab_addMission);
+
+
+        if(DB.getAllMission().size() == 0) startGuide();
+
+        listView = (ListView)rootView.findViewById(R.id.listMission);
+        personID = getArguments().getInt("personID", 0);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 int cx = myView.getWidth();
@@ -62,18 +67,15 @@ public class MissionsOpen extends Fragment {
                 AppUtilities.circularReveal(myView, cx, cy);
                 Intent addMission = new Intent(v.getContext(), com.example.nicoladalmaso.gruppo1.AddNewMission.class);
                 addMission.putExtra("person", personID);
-                Log.d("PersonID", ""+personID);
                 startActivityForResult(addMission, 1);
             }
         });
-
-        if(DB.getAllMission().size() == 0) startGuide();
-
-        listView = (ListView)rootView.findViewById(R.id.listMission);
-        personID = getArguments().getInt("personID", 0);
-
         printAllMissions();
         return rootView;
+    }
+
+    public void setParentInstance(MissionsTabbed missionsTabbed){
+        this.tabInstance = missionsTabbed;
     }
 
     @Override
@@ -86,7 +88,7 @@ public class MissionsOpen extends Fragment {
      * Adds in the database the new mission
      */
     public void addToListDB(){
-        adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        adapter = new MissionAdapterDB(tabInstance, R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
     }
 

@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
     public void addToList(PersonEntity person){
         listPeople.add(person);
         ListView listView = (ListView)findViewById(R.id.listPeople);
-        PeopleAdapter adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
+        adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
         listView.setAdapter(adapter);
     }
 

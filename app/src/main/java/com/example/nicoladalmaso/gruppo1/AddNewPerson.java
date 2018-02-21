@@ -29,7 +29,7 @@ public class AddNewPerson extends AppCompatActivity {
     public DataManager DB;
     TextView missionStart;
     TextView missionFinish;
-    int personID = 1;
+    long personID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +43,10 @@ public class AddNewPerson extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(addPerson()){
-                    Intent intent = new Intent();
                     Intent startMissionView = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
                     startMissionView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startMissionView.putExtra(IntentCodes.INTENT_PERSON_ID,personID);
                     context.startActivity(startMissionView);
-                    setResult(RESULT_OK, intent);
                     finish();
                 }
             }
@@ -98,8 +97,8 @@ public class AddNewPerson extends AppCompatActivity {
         person.setAcademicTitle(academicTitle);
         // person.setEmail(email);
 
-        long personID = DB.addPerson(person);
-        Singleton.getInstance().setPersonID((int) personID);
+        personID = DB.addPerson(person);
+
         return true;
     }
 }

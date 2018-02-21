@@ -41,7 +41,7 @@ public class MissionsTabbed extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     DataManager DB;
-    int personID;
+    long personID;
     PersonEntity thisPerson;
     final int MISSION_MOD = 1;
     final int PERSON_MOD = 2;
@@ -55,7 +55,7 @@ public class MissionsTabbed extends AppCompatActivity {
         setContentView(R.layout.activity_missions_tabbed);
 
         Intent intent = getIntent();
-        personID = Singleton.getInstance().getPersonID();
+        personID = intent.getExtras().getLong(IntentCodes.INTENT_PERSON_ID);
         DB = new DataManager(this);
         thisPerson = DB.getPerson(personID);
 
@@ -156,13 +156,15 @@ public class MissionsTabbed extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
-            bundle.putInt("personID", personID);
+            bundle.putInt("personID", (int)personID);
             switch(position){
                 case 0:
                     missionsOpen.setArguments(bundle);
+                    missionsOpen.setParentInstance(MissionsTabbed.this);
                     return missionsOpen;
                 case 1:
                     missionsClosed.setArguments(bundle);
+                    missionsClosed.setParentInstance(MissionsTabbed.this);
                     return missionsClosed;
                 default:
                     return null;

@@ -17,101 +17,54 @@
         android:elevation="8dp"
         app:cardCornerRadius="2dp">
 
-        <com.daimajia.swipe.SwipeLayout
-            android:id="@+id/swipePerson"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            app:cardCornerRadius="2dp">
 
             <LinearLayout
-                android:id="@+id/bottomPerson"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <RelativeLayout
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent"
-                    android:background="#4CAF50">
-
-                    <ImageButton
-                        android:id="@+id/editPerson"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent"
-                        app:srcCompat="@drawable/ic_mode_edit_white_24px" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent"
-                    android:background="#F44336">
-
-                    <ImageButton
-                        android:id="@+id/deletePerson"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent"
-                        app:srcCompat="@drawable/ic_delete_forever_white_24px" />
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/personClick"
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#FFF">
+                android:layout_margin="16dp"
+                android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/profile_image"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_user" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_width="200dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/personName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="1dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/text_init_value"
+                        android:textColor="#333"
+                        android:textSize="20sp" />
+
+
+                    <!--<TextView
+                        android:id="@+id/personEmail"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="16dp"
-                        android:orientation="horizontal">
-
-                        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                            android:id="@+id/profile_image"
-                            android:layout_width="48dp"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="16dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <TextView
-                                android:id="@+id/personName"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
-                                android:gravity="center_vertical"
-                                android:text="@string/text_init_value"
-                                android:textColor="#333"
-                                android:textSize="20sp" />
-
-
-                            <!--<TextView
-                                android:id="@+id/personEmail"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:text="something@something.com"
-                                android:textColor="@color/cardview_dark_background"
-                                android:textSize="12dp" />-->
-                        </LinearLayout>
-                    </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="something@something.com"
+                        android:textColor="@color/cardview_dark_background"
+                        android:textSize="12dp" />-->
                 </LinearLayout>
-
-                <RelativeLayout
+                <LinearLayout
                     android:layout_margin="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -135,8 +88,9 @@
                         android:textColor="@color/colorNotification"
                         android:textSize="15sp" />
 
-                </RelativeLayout>
+                </LinearLayout>
             </LinearLayout>
-        </com.daimajia.swipe.SwipeLayout>
+        </RelativeLayout>
     </android.support.v7.widget.CardView>
+
 </RelativeLayout>

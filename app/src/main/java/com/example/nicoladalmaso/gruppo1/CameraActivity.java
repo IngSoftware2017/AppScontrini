@@ -69,7 +69,7 @@ public class CameraActivity extends Activity {
      * Initialize all the components
      */
     public void initializeComponents(){
-        mCamera = getCameraInstance();
+        mCamera = BillActivity.getCameraInstance();
         mCamera.setDisplayOrientation(90);
 
         //Camera parameters

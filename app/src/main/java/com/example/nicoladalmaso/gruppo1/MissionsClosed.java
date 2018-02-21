@@ -30,6 +30,7 @@ public class MissionsClosed extends Fragment {
     MissionAdapterDB adapter;
     ListView listView;
     TextView noMissions;
+    MissionsTabbed tabInstance;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,11 +47,14 @@ public class MissionsClosed extends Fragment {
         return rootView;
     }
 
+    public void setParentInstance(MissionsTabbed missionsTabbed){
+        this.tabInstance = missionsTabbed;
+    }
     /** PICCOLO
      * Adds in the database the new mission
      */
     public void addToListDB(){
-        adapter = new MissionAdapterDB(getContext(), R.layout.mission_card, listMission);
+        adapter = new MissionAdapterDB(tabInstance, R.layout.mission_card, listMission);
         listView.setAdapter(adapter);
     }
 

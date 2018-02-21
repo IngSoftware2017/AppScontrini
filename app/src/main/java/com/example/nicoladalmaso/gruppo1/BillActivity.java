@@ -13,6 +13,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraDevice;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -85,7 +87,7 @@ public class BillActivity extends AppCompatActivity {
     int screenWIdth;
 
     CustomAdapter adapter;
-    Camera mCamera;
+    //Camera mCamera;
     ListView listView;
     ExportManager manager;
     TextView title;
@@ -304,7 +306,6 @@ public class BillActivity extends AppCompatActivity {
      */
     private void takePhotoIntent() {
         if(checkCameraHardware(context)){
-            mCamera = getCameraInstance();
             Intent cameraActivity = new Intent(context, com.example.nicoladalmaso.gruppo1.CameraActivity.class);
             startActivityForResult(cameraActivity, REQUEST_TAKE_PHOTO);
         }
@@ -327,12 +328,26 @@ public class BillActivity extends AppCompatActivity {
     public static Camera getCameraInstance(){
         Camera c = null;
         try {
-            c = Camera.open(); // attempt to get a Camera instance
+            c = Camera.open(findFrontFacingCamera()); // attempt to get a Camera instance
         }
         catch (Exception e){
-            // Camera is not available (in use or does not exist)
+            e.printStackTrace();
         }
         return c; // returns null if camera is unavailable
+    }
+
+    private static int findFrontFacingCamera() {
+        int cameraId= -1;
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                cameraId = i;
+                break;
+            }
+        }
+        return cameraId;
     }
 
     /** Dal Maso modified by FEDERICO TASCHIN

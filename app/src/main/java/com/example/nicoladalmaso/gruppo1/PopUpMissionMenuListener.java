@@ -98,7 +98,7 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
             case R.id.close_mission:
                 mission.setClosed(true);
                 DB.updateMission(mission);
-                adapterDB.closeMission(mission);
+                adapterDB.removeMission(mission);
                 break;
 
             // Delete the mission
@@ -132,7 +132,7 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
                     DB.deleteTicket((int) list.get(i).getID());
                 }
                 boolean deleted = DB.deleteMission(missionID);
-                adapterDB.deleteMission(mission);
+                adapterDB.removeMission(mission);
             }
         });
 

@@ -132,5 +132,13 @@
     <string name="NullPExc_Intent">Errore nella lettura della missione, riavviare l\\'app</string>
     <string name="NullPExc_MissionName">Controllare che la missione abbia un nome valido</string>
     <string name="NullPExc_PersonName">Controllare che la persona abbia cognome e nome validi</string>
+
+    <string name="settings">Impostazioni</string>
+    <string name="missionOf">Missione di</string>
+    <string name="downLibrary">Scarico la libreria...</string>
+
+    <string name="refundable">Rimborsabile</string>
+    <string name="nonRefundable">Non rimborsabile</string>
+
 </resources>
 
