@@ -65,7 +65,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
 
         title.setText(c.getName());
         location.setText(c.getLocation());
-        total.setText(String.valueOf(totale.setScale(2, BigDecimal.ROUND_HALF_UP)));
+        total.setText(String.valueOf(totale.setScale(2, BigDecimal.ROUND_HALF_UP)) + " " + Singleton.getInstance().getCurrency());
         cardLayout.setTag(c.getID());
         Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data

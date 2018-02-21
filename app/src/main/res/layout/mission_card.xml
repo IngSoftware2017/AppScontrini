@@ -95,7 +95,7 @@
                                 android:maxLines="1"
                                 android:text="@string/text_initTotal"
                                 android:textAlignment="textEnd"
-                                android:textColor="#666"
+                                android:textColor="#000"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/missionTitle" />
                         </LinearLayout>
