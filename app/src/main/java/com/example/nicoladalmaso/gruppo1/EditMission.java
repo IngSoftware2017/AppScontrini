@@ -57,7 +57,7 @@ public class EditMission extends AppCompatActivity {
     //TextView txtCount;
     //TextView txtMissionTotal;
     Button btnExport;
-    Spinner spnrExport;
+
     File defaultOutputPath;
     ExportManager manager;
 
@@ -83,7 +83,6 @@ public class EditMission extends AppCompatActivity {
         //txtCount=(TextView)findViewById(R.id.ticket_count);
         //txtMissionTotal=(TextView)findViewById(R.id.mission_total);
         btnExport = findViewById(R.id.export_button);
-        spnrExport = findViewById(R.id.export_spinner);
 
         missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
@@ -113,16 +112,7 @@ public class EditMission extends AppCompatActivity {
         defaultOutputPath = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         manager = new ExportManager(DB, defaultOutputPath.getPath());
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
-        spnrExport.setAdapter(spinnerAdapter);
 
-        btnExport.setOnClickListener(v -> {
-                try {
-                    ExportedFile exported = manager.exportMission(missionID,(String) spnrExport.getSelectedItem());
-                    EmailBuilder.createEmail().to(person.getEmail()).attachFile(exported.file).sendEmail(EditMission.this);
-                } catch (ExportTypeNotSupportedException e) {
-                    e.printStackTrace();
-                }
-        });
 
         setMissionValues();
     }
