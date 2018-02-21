@@ -63,38 +63,9 @@
                 android:text="@string/billTitle"
                 android:textSize="26sp" />
 
-            <TextView
-                android:id="@+id/nameTxt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="22dp"
-                android:text="@string/name"
-                android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/billName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="8dp"
-                android:text="" />
 
-            <TextView
-                android:id="@+id/descTxt"
-                android:layout_marginTop="22dp"
-                android:layout_marginStart="32dp"
-                android:textSize="20sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/shop" />
 
-            <TextView
-                android:id="@+id/billShop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="8dp" />
 
             <TextView
                 android:id="@+id/totalTxt"
@@ -162,7 +133,38 @@
                 android:layout_marginTop="8dp"
                 android:text="" />
 
+            <TextView
+                android:id="@+id/descTxt"
+                android:layout_marginTop="22dp"
+                android:layout_marginStart="32dp"
+                android:textSize="20sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/shop" />
 
+            <TextView
+                android:id="@+id/billShop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/nameTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/name"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/billName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:text="" />
 
         </LinearLayout>
     </ScrollView>
