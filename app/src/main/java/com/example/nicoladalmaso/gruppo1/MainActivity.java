@@ -208,10 +208,23 @@ public class MainActivity extends AppCompatActivity {
      */
     public void addToList(PersonEntity person){
         listPeople.add(person);
-        ListView listView = findViewById(R.id.listPeople);
-        adapter = new PeopleAdapter(this, R.layout.person_card, listPeople);
+        ListView listView = (ListView)findViewById(R.id.listPeople);
+        PeopleAdapter adapter = new PeopleAdapter(this, R.layout.person_card, listPeople,this);
         listView.setAdapter(adapter);
     }
+
+    /**Lazzarin
+     * clear the view after I've eliminated a mission(before to call printAllMissions)
+     */
+    public void clearAllPeople()
+    {
+        ListView listView = (ListView)findViewById(R.id.listPeople);
+        PeopleAdapter emptyAdapter = new PeopleAdapter(this, R.layout.person_card, listPeople,this);
+        emptyAdapter.clear();
+        emptyAdapter.notifyDataSetChanged();
+        listView.setAdapter(emptyAdapter);
+    }
+
 
     /** Dal Maso
      * get all missions from the DB and print
@@ -318,4 +331,10 @@ public class MainActivity extends AppCompatActivity {
             this.numMissions = numMissions;
         }
     }
+
+    public void reload() {
+        clearAllPeople();
+        printAllPeople();
+    }
+
 }
