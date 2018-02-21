@@ -111,7 +111,6 @@ public class EditMission extends AppCompatActivity {
 
         defaultOutputPath = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         manager = new ExportManager(DB, defaultOutputPath.getPath());
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
 
 
         setMissionValues();

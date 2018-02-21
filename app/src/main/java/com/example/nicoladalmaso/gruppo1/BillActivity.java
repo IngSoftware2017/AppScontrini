@@ -436,6 +436,7 @@ public class BillActivity extends AppCompatActivity {
      * Method that is run when the activity is resumed.
      * it hides the button for adding tickets if the mission is closed, else it shows it.
      */
+    @Override
     public void onResume(){
         super.onResume();
         if(thisMission.isClosed()) {
@@ -444,6 +445,7 @@ public class BillActivity extends AppCompatActivity {
         else{
             fab.setVisibility(View.VISIBLE);
         }
+        printAllTickets();
     }
 
     @Override
@@ -459,4 +461,6 @@ public class BillActivity extends AppCompatActivity {
         super.onDestroy();
         ocrManager.release();
     }
+
+
 }
