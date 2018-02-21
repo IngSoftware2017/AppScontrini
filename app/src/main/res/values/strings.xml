@@ -9,6 +9,7 @@
     <string name="action_editMission">Modifica missione</string>
     <string name="action_editPerson">Modifica persona</string>
     <string name="action_deleteMission">Elimina missione</string>
+
     <string name="action_deletePerson">Elimina persona</string>
     <string name="billTitle">Il tuo scontrino</string>
     <string name="add">Aggiungi</string>
@@ -48,6 +49,7 @@
     <string name="titlePeople">Persone</string>
     <string name="defaultDescription">Nessuna descrizione</string>
     <string name="deleteTitle">Cancellazione</string>
+
     <string name="toast_missionNoName">Nome missione mancante</string>
     <string name="toast_personNoName">Nome persona mancante</string>
     <string name="toast_missionNoLocation">Luogo missione mancante</string>
@@ -97,6 +99,7 @@
     <string name="ticket_count_text">Scontrini presenti :</string>
     <string name="mission_total_text">Spese totali missione:</string>
 
+    <string name="action_closeMission">Chiudi missione</string>
     <string name="menu_modify_mission">Modifica</string>
     <string name="menu_mission_summary">Informazioni</string>
     <string name="menu_delete_mission">Elimina</string>
@@ -107,6 +110,9 @@
     <string name="export_share_text">Vuoi condividere i file esportati?</string>
     <string name="export_mission_button">Esporta missione</string>
     <string name="selection_format">Seleziona formato esportazione:</string>
+    <string name="closeTitle">Chiudi</string>
+    <string name="buttonClose">Chiudi</string>
+    <string name="closeMissionToast">Sei sicuro di voler chiudere la missione?</string>
 
 
     <!--Mascotto-->
