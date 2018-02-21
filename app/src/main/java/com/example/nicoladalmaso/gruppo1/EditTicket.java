@@ -66,15 +66,12 @@ public class EditTicket extends AppCompatActivity {
         ticketID = getIntent().getExtras().getLong(IntentCodes.INTENT_TICKET_ID);
         thisTicket = DB.getTicket(ticketID);
         thisMission = DB.getMission(thisTicket.getMissionID());
-        TextView editDate=(TextView)findViewById(R.id.input_ticketDateMod);
-        LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.buttonEditTicketDate);
-        bntMissionStart.setOnClickListener(new View.OnClickListener() {
-            //lazzarin
-            public void onClick(View v) {
+        TextView editDate = findViewById(R.id.input_ticketDateMod);
+        LinearLayout bntMissionStart = findViewById(R.id.buttonEditTicketDate);
+        bntMissionStart.setOnClickListener(v -> {
                 Singleton.getInstance().setStartFlag(2);
                 DialogFragment newFragment = new DatePickerFragment().newInstance(editDate,thisTicket.getDate(),null);
                 newFragment.show(getFragmentManager(), "startDatePicker");
-            }
         });
 
         //Get data from parent view
@@ -83,7 +80,7 @@ public class EditTicket extends AppCompatActivity {
 
     /** Dal Maso
      * Setting toolbar buttons and style from /res/menu
-     * @param menu
+     * @param menu menu to create
      * @return success flag
      */
     @Override
@@ -101,7 +98,7 @@ public class EditTicket extends AppCompatActivity {
      * Modify by Marco Olivieri: fixed amount error
      *
      * Modified: Improve refoundable Ticket
-     * @author: Matteo Mascotto on 15-02-2018
+     * @author Matteo Mascotto on 15-02-2018
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -160,7 +157,7 @@ public class EditTicket extends AppCompatActivity {
     /** Dal Maso
      * set the current values on the variables
      */
-    private void setTicketValues(){
+    private void setTicketValues() {
 
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketTitle = thisTicket.getTitle();
@@ -187,24 +184,23 @@ public class EditTicket extends AppCompatActivity {
      * @author Matteo Mascotto on 15-02-2018
      */
     private void setTicketValuesOnScreen(){
-        txtTitle = (TextView)findViewById(R.id.input_ticketTitleMod);
-        txtAmount = (TextView)findViewById(R.id.input_ticketAmountMod);
-        txtShop = (TextView)findViewById(R.id.input_ticketShopMod);
-        txtDate = (TextView)findViewById(R.id.input_ticketDateMod);
-        chkIsRefoundable = (CheckBox)findViewById(R.id.check_isRefoundable);
-        txtPeople = (TextView)findViewById(R.id.input_ticketPersonNumber);
-        LinearLayout btnModifyDate = (LinearLayout) findViewById(R.id.buttonEditTicketDate);
+        txtTitle = findViewById(R.id.input_ticketTitleMod);
+        txtAmount = findViewById(R.id.input_ticketAmountMod);
+        txtShop = findViewById(R.id.input_ticketShopMod);
+        txtDate = findViewById(R.id.input_ticketDateMod);
+        chkIsRefoundable = findViewById(R.id.check_isRefoundable);
+        txtPeople = findViewById(R.id.input_ticketPersonNumber);
+        LinearLayout btnModifyDate = findViewById(R.id.buttonEditTicketDate);
 
-        btnModifyDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnModifyDate.setOnClickListener(v -> {
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtDate, thisTicket.getDate(),null);
                 newFragment.show(getFragmentManager(), "startDatePicker");
-            }
         });
 
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
         txtTitle.setText(ticketTitle);
-        txtDate.setText(ticketDate);
+        txtDate.setText(formatter.format(thisTicket.getDate()));
         txtShop.setText(ticketShop);
         txtAmount.setText(ticketAmount);
         chkIsRefoundable.setChecked(thisTicket.isRefundable());

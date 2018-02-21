@@ -61,10 +61,9 @@ public class EditMission extends AppCompatActivity {
     File defaultOutputPath;
     ExportManager manager;
 
-    //TODO: poter cambiare persona?
     @Override
-    /**Piccolo (using Dal Maso's code)
-     * Method that is run every time the activity is started
+    /*Piccolo (using Dal Maso's code)
+      Method that is run every time the activity is started
      */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
