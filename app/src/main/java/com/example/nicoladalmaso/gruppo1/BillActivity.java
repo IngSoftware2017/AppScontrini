@@ -120,8 +120,9 @@ public class BillActivity extends AppCompatActivity {
         } catch (NullPointerException e) {
             Toast.makeText(context, R.string.NullPExc_gallery, Toast.LENGTH_LONG).show();
         }
-        DB = new DataManager(this.getApplicationContext());
+
         context = this.getApplicationContext();
+        DB = new DataManager(context);
 
         long missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
