@@ -81,52 +81,12 @@ public class ReportDB extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String selectedExportTag = (String) exportSpiner.getSelectedItem();
-                Log.d("EXPORTDEBUG","EXPORTING");
-
-                DialogProperties properties = new DialogProperties();
-                properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                properties.selection_type = DialogConfigs.DIR_SELECT;
-                properties.root = new File(DialogConfigs.DEFAULT_DIR);
-                properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
-                properties.offset = new File(DialogConfigs.DEFAULT_DIR);
-                properties.extensions = null;
-
-                FilePickerDialog dialog = new FilePickerDialog(ReportDB.this,properties);
-                dialog.setTitle(R.string.export_activity_name);
-
-                dialog.setDialogSelectionListener(new DialogSelectionListener() {
-                    @Override
-                    public void onSelectedFilePaths(String[] files) {
-                        Log.d("EXPORTDEBUG","SELECTED PATH: "+files[0]);
-                        manager.setOutputPath(files[0]);
-                        try {
-                            List<ExportedFile> exportedFiles = manager.exportDatabase(selectedExportTag);
-                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    switch (which){
-                                        case DialogInterface.BUTTON_POSITIVE:
-                                            EmailBuilder.createEmail().attachFiles(exportedFiles).sendEmail(context);
-                                            break;
-                                        case DialogInterface.BUTTON_NEGATIVE:
-                                            //No button clicked
-                                            break;
-                                    }
-                                }
-                            };
-
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ReportDB.this);
-                            builder.setMessage(R.string.export_share_text).setPositiveButton("Si", dialogClickListener)
-                                    .setNegativeButton("No", dialogClickListener).show();
-                        } catch (ExportTypeNotSupportedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-                dialog.show();
-
-
+                try {
+                    List<ExportedFile> exportedFiles = manager.exportDatabase(selectedExportTag);
+                    EmailBuilder.createEmail().attachFiles(exportedFiles).sendEmail(context);
+                } catch (ExportTypeNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
