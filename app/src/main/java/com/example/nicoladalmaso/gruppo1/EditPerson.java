@@ -23,7 +23,7 @@ import database.PersonEntity;
  */
 public class EditPerson extends AppCompatActivity{
     public DataManager DB;
-    int personID;
+    long personID;
     Context context;
     PersonEntity thisPerson;
     String personName = "", personLastName = "", personAcademicTitle = "", email = "";
@@ -38,7 +38,7 @@ public class EditPerson extends AppCompatActivity{
 
         context = this.getApplicationContext();
         DB = new DataManager(context);
-        personID = Singleton.getInstance().getPersonID();
+        personID = getIntent().getExtras().getLong(IntentCodes.INTENT_PERSON_ID);
         thisPerson = DB.getPerson(personID);
 
         getSupportActionBar().setElevation(0);

@@ -76,8 +76,6 @@ public class BillActivity extends AppCompatActivity {
     public List<TicketEntity> list = new LinkedList<>();
     public Uri photoURI;
     public boolean isFabOpen = false;
-    String tempPhotoPath;
-    Integer missionID;
     MissionEntity thisMission;
     Context context;
     String root;
@@ -124,15 +122,11 @@ public class BillActivity extends AppCompatActivity {
         }
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
-        PersonEntity thisPerson = DB.getPerson(Singleton.getInstance().getPersonID());
 
-        missionID = Singleton.getInstance().getMissionID();
+        long missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
-        //lazzarin
-        Singleton.getInstance().setStartDate(thisMission.getStartDate());
-        Singleton.getInstance().setEndDate(thisMission.getEndDate());
-
         PersonEntity person = DB.getPerson(thisMission.getPersonID());
+
         ActionBar ab = getSupportActionBar();
 
         try {
@@ -198,7 +192,7 @@ public class BillActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int which, long l) {
                         try{
-                            ExportedFile exported = manager.exportMission(missionID,formats.get(which));
+                            ExportedFile exported = manager.exportMission(thisMission.getID(),formats.get(which));
                             Uri toExport = Uri.fromFile(exported.file);
                             Intent shareIntent = new Intent();
                             shareIntent.setAction(Intent.ACTION_SEND);
@@ -296,7 +290,7 @@ public class BillActivity extends AppCompatActivity {
      * Add new ticket to the list
      */
     public void addToList(){
-        adapter = new CustomAdapter(this, R.layout.cardview, list, missionID, DB);
+        adapter = new CustomAdapter(this, R.layout.cardview, list, (int)thisMission.getID(), DB);
         listView.setAdapter(adapter);
 
     }
@@ -307,6 +301,7 @@ public class BillActivity extends AppCompatActivity {
     private void takePhotoIntent() {
         if(checkCameraHardware(context)){
             Intent cameraActivity = new Intent(context, com.example.nicoladalmaso.gruppo1.CameraActivity.class);
+            cameraActivity.putExtra(IntentCodes.INTENT_MISSION_ID,thisMission.getID());
             startActivityForResult(cameraActivity, REQUEST_TAKE_PHOTO);
         }
     }
@@ -401,7 +396,7 @@ public class BillActivity extends AppCompatActivity {
      */
     public void printAllTickets(){
         list.clear();
-        List<TicketEntity> ticketList = DB.getTicketsForMission(missionID);
+        List<TicketEntity> ticketList = DB.getTicketsForMission(thisMission.getID());
         TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){

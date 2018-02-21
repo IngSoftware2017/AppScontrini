@@ -39,14 +39,14 @@ import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
 
-public class AddNewMission extends AppCompatActivity{
+public class AddNewMission extends AppCompatActivity {
 
     Context context;
     public DataManager DB;
     TextView missionStart;
     TextView missionFinish;
     int personID = 1;
-    int missionID;
+    long missionID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +78,11 @@ public class AddNewMission extends AppCompatActivity{
         missionFinish = (TextView)findViewById(R.id.input_missionFinish);
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionFinish);
-        //clean Singleton Date
-        Singleton.getInstance().setStartDate(null);
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 hideSoftKeyboard(AddNewMission.this);
                 Singleton.getInstance().setStartFlag(0);
-                DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart);
+                DialogFragment newFragment = new DatePickerFragment().newInstance(missionStart,null,null);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
@@ -93,7 +91,7 @@ public class AddNewMission extends AppCompatActivity{
             public void onClick(View v) {
                 Singleton.getInstance().setStartFlag(1);
                 hideSoftKeyboard(AddNewMission.this);
-                DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish);
+                DialogFragment newFragment = new DatePickerFragment().newInstance(missionFinish,null,null);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
             }
         });
@@ -105,6 +103,7 @@ public class AddNewMission extends AppCompatActivity{
                     Intent intent = new Intent();
                     Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillActivity.class);
                     startImageView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startImageView.putExtra(IntentCodes.INTENT_MISSION_ID,missionID);
                     context.startActivity(startImageView);
                     setResult(RESULT_OK, intent);
                     finish();
@@ -183,9 +182,9 @@ public class AddNewMission extends AppCompatActivity{
             e.printStackTrace();
         }
 
-        long missionID = DB.addMission(miss);
-        Singleton.getInstance().setMissionID((int)missionID);
-
+        missionID = DB.addMission(miss);
         return true;
     }
+
+
 }

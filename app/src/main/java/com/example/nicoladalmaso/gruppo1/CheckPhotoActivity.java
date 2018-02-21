@@ -98,7 +98,8 @@ public class CheckPhotoActivity extends Activity {
         btnOK = (Button)findViewById(R.id.btnCheck_allow);
         waitOCR = (ProgressBar)findViewById(R.id.progressBarOCR);
         waitOCR.setVisibility(View.VISIBLE);
-        ticketMission = DB.getMission(Singleton.getInstance().getMissionID());
+        long missionId = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
+        ticketMission = DB.getMission(missionId);
 
         //OCR initialize
         ocrManager = new OcrManager();
@@ -237,7 +238,7 @@ public class CheckPhotoActivity extends Activity {
             }
             thisTicket.setTitle(checkName.getText().toString());
 
-            thisTicket.setMissionID(Singleton.getInstance().getMissionID());
+            thisTicket.setMissionID(ticketMission.getID());
             long id = DB.addTicket(thisTicket);
 
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);

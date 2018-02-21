@@ -84,19 +84,20 @@ public class EditMission extends AppCompatActivity {
         btnExport=(Button)findViewById(R.id.export_button);
         spnrExport=(Spinner)findViewById(R.id.export_spinner);
 
-        missionID = Singleton.getInstance().getMissionID();
+        missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
 
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionEditStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionEditFinish);
         //lazzarin clean startDate on Singleton
-        Singleton.getInstance().setStartDate(thisMission.getStartDate());
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // edit by Lazzarin: use flag to tell Datepicker what date we're setting
                 hideSoftKeyboard(EditMission.this);
                 Singleton.getInstance().setStartFlag(0);
-                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart);
+                Date startDate = thisMission.getStartDate();
+                Date endDate = thisMission.getEndDate();
+                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart, startDate,endDate);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
@@ -106,7 +107,9 @@ public class EditMission extends AppCompatActivity {
             public void onClick(View v) {
                 Singleton.getInstance().setStartFlag(1);
                 hideSoftKeyboard(EditMission.this);
-                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd);
+                Date startDate = thisMission.getStartDate();
+                Date endDate = thisMission.getEndDate();
+                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd,startDate,endDate);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
             }
         });
@@ -239,4 +242,5 @@ public class EditMission extends AppCompatActivity {
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
+
 }

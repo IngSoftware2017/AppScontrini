@@ -124,13 +124,11 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                     if(t.get(i).getID() == ticketID){
                         TicketEntity thisTicket = t.get(i);
                         Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
+                        startImageView.putExtra(IntentCodes.INTENT_TICKET_ID,ticketID);
                         File photo = new File(thisTicket.getFileUri().toString().substring(7));
 
-                        //Put data to next activity
-                        Singleton.getInstance().setTicketID(ticketID);
-
                         //Start new activity
-                        ((BillActivity)context).startActivityForResult(startImageView, 4);
+                        //((BillActivity)context).startActivityForResult(startImageView, 4);
                         return;
                     }
                 }

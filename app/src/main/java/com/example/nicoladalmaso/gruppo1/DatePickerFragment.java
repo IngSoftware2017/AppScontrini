@@ -3,18 +3,14 @@ package com.example.nicoladalmaso.gruppo1;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.util.Log;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.Calendar;
+import java.util.Date;
 
 /** This class is fully developed by Nicola Dal Maso
  * Datepicker management
@@ -25,11 +21,16 @@ public class  DatePickerFragment extends DialogFragment
 
     int id;
     boolean check;
+    static String START_DATE  = "startdate";
+    static String END_DATE  = "enddate";
 
-    public static DatePickerFragment newInstance(TextView textView) {
+    Date startDate,endDate;
+    public static DatePickerFragment newInstance(TextView textView, Date startDate, Date endDate ) {
         DatePickerFragment f = new DatePickerFragment();
         Bundle args = new Bundle();
         args.putInt("textView", textView.getId());
+        args.putSerializable(START_DATE, startDate);
+        args.putSerializable(END_DATE, endDate);
         f.setArguments(args);
         return f;
     }
@@ -38,6 +39,8 @@ public class  DatePickerFragment extends DialogFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         id = getArguments().getInt("textView");
+        startDate = (Date)getArguments().getSerializable(START_DATE);
+        endDate = (Date)getArguments().getSerializable(END_DATE);
         check=false;
     }
 
@@ -65,9 +68,9 @@ public class  DatePickerFragment extends DialogFragment
             case 1:
             {
                 dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-                if (Singleton.getInstance().getStartDate() != null)
+                if (startDate != null)
                 {
-                    long start = Singleton.getInstance().getStartDate().getTime();
+                    long start = startDate.getTime();
                     dialog.getDatePicker().setMinDate(start);
                 }
                 else
@@ -85,9 +88,9 @@ public class  DatePickerFragment extends DialogFragment
             //DatePicker of editTicket(2)
             case 2:
             {
-                long start = Singleton.getInstance().getStartDate().getTime();
+                long start = startDate.getTime();
                 dialog.getDatePicker().setMinDate(start);
-                long end = Singleton.getInstance().getEndDate().getTime();
+                long end = endDate.getTime();
                 dialog.getDatePicker().setMaxDate(end);
                 break;
             }
@@ -118,7 +121,7 @@ public class  DatePickerFragment extends DialogFragment
         if(check)
             {
             try{
-            Singleton.getInstance().setStartDate(dateformat.parse(day + "/" + (month+1) + "/" + year));
+                Date d = dateformat.parse(day + "/" + (month+1) + "/" + year);
                  }
             catch (ParseException e) {
                 e.printStackTrace();
@@ -126,4 +129,6 @@ public class  DatePickerFragment extends DialogFragment
             check=false;
         }
     }
+
 }
+

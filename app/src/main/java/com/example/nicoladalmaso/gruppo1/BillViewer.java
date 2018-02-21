@@ -57,7 +57,7 @@ import database.TicketEntity;
 public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
-    int ticketId;
+    long ticketId;
     int missionID;
     Context context;
     final int TICKET_MOD = 1;
@@ -111,7 +111,7 @@ public class BillViewer extends AppCompatActivity {
     public void initialize(){
         //Get data from parent view
         Intent intent = getIntent();
-        ticketId = Singleton.getInstance().getTicketID();
+        ticketId = intent.getExtras().getLong(IntentCodes.INTENT_TICKET_ID);
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketPeople = ""+thisTicket.getTagPlaces();
@@ -189,7 +189,7 @@ public class BillViewer extends AppCompatActivity {
         fabCrop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                cropPhoto(ticketId);
+                cropPhoto((int)ticketId);
             }//onClick
         });
         fabDelete.setOnClickListener(new View.OnClickListener() {

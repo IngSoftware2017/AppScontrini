@@ -41,8 +41,7 @@ import static com.example.nicoladalmaso.gruppo1.EditMission.hideSoftKeyboard;
 public class EditTicket extends AppCompatActivity {
 
     public DataManager DB;
-    int ticketID;
-    int missionID;
+    long ticketID, missionID;
     Context context;
     TicketEntity thisTicket;
     String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
@@ -64,8 +63,8 @@ public class EditTicket extends AppCompatActivity {
         setContentView(R.layout.activity_edit_ticket);
 
         DB = new DataManager(this.getApplicationContext());
-        ticketID = Singleton.getInstance().getTicketID();
-        missionID = Singleton.getInstance().getMissionID();
+        ticketID = getIntent().getExtras().getLong(IntentCodes.INTENT_TICKET_ID);
+        missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisTicket = DB.getTicket(ticketID);
         thisMission = DB.getMission(missionID);
         TextView editDate=(TextView)findViewById(R.id.input_ticketDateMod);
@@ -74,7 +73,7 @@ public class EditTicket extends AppCompatActivity {
             //lazzarin
             public void onClick(View v) {
                 Singleton.getInstance().setStartFlag(2);
-                DialogFragment newFragment = new DatePickerFragment().newInstance(editDate);
+                DialogFragment newFragment = new DatePickerFragment().newInstance(editDate,thisTicket.getDate(),null);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
@@ -198,7 +197,7 @@ public class EditTicket extends AppCompatActivity {
         btnModifyDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new DatePickerFragment().newInstance(txtDate);
+                DialogFragment newFragment = new DatePickerFragment().newInstance(txtDate, thisTicket.getDate(),null);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });

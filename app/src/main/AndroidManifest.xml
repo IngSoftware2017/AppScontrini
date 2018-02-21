@@ -68,6 +68,10 @@
         <activity
             android:name=".CameraActivity"
             android:parentActivityName=".BillActivity" />
+
+        <activity
+            android:name=".CheckPhotoActivity"
+            android:parentActivityName=".CameraActivity" />
         <activity
             android:name=".MissionsTabbed"
             android:label="@string/title_activity_missions_tabbed"
