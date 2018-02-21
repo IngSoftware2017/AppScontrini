@@ -61,7 +61,7 @@
 
 
     <!--Piccolo-->
-    <string name="text_isRepaid">La missione è stata archiviata?</string>
+    <string name="text_isRepaid">La missione è stata chiusa?</string>
     <string name="title_activity_missions_tabbed">MissionsTabbed</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
@@ -98,7 +98,6 @@
     <string name="text_closeMission">Missioni chiuse:</string>
     <string name="ticket_count_text">Scontrini presenti :</string>
     <string name="mission_total_text">Spese totali missione:</string>
-
     <string name="action_closeMission">Chiudi missione</string>
     <string name="menu_modify_mission">Modifica</string>
     <string name="menu_mission_summary">Informazioni</string>
