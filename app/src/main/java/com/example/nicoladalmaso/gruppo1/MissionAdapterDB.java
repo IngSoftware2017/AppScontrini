@@ -16,6 +16,8 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +40,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
     long missionID = 0;
     List<MissionEntity> missions;
 
-    public MissionAdapterDB(MissionsTabbed activity, int textViewResourceId, List<MissionEntity> objects) {
+    private MissionAdapterDB(MissionsTabbed activity, int textViewResourceId, List<MissionEntity> objects) {
         super(activity, textViewResourceId, objects);
         this.activity = activity;
         missions = objects;
@@ -51,22 +53,24 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.mission_card, null);
 
-        CardView card = (CardView)convertView.findViewById(R.id.missionCard);
-        TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
-        TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
-        TextView total = (TextView)convertView.findViewById(R.id.missionTotal);
-        ImageButton menuCard = (ImageButton) convertView.findViewById(R.id.missionMenu);
+        CardView card = convertView.findViewById(R.id.missionCard);
+        TextView title = convertView.findViewById(R.id.missionTitle);
+        TextView location = convertView.findViewById(R.id.missionLocation);
+        TextView total = convertView.findViewById(R.id.missionTotal);
+        ImageButton menuCard = convertView.findViewById(R.id.missionMenu);
         RelativeLayout cardLayout = convertView.findViewById(R.id.missionClick);
 
         MissionEntity c = getItem(position);
+        BigDecimal totale = new BigDecimal(DB.getTotalAmountForMission(c.getID()).toString());
+
         title.setText(c.getName());
         location.setText(c.getLocation());
-        total.setText(String.valueOf(DB.getTotalAmountForMission(c.getID())));
+        total.setText(String.valueOf(totale.setScale(2, BigDecimal.ROUND_HALF_UP)));
         cardLayout.setTag(c.getID());
         Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data
         Date start=c.getStartDate();
-        SimpleDateFormat tr=new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat tr = new SimpleDateFormat("dd/MM/yyyy");
         String startDate=tr.format(start);
         Date finish=c.getStartDate();
         String finishDate=tr.format(finish);
@@ -104,16 +108,11 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         cardLayout.setOnClickListener(listener);
 
 
-        /**
-         * Listener for the pupUp menu of the mission's cardView
-         * @author Matteo Mascotto
+        /*
+          Listener for the pupUp menu of the mission's cardView
+          @author Matteo Mascotto
          */
-        menuCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPopupMenu(activity,menuCard, c.getID());
-            }
-        });
+        menuCard.setOnClickListener(v -> showPopupMenu(activity,menuCard, c.getID()));
 
         return convertView;
     }

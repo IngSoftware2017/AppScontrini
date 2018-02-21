@@ -40,6 +40,7 @@ import export.ExportedFile;
 
 /**
  * Created by Francesco on 03/01/2018.
+ *
  */
 
 public class EditMission extends AppCompatActivity {
@@ -53,8 +54,8 @@ public class EditMission extends AppCompatActivity {
     TextView txtMissionEnd;
     TextView txtMissionLocation;
     CheckBox chkIsClosed;
-    TextView txtCount;
-    TextView txtMissionTotal;
+    //TextView txtCount;
+    //TextView txtMissionTotal;
     Button btnExport;
     Spinner spnrExport;
     File defaultOutputPath;
@@ -74,24 +75,23 @@ public class EditMission extends AppCompatActivity {
         setTitle(context.getString(R.string.title_EditMission));
 
         DB = new DataManager(this.getApplicationContext());
-        txtMissionName=(TextView)findViewById(R.id.input_missionEditName);
-        txtMissionLocation=(TextView)findViewById(R.id.input_missionEditLocation);
-        txtMissionStart=(TextView)findViewById(R.id.input_missionEditStart);
-        txtMissionEnd=(TextView)findViewById(R.id.input_missionEditFinish);
-        chkIsClosed=(CheckBox)findViewById(R.id.check_isRepaid);
-        txtCount=(TextView)findViewById(R.id.ticket_count);
-        txtMissionTotal=(TextView)findViewById(R.id.mission_total);
-        btnExport=(Button)findViewById(R.id.export_button);
-        spnrExport=(Spinner)findViewById(R.id.export_spinner);
+        txtMissionName = findViewById(R.id.input_missionEditName);
+        txtMissionLocation = findViewById(R.id.input_missionEditLocation);
+        txtMissionStart = findViewById(R.id.input_missionEditStart);
+        txtMissionEnd = findViewById(R.id.input_missionEditFinish);
+        chkIsClosed = findViewById(R.id.check_isRepaid);
+        //txtCount=(TextView)findViewById(R.id.ticket_count);
+        //txtMissionTotal=(TextView)findViewById(R.id.mission_total);
+        btnExport = findViewById(R.id.export_button);
+        spnrExport = findViewById(R.id.export_spinner);
 
         missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
 
-        LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionEditStart);
-        LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionEditFinish);
+        LinearLayout bntMissionStart = findViewById(R.id.button_missionEditStart);
+        LinearLayout bntMissionFinish = findViewById(R.id.button_missionEditFinish);
         //lazzarin clean startDate on Singleton
-        bntMissionStart.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        bntMissionStart.setOnClickListener(v ->{
                 // edit by Lazzarin: use flag to tell Datepicker what date we're setting
                 hideSoftKeyboard(EditMission.this);
                 Singleton.getInstance().setStartFlag(0);
@@ -99,36 +99,29 @@ public class EditMission extends AppCompatActivity {
                 Date endDate = thisMission.getEndDate();
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart, startDate,endDate);
                 newFragment.show(getFragmentManager(), "startDatePicker");
-            }
         });
 
-        bntMissionFinish.setOnClickListener(new View.OnClickListener() {
-            // edit by Lazzarin
-            public void onClick(View v) {
+        bntMissionFinish.setOnClickListener(v -> {
                 Singleton.getInstance().setStartFlag(1);
                 hideSoftKeyboard(EditMission.this);
                 Date startDate = thisMission.getStartDate();
                 Date endDate = thisMission.getEndDate();
                 DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd,startDate,endDate);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
-            }
         });
 
         defaultOutputPath = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         manager = new ExportManager(DB, defaultOutputPath.getPath());
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
         spnrExport.setAdapter(spinnerAdapter);
 
-        btnExport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnExport.setOnClickListener(v -> {
                 try {
                     ExportedFile exported = manager.exportMission(missionID,(String) spnrExport.getSelectedItem());
                     EmailBuilder.createEmail().to(person.getEmail()).attachFile(exported.file).sendEmail(EditMission.this);
                 } catch (ExportTypeNotSupportedException e) {
                     e.printStackTrace();
                 }
-            }
         });
 
         setMissionValues();
@@ -136,7 +129,7 @@ public class EditMission extends AppCompatActivity {
 
     /** Dal Maso
      * Setting toolbar buttons and style from /res/menu
-     * @param menu
+     * @param menu toolbar menu
      * @return success flag
      */
     @Override
@@ -213,6 +206,7 @@ public class EditMission extends AppCompatActivity {
         chkIsClosed.setChecked(thisMission.isClosed());
 
         //Elardo mission summary
+        /* Not view in the activity
         List<TicketEntity> ticketList=DB.getTicketsForMission(missionID);
         txtCount.setText(Integer.toString(ticketList.size()));
         Double total= 0.0;
@@ -233,6 +227,7 @@ public class EditMission extends AppCompatActivity {
             txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + total.toString()+" "+getResources().getString(R.string.unreadable_ticket));
         else
             txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + total.toString());
+            */
     }
 
     public static void hideSoftKeyboard(Activity activity) {
