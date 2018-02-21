@@ -41,7 +41,7 @@ import static com.example.nicoladalmaso.gruppo1.EditMission.hideSoftKeyboard;
 public class EditTicket extends AppCompatActivity {
 
     public DataManager DB;
-    long ticketID, missionID;
+    long ticketID;
     Context context;
     TicketEntity thisTicket;
     String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
@@ -64,9 +64,8 @@ public class EditTicket extends AppCompatActivity {
 
         DB = new DataManager(this.getApplicationContext());
         ticketID = getIntent().getExtras().getLong(IntentCodes.INTENT_TICKET_ID);
-        missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisTicket = DB.getTicket(ticketID);
-        thisMission = DB.getMission(missionID);
+        thisMission = DB.getMission(thisTicket.getMissionID());
         TextView editDate=(TextView)findViewById(R.id.input_ticketDateMod);
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.buttonEditTicketDate);
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
@@ -114,10 +113,10 @@ public class EditTicket extends AppCompatActivity {
                 SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
                 try {
-                    MissionEntity current = DB.getMission(missionID);
-                    String  start = DateFormat.format(current.getStartDate());
 
-                    String finish = DateFormat.format(current.getEndDate());
+                    String  start = DateFormat.format(thisMission.getStartDate());
+
+                    String finish = DateFormat.format(thisMission.getEndDate());
 
                     if( AppUtilities.checkIntervalDate(start,finish,txtDate.getText().toString()))
                         thisTicket.setDate(DateFormat.parse(txtDate.getText().toString()));
@@ -130,7 +129,9 @@ public class EditTicket extends AppCompatActivity {
                 }
 
                 thisTicket.setShop(txtShop.getText().toString());
-                thisTicket.setTagPlaces(Short.parseShort(txtPeople.getText().toString()));
+                if(!txtPeople.getText().toString().equals("")){
+                    thisTicket.setTagPlaces(Short.parseShort(txtPeople.getText().toString()));
+                }
 
                 try {
                     String newAmount = txtAmount.getText().toString();

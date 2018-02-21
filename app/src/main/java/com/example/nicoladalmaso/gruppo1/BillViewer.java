@@ -215,7 +215,7 @@ public class BillViewer extends AppCompatActivity {
             case R.id.action_editTicket:
                 //Open Edit Ticket Activity
                 Intent editTicket = new Intent(context, com.example.nicoladalmaso.gruppo1.EditTicket.class);
-                // editTicket.putExtra("ticketID", thisTicket.getID());
+                editTicket.putExtra(IntentCodes.INTENT_TICKET_ID, thisTicket.getID());
                 startActivityForResult(editTicket, TICKET_MOD);
                 break;
 
