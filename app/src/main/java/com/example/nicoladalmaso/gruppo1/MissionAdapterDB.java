@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,11 +35,10 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
     DataManager DB;
     MissionsTabbed activity;
     String path = "";
-    int missionID = 0;
+    long missionID = 0;
     List<MissionEntity> missions;
 
-    public MissionAdapterDB(MissionsTabbed activity, int textViewResourceId,
-                            List<MissionEntity> objects) {
+    public MissionAdapterDB(MissionsTabbed activity, int textViewResourceId, List<MissionEntity> objects) {
         super(activity, textViewResourceId, objects);
         this.activity = activity;
         missions = objects;
@@ -50,15 +50,17 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.mission_card, null);
+
         CardView card = (CardView)convertView.findViewById(R.id.missionCard);
         TextView title = (TextView)convertView.findViewById(R.id.missionTitle);
         TextView location = (TextView)convertView.findViewById(R.id.missionLocation);
         ImageButton menuCard = (ImageButton) convertView.findViewById(R.id.missionMenu);
+        RelativeLayout cardLayout = convertView.findViewById(R.id.missionClick);
 
         MissionEntity c = getItem(position);
         title.setText(c.getName());
         location.setText(c.getLocation());
-        convertView.setTag(c.getID());
+        cardLayout.setTag(c.getID());
         Log.d("MissionStartBadFormat", ""+c.getStartDate());
         //Lazzarin :blocco per convertire in formato più leggibile la data
         Date start=c.getStartDate();
@@ -87,14 +89,18 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 break;
         }
 
-        convertView.setOnClickListener(new View.OnClickListener(){
-            public void onClick (View v){
-                missionID = Integer.parseInt(v.getTag().toString());
-                Intent startTicketsView = new Intent(activity.getApplicationContext(), BillActivity.class);
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                missionID = Integer.parseInt(view.getTag().toString());
+                Intent startTicketsView = new Intent(activity, BillActivity.class);
                 startTicketsView.putExtra(IntentCodes.INTENT_MISSION_ID, missionID);
-                (activity).startActivityForResult(startTicketsView, 1);
+                activity.startActivity(startTicketsView);
             }
-        });
+        };
+
+        cardLayout.setOnClickListener(listener);
+
 
         /**
          * Listener for the pupUp menu of the mission's cardView
@@ -139,14 +145,8 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         popup.show();
     }
 
-    public void closeMission(MissionEntity missionEntity){
-        missions.remove(missionEntity);
-        notifyDataSetChanged();
-        activity.reload();
 
-    }
-
-    public void deleteMission(MissionEntity missionEntity){
+    public void removeMission(MissionEntity missionEntity){
         missions.remove(missionEntity);
         notifyDataSetChanged();
         activity.reload();

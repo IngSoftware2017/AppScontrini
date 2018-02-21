@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.nicoladalmaso.gruppo1">
 
@@ -11,6 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -65,6 +65,13 @@
             android:name=".EditMission"
             android:parentActivityName=".BillActivity" />
         <activity
+            android:name=".CameraActivity"
+            android:parentActivityName=".BillActivity" />
+
+        <activity
+            android:name=".CheckPhotoActivity"
+            android:parentActivityName=".CameraActivity" />
+        <activity
             android:name=".MissionsTabbed"
             android:label="@string/title_activity_missions_tabbed"
             android:parentActivityName=".MainActivity"
@@ -73,8 +80,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.nicoladalmaso.gruppo1.MainActivity" />
         </activity>
-        <activity android:name=".ReportDB"
-            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".ReportDB"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".ApplicationSettings"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

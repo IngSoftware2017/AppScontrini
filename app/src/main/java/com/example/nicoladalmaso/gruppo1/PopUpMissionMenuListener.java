@@ -96,9 +96,8 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
 
             // Close the mission
             case R.id.close_mission:
-                mission.setClosed(true);
-                DB.updateMission(mission);
-                adapterDB.closeMission(mission);
+                closeMission();
+
                 break;
 
             // Delete the mission
@@ -132,7 +131,41 @@ public class PopUpMissionMenuListener implements PopupMenu.OnMenuItemClickListen
                     DB.deleteTicket((int) list.get(i).getID());
                 }
                 boolean deleted = DB.deleteMission(missionID);
-                adapterDB.deleteMission(mission);
+                adapterDB.removeMission(mission);
+            }
+        });
+
+        //Negative button
+        toast.setNegativeButton(activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Nothing to do
+            }
+        });
+
+        //Show toast
+        AlertDialog alert = toast.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        nbutton.setTextColor(Color.parseColor("#2196F3"));
+    }
+
+    /**
+     * Close the mission from the bill viewer (inside the mission)
+     *
+     * @author: Marco Olivieri (Using Dal Maso and Lazzarin code)
+     */
+    public void closeMission(){
+
+        AlertDialog.Builder toast = new AlertDialog.Builder(activity);
+
+        toast.setMessage(activity.getString(R.string.closeMissionToast))
+                .setTitle(activity.getString(R.string.closeTitle));
+
+        //Positive button
+        toast.setPositiveButton(activity.getString(R.string.buttonClose), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mission.setClosed(true);
+                DB.updateMission(mission);
+                adapterDB.removeMission(mission);
             }
         });
 

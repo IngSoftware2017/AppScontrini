@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AppScontrini.iml" filepath="$PROJECT_DIR$/AppScontrini.iml" />
+      <module fileurl="file://D:\MARCO\Android\GitHub\Last\AppScontrini.iml" filepath="D:\MARCO\Android\GitHub\Last\AppScontrini.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Last.iml" filepath="$PROJECT_DIR$/Last.iml" />
+      <module fileurl="file://C:\Users\fedet\StudioProjects\AppScontrini\Last.iml" filepath="C:\Users\fedet\StudioProjects\AppScontrini\Last.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />

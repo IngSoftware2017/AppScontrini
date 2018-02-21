@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -24,6 +26,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -59,15 +62,18 @@ public class EditMission extends AppCompatActivity {
 
     //TODO: poter cambiare persona?
     @Override
+    /**Piccolo (using Dal Maso's code)
+     * Method that is run every time the activity is started
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_edit_mission);
-        setTitle("Modifica la missione");
+        context = this.getApplicationContext();
+        setTitle(context.getString(R.string.title_EditMission));
 
         DB = new DataManager(this.getApplicationContext());
-        context = this.getApplicationContext();
         txtMissionName=(TextView)findViewById(R.id.input_missionEditName);
         txtMissionLocation=(TextView)findViewById(R.id.input_missionEditLocation);
         txtMissionStart=(TextView)findViewById(R.id.input_missionEditStart);
@@ -78,20 +84,32 @@ public class EditMission extends AppCompatActivity {
         btnExport=(Button)findViewById(R.id.export_button);
         spnrExport=(Spinner)findViewById(R.id.export_spinner);
 
+        missionID = getIntent().getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
+        thisMission = DB.getMission(missionID);
 
         LinearLayout bntMissionStart = (LinearLayout)findViewById(R.id.button_missionEditStart);
         LinearLayout bntMissionFinish = (LinearLayout)findViewById(R.id.button_missionEditFinish);
-
+        //lazzarin clean startDate on Singleton
         bntMissionStart.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart);
+                // edit by Lazzarin: use flag to tell Datepicker what date we're setting
+                hideSoftKeyboard(EditMission.this);
+                Singleton.getInstance().setStartFlag(0);
+                Date startDate = thisMission.getStartDate();
+                Date endDate = thisMission.getEndDate();
+                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionStart, startDate,endDate);
                 newFragment.show(getFragmentManager(), "startDatePicker");
             }
         });
 
         bntMissionFinish.setOnClickListener(new View.OnClickListener() {
+            // edit by Lazzarin
             public void onClick(View v) {
-                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd);
+                Singleton.getInstance().setStartFlag(1);
+                hideSoftKeyboard(EditMission.this);
+                Date startDate = thisMission.getStartDate();
+                Date endDate = thisMission.getEndDate();
+                DialogFragment newFragment = new DatePickerFragment().newInstance(txtMissionEnd,startDate,endDate);
                 newFragment.show(getFragmentManager(), "finishDatePicker");
             }
         });
@@ -147,13 +165,11 @@ public class EditMission extends AppCompatActivity {
                 try {
                     String start = txtMissionStart.getText().toString();
                     String finish =  txtMissionEnd.getText().toString();
+
                     if(!AppUtilities.checkDate(start, finish)) {
-                        Log.d("formato data inserita", "errato");
                         Toast.makeText(context, getResources().getString(R.string.toast_errorDate), Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    else
-                        Log.d("formato data inserita","corretto");
 
                     thisMission.setStartDate(format.parse(start));
                     thisMission.setEndDate(format.parse(finish));
@@ -161,8 +177,6 @@ public class EditMission extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                //thisMission.setStartMission(missionStart);
-                //thisMission.setEndMission(missionEnd);
                 thisMission.setClosed(chkIsClosed.isChecked());
                 DB.updateMission(thisMission);
                 Intent intent = new Intent();
@@ -181,8 +195,9 @@ public class EditMission extends AppCompatActivity {
      * set the values of the mission
      */
     private void setMissionValues(){
-        Intent intent = getIntent();
+        //Intent intent = getIntent();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        /*
         missionID = (int) intent.getExtras().getLong(IntentCodes.INTENT_MISSION_ID);
         thisMission = DB.getMission(missionID);
         Log.d("EDITMISSION","MISSION_ID= "+missionID);
@@ -190,7 +205,7 @@ public class EditMission extends AppCompatActivity {
             Log.d("EDITMISSION",""+missionEntity.getID());
         }
         person = DB.getPerson(thisMission.getPersonID());
-
+        */
         txtMissionName.setText(thisMission.getName());
         txtMissionLocation.setText(thisMission.getLocation());
         txtMissionStart.setText(formatter.format(thisMission.getStartDate()));
@@ -219,4 +234,13 @@ public class EditMission extends AppCompatActivity {
         else
             txtMissionTotal.setText(getResources().getString(R.string.euro_string)+ " " + total.toString());
     }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
 }

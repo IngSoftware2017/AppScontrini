@@ -19,8 +19,8 @@ import database.PersonEntity;
 
 /**
  * Created by Francesco on 02/01/2018.
+ *
  */
-
 public class EditPerson extends AppCompatActivity{
     public DataManager DB;
     long personID;
@@ -35,13 +35,16 @@ public class EditPerson extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setElevation(0);
-        //TODO: use string.xml
-        setTitle("Modifica persona");
-        setContentView(R.layout.activity_edit_person);
 
         context = this.getApplicationContext();
         DB = new DataManager(context);
+        personID = getIntent().getExtras().getLong(IntentCodes.INTENT_PERSON_ID);
+        thisPerson = DB.getPerson(personID);
+
+        getSupportActionBar().setElevation(0);
+        setTitle(context.getString(R.string.action_editPerson));
+        setContentView(R.layout.activity_edit_person);
+        setContentView(R.layout.activity_edit_person);
 
         //Get data from parent view
         setPersonValues();
@@ -60,6 +63,7 @@ public class EditPerson extends AppCompatActivity{
         inflater.inflate(R.menu.confirm_menu, menu);
         return true;
     }
+
     /** Dal Maso, adapted by Piccolo
      * Catch events on toolbar
      * @param item object on the toolbar
@@ -93,27 +97,26 @@ public class EditPerson extends AppCompatActivity{
      * set the values of the person
      */
     private void setPersonValues(){
+
         Intent intent = getIntent();
         personID = intent.getExtras().getLong("personID");
         Log.d("personID", "Edit person "+personID);
         thisPerson = DB.getPerson(personID);
-        //TODO: fix the crash
+
         personName = thisPerson.getName();
         personLastName = thisPerson.getLastName();
         personAcademicTitle = thisPerson.getAcademicTitle();
         email = thisPerson.getEmail();
-        Log.d("DBPerson",personID+" "+personName+" "+personLastName+" "+email);
-        //set those values to the edittext
     }
 
     /**Dal Maso, adapted by Piccolo
      * show on screen the values of the person
      */
     private void setPersonValuesOnScreen(){
-        txtName = (TextView)findViewById(R.id.input_personEditName);
-        txtLastName = (TextView)findViewById(R.id.input_personEditLastName);
-        txtAcademicTitle = (TextView)findViewById(R.id.input_personEditAcademicTitle);
-        txtEmail = (TextView)findViewById(R.id.input_personEmail);
+        txtName = findViewById(R.id.input_personEditName);
+        txtLastName = findViewById(R.id.input_personEditLastName);
+        txtAcademicTitle = findViewById(R.id.input_personEditAcademicTitle);
+        txtEmail = findViewById(R.id.input_personEmail);
         txtName.setText(personName);
         txtLastName.setText(personLastName);
         txtAcademicTitle.setText(personAcademicTitle);

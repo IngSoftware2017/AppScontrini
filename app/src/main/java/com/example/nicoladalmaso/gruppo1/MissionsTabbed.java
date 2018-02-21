@@ -26,6 +26,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
+
 import java.util.List;
 
 import database.DataManager;
@@ -38,7 +41,7 @@ public class MissionsTabbed extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     DataManager DB;
-    int personID;
+    long personID;
     PersonEntity thisPerson;
     final int MISSION_MOD = 1;
     final int PERSON_MOD = 2;
@@ -52,22 +55,32 @@ public class MissionsTabbed extends AppCompatActivity {
         setContentView(R.layout.activity_missions_tabbed);
 
         Intent intent = getIntent();
-        personID = intent.getExtras().getInt(IntentCodes.INTENT_PERSON_ID);
+        personID = intent.getExtras().getLong(IntentCodes.INTENT_PERSON_ID);
         DB = new DataManager(this);
         thisPerson = DB.getPerson(personID);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(thisPerson.getLastName()+" "+thisPerson.getName());
+        toolbar.setSubtitle("Missioni disponibili");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        initialize();
+        initializeComponents();
     }
 
-    private void initialize(){
+    /** Dal Maso
+     * Initialize the activity
+     */
+    private void initializeComponents(){
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        //Set the currency
+        if(DB.getAllSettings().size() > 0)
+            Singleton.getInstance().setCurrency(DB.getAllSettings().get(0).getCurrencyDefault());
+        else
+            Singleton.getInstance().setCurrency("EUR");
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -76,14 +89,6 @@ public class MissionsTabbed extends AppCompatActivity {
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.person_menu, menu);
-        return true;
     }
 
     /** Dal Maso
@@ -96,7 +101,7 @@ public class MissionsTabbed extends AppCompatActivity {
         Intent intent = new Intent();
         // Handle item selection
         switch (item.getItemId()) {
-
+/*
             case (R.id.action_deletePerson):
                 deletePerson();
                 break;
@@ -107,7 +112,7 @@ public class MissionsTabbed extends AppCompatActivity {
                 editPerson.putExtra(IntentCodes.INTENT_PERSON_ID, personID);
                 startActivityForResult(editPerson, PERSON_MOD);
                 break;
-
+*/
             default:
                 setResult(RESULT_OK, intent);
                 finish();
@@ -125,21 +130,16 @@ public class MissionsTabbed extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Result", ""+requestCode);
+
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-                case (PERSON_MOD):
-                    thisPerson = DB.getPerson(personID);
-                    toolbar.setTitle(thisPerson.getName());
-                    break;
-
                 default:
-                    missionsOpen.clearAllMissions();
-                    missionsOpen.printAllMissions();
-                    missionsClosed.clearAllMissions();
-                    missionsClosed.printAllMissions();
+                    refresh();
                     break;
             }
+        }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            refresh();
         }
     }
 
@@ -156,15 +156,15 @@ public class MissionsTabbed extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
-            bundle.putInt(IntentCodes.INTENT_PERSON_ID, personID);
+            bundle.putInt("personID", (int)personID);
             switch(position){
                 case 0:
                     missionsOpen.setArguments(bundle);
-                    missionsOpen.setParentActivity(MissionsTabbed.this);
+                    missionsOpen.setParentInstance(MissionsTabbed.this);
                     return missionsOpen;
                 case 1:
                     missionsClosed.setArguments(bundle);
-                    missionsClosed.setParentActivity(MissionsTabbed.this);
+                    missionsClosed.setParentInstance(MissionsTabbed.this);
                     return missionsClosed;
                 default:
                     return null;
@@ -178,44 +178,44 @@ public class MissionsTabbed extends AppCompatActivity {
         }
     }
 
-    /**
-     * Mantovan Federico
-     * Delete the person and the missions\tickets associated with it
+    /** Dal Maso
+     * Update the listViews of the missions after item delete
+     * @param choice (0: mission open, 1: mission closed)
+     * @param v view who get the animation
+     * @param position item list position
      */
-    public void deletePerson(){
-        AlertDialog.Builder toast = new AlertDialog.Builder(this);
-        //Dialog
-        toast.setMessage(getString(R.string.delete_person))
-                .setTitle(getString(R.string.delete_title_person));
-        //Positive button
-        toast.setPositiveButton(getString(R.string.buttonDelete), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                List<MissionEntity> listMission = DB.getMissionsForPerson(personID);
-                for(int i = 0; i < listMission.size(); i++){
-                    List<TicketEntity> listTicket = DB.getTicketsForMission((int) listMission.get(i).getID());
-                    for(int j = 0; j < listTicket.size(); j++){
-                        DB.deleteTicket((int) listTicket.get(j).getID());
-                    }
-                }
-                DB.deleteMission(personID);
-                DB.deletePerson(personID);
-                Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        });
-        //Negative button
-        toast.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //Nothing to do
-            }
-        });
-        //Show toast
-        AlertDialog alert = toast.show();
-        Button nbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
-        nbutton.setTextColor(Color.parseColor("#2196F3"));
+    public void updateThisAdapter(int choice, View v, final int position){
+        switch (choice){
+            case 0:
+                missionsOpen.deleteCell(v, position);
+                break;
+            case 1:
+                missionsClosed.deleteCell(v, position);
+        }
     }
 
+    /** Dal Maso
+     * Refresh the listViews
+     */
+    public void refresh(){
+        missionsOpen.printAllMissions();
+        missionsClosed.printAllMissions();
+    }
+
+    /** Dal Maso
+     * It manages the physical back button
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        finish();
+    }
+
+    /** Dal Maso
+     * Reload the activity
+     */
     public void reload() {
         Intent intent = getIntent();
         finish();

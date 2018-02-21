@@ -95,8 +95,8 @@ public class PeopleAdapter extends ArrayAdapter<PersonEntity> {
                 /*Intent startMissionsView = new Intent(activity, com.example.nicoladalmaso.gruppo1.MissionActivity.class);
                 startMissionsView.putExtra("personID", Integer.parseInt(v.getTag().toString()));
                 ((MainActivity)activity).startActivityForResult(startMissionsView, 1);*/
-                Intent missionTab = new Intent(context, com.example.nicoladalmaso.gruppo1.MissionsTabbed.class);
-                missionTab.putExtra(IntentCodes.INTENT_PERSON_ID, Integer.parseInt(v.getTag().toString()));
+                Intent missionTab = new Intent(context, MissionsTabbed.class);
+                missionTab.putExtra(IntentCodes.INTENT_PERSON_ID,person.getID());
                 ((MainActivity)context).startActivityForResult(missionTab, 1);
             }
         });

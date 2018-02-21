@@ -27,7 +27,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
-                android:textColor="#FFF"
+                android:inputType="textCapWords"
+                android:textColor="#fff"
                 android:textSize="22sp"
                 android:singleLine="true"/>
 
@@ -48,17 +49,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/location"
-                android:textColor="#FFF"
+                android:inputType="textCapWords"
+                android:textColor="#fff"
                 android:singleLine="true"
                 android:textSize="22sp" />
 
         </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -67,59 +65,78 @@
 
             <LinearLayout
                 android:id="@+id/button_missionStart"
-                android:layout_marginTop="30dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="45dp"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:minWidth="40dp"
                     android:minHeight="40dp"
-                    app:srcCompat="@drawable/ic_date_range_black_48px" />
+                    android:minWidth="40dp"
+                    app:srcCompat="@drawable/ic_date_range_white_48px" />
 
                 <TextView
                     android:id="@+id/input_missionStart"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
                     android:layout_weight="8"
+                    android:orientation="vertical"
                     android:text="@string/dateStart"
-                    android:textSize="21sp"/>
+                    android:textColor="#000"
+                    android:textSize="26dp" />
 
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/button_missionFinish"
-                android:layout_marginTop="35dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="45dp"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:minWidth="40dp"
                     android:minHeight="40dp"
-                    app:srcCompat="@drawable/ic_date_range_black_48px" />
+                    android:minWidth="40dp"
+                    app:srcCompat="@drawable/ic_date_range_white_48px" />
 
                 <TextView
                     android:id="@+id/input_missionFinish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
                     android:layout_weight="8"
+                    android:orientation="vertical"
                     android:text="@string/dateFinish"
-                    android:textSize="20sp" />
+                    android:textColor="#000"
+                    android:textSize="26dp" />
 
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_new_mission"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/colorPrimary"
+        android:clickable="true"
+        app:srcCompat="@mipmap/ic_add_white_24dp" />
+    </RelativeLayout>
 
 </LinearLayout>

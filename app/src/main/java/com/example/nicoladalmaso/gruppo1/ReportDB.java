@@ -77,11 +77,6 @@ public class ReportDB extends AppCompatActivity {
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, manager.exportTags());
         exportSpiner.setAdapter(spinnerAdapter);
 
-
-
-
-
-        Log.d("EXPORTDEBUG","EXPORTING");
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

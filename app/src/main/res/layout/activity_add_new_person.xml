@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context="com.example.nicoladalmaso.gruppo1.BillViewer">
 
@@ -11,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        android:id="@+id/circularLinear"
         android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
@@ -23,11 +25,12 @@
             android:theme="@style/TextLabel">
 
             <EditText
-                android:singleLine="true"
                 android:id="@+id/input_personName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
+                android:inputType="textCapWords"
+                android:singleLine="true"
                 android:textColor="#FFF"
                 android:textSize="22sp" />
 
@@ -44,11 +47,12 @@
             android:theme="@style/TextLabel">
 
             <EditText
-                android:singleLine="true"
                 android:id="@+id/input_personLastName"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:hint="@string/text_cognome"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_LastName"
+                android:inputType="textCapWords"
+                android:singleLine="true"
                 android:textColor="#FFF"
                 android:textSize="22sp" />
 
@@ -58,7 +62,9 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/circularLinear">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,21 +72,22 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_marginTop="30dp"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:orientation="horizontal"
-                android:layout_marginEnd="10dp">
+                android:layout_height="match_parent"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="30dp"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="11dp"
                     android:layout_marginRight="11dp"
-                    android:layout_weight="1"
                     android:layout_marginTop="3dp"
+                    android:layout_weight="1"
                     android:minHeight="48dp"
                     android:minWidth="48dp"
+                    android:contentDescription="@string/hint_AcademicTitle"
                     app:srcCompat="@drawable/ic_store_black_48px" />
 
                 <android.support.design.widget.TextInputLayout
@@ -89,21 +96,21 @@
                     android:layout_weight="6">
 
                     <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_personAcademicTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/input_personAcademicTitle"
-                        android:singleLine="true"
-                        android:hint="@string/text_titolo" />
+                        android:hint="@string/text_titolo"
+                        android:singleLine="true" />
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_marginTop="30dp"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:orientation="horizontal"
-                android:layout_marginEnd="10dp">
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -114,6 +121,7 @@
                     android:layout_weight="1"
                     android:minHeight="48dp"
                     android:minWidth="48dp"
+                    android:contentDescription="@string/text_email"
                     app:srcCompat="@android:drawable/sym_action_email" />
 
                 <android.support.design.widget.TextInputLayout
@@ -130,8 +138,23 @@
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_above="@+id/circularLinear"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/colorPrimary"
+        android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@drawable/ic_done_white" />
+
+</RelativeLayout>

@@ -1,110 +1,134 @@
 package com.example.nicoladalmaso.gruppo1;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import database.DataManager;
 import database.TicketEntity;
 
 /**
  * Created by nicoladalmaso on 28/10/17.
  */
 
-//Classe utilizzata per dupplicare la view cardview all'interno della ListView
-//Dal Maso
 public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
     Context context;
     String path = "";
     int ticketID = 0;
     int missionID;
-    //DataManager DB;
+    DataManager DB;
     List<TicketEntity> t = new ArrayList<TicketEntity>();
-    HashMap<Integer, Bitmap> bitmaps = new HashMap<>();
-    int screenWidth;
 
     //Dal Maso, adapter declare
-    public CustomAdapter(Context context, int textViewResourceId, List<TicketEntity> objects, int missionID, int screenWidth) {
+    public CustomAdapter(Context context, int textViewResourceId,
+                         List<TicketEntity> objects, int missionID, DataManager DB) {
         super(context, textViewResourceId, objects);
         this.context = context;
         this.missionID = missionID;
+        this.DB = new DataManager(context);
         this.t = objects;
-        this.screenWidth= screenWidth;
-        Log.d("MISSION", ""+missionID);
     }
 
-    // Modify by Marco Olivieri: fixed amount error
+    /** Dal Maso
+     * It manages the Adapter
+     * @param position item position
+     * @param convertView my custom view
+     * @param parent
+     * @return view setted
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        LayoutInflater inflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.cardview, null);
+
         ImageView img = (ImageView)convertView.findViewById(R.id.image);
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
+        TextView ticketShop = (TextView)convertView.findViewById(R.id.shop);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
-
-        CardView card = (CardView)convertView.findViewById(R.id.ticketViewer);
+        CardView cardView = convertView.findViewById(R.id.ticketViewer);
 
         TicketEntity c = getItem(position);
+        File photo = new File(c.getFileUri().toString().substring(7));
         ticketTitle.setText(c.getTitle());
+
+        if(c.isRefundable()){
+            ticketShop.setText("Rimborsabile");
+            ticketShop.setTextColor(Color.parseColor("#00C853"));
+        }
+        else {
+            ticketShop.setText("Non rimborsabile");
+            ticketShop.setTextColor(Color.parseColor("#D50000"));
+        }
 
         //Amount text fixes
         String amount = "";
-        if(c.getAmount() == null){
-            amount = "Prezzo non rilevato";
+        if(c.getAmount() == null || c.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
+            amount = context.getString(R.string.string_NoAmount);
             tot.setText(amount);
         }
         else {
-            Double a = c.getAmount().doubleValue();
-            tot.setText("Totale: "+a+"€");
+            amount = c.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString();
+            tot.setText(amount + " " + Singleton.getInstance().getCurrency());
         }
 
-        // Check if the Ticket is or not refundable and color the card's background with different colors
-        if (c.isRefundable()) {
-            card.setCardBackgroundColor(context.getResources().getColor(R.color.colorRef));
-        } else {
-            card.setCardBackgroundColor(context.getResources().getColor(R.color.colorNotRef));
-        }
+        //Ticket image bitmap set
+        Glide.with(context)
+                .load(photo.getAbsolutePath())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(img);
 
-        //Bitmap image = bitmaps.get(new Integer((int)c.getID()));
-        //img.setImageBitmap(image);
-
-        //Picasso.with(context).load(c.getFileUri()).transform(new ScaleTransform(screenWidth)).into(img);
-        Picasso.with(context).load(c.getFileUri()).fit().centerCrop().into(img);
-        //For next ticket manages
-        convertView.setTag(c.getID());
-
+        cardView.setTag(c.getID());
         //Dal Maso
-        convertView.setOnClickListener(new View.OnClickListener(){
+        cardView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                ticketID = Integer.parseInt(v.getTag().toString());
+                long ticketID = Integer.parseInt(v.getTag().toString());
+                Log.d("AAAAAAAAAAA","ID "+ticketID);
                 for(int i = 0; i < t.size(); i++){
                     if(t.get(i).getID() == ticketID){
                         TicketEntity thisTicket = t.get(i);
                         Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
+                        startImageView.putExtra(IntentCodes.INTENT_TICKET_ID,ticketID);
                         File photo = new File(thisTicket.getFileUri().toString().substring(7));
-
-                        //Put data to next activity
-                        startImageView.putExtra("ID",thisTicket.getID());
-
                         //Start new activity
-                        ((BillActivity)context).startActivityForResult(startImageView, 4);
+                        context.startActivity(startImageView);
                         return;
                     }
                 }
@@ -118,13 +142,16 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
      * Sets the HashMap with the bitmaps to be displayed
      * @param bitmaps not null, contains the Bitmap objects that have to be displayed in the list
      */
+    /*
     public void setBitmaps(HashMap<Integer,Bitmap> bitmaps){
         this.bitmaps = bitmaps;
     }
+    */
 
     /** Created by FEDERICO TASCHIN
      *
      */
+    /*
     public class ScaleTransform implements Transformation {
         int width;
         public ScaleTransform(int width){
@@ -141,5 +168,5 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
 
         @Override public String key() { return "square()"; }
     }
-
+*/
 }

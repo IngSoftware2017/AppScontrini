@@ -9,6 +9,7 @@
     <string name="action_editMission">Modifica missione</string>
     <string name="action_editPerson">Modifica persona</string>
     <string name="action_deleteMission">Elimina missione</string>
+
     <string name="action_deletePerson">Elimina persona</string>
     <string name="billTitle">Il tuo scontrino</string>
     <string name="add">Aggiungi</string>
@@ -19,14 +20,24 @@
     <string name="location">Luogo</string>
     <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + per iniziare</string>
     <string name="noMissionsClosed">Nessuna missione chiusa</string>
-    <string name="noBills">Nessun scontrino disponibile</string>
-    <string name="noBillsOpen">\nClicca sul pulsante + per iniziare</string>
+    <string name="noBills">Nessuno scontrino disponibile</string>
+    <string name="noBillsOpen">\nClicca sul pulsante foto per iniziare</string>
     <string name="noAcademicTitle">Nessun titolo accademico</string>
     <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + per iniziare</string>
     <string name="dateStart">Data inizio</string>
     <string name="dateFinish">Data fine</string>
     <string name="Open">Aperte</string>
     <string name="Closed">Chiuse</string>
+    <string name="personAddTitle">Benvenuto in TicketManager!</string>
+    <string name="personAddDesc">Clicca qui per aggiungere una nuova persona</string>
+    <string name="ticketAddTitle">Iniziamo!</string>
+    <string name="ticketAddDesc">Aggiungi un nuovo scontrino, inizia subito scattando una foto</string>
+    <string name="missionAddTitle">Ci sei quasi!</string>
+    <string name="missionAddDesc">Clicca qui per creare una nuova missione</string>
+    <string name="dateTicketMin">Data minore dell\u0027inizio missione</string>
+    <string name="dateTicketMax">Data maggiore del termine missione</string>
+
+
     <!--lazzarin-->
     <string name="newMission">Nuova missione</string>
     <string name="newPerson">Nuova persona</string>
@@ -38,6 +49,7 @@
     <string name="titlePeople">Persone</string>
     <string name="defaultDescription">Nessuna descrizione</string>
     <string name="deleteTitle">Cancellazione</string>
+
     <string name="toast_missionNoName">Nome missione mancante</string>
     <string name="toast_personNoName">Nome persona mancante</string>
     <string name="toast_missionNoLocation">Luogo missione mancante</string>
@@ -45,17 +57,41 @@
     <string name="toast_errorDate">Inizio > Fine</string>
     <string name="toast_noDataStart">Data di inizio mancante</string>
     <string name="toast_noDataFinish">Data di fine mancante</string>
+    <string name="toast_errorIntervalDate">data non presente nella missione</string>
+
+
     <!--Piccolo-->
-    <string name="text_isRepaid">Missione chiusa?</string>
+    <string name="text_isRepaid">La missione è stata archiviata?</string>
     <string name="title_activity_missions_tabbed">MissionsTabbed</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="tab_text_3">Tab 3</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_Ticket">Scontrino</string>
+    <string name="string_NoShop">Negozio non impostato</string>
+    <string name="string_NoAmount">Null</string>
+    <string name="string_NoAmountFull">Numero non rilevato</string>
+    <string name="string_Total">Totale: </string>
+    <string name="string_Euros">€</string>
+    <string name="title_EditPerson">Modifica persona</string>
+    <string name="title_EditTicket">Modifica scontrino</string>
+    <string name="title_EditMission">Modifica missione</string>
+    <string name="hint_LastName">Cognome</string>
+    <string name="hint_AcademicTitle">Titolo accademico</string>
+    <string name="text_ExportMission">Esporta la missione</string>
+    <string name="button_ExportMission">Esporta</string>
+
     <!--Mantovan-->
-    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe missioni\\scontrini associati alla persona verranno eliminati</string>
+    <string name="delete_person">Sei sicuro di voler eliminare la persona?\nLe sue missioni e gli scontrini verranno eliminati</string>
     <string name="delete_title_person">Cancellazione</string>
+    <string name="toast_multiPoint">Totale non valido</string>
+    <string name="toast_tooHightTotal">Importo troppo grande</string>
+    <string name="toast_multiPoint_noNumber">Totale non valido</string>
+    <string name="text_ExportMissionTo">Dove vuoi esportare la missione?</string>
+    <string name="text_Export">Formato esportazione</string>
+
+
     <!--Olivieri-->
     <string name="text_numPerson">Persone presenti:</string>
     <string name="text_activeMission">Missioni aperte:</string>
@@ -63,6 +99,7 @@
     <string name="ticket_count_text">Scontrini presenti :</string>
     <string name="mission_total_text">Spese totali missione:</string>
 
+    <string name="action_closeMission">Chiudi missione</string>
     <string name="menu_modify_mission">Modifica</string>
     <string name="menu_mission_summary">Informazioni</string>
     <string name="menu_delete_mission">Elimina</string>
@@ -73,6 +110,10 @@
     <string name="export_share_text">Vuoi condividere i file esportati?</string>
     <string name="export_mission_button">Esporta missione</string>
     <string name="selection_format">Seleziona formato esportazione:</string>
+    <string name="closeTitle">Chiudi</string>
+    <string name="buttonClose">Chiudi</string>
+    <string name="closeMissionToast">Sei sicuro di voler chiudere la missione?</string>
+
 
     <!--Mascotto-->
     <string name="popup_mission_modify">Modifica</string>
@@ -92,13 +133,29 @@
     <string name="text_email">Email</string>
     <string name="text_init_value">Text</string>
     <string name="text_count">C</string>
+    <string name="text_mission">Missione</string>
+    <string name="text_initTotal">0.00</string>
+
+    <string name="set_OCRQuality">Qualità OCR</string>
+    <string name="set_Correction">Correzione del totale</string>
+    <string name="set_PhRotation">Ricerca foto capovolta</string>
+    <string name="set_Currency">Moneta</string>
 
     <string name="NullPExc_gallery">Controllare che la galleria sia correttamente configurata</string>
     <string name="NullPExc_Intent">Errore nella lettura della missione, riavviare l\\'app</string>
     <string name="NullPExc_MissionName">Controllare che la missione abbia un nome valido</string>
     <string name="NullPExc_PersonName">Controllare che la persona abbia cognome e nome validi</string>
 
+
     <string name="popup_person_modify">Modifica</string>
     <string name="popup_person_delete">Elimina</string>
+
+    <string name="settings">Impostazioni</string>
+    <string name="missionOf">Missione di</string>
+    <string name="downLibrary">Scarico la libreria...</string>
+
+    <string name="refundable">Rimborsabile</string>
+    <string name="nonRefundable">Non rimborsabile</string>
+
 </resources>
 

@@ -1,5 +1,6 @@
 package com.example.nicoladalmaso.gruppo1;
 
+import android.support.v7.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Debug;
 import android.provider.MediaStore;
@@ -29,12 +31,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.ing.software.ocr.ImageProcessor;
+import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -46,12 +57,14 @@ import database.TicketEntity;
 public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
-    int ticketId;
+    long ticketId;
     Context context;
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
-    String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketShop = "", ticketPath = "";
+    String ticketTitle = "", ticketDate = "", ticketAmount = "", ticketPeople = "", ticketAmountUn = "", ticketShop = "", ticketPath = ""; // ticketDate = ""
     String noFound = "Non trovato";
+    ImageView imgView;
+
     //Dal Maso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +74,14 @@ public class BillViewer extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_bill_viewer);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#66000000")));
         DB = new DataManager(this.getApplicationContext());
         context = this.getApplicationContext();
 
         initialize();
 
+        /*
         fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
         fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
         fabCrop.setOnClickListener(new View.OnClickListener(){
@@ -80,6 +96,7 @@ public class BillViewer extends AppCompatActivity {
                 deleteTicket(ticketId);
             }//onClick
         });
+        */
     }
 
     /** Dal Maso
@@ -93,11 +110,29 @@ public class BillViewer extends AppCompatActivity {
     public void initialize(){
         //Get data from parent view
         Intent intent = getIntent();
-        ticketId = (int) intent.getExtras().getLong("ID");
+        ticketId = intent.getExtras().getLong(IntentCodes.INTENT_TICKET_ID);
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
+        ticketPeople = ""+thisTicket.getTagPlaces();
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate()==null? "":thisTicket.getDate().toString();
+        Log.d("AAAAAAAA","TICKET DATE: "+thisTicket.getDate());
+        if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
+            ticketShop = getString(R.string.string_NoShop);
+        }
+        else {
+            ticketShop = thisTicket.getShop();
+        }
+        if(thisTicket.getAmount() == null || thisTicket.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
+            ticketAmount = getString(R.string.string_NoAmountFull);
+            ticketAmountUn = getString(R.string.string_NoAmountFull);
+        }
+        else {
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() +  Singleton.getInstance().getCurrency();
+            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " " + Singleton.getInstance().getCurrency();
+        }
+
+        /* OLD CODE
         String empty = "";
         if(!thisTicket.getShop().equals(empty)) {
             ticketShop = thisTicket.getShop();
@@ -110,11 +145,14 @@ public class BillViewer extends AppCompatActivity {
         }else{
             ticketAmount = noFound;
         }
+        */
 
         //Title
         setTitle(ticketTitle);
         TextView billLastMod = (TextView)findViewById(R.id.billDate);
-        billLastMod.setText(ticketDate);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        billLastMod.setText(formatter.format(thisTicket.getDate()));
+
         /*
         //ImageName
         TextView billName = (TextView)findViewById(R.id.billName);
@@ -122,22 +160,48 @@ public class BillViewer extends AppCompatActivity {
         */
         //Total price
         TextView billPrice = (TextView)findViewById(R.id.billTotal);
-        billPrice.setText(ticketAmount+" €");
+        billPrice.setText(ticketAmount + " €");
+
+        //Total per person
+        TextView billPriceUn = (TextView)findViewById(R.id.billTotalUn);
+        billPriceUn.setText(ticketAmountUn);
+
+        //Number of people
+        TextView billPeople = (TextView)findViewById(R.id.billPeople);
+        billPeople.setText(ticketPeople);
 
         //Shop
         TextView billShop = (TextView)findViewById(R.id.billShop);
         billShop.setText(ticketShop);
 
         //Full image view
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(ticketPath,bmOptions);
-        imgView.setImageBitmap(bitmap);
+        imgView = (ImageView)findViewById(R.id.billImage);
+
+        Glide.with(context)
+                .load(ticketPath)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(imgView);
+
+        fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
+        fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
+        fabCrop.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                cropPhoto((int)ticketId);
+            }//onClick
+        });
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteTicket(ticketId);
+            }//onClick
+        });
     }
 
     /** Dal Maso
      * Setting toolbar buttons and style from /res/menu
-     * @param menu
+     * @param menu it contain the menu to show
      * @return success flag
      */
     @Override
@@ -161,7 +225,7 @@ public class BillViewer extends AppCompatActivity {
             case R.id.action_editTicket:
                 //Open Edit Ticket Activity
                 Intent editTicket = new Intent(context, com.example.nicoladalmaso.gruppo1.EditTicket.class);
-                editTicket.putExtra("ticketID", thisTicket.getID());
+                // editTicket.putExtra("ticketID", thisTicket.getID());
                 startActivityForResult(editTicket, TICKET_MOD);
                 break;
 
@@ -190,6 +254,7 @@ public class BillViewer extends AppCompatActivity {
                     initialize();
                     break;
                 case (CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE):
+                    DB.updateTicket(thisTicket);
                     initialize();
                     break;
             }
@@ -232,24 +297,30 @@ public class BillViewer extends AppCompatActivity {
         nbutton.setTextColor(Color.parseColor("#2196F3"));
     }//deleteTicket
 
-    /**PICCOLO
-     * Method that lets the user crop and/or rotate the original photo
+    /**PICCOLO, problems fixes and edit by Dal Maso
+     * Method that lets the user crop and/or rotate the original photo, once the crop is confirmed,
+     * the ocr is run to get data that it couldn't have red the first time
      * @param id the id of the TicketEntity in the db
      */
-    private void cropPhoto(long id) {
-        TicketEntity ticket = DB.getTicket((int) id);
-        Uri toCropUri = ticket.getFileUri();
+    private void cropPhoto(int id) {
+        Uri toCropUri = thisTicket.getFileUri();
         File originalFile = new File(toCropUri.toString().substring(7)+"orig");
         Uri originalUri=Uri.fromFile(originalFile);
         CropImage.activity(originalUri)
                 .setOutputUri(toCropUri).start(this);
-        ticket.setFileUri(toCropUri);
+    }
 
-        ImageView imgView = (ImageView)findViewById(R.id.billImage);
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(toCropUri.toString().substring(7),bmOptions);
-        imgView.setImageBitmap(bitmap);
-    }//cropPhoto
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        finish();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
 
