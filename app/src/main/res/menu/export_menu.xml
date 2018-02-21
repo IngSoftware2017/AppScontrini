@@ -5,5 +5,6 @@
         android:id="@+id/action_export"
         android:icon="@drawable/ic_open_in_browser_white"
         android:title="@string/add"
+        android:visible="false"
         app:showAsAction="always" />
 </menu>
