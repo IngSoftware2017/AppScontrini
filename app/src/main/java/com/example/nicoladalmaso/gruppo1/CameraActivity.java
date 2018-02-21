@@ -79,6 +79,7 @@ public class CameraActivity extends Activity {
         Camera.Parameters p = mCamera.getParameters();
         p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         p.setJpegQuality(100);
+        p.setPictureSize(1280,720);
 
         mCamera.setParameters(p);
 
