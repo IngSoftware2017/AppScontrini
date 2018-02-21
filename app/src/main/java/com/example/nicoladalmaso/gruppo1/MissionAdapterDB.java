@@ -82,16 +82,16 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
         //Sets a default background color for the mission's card
         switch (position%4){
             case 0:
-                card.setBackgroundColor(Color.parseColor("#1F566D"));
+                card.setBackgroundColor(Color.parseColor("#FF4589A6"));
                 break;
             case 1:
-                card.setBackgroundColor(Color.parseColor("#007787"));
+                card.setBackgroundColor(Color.parseColor("#FF016C7B"));
                 break;
             case 2:
-                card.setBackgroundColor(Color.parseColor("#950068"));
+                card.setBackgroundColor(Color.parseColor("#FFA80276"));
                 break;
             case 3:
-                card.setBackgroundColor(Color.parseColor("#BC004F"));
+                card.setBackgroundColor(Color.parseColor("#FFBC0058"));
                 break;
         }
 
