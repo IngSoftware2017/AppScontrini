@@ -45,7 +45,7 @@ public class CheckPhotoActivity extends Activity {
     OcrManager ocrManager;
     String root;
     DataManager DB;
-    OcrTicket OCR_result;
+    OcrTicket OCR_result = new OcrTicket();
     EditText checkName;
     EditText checkPrice;
     EditText checkPeople;
@@ -185,39 +185,43 @@ public class CheckPhotoActivity extends Activity {
      */
     private void startOCRProcess(){
         // OCR asynchronous implementation:
-        ImageProcessor imgProc = new ImageProcessor(finalBitmap);
-        ocrManager.getTicket(imgProc, getOcrOptions(), result -> {
-            //Thread UI control reservation
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(!result.errors.isEmpty()) {
-                        Toast.makeText(getApplicationContext(), result.errors.toString().replace("_", " ").replace("[", "").replace("]", ""), Toast.LENGTH_SHORT).show();
-                    }
-                    if(result.total != null) {
-                        checkPrice.setText(result.total.toString());
-                    }
-                    if(OCR_result.date != null) {
-                        dateTicket = OCR_result.date;
-                        //Ticket date < Mission date start, it advises the user
-                        if(OCR_result.date.before(ticketMission.getStartDate())){
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMin), Toast.LENGTH_SHORT).show();
+        try {
+            ImageProcessor imgProc = new ImageProcessor(finalBitmap);
+            ocrManager.getTicket(imgProc, getOcrOptions(), result -> {
+                //Thread UI control reservation
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!result.errors.isEmpty()) {
+                            Toast.makeText(getApplicationContext(), result.errors.toString().replace("_", " ").replace("[", "").replace("]", ""), Toast.LENGTH_SHORT).show();
                         }
-                        //Ticket date > Mission date finish, it advises the user
-                        if(OCR_result.date.after(ticketMission.getEndDate())){
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMax), Toast.LENGTH_SHORT).show();
+                        if (result.total != null) {
+                            checkPrice.setText(result.total.toString());
                         }
+                        if (OCR_result.date != null) {
+                            dateTicket = OCR_result.date;
+                            //Ticket date < Mission date start, it advises the user
+                            if (OCR_result.date.before(ticketMission.getStartDate())) {
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMin), Toast.LENGTH_SHORT).show();
+                            }
+                            //Ticket date > Mission date finish, it advises the user
+                            if (OCR_result.date.after(ticketMission.getEndDate())) {
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.dateTicketMax), Toast.LENGTH_SHORT).show();
+                            }
 
-                    } else {
-                        dateTicket = ticketMission.getStartDate();
+                        } else {
+                            dateTicket = ticketMission.getStartDate();
+                        }
+                        waitOCR.setVisibility(View.INVISIBLE);
                     }
-                    waitOCR.setVisibility(View.INVISIBLE);
-                }
+                });
+                OCR_result = result;
             });
-            OCR_result = result;
-            //enable save button
-            btnOK.setClickable(true);
-        });
+        } catch (Exception e) {
+            Log.d("OCR_ERROR ", e.toString());
+        }
+        //enable save button
+        btnOK.setClickable(true);
     }
 
     /** Dal Maso

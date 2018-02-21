@@ -164,6 +164,8 @@ public class RawImage {
      * @return rect containing all Products texts. Fake rect if no text has products tag.
      */
     public RectF getProductsRect() {
+        if (getIntroRect().bottom > getConclusionRect().top)
+            return pricesRect != null? pricesRect : new RectF(0, getIntroRect().bottom, width/2, getIntroRect().bottom);
         return productsRect != null? productsRect : new RectF(0, getIntroRect().bottom, width/2, getConclusionRect().top);
     }
 
@@ -183,6 +185,8 @@ public class RawImage {
      * @return rect containing all Prices texts. Fake rect if no text has prices tag.
      */
     public RectF getPricesRect() {
+        if (getIntroRect().bottom > getConclusionRect().top)
+            return pricesRect != null? pricesRect : new RectF(width/2, getIntroRect().bottom, width, getIntroRect().bottom);
         return pricesRect != null? pricesRect : new RectF(width/2, getIntroRect().bottom, width, getConclusionRect().top);
     }
 
