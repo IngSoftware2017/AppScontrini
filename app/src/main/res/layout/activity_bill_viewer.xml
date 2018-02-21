@@ -89,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="22dp"
-                android:text="Totale unitario"
+                android:text="@string/text_totUnitario"
                 android:textSize="20sp" />
 
             <TextView

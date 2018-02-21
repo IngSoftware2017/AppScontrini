@@ -40,7 +40,7 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
     long missionID = 0;
     List<MissionEntity> missions;
 
-    private MissionAdapterDB(MissionsTabbed activity, int textViewResourceId, List<MissionEntity> objects) {
+    public MissionAdapterDB(MissionsTabbed activity, int textViewResourceId, List<MissionEntity> objects) {
         super(activity, textViewResourceId, objects);
         this.activity = activity;
         missions = objects;
@@ -95,18 +95,14 @@ public class MissionAdapterDB extends ArrayAdapter<MissionEntity> {
                 break;
         }
 
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        View.OnClickListener listener = view -> {
                 missionID = Integer.parseInt(view.getTag().toString());
                 Intent startTicketsView = new Intent(activity, BillActivity.class);
                 startTicketsView.putExtra(IntentCodes.INTENT_MISSION_ID, missionID);
                 activity.startActivity(startTicketsView);
-            }
         };
 
         cardLayout.setOnClickListener(listener);
-
 
         /*
           Listener for the pupUp menu of the mission's cardView

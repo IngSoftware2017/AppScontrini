@@ -128,7 +128,7 @@ public class BillViewer extends AppCompatActivity {
             ticketAmountUn = getString(R.string.string_NoAmountFull);
         }
         else {
-            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() +  Singleton.getInstance().getCurrency();
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() + " " + Singleton.getInstance().getCurrency();
             ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " " + Singleton.getInstance().getCurrency();
         }
 
@@ -149,7 +149,7 @@ public class BillViewer extends AppCompatActivity {
 
         //Title
         setTitle(ticketTitle);
-        TextView billLastMod = (TextView)findViewById(R.id.billDate);
+        TextView billLastMod = findViewById(R.id.billDate);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         billLastMod.setText(formatter.format(thisTicket.getDate()));
 
@@ -159,23 +159,23 @@ public class BillViewer extends AppCompatActivity {
         billName.setText(ticketTitle);
         */
         //Total price
-        TextView billPrice = (TextView)findViewById(R.id.billTotal);
-        billPrice.setText(ticketAmount + " €");
+        TextView billPrice = findViewById(R.id.billTotal);
+        billPrice.setText(ticketAmount);
 
         //Total per person
-        TextView billPriceUn = (TextView)findViewById(R.id.billTotalUn);
+        TextView billPriceUn = findViewById(R.id.billTotalUn);
         billPriceUn.setText(ticketAmountUn);
 
         //Number of people
-        TextView billPeople = (TextView)findViewById(R.id.billPeople);
+        TextView billPeople = findViewById(R.id.billPeople);
         billPeople.setText(ticketPeople);
 
         //Shop
-        TextView billShop = (TextView)findViewById(R.id.billShop);
+        TextView billShop = findViewById(R.id.billShop);
         billShop.setText(ticketShop);
 
         //Full image view
-        imgView = (ImageView)findViewById(R.id.billImage);
+        imgView = findViewById(R.id.billImage);
 
         Glide.with(context)
                 .load(ticketPath)
@@ -183,20 +183,10 @@ public class BillViewer extends AppCompatActivity {
                 .skipMemoryCache(true)
                 .into(imgView);
 
-        fabCrop=(FloatingActionButton)findViewById(R.id.fabCrop);
-        fabDelete=(FloatingActionButton)findViewById(R.id.fabDelete);
-        fabCrop.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                cropPhoto((int)ticketId);
-            }//onClick
-        });
-        fabDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                deleteTicket(ticketId);
-            }//onClick
-        });
+        fabCrop=findViewById(R.id.fabCrop);
+        fabDelete=findViewById(R.id.fabDelete);
+        fabCrop.setOnClickListener(v -> cropPhoto((int)ticketId));
+        fabDelete.setOnClickListener(v -> deleteTicket(ticketId));
     }
 
     /** Dal Maso
