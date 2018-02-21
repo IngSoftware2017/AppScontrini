@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
         List<MissionEntity> missions = DB.getMissionsForPerson(personId);
         int cont = 0;
         for(MissionEntity missionEntity : missions){
-            if(missionEntity.isClosed()){
+            if(!missionEntity.isClosed()){
                 cont++;
             }
         }
