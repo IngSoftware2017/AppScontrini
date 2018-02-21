@@ -58,7 +58,6 @@ public class BillViewer extends AppCompatActivity {
     public FloatingActionButton fabEdit, fabDelete, fabCrop, fabConfirmEdit;
     public DataManager DB;
     long ticketId;
-    int missionID;
     Context context;
     final int TICKET_MOD = 1;
     TicketEntity thisTicket;
@@ -117,7 +116,7 @@ public class BillViewer extends AppCompatActivity {
         ticketPeople = ""+thisTicket.getTagPlaces();
         ticketTitle = thisTicket.getTitle();
         ticketDate = thisTicket.getDate()==null? "":thisTicket.getDate().toString();
-
+        Log.d("AAAAAAAA","TICKET DATE: "+thisTicket.getDate());
         if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
             ticketShop = getString(R.string.string_NoShop);
         }
@@ -152,7 +151,7 @@ public class BillViewer extends AppCompatActivity {
         setTitle(ticketTitle);
         TextView billLastMod = (TextView)findViewById(R.id.billDate);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        billLastMod.setText(formatter.format(ticketDate));
+        billLastMod.setText(formatter.format(thisTicket.getDate()));
 
         /*
         //ImageName

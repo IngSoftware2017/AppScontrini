@@ -398,7 +398,6 @@ public class BillActivity extends AppCompatActivity {
     public void printAllTickets(){
         list.clear();
         List<TicketEntity> ticketList = DB.getTicketsForMission(thisMission.getID());
-        TicketEntity t;
         int count = 0;
         for(int i = 0; i < ticketList.size(); i++){
             list.add(ticketList.get(i));

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,6 +82,7 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
         TextView ticketTitle = (TextView)convertView.findViewById(R.id.title);
         TextView ticketShop = (TextView)convertView.findViewById(R.id.shop);
         TextView tot = (TextView)convertView.findViewById(R.id.description);
+        CardView cardView = convertView.findViewById(R.id.ticketViewer);
 
         TicketEntity c = getItem(position);
         File photo = new File(c.getFileUri().toString().substring(7));
@@ -113,22 +115,20 @@ public class CustomAdapter extends ArrayAdapter<TicketEntity> {
                 .skipMemoryCache(true)
                 .into(img);
 
-        //For next ticket manages
-        convertView.setTag(c.getID());
-
+        cardView.setTag(c.getID());
         //Dal Maso
-        convertView.setOnClickListener(new View.OnClickListener(){
+        cardView.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                ticketID = Integer.parseInt(v.getTag().toString());
+                long ticketID = Integer.parseInt(v.getTag().toString());
+                Log.d("AAAAAAAAAAA","ID "+ticketID);
                 for(int i = 0; i < t.size(); i++){
                     if(t.get(i).getID() == ticketID){
                         TicketEntity thisTicket = t.get(i);
                         Intent startImageView = new Intent(context, com.example.nicoladalmaso.gruppo1.BillViewer.class);
                         startImageView.putExtra(IntentCodes.INTENT_TICKET_ID,ticketID);
                         File photo = new File(thisTicket.getFileUri().toString().substring(7));
-
                         //Start new activity
-                        //((BillActivity)context).startActivityForResult(startImageView, 4);
+                        context.startActivity(startImageView);
                         return;
                     }
                 }
