@@ -5,5 +5,12 @@
         android:id="@+id/action_OCRsettings"
         android:icon="@drawable/ic_settings_white_24px"
         android:title="@string/action_editTicket"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_infoDB"
+        android:icon="?android:attr/actionModeShareDrawable"
+        android:title="@string/titlePeople"
+        app:showAsAction="ifRoom" />
+
 </menu>

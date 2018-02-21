@@ -97,6 +97,12 @@ public class EditPerson extends AppCompatActivity{
      * set the values of the person
      */
     private void setPersonValues(){
+
+        Intent intent = getIntent();
+        personID = intent.getExtras().getLong("personID");
+        Log.d("personID", "Edit person "+personID);
+        thisPerson = DB.getPerson(personID);
+
         personName = thisPerson.getName();
         personLastName = thisPerson.getLastName();
         personAcademicTitle = thisPerson.getAcademicTitle();

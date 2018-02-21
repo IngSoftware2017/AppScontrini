@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="#DFDFDF"
     tools:context="com.example.nicoladalmaso.gruppo1.ApplicationSettings">
 
     <LinearLayout
@@ -18,11 +18,11 @@
             android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Qualità OCR"
-            android:textSize="20dp"
-            android:textColor="@color/white"
+            android:text="@string/set_OCRQuality"
+            android:textSize="20sp"
+            android:textColor="@color/black"
             android:layout_marginTop="20dp"
-            android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
             android:layout_marginBottom="5dp"/>
 
         <co.ceryle.radiorealbutton.RadioRealButtonGroup
@@ -87,10 +87,10 @@
             android:id="@+id/textView5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Correzione del totale"
-            android:textSize="20dp"
-            android:textColor="@color/white"
-            android:layout_marginLeft="3dp"
+            android:text="@string/set_Correction"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="3dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="5dp"/>
 
@@ -144,10 +144,10 @@
             android:id="@+id/textView6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ricerca foto capovolta"
-            android:textSize="20dp"
-            android:textColor="@color/white"
-            android:layout_marginLeft="3dp"
+            android:text="@string/set_PhRotation"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="3dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="5dp"/>
 
@@ -201,11 +201,11 @@
             android:id="@+id/textView7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Moneta"
-            android:textSize="20dp"
-            android:textColor="@color/white"
+            android:text="@string/set_Currency"
+            android:textSize="20sp"
+            android:textColor="@color/black"
             android:layout_marginTop="20dp"
-            android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
             android:layout_marginBottom="5dp"/>
 
         <co.ceryle.radiorealbutton.RadioRealButtonGroup
@@ -276,12 +276,13 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@android:color/background_light"
+        android:layout_marginEnd="16dp"
+        android:background="@color/colorPrimaryDark"
         android:clickable="true"
-        app:backgroundTint="@color/cardview_light_background"
-        app:srcCompat="@drawable/ic_done_primary" />
+        android:focusable="true"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:srcCompat="@drawable/ic_done_white" />
 
 </RelativeLayout>
