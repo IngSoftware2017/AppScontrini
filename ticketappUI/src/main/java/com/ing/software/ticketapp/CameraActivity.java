@@ -64,6 +64,7 @@ public class CameraActivity extends Activity {
                 size = sizes.get(i);
         }
         p.setPictureSize(size.width, size.height);
+        p.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
         mCamera.setParameters(p);
 

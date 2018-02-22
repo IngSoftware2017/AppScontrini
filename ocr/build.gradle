@@ -6,7 +6,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 3
-        versionName "2.1.0 Kokuhaku & My Dearest" //I can't choose only one
+        versionName "2.1.1 Kokuhaku & My Dearest" //I can't choose only one
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

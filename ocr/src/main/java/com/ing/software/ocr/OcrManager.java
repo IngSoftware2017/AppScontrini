@@ -309,15 +309,14 @@ public class OcrManager {
                     if (bestRestoredTicketScheme != null && bestRestoredTicketScheme.getScore() > 1) { //One hit necessary to accept restored value
                         if (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore()) {
                             bestTicketScheme = bestRestoredTicketScheme; //choose scheme with highest score.
+                            newTicket.errors.add(OcrError.TOTAL_EDITED);
                         }
                     }
-                    if (bestTicketScheme != null) {
-                        newTicket.total = bestTicketScheme.obj().getBestAmount().second; //10
-                        amountPriceText = bestTicketScheme.obj().getBestAmount().first; //10
-                        newTicket.errors.add(OcrError.TOTAL_EDITED);
-                    }
                 }
-
+                if (bestTicketScheme != null) {
+                    newTicket.total = bestTicketScheme.obj().getBestAmount().second; //10
+                    amountPriceText = bestTicketScheme.obj().getBestAmount().first; //10
+                }
                 ticket.containsCover = coverStrings.size() > 0;
                 if (amountPriceText != null) {
                     ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));
