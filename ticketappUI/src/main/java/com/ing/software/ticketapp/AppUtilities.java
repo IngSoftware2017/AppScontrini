@@ -1,31 +1,19 @@
 package com.ing.software.ticketapp;
 
 import android.animation.Animator;
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.view.inputmethod.InputMethodManager;
-
-import com.getkeepsafe.taptargetview.TapTarget;
-import com.getkeepsafe.taptargetview.TapTargetView;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 import static com.ing.software.ticketapp.BillActivity.rotateImage;
 
@@ -46,23 +34,15 @@ public class AppUtilities {
         SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
         try {
-
-
-            Log.d("dateOriginStart",start);
-
-            Log.d("dateOriginFinish",finish);
             Date in = basicFormat.parse(start);
             Date out = basicFormat.parse(finish);
-
             String newIn = formatCheck.format(in);
-            Log.d("dataModificataIn",newIn);
             String newOut = formatCheck.format(out);
-            Log.d("dataModificataOut",newOut);
             int before = Integer.parseInt(newIn);
             int then = Integer.parseInt(newOut);
-            if(before <= then)
+            if(before <= then) {
                 return true;
-
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -76,24 +56,18 @@ public class AppUtilities {
       * @return date with +1 about Month, on format dd/MM/yyyy
      */
     public static String addMonth(String date)
-    {        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
-                SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
-                String newDate="00000000";
-        try
-         {
-                Log.d("dateOrigin",date);
-                Date in = basicFormat.parse(date);
-                newDate = formatCheck.format(in);
-                Log.d("formatoData",newDate);
-                int temp = Integer.parseInt(newDate); // on this format, month is in the hundreds order
-                Log.d("meseAggiunto",temp+"");
-                newDate = temp+"";
-                in = formatCheck.parse(newDate);
-                newDate = basicFormat.format(in);
-                Log.d("formatoDataRestituito",newDate);
-
-        }
-        catch(ParseException e){
+    {
+        SimpleDateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formatCheck = new SimpleDateFormat("yyyyMMdd");
+        String newDate="00000000";
+        try {
+            Date in = basicFormat.parse(date);
+            newDate = formatCheck.format(in);
+            int temp = Integer.parseInt(newDate); // on this format, month is in the hundreds order
+            newDate = temp+"";
+            in = formatCheck.parse(newDate);
+            newDate = basicFormat.format(in);
+        } catch(ParseException e){
             Log.d("Error","Wrong date format");
         }
         return newDate;
@@ -107,10 +81,10 @@ public class AppUtilities {
     */
     public static  boolean checkIntervalDate(String start, String finish, String current)
     {
-        if(checkDate(start,current) && checkDate(current,finish))
+        if(checkDate(start,current) && checkDate(current,finish)) {
             return true;
-
-     return false;
+        }
+        return false;
     }
 
     public static Bitmap fromByteArrayToBitmap (byte[] data){
@@ -128,23 +102,17 @@ public class AppUtilities {
         Bitmap rotatedBitmap = img;
         try {
             ExifInterface ei = new ExifInterface(path);
-            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_UNDEFINED);
-
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
             switch (orientation) {
-
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     rotatedBitmap = rotateImage(img, 90);
                     break;
-
                 case ExifInterface.ORIENTATION_ROTATE_180:
                     rotatedBitmap = rotateImage(img, 180);
                     break;
-
                 case ExifInterface.ORIENTATION_ROTATE_270:
                     rotatedBitmap = rotateImage(img, 270);
                     break;
-
                 default:
                     rotatedBitmap = img;
             }

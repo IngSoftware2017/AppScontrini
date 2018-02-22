@@ -4,8 +4,6 @@ import android.util.Log;
 
 import java.util.Date;
 
-import database.DataManager;
-
 /**
  * Created by Nicola on 24/01/2018.
  */
@@ -19,6 +17,7 @@ public class Singleton {
     private byte[] pictureTaken; //it saves the system from another picture save (-2 sec in photo taking process)
     private Date startDate;
     private Date endDate;
+    private String currency;
     private int flag;
     private boolean flagStart;
     private Singleton(){
@@ -28,12 +27,12 @@ public class Singleton {
         pictureTaken = null;
         startDate = null;
         flag = 0;
+        currency = "";
     }
 
     public static synchronized Singleton getInstance(){
         if (mInstance == null) {
             mInstance = new Singleton();
-            Log.d("Nuovo singleton", "OK");
         }
         return mInstance;
     }
@@ -70,6 +69,7 @@ public class Singleton {
 
     public void setTakenPicure(byte[] value){
         pictureTaken = value;
+        Log.d("DATA SIZE:", pictureTaken.length + "");
     }
 
 
@@ -85,5 +85,24 @@ public class Singleton {
     public Date getEndDate(){return endDate;}
 
     public void setEndDate(Date end){endDate = end;}
+
+    public void setCurrency(String curr){
+        switch (curr){
+            case ("EUR"):
+                currency = "\u20ac";
+                break;
+            case ("USD"):
+                currency = "\u0024";
+                break;
+            case ("GBP"):
+                currency = "\u20a4";
+                break;
+            default:
+                currency = "\u20ac";
+                break;
+        }
+    }
+
+    public String getCurrency() {return currency;}
 
 }

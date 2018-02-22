@@ -8,7 +8,7 @@ import android.util.Pair;
 
 import com.ing.software.common.Scored;
 import com.ing.software.ocr.OcrObjects.OcrText;
-import com.ing.software.ocr.OcrObjects.TicketSchemes.TicketScheme;
+import com.ing.software.ocr.OcrObjects.TicketSchemes.*;
 import com.ing.software.ocr.OperativeObjects.AmountComparator;
 import com.ing.software.ocr.OperativeObjects.ListAmountOrganizer;
 import com.ing.software.ocr.OperativeObjects.RawImage;
@@ -161,6 +161,13 @@ public class OcrManager {
             10- set amount retrieving best ticket from amount comparator
              */
 
+            //Redo ocr on prices strip if enabled (must do it here to avoid overwriting total price, which has an optimized aspect ratio) //8
+            if (options.productsSearch == ProductsSearch.DEEP) {
+                RectF extendedRect = OcrUtils.extendRect(mainImage.getPricesRect(), 5, 10);
+                List<Scored<OcrText>> pricesTexts = analyzer.getTextsInStrip(procCopy, OcrUtils.imageToSize(mainImage), extendedRect);
+                mainImage.replaceTexts(pricesTexts, extendedRect);
+            }
+
             List<Scored<Pair<OcrText, Locale>>> amountStringsWithLocale = DataAnalyzer.findAmountStringTexts(texts); //1
             List<Scored<Pair<OcrText, Locale>>> subtotalStringsWithLocale = DataAnalyzer.findSubtotalStringTexts(texts); //1
             List<Scored<Pair<OcrText, Locale>>> cashStringsWithLocale = DataAnalyzer.findCashStringTexts(texts); //1
@@ -195,6 +202,7 @@ public class OcrManager {
                         if (options.totalSearch.ordinal() >= TotalSearch.DEEP.ordinal() && i <= maxScan) {
                             //Redo ocr on i element of list.
                             amountPrices = analyzer.getTextsInStrip(procCopy, OcrUtils.imageToSize(mainImage), amountStringText, stripBoundingBox);//4
+                            mainImage.replaceTexts(amountPrices, stripBoundingBox);
                         } else {
                             //Search total price using current texts
                             amountPrices = analyzer.getOrigTexts(amountStringText, stripBoundingBox);
@@ -202,14 +210,35 @@ public class OcrManager {
                         //set target texts (prices) to source text (containing total string)
                         amountList.get(i).setAmountTargetTexts(amountPrices); //5
                         AmountComparator amountComparator;
-                        Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), false); //6
-                        //todo: Redo ocr on prices strip if enabled //8
+                        Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(amountList.get(i).getTargetTexts(), editTotal); //6
                         if (amountT != null && newTicket.total == null) {
                             newTicket.total = amountT.second; //BigDecimal containing total price
                             amountPriceText = amountT.first; //Text containing total price
-                            //todo: Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
-                            amountComparator = new AmountComparator(newTicket.total, amountT.first, mainImage); //9
-                            bestTicketScheme = amountComparator.getBestAmount(!editTotal); //editTotal == false => total is not overwritten, only scheme with a complete
+                            //Initialize amount comparator with specific schemes if 'contante'/'resto'/'subtotale' are found
+                            List<TicketScheme> schemes = new ArrayList<>();
+                            if (!subtotalStrings.isEmpty() || !changeStrings.isEmpty()) { // may miss one of the two, accept anyway
+                                schemes.add(new TicketSchemeIT_PSCC(new Pair<>(amountT.first, newTicket.total),
+                                        AmountComparator.getAboveTotalPrices(amountT.first, mainImage), AmountComparator.getBelowTotalPrices(amountT.first, mainImage)));
+                                OcrUtils.log(2, "MAN.AmountComparator", "Adding scheme: PSCC");
+                            }
+                            if (!subtotalStrings.isEmpty()) {
+                                schemes.add(new TicketSchemeIT_PSC(new Pair<>(amountT.first, newTicket.total),
+                                        AmountComparator.getAboveTotalPrices(amountT.first, mainImage), AmountComparator.getBelowTotalPrices(amountT.first, mainImage)));
+                                OcrUtils.log(2, "MAN.AmountComparator", "Adding scheme: PSC");
+                            }
+                            if (!changeStrings.isEmpty()) {
+                                schemes.add(new TicketSchemeIT_PCC(new Pair<>(amountT.first, newTicket.total),
+                                        AmountComparator.getAboveTotalPrices(amountT.first, mainImage), AmountComparator.getBelowTotalPrices(amountT.first, mainImage)));
+                                OcrUtils.log(2, "MAN.AmountComparator", "Adding scheme: PCC");
+                            }
+                            if (!schemes.isEmpty()) {
+                                OcrUtils.log(2, "", "Using custom amount comparator");
+                                amountComparator = new AmountComparator(schemes);
+                            } else {
+                                OcrUtils.log(2, "", "Using default amount comparator");
+                                amountComparator = new AmountComparator(newTicket.total, amountT.first, mainImage); //9
+                            }
+                            bestTicketScheme = amountComparator.getBestAmount(!editTotal); //editTotal == false => total is not overwritten, only scheme with a complete match has score > 1
                             if (bestTicketScheme != null) {
                                 OcrUtils.log(2, "MANAGER.Comparator", "Best amount is: " + bestTicketScheme.obj().getBestAmount().second.setScale(2, RoundingMode.HALF_UP) +
                                         "\nwith scheme: " + bestTicketScheme.obj().toString() + "\nand score: " + bestTicketScheme.getScore());
@@ -222,7 +251,29 @@ public class OcrManager {
                             Pair<OcrText, BigDecimal> restoredAmountT = DataAnalyzer.getRestoredAmount(amountList.get(i).getTargetTexts()); //7
                             if (restoredAmountT != null && bestRestoredTicketScheme == null) { //Do not find a new restored amount if one is already saved
                                 restoredAmount = restoredAmountT.second; //BigDecimal containing total price
-                                amountComparator = new AmountComparator(restoredAmount, restoredAmountT.first, mainImage); //9
+                                List<TicketScheme> schemes = new ArrayList<>();
+                                if (!subtotalStrings.isEmpty() || !changeStrings.isEmpty()) { // may miss one of the two, accept anyway
+                                    schemes.add(new TicketSchemeIT_PSCC(new Pair<>(restoredAmountT.first, restoredAmount),
+                                            AmountComparator.getAboveTotalPrices(restoredAmountT.first, mainImage), AmountComparator.getBelowTotalPrices(restoredAmountT.first, mainImage)));
+                                    OcrUtils.log(2, "MAN.AmountComparator", "Adding scheme: PSCC");
+                                }
+                                if (!subtotalStrings.isEmpty()) {
+                                    schemes.add(new TicketSchemeIT_PSC(new Pair<>(restoredAmountT.first, restoredAmount),
+                                            AmountComparator.getAboveTotalPrices(restoredAmountT.first, mainImage), AmountComparator.getBelowTotalPrices(restoredAmountT.first, mainImage)));
+                                    OcrUtils.log(2, "MAN.AmountComparator", "Adding scheme: PSC");
+                                }
+                                if (!changeStrings.isEmpty()) {
+                                    schemes.add(new TicketSchemeIT_PCC(new Pair<>(restoredAmountT.first, restoredAmount),
+                                            AmountComparator.getAboveTotalPrices(restoredAmountT.first, mainImage), AmountComparator.getBelowTotalPrices(restoredAmountT.first, mainImage)));
+                                    OcrUtils.log(2, "MAN.AmountComparator", "Adding scheme: PCC");
+                                }
+                                if (!schemes.isEmpty()) {
+                                    OcrUtils.log(2, "", "Using custom restored amount comparator");
+                                    amountComparator = new AmountComparator(schemes);
+                                } else {
+                                    OcrUtils.log(2, "", "Using default restored amount comparator");
+                                    amountComparator = new AmountComparator(restoredAmount, restoredAmountT.first, mainImage); //9
+                                }
                                 bestRestoredTicketScheme = amountComparator.getBestAmount(false); //editTotal true => can correct the result
                                 if (bestRestoredTicketScheme != null) {
                                     OcrUtils.log(2, "MANAGER.Comparator", "Best restored amount is: " + bestRestoredTicketScheme.obj().getBestAmount().second.setScale(2, RoundingMode.HALF_UP) +
@@ -234,13 +285,13 @@ public class OcrManager {
                             break;
                         ++i;
                     }
-                } else if (options.priceEditing == PriceEditing.ALLOW_LOOSE) {
+                } else if (options.priceEditing == PriceEditing.ALLOW_VOID) {
                     //No matching word for total string. Try to find a price
                     List<Scored<OcrText>> possiblePrices = Stream.of(mainImage.getPricesTexts())
                             .map(price -> new Scored<>(ScoreFunc.getAmountScore(new Scored<>(0, price), mainImage), price))
                             .toList();
-                    OcrUtils.log(2, "", "NO STRING FOR TOTAL FOUND");
-                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(possiblePrices, false);
+                    OcrUtils.log(2, "", "NO STRING FOR TOTAL FOUND\nPASSING TO VOID SEARCH");
+                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(possiblePrices, true);
                     if (amountT != null && newTicket.total == null) {
                         AmountComparator amountComparator = new AmountComparator(amountT.second, amountT.first, mainImage); //9
                         Scored<TicketScheme> tempTicketScheme = amountComparator.getBestAmount(false);
@@ -255,19 +306,17 @@ public class OcrManager {
                     }
                 }
                 if (editTotal) {
-                    if (bestRestoredTicketScheme != null) {
-                        //if (bestRestoredTicketScheme.getScore() > 1 && (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore())) { //This '1' will be changed later. Accept restored only if there is at least 1 hit
+                    if (bestRestoredTicketScheme != null && bestRestoredTicketScheme.getScore() > 1) { //One hit necessary to accept restored value
                         if (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore()) {
                             bestTicketScheme = bestRestoredTicketScheme; //choose scheme with highest score.
+                            newTicket.errors.add(OcrError.TOTAL_EDITED);
                         }
                     }
-                    if (bestTicketScheme != null) {
-                        newTicket.total = bestTicketScheme.obj().getBestAmount().second; //10
-                        amountPriceText = bestTicketScheme.obj().getBestAmount().first; //10
-                        newTicket.errors.add(OcrError.TOTAL_EDITED);
-                    }
                 }
-
+                if (bestTicketScheme != null) {
+                    newTicket.total = bestTicketScheme.obj().getBestAmount().second; //10
+                    amountPriceText = bestTicketScheme.obj().getBestAmount().first; //10
+                }
                 ticket.containsCover = coverStrings.size() > 0;
                 if (amountPriceText != null) {
                     ticket.totalRect = ImageProcessor.normalizeCoordinates(amountPriceText.box(), size(frame));

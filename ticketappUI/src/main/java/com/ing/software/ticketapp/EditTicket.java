@@ -5,31 +5,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import database.DataManager;
 import database.MissionEntity;
 import database.TicketEntity;
-
 
 public class EditTicket extends AppCompatActivity {
 
@@ -125,12 +118,8 @@ public class EditTicket extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                if(txtShop.getText().toString().replace(" ","").compareTo("") != 0) {
-                    thisTicket.setShop(txtShop.getText().toString());
-                }
-
+                thisTicket.setShop(txtShop.getText().toString());
                 thisTicket.setTagPlaces(Short.parseShort(txtPeople.getText().toString()));
-
                 thisTicket.setRefundable(checkRefund.isChecked());
 
                 /**
@@ -224,7 +213,7 @@ public class EditTicket extends AppCompatActivity {
         txtAmount.setText(ticketAmount);
         txtPeople.setText(ticketPeople);
         if(thisTicket.isRefundable()){
-            checkRefund.isChecked();
+            checkRefund.setChecked(true);
         }
     }
 }

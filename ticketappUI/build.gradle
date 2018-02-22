@@ -10,7 +10,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 3
-        versionName "2.0.1 Euterpe"
+        versionName "2.1.1 Il ballo di Simone"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true

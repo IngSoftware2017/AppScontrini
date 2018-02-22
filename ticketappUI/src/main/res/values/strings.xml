@@ -19,8 +19,8 @@
     <string name="location">Luogo</string>
     <string name="noMissions">Nessuna missione aperta\nClicca sul pulsante + per iniziare</string>
     <string name="noMissionsClosed">Nessuna missione chiusa</string>
-    <string name="noBills">Nessun scontrino disponibile</string>
-    <string name="noBillsOpen">\nClicca sul pulsante + per iniziare</string>
+    <string name="noBills">Nessuno scontrino disponibile</string>
+    <string name="noBillsOpen">\nClicca sul pulsante foto per iniziare</string>
     <string name="noAcademicTitle">Nessun titolo accademico</string>
     <string name="noPeople">Nessuna persona registrata\nClicca sul pulsante + per iniziare</string>
     <string name="dateStart">Data inizio</string>
@@ -33,6 +33,11 @@
     <string name="ticketAddDesc">Aggiungi un nuovo scontrino, inizia subito scattando una foto</string>
     <string name="missionAddTitle">Ci sei quasi!</string>
     <string name="missionAddDesc">1) Clicca qui per creare una nuova missione\n2) Una volta creata esegui uno swipe verso sinistra sulla casella se vuoi modificarla</string>
+    <string name="dateTicketMin">Data minore dell\u0027inizio missione</string>
+    <string name="dateTicketMax">Data maggiore del termine missione</string>
+    <string name="settings">Impostazioni</string>
+    <string name="missionOf">Missione di</string>
+    <string name="downLibrary">Scarico la libreria...</string>
     <!--lazzarin-->
     <string name="newMission">Nuova missione</string>
     <string name="newPerson">Nuova persona</string>
@@ -51,7 +56,9 @@
     <string name="toast_errorDate">Inizio > Fine</string>
     <string name="toast_noDataStart">Data di inizio mancante</string>
     <string name="toast_noDataFinish">Data di fine mancante</string>
-    <string name="toast_errorIntervalDate">data non presente nella missione</string>
+    <string name="toast_errorIntervalDate">Data non presente nella missione</string>
+    <string name="refundable">Rimborsabile</string>
+    <string name="nonRefundable">Non rimborsabile</string>
     <!--Piccolo-->
     <string name="text_isRepaid">La missione è stata archiviata?</string>
     <string name="title_activity_missions_tabbed">MissionsTabbed</string>
@@ -62,7 +69,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_Ticket">Scontrino</string>
     <string name="string_NoShop">Negozio non impostato</string>
-    <string name="string_NoAmount">NaN</string>
+    <string name="string_NoAmount">Null</string>
     <string name="string_NoAmountFull">Numero non rilevato</string>
     <string name="string_Total">Totale: </string>
     <string name="string_Euros">€</string>

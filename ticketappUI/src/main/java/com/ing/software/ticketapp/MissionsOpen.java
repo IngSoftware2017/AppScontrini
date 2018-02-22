@@ -1,24 +1,13 @@
 package com.ing.software.ticketapp;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,7 +20,6 @@ import java.util.List;
 import database.DataManager;
 import database.MissionEntity;
 import database.PersonEntity;
-import database.TicketEntity;
 
 public class MissionsOpen extends Fragment {
 
@@ -61,7 +49,6 @@ public class MissionsOpen extends Fragment {
                 AppUtilities.circularReveal(myView, cx, cy);
                 Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                 addMission.putExtra("person", personID);
-                Log.d("PersonID", ""+personID);
                 startActivityForResult(addMission, 1);
             }
         });
@@ -72,7 +59,6 @@ public class MissionsOpen extends Fragment {
 
         listView = (ListView)rootView.findViewById(R.id.listMission);
         personID = getArguments().getInt("personID", 0);
-        Log.d("TAB1", ""+personID);
 
         printAllMissions();
         return rootView;
@@ -139,7 +125,6 @@ public class MissionsOpen extends Fragment {
                     AppUtilities.circularReveal(myView, cx, cy);
                     Intent addMission = new Intent(v.getContext(), AddNewMission.class);
                     addMission.putExtra("person", personID);
-                    Log.d("PersonID", ""+personID);
                     startActivityForResult(addMission, 1);
                 }
             }

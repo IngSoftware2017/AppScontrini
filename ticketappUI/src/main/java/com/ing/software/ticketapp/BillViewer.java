@@ -5,53 +5,34 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Debug;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.ing.software.ocr.ImageProcessor;
-import com.ing.software.ocr.OcrManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 import database.DataManager;
-import database.MissionEntity;
 import database.TicketEntity;
 
 public class BillViewer extends AppCompatActivity {
@@ -93,21 +74,23 @@ public class BillViewer extends AppCompatActivity {
         thisTicket = DB.getTicket(ticketId);
         ticketPath = thisTicket.getFileUri().toString().substring(7);
         ticketPeople = ""+thisTicket.getTagPlaces();
-        ticketTitle = thisTicket.getTitle();
+        if(thisTicket.getTitle().replace(" ", "").length() == 0){
+            ticketTitle = getResources().getString(R.string.title_Ticket);
+        } else {
+            ticketTitle = thisTicket.getTitle();
+        }
         ticketDate = thisTicket.getDate();
         if(thisTicket.getShop() == null || thisTicket.getShop().trim().compareTo("") == 0){
             ticketShop = getString(R.string.string_NoShop);
-        }
-        else {
+        } else {
             ticketShop = thisTicket.getShop();
         }
         if(thisTicket.getAmount() == null || thisTicket.getAmount().compareTo(new BigDecimal(0.00, MathContext.DECIMAL64)) <= 0){
             ticketAmount = getString(R.string.string_NoAmountFull);
             ticketAmountUn = getString(R.string.string_NoAmountFull);
-        }
-        else {
-            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
-            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " €";
+        } else {
+            ticketAmount = thisTicket.getAmount().setScale(2, RoundingMode.HALF_EVEN).toString() +  Singleton.getInstance().getCurrency();
+            ticketAmountUn = thisTicket.getPricePerson().setScale(2, RoundingMode.HALF_EVEN).toString() + " " + Singleton.getInstance().getCurrency();
         }
 
         //Title
@@ -208,7 +191,6 @@ public class BillViewer extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Result", ""+requestCode);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case(TICKET_MOD):
@@ -240,7 +222,6 @@ public class BillViewer extends AppCompatActivity {
                 toDelete = thisTicket.getFileUri().toString().substring(7);
                 final File ticketDelete = new File(toDelete);
                 final File ticketDeleteOriginal = new File (toDelete+"orig");
-                Log.d("TicketID", ""+ticketId);
                 if(DB.deleteTicket(ticketId) && ticketDelete.delete() && ticketDeleteOriginal.delete()){
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);

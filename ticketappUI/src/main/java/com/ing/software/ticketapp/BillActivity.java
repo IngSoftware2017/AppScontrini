@@ -3,13 +3,10 @@ package com.ing.software.ticketapp;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -19,22 +16,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -100,13 +91,13 @@ public class BillActivity extends AppCompatActivity {
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(thisMission.getName());
-        ab.setSubtitle("Missione di "+thisPerson.getName()+" "+thisPerson.getLastName());
+        ab.setSubtitle(getResources().getString(R.string.missionOf)+" "+thisPerson.getName()+" "+thisPerson.getLastName());
 
         ocrManager = new OcrManager();
         while (ocrManager.initialize(this) != 0) { // 'this' is the context
             try {
                 //On first run vision library will be downloaded
-                Toast.makeText(this, "Downloading library...", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.downLibrary), Toast.LENGTH_LONG).show();
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -193,22 +184,24 @@ public class BillActivity extends AppCompatActivity {
      * Se non sono presenti ticket mostra come aggiungerli
      */
     public void showGuide(){
-        TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab), getResources().getString(R.string.ticketAddTitle), getResources().getString(R.string.ticketAddDesc))
-            .targetCircleColor(R.color.white)
-            .titleTextSize(20)
-            .titleTextColor(R.color.white)
-            .descriptionTextSize(10)
-            .descriptionTextColor(R.color.white)
-            .textColor(R.color.white)
-            .icon(getResources().getDrawable(R.mipmap.ic_camera_white_24dp)),
-            new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
-                @Override
-                public void onTargetClick(TapTargetView view) {
-                    super.onTargetClick(view);      // This call is optional
-                    takePhotoIntent();
-                }
-            }
-        );
+        if(!thisMission.isClosed()) {
+            TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab), getResources().getString(R.string.ticketAddTitle), getResources().getString(R.string.ticketAddDesc))
+                            .targetCircleColor(R.color.white)
+                            .titleTextSize(21)
+                            .titleTextColor(R.color.white)
+                            .descriptionTextSize(13)
+                            .descriptionTextColor(R.color.white)
+                            .textColor(R.color.white)
+                            .icon(getResources().getDrawable(R.mipmap.ic_camera_white_24dp)),
+                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);      // This call is optional
+                            takePhotoIntent();
+                        }
+                    }
+            );
+        }
     }
 
     /** Dal Maso

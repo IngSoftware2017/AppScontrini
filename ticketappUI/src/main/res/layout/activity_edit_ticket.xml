@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:focusableInTouchMode="true"
     tools:context="com.ing.software.ticketapp.EditTicket">
 
     <LinearLayout
@@ -29,6 +30,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:hint="@string/name"
+                android:maxLength="30"
+                android:maxLines="1"
                 android:inputType="textCapSentences"
                 android:singleLine="true"
                 android:textColor="#FFF"
@@ -75,6 +78,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/shop"
+                        android:maxLength="30"
+                        android:maxLines="1"
                         android:inputType="textCapSentences"
                         android:textColor="#666"
                         android:textSize="20dp" />
@@ -111,6 +116,8 @@
                         android:layout_height="wrap_content"
                         android:digits="0123456789."
                         android:hint="@string/total"
+                        android:maxLength="9"
+                        android:maxLines="1"
                         android:inputType="numberDecimal"
                         android:textColor="#666"
                         android:textSize="20dp" />
@@ -145,8 +152,10 @@
                         android:id="@+id/input_ticketPersonNumber"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:digits="123456789"
+                        android:digits="0123456789"
                         android:hint="Numero persone"
+                        android:maxLength="2"
+                        android:maxLines="1"
                         android:inputType="number"
                         android:textColor="#666"
                         android:textSize="20dp" />
