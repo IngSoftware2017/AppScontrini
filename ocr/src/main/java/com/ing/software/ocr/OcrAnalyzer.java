@@ -29,7 +29,7 @@ public class OcrAnalyzer {
 
     // ideal character width / height
     private static final double CHAR_ASPECT_RATIO = 5. / 8.;
-    private static final float AMOUNT_RECT_HEIGHT_EXTENDER = 0.8f; //Extend height of source amount text. Used in OcrAnalyzer.getAmountExtendedBox()
+    private static final float AMOUNT_RECT_HEIGHT_EXTENDER = 0.7f; //Extend height of source amount text. Used in OcrAnalyzer.getAmountExtendedBox()
     private static final float PRODUCT_RECT_HEIGHT_EXTENDER = 0.5f; //Extend height of source text of product price. Used when trying to find products from prices.
 
     private TextRecognizer ocrEngine = null;

@@ -26,6 +26,7 @@ import com.ing.software.ocr.OcrTicket;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -212,7 +213,6 @@ public class CheckPhotoActivity extends Activity {
                         } else {
                             dateTicket = ticketMission.getStartDate();
                         }
-                        waitOCR.setVisibility(View.INVISIBLE);
                     }
                 });
                 OCR_result = result;
@@ -220,6 +220,7 @@ public class CheckPhotoActivity extends Activity {
         } catch (Exception e) {
             Log.d("OCR_ERROR ", e.toString());
         }
+        waitOCR.setVisibility(View.INVISIBLE);
         //enable save button
         btnOK.setClickable(true);
     }

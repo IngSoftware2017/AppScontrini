@@ -291,7 +291,7 @@ public class OcrManager {
                             .map(price -> new Scored<>(ScoreFunc.getAmountScore(new Scored<>(0, price), mainImage), price))
                             .toList();
                     OcrUtils.log(2, "", "NO STRING FOR TOTAL FOUND\nPASSING TO VOID SEARCH");
-                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(possiblePrices, false);
+                    Pair<OcrText, BigDecimal> amountT = DataAnalyzer.getMatchingAmount(possiblePrices, true);
                     if (amountT != null && newTicket.total == null) {
                         AmountComparator amountComparator = new AmountComparator(amountT.second, amountT.first, mainImage); //9
                         Scored<TicketScheme> tempTicketScheme = amountComparator.getBestAmount(false);
@@ -306,8 +306,7 @@ public class OcrManager {
                     }
                 }
                 if (editTotal) {
-                    if (bestRestoredTicketScheme != null && bestRestoredTicketScheme.getScore() > 1) {
-                        //if (bestRestoredTicketScheme.getScore() > 1 && (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore())) { //This '1' will be changed later. Accept restored only if there is at least 1 hit
+                    if (bestRestoredTicketScheme != null && bestRestoredTicketScheme.getScore() > 1) { //One hit necessary to accept restored value
                         if (bestTicketScheme == null || bestRestoredTicketScheme.getScore() > bestTicketScheme.getScore()) {
                             bestTicketScheme = bestRestoredTicketScheme; //choose scheme with highest score.
                         }
